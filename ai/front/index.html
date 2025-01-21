@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>웹캠 캡처 및 분석</title>
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .video-section {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        #video, #canvas {
+            border: 1px solid #ccc;
+        }
+        #processedImage {
+            max-width: 100%;
+            border: 1px solid blue;
+        }
+        #connection-status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>웹캠 캡처 및 분석</h1>
+        <div id="connection-status">연결 상태: 연결 중...</div>
+        
+        <div class="video-section">
+            <div>
+                <h3>웹캠</h3>
+                <video id="video" width="640" height="480" autoplay></video>
+            </div>
+            <div>
+                <h3>캡처된 이미지</h3>
+                <canvas id="canvas" width="640" height="480"></canvas>
+            </div>
+        </div>
+        
+        <button id="capture">자동 캡처 시작</button>
+        <button id="stop">멈춤</button>
+        
+        <div>
+            <h3>분석 결과</h3>
+            <div id="counts"></div>
+            <img id="processedImage" alt="처리된 이미지">
+        </div>
+    </div>
+
+    <script>
+    let nIntervId;
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    const sendBtn = document.getElementById('capture');
+    const stopBtn = document.getElementById('stop');
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        websocket = new WebSocket("ws://localhost:8005/ws");
+
+        websocket.onopen = onOpen;
+        websocket.onmessage = onMessage;
+        websocket.onclose = onClose;
+        
+        navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+        })
+        .catch(error => {
+            console.error('웹캠을 사용할 수 없습니다:', error);
+        });
+
+        // stopBtn에 대한 이벤트 리스너 추가
+        stopBtn.addEventListener("click", stopCapture);
+    });
+
+    // 메세지를 보낸다
+    function send() {
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = canvas.toDataURL('image/png');
+
+        try {
+            websocket.send(imageData);
+            console.log("이미지 전송 완료");
+        } catch (error) {
+            console.error("이미지 전송 중 오류:", error);
+        }
+    }
+
+    function startCapture() {
+        if (!nIntervId) {
+            nIntervId = setInterval(send, 33); // send() 호출 간격 설정
+        }
+    }
+
+    function stopCapture() {
+        clearInterval(nIntervId);
+        nIntervId = null; // intervalID 초기화
+        websocket.close();
+        console.log("종료");
+    }
+
+    //채팅창에서 나갔을 때
+    function onClose(event) {
+        websocket.close();
+    }
+
+    // 채팅창에 들어왔을 때
+    function onOpen(event) {
+        // 웹소켓 연결되면 전송 버튼 기능 활성화
+        sendBtn.addEventListener("click", startCapture); // startCapture 함수에 대한 이벤트 리스너 추가
+    }
+
+    // 메세지를 받았을 때
+    function onMessage(receiveMsg) {
+        console.log(receiveMsg);
+    }
+    </script>
+</body>
+</html>
