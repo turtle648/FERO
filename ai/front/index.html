@@ -38,14 +38,14 @@
 <body>
     <div class="container">
         <h1>웹캠 캡처 및 분석</h1>
-        <div id="connection-status">연결 상태: 연결 중...</div>
+        <div id="connection-status">status: <span id="result"></span></div>
         
         <div class="video-section">
             <div>
                 <h3>웹캠</h3>
                 <video id="video" width="640" height="480" autoplay></video>
             </div>
-            <div>
+            <div style="display: none;">
                 <h3>캡처된 이미지</h3>
                 <canvas id="canvas" width="640" height="480"></canvas>
             </div>
@@ -68,9 +68,10 @@
     const context = canvas.getContext('2d');
     const sendBtn = document.getElementById('capture');
     const stopBtn = document.getElementById('stop');
-    
+    const result = document.getElementById('result');
+
     document.addEventListener("DOMContentLoaded", function () {
-        websocket = new WebSocket("ws://localhost:8005/ws");
+        websocket = new WebSocket("ws://localhost:8006/ws");
 
         websocket.onopen = onOpen;
         websocket.onmessage = onMessage;
@@ -128,6 +129,7 @@
     // 메세지를 받았을 때
     function onMessage(receiveMsg) {
         console.log(receiveMsg);
+        result.innerHTML = receiveMsg.data
     }
     </script>
 </body>
