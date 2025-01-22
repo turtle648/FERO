@@ -1,6 +1,8 @@
 package com.ssafy.api.service;
 
+import com.ssafy.api.request.UserCharacterRegisterPostReq;
 import com.ssafy.db.entity.User;
+import com.ssafy.db.entity.UserCharacter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,12 +35,19 @@ public class UserServiceImpl implements UserService {
 		user.setUserPassword(passwordEncoder.encode(userRegisterInfo.getPassword()));
 		user.setUserName(userRegisterInfo.getUserName());
 		user.setUserEmail(userRegisterInfo.getUserEmail());
-		user.setUserNickname(userRegisterInfo.getUserNickname());
-		user.setGender(userRegisterInfo.getGender());
 		user.setPhoneNumber(userRegisterInfo.getPhoneNumber());
 
 		return userRepository.save(user);
 	}
+
+//	public UserCharacter createCharacter(UserCharacterRegisterPostReq userCharacterInfo){
+//		UserCharacter usercharacter = new UserCharacter();
+//
+//		usercharacter.setUserNickname(userCharacterInfo.getUserNickname());
+//		usercharacter.setGender(userCharacterInfo.getGender());
+//
+//		return userRepository.save(usercharacter);  // 올바른 레포지토리 사용
+//	}
 
 	@Override
 	public User getUserByUserId(String userId) {
