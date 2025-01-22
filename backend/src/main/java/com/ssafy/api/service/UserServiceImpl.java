@@ -2,7 +2,6 @@ package com.ssafy.api.service;
 
 import com.ssafy.api.request.UserCharacterRegisterPostReq;
 import com.ssafy.db.entity.User;
-import com.ssafy.db.entity.UserCharacter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
