@@ -20,6 +20,8 @@ public class UserCharacterServiceImpl implements UserCharacterService{
     public UserCharacter createUserCharacter(UserCharacterRegisterPostReq userCharacterRegisterInfo) {
         UserCharacter usercharacter = new UserCharacter();
 
+
+        usercharacter.setUserId(userCharacterRegisterInfo.getUserId());
         usercharacter.setUserNickname(userCharacterRegisterInfo.getUserNickname());
         usercharacter.setGender(userCharacterRegisterInfo.getGender());
 
