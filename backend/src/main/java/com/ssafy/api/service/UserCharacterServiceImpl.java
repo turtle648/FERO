@@ -11,17 +11,15 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service("userCharacterService")
-public class UserCharacterServiceImpl implements UserCharacterService{
+public class UserCharacterServiceImpl implements UserCharacterService {
 
     @Autowired
     UserCharacterRepository userCharacterRepository;
 
-
-    public UserCharacter createUserCharacter(UserCharacterRegisterPostReq userCharacterRegisterInfo) {
+    public UserCharacter createUserCharacter(UserCharacterRegisterPostReq userCharacterRegisterInfo, User user) {
         UserCharacter usercharacter = new UserCharacter();
 
-
-        usercharacter.setUserId(userCharacterRegisterInfo.getUserId());
+        usercharacter.setUserInfo(user);
         usercharacter.setUserNickname(userCharacterRegisterInfo.getUserNickname());
         usercharacter.setGender(userCharacterRegisterInfo.getGender());
 

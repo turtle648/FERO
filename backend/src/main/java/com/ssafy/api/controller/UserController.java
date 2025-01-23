@@ -1,6 +1,7 @@
 package com.ssafy.api.controller;
 
 import com.ssafy.api.request.UserCharacterRegisterPostReq;
+import com.ssafy.api.service.RegistrationService;
 import com.ssafy.api.service.UserCharacterService;
 import com.ssafy.db.entity.User;
 import com.ssafy.db.entity.UserCharacter;
@@ -36,6 +37,9 @@ public class UserController {
 	@Autowired
     UserCharacterService userCharacterService;
 
+    @Autowired
+    private RegistrationService registrationService;
+
 
     @PostMapping()
     @ApiOperation(value = "회원 가입", notes = "회원가입")
@@ -45,23 +49,23 @@ public class UserController {
             @ApiResponse(code = 404, message = "사용자 없음"),
             @ApiResponse(code = 500, message = "서버 오류")
     })
-    public ResponseEntity<? extends BaseResponseBody> register(
+    public ResponseEntity<? extends BaseResponseBody> saveUserInfo(
             @RequestBody @ApiParam(value = "회원가입 정보", required = true) UserRegisterPostReq registerInfo) {
 
-        //임의로 리턴된 User 인스턴스. 현재 코드는 회원 가입 성공 여부만 판단하기 때문에 굳이 Insert 된 유저 정보를 응답하지 않음.
-        User user = userService.createUser(registerInfo);
+        String sessionId = registrationService.initializeRegistration(registerInfo);
 
-        return ResponseEntity.status(200).body(BaseResponseBody.of(200, "Success"));
+        return ResponseEntity.status(200).body(BaseResponseBody.of(200, sessionId));
     }
 
     @PostMapping("/character")
     @ApiOperation(value = "캐릭터 정보입력", notes = "닉네임을 지을 수 있고, 캐릭터의 성별을 결정할 수 있다.")
     public ResponseEntity<? extends BaseResponseBody> CharacterRegister(
+            @RequestParam @ApiParam(value = "세션 ID", required = true) String sessionId,
             @RequestBody @ApiParam(value = "캐릭터 정보", required = true) UserCharacterRegisterPostReq characterRegisterinfo) {
 
-        UserCharacter usercharacter = userCharacterService.createUserCharacter(characterRegisterinfo);
+        registrationService.completeRegistration(sessionId, characterRegisterinfo);
 
-        return ResponseEntity.status(200).body(BaseResponseBody.of(200, "Success"));
+        return ResponseEntity.status(200).body(BaseResponseBody.of(200, "Join Success"));
     }
 
 

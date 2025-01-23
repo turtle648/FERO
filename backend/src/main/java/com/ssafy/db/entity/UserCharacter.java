@@ -16,8 +16,8 @@ import javax.persistence.*;
 @Table(name = "user_character")
 public class UserCharacter extends BaseEntity{
 
-    @Column(name ="user_id", unique = true, nullable = false)
-    private String userId;
+//    @Column(name ="user_id", unique = true, nullable = false)
+//    private String userId;
 
     @Column(nullable = false)
     private char gender;
@@ -38,6 +38,6 @@ public class UserCharacter extends BaseEntity{
     private Short points;
 
     @OneToOne
-    @JoinColumn(name = "user_info", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
     private User userInfo;
 }
