@@ -29,10 +29,11 @@ const router = createRouter({
 
 // 네비게이션 가드 설정
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem('authToken')
   
   if (to.meta.requiresAuth && !token) {
-    next('/login')
+    next('/start')
+    console.log('토큰 없어서 start페이지로 돌아감:)')
   } else {
     next()
   }
