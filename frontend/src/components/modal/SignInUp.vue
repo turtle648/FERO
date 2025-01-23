@@ -46,23 +46,23 @@
             </div>
             <div>
               <label for="signup-password">Password</label>
-              <input
-                type="password"
-                id="signup-password"
-                v-model="password"
-                placeholder="Enter your password"
-                required
-              />
+              <input type="password" id="signup-password" v-model="password" placeholder="Enter your password" required />
             </div>
             <div>
               <label for="confirm-password">Confirm Password</label>
-              <input
-                type="password"
-                id="confirm-password"
-                v-model="confirmPassword"
-                placeholder="Confirm your password"
-                required
-              />
+              <input type="password" id="confirm-password" v-model="confirmPassword" placeholder="Confirm your password" required />
+            </div>
+            <div>
+              <label for="user-email">Email</label>
+              <input type="email" id="user-email" v-model="email" placeholder="Enter your email" required />
+            </div>
+            <div>
+              <label for="user-phone">Phone Number</label>
+              <input type="text" id="user-phone" v-model="phone" placeholder="Enter your phone number" required />
+            </div>
+            <div>
+              <label for="user-name">Name</label>
+              <input type="text" id="user-name" v-model="name" placeholder="Enter your name" required />
             </div>
             <div>
               <button type="submit">Sign Up</button>
@@ -88,10 +88,13 @@
   // 로그인/회원가입 모드 상태
   const isSignUpMode = ref(false)
   
-  // 아이디, 비밀번호 상태
+  // 사용자 입력 상태
   const id = ref('')
   const password = ref('')
   const confirmPassword = ref('')
+  const email = ref('')
+  const phone = ref('')
+  const name = ref('')
   
   // 라우터 사용
   const router = useRouter()
@@ -118,7 +121,35 @@
   
   // 회원가입 폼 제출 처리
   const handleSignUp = async () => {
-    alert('회원가입 완료!')
+    // 회원가입 요청 데이터
+    const requestData = {
+      userId: id.value,
+      password: password.value,
+      userEmail: email.value,
+      phoneNumber: phone.value,
+      userName: name.value
+    }
+  
+    try {
+      // Spring Boot API 호출 (이 부분은 실제 API 호출로 변경 필요)
+      const response = await fetch('/api/v1/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      })
+  
+      if (response.ok) {
+        alert('회원가입 완료!')
+        closeSignUp()
+      } else {
+        alert('회원가입 실패!')
+      }
+    } catch (error) {
+      console.error('회원가입 중 에러 발생:', error)
+      alert('회원가입 처리 중 문제가 발생했습니다.')
+    }
   }
   
   // 소셜 로그인 처리
@@ -132,6 +163,9 @@
     id.value = ''
     password.value = ''
     confirmPassword.value = ''
+    email.value = ''
+    phone.value = ''
+    name.value = ''
   }
   
   // 로그인 모달 열기
@@ -140,6 +174,9 @@
     id.value = ''
     password.value = ''
     confirmPassword.value = ''
+    email.value = ''
+    phone.value = ''
+    name.value = ''
   }
   
   // 모달 닫기 처리
@@ -166,7 +203,7 @@
     padding: 20px;
     border-radius: 8px;
     width: 280px;
-    height: 230px;
+    height: 300px;
   }
   button {
     margin-top: 10px;

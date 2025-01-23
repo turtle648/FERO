@@ -42,7 +42,6 @@
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
-  z-index: 1;
 }
 
 /* 태블릿 크기 */
