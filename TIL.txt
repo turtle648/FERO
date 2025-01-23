@@ -1,0 +1,9 @@
+오늘 한 일
+1. vue cli 로 프로젝트 시작
+- 라우터, 피냐, 액시오스 별도로 설치해야 함
+2. webRTC, openvidu 공부
+3. openvidu-tutorial
+- 로컬에서 openvidu 써보기
+- 같은 망에서 openvidu 써보기
+- 원인 모를 이유로 적용이 안됨
+- 더 공부해야 함
