@@ -185,6 +185,11 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.20")
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
+
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'io.lettuce:lettuce-core'  // Redis 클라이언트
+
 }
 
 test {
