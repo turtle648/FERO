@@ -40,11 +40,18 @@ services:
     command: >
       redis-server
       --bind 0.0.0.0
+<<<<<<< HEAD
     depends_on:
       setup:
         condition: service_completed_successfully
     networks:
       - redis-network
+=======
+      --requirepass ${REDIS_PASSWORD:-}
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+>>>>>>> cbad129 (fix(docker): openvidu 분리 - #S12P11E103-286)
 
   minio:
     image: docker.io/bitnami/minio:2024.10.13-debian-12-r1
@@ -245,8 +252,11 @@ volumes:
   minio-data:
   mongo-data:
   egress-data:
+<<<<<<< HEAD
 
 networks:
   redis-network:
     driver: bridge
     external: true
+=======
+>>>>>>> cbad129 (fix(docker): openvidu 분리 - #S12P11E103-286)
