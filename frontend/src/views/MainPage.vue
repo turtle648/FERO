@@ -25,8 +25,7 @@ import { ref, onMounted, onUnmounted } from "vue"
 const isDesktop = ref(false)
 
 const checkScreenSize = () => {
-  console.log("Current width:", window.innerWidth)
-  isDesktop.value = window.innerWidth > 1024
+  isDesktop.value = window.innerWidth > 821
 }
 
 onMounted(() => {
@@ -92,7 +91,7 @@ onUnmounted(() => {
 }
 
 /* 모바일 */
-@media screen and (max-width: 739px) {
+@media screen and (max-width: 821px) {
   .background-wrapper {
     width: 100%;
     height: 100vh;
@@ -113,8 +112,9 @@ onUnmounted(() => {
   }
 }
 
-/* 태블릿 */
-@media screen and (min-device-width: 700px) and (max-device-width: 1024px) {
+/* 추후 수정필요 */
+/* 태블릿
+@media screen and (min-device-width: 700px) and (max-device-width: 821px) {
   .background-wrapper {
     width: 100%;
     height: 100vh;
@@ -133,5 +133,5 @@ onUnmounted(() => {
     width: calc(100% - 20px);
     padding: 10px;
   }
-}
+} */
 </style>
