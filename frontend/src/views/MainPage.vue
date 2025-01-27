@@ -1,44 +1,98 @@
 <template>
-  <div class="main-container">
-    <div class="background-wrapper">
-      <img class="background-image" src="@/assets/images/background_image.jpg" alt="배경이미지" />
+  <img class="background-image" src="@/assets/images/background_image.jpg" alt="배경이미지" />
+  <div class="container" v-if="!isDesktop">
+    <div class="header">
+      <div class="header-item level">레벨</div>
+      <div class="header-item experience">경험치</div>
+      <div class="header-item quest">퀘스트</div>
     </div>
+    <div class="footer">
+      <!-- class명 추가해서 쓰기 -->
+      <div class="grid-item">1</div>
+      <div class="grid-item">2</div>
+      <div class="grid-item">3</div>
+      <div class="grid-item">4</div>
+    </div>
+  </div>
+  <div v-else class="qr-code">
+    <h1>(나중에 큐알 들어갈 자리)</h1>
   </div>
 </template>
 
 <script setup>
-// import { ref } from "vue"
+import { ref, onMounted, onUnmounted } from "vue"
+
+const isDesktop = ref(false)
+
+const checkScreenSize = () => {
+  console.log("Current width:", window.innerWidth)
+  isDesktop.value = window.innerWidth > 1024
+}
+
+onMounted(() => {
+  checkScreenSize()
+  window.addEventListener("resize", checkScreenSize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener("resize", checkScreenSize)
+})
 </script>
 
 <style scoped>
-.main-container {
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.background-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-}
-
 .background-image {
   max-width: 100%;
-  max-height: 100%;
+  height: 100vh; /* 뷰포트 기준 100% */
   object-fit: cover;
+  display: block; /* 이미지가 인라인 요소로 처리X */
+  margin: 0 auto; /* 가로 기준 가운데 정렬 */
+}
+
+.footer {
+  position: absolute;
+  bottom: 0%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 열 4개로로 */
+  z-index: 1;
+  gap: 2%;
+  background-color: rgb(255, 255, 255);
+  height: 5%;
+  width: calc(100% - 20px);
+}
+
+.grid-item {
+  background-color: rgba(88, 104, 255, 0.8);
+  text-align: center;
+  border-radius: 50%;
+}
+
+.header {
+  display: flex;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  justify-content: space-around;
+  width: 100%;
+  height: 5vh;
+  position: absolute;
+}
+
+.header-item {
+  background-color: rgb(194, 255, 96);
+  flex: 1;
+}
+
+.qr-code {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  text-align: center;
 }
 
 /* 모바일 */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 739px) {
   .background-wrapper {
     width: 100%;
     height: 100vh;
@@ -49,11 +103,18 @@
     height: 100vh;
     object-fit: cover;
     overflow: hidden;
+  }
+
+  .footer {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2%;
+    width: calc(100% - 20px);
+    padding: 10px;
   }
 }
 
-/* Pad */
-@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) {
+/* 태블릿 */
+@media screen and (min-device-width: 700px) and (max-device-width: 1024px) {
   .background-wrapper {
     width: 100%;
     height: 100vh;
@@ -64,6 +125,13 @@
     height: 100vh;
     object-fit: cover;
     overflow: hidden;
+  }
+
+  .footer {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    width: calc(100% - 20px);
+    padding: 10px;
   }
 }
 </style>
