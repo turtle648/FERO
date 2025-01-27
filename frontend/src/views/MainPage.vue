@@ -2,16 +2,16 @@
   <img class="background-image" src="@/assets/images/background_image.jpg" alt="배경이미지" />
   <div class="container" v-if="!isDesktop">
     <div class="header">
-      <div class="header-item level">레벨</div>
-      <div class="header-item experience">경험치</div>
+      <div class="header-item level">레벨, 경험치 (상태창)</div>
+      <div class="header-item experience">설정</div>
       <div class="header-item quest">퀘스트</div>
     </div>
     <div class="footer">
       <!-- class명 추가해서 쓰기 -->
-      <div class="grid-item">1</div>
-      <div class="grid-item">2</div>
-      <div class="grid-item">3</div>
-      <div class="grid-item">4</div>
+      <div class="grid-item">운동</div>
+      <div class="grid-item">달력</div>
+      <div class="grid-item">친구</div>
+      <div class="grid-item">????</div>
     </div>
   </div>
   <div v-else class="qr-code">
@@ -62,7 +62,7 @@ onUnmounted(() => {
 .grid-item {
   background-color: rgba(88, 104, 255, 0.8);
   text-align: center;
-  border-radius: 50%;
+  /* border-radius: 50%; */
 }
 
 .header {
