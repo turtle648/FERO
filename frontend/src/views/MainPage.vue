@@ -1,74 +1,54 @@
 <template>
   <div class="main-container">
     <div class="background-wrapper">
-      <img class="background-image" src="@/assets/images/backgroundImage.png" alt="배경이미지" />
-      <img class="calendar" src="@/assets/images/tmpImage.png" alt="임시달력" />
-
-      <!-- <CalendarModal :isOpen="isModalOpen" @close="closeModal" /> -->
+      <img class="background-image" src="@/assets/images/background_image.jpg" alt="배경이미지" />
     </div>
   </div>
 </template>
 
 <script setup>
-// eslint-disable-next-line
-import { ref } from "vue"
-// import CalendarModal from "@/components/modal/CalendarModal.vue"
-
-// const isModalOpen = ref(false)
-
-// // eslint-disable-next-line
-// const openModal = () => {
-//   isModalOpen.value = true
-// }
-
-// const closeModal = () => {
-//   isModalOpen.value = false
-// }
+// import { ref } from "vue"
 </script>
 
 <style scoped>
 .main-container {
   width: 100%;
-  height: 100%;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  overflow: hidden;
 }
 
 .background-wrapper {
-  position: relative;
-  width: 27%;
-  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
 }
 
 .background-image {
-  width: 100%;
-  height: 100%;
-}
-
-.calendar {
-  width: 30%;
-  position: absolute;
-  left: 0;
-  top: 20%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
 }
 
 /* 모바일 */
 @media screen and (max-width: 600px) {
   .background-wrapper {
     width: 100%;
-    height: auto;
+    height: 100vh;
   }
 
   .background-image {
     width: 100%;
-    height: auto;
-  }
-
-  .calendar {
-    width: 25%;
-    top: 20%;
+    height: 100vh;
+    object-fit: cover;
+    overflow: hidden;
   }
 }
 
@@ -76,12 +56,14 @@ import { ref } from "vue"
 @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) {
   .background-wrapper {
     width: 100%;
-    height: auto;
+    height: 100vh;
   }
 
-  .calendar {
-    width: 20%;
-    top: 21%;
+  .background-image {
+    width: 100%;
+    height: 100vh;
+    object-fit: cover;
+    overflow: hidden;
   }
 }
 </style>
