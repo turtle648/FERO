@@ -2,10 +2,14 @@
   <img class="background-image" src="@/assets/images/background_image.jpg" alt="배경이미지" />
   <div class="container" v-if="!isDesktop">
     <div class="header">
-      <div class="header-item level">레벨, 경험치 (상태창)</div>
+      <div class="header-item level" @click="openStatusModal">레벨, 경험치 (상태창)</div>
       <div class="header-item experience">설정</div>
       <div class="header-item quest">퀘스트</div>
     </div>
+
+    <!-- 상태창 -->
+    <StatusModal v-if="showStatusModal" @closeStatus="closeStatusModal" />
+
     <div class="footer">
       <!-- class명 추가해서 쓰기 -->
       <div class="grid-item">운동</div>
@@ -36,6 +40,13 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("resize", checkScreenSize)
 })
+
+// 상태창 관련 변수 및 함수
+import StatusModal from '@/components/modal/StatusModal.vue'
+const showStatusModal = ref(false)
+const openStatusModal = () => { showStatusModal.value = true }
+const closeStatusModal = () => { showStatusModal.value = false}
+
 </script>
 
 <style scoped>
