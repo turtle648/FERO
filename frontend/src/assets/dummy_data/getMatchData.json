@@ -1,0 +1,186 @@
+[
+    {
+      "date": "2025-01-27",
+      "time": "18:30:00",
+      "type": "push-up",
+      "reps": 50,
+      "result": "win",
+      "score": 75,
+      "partners": ["user123", "user456", "user789"]
+    },
+    {
+      "date": "2025-01-26",
+      "time": "19:00:00",
+      "type": "squat",
+      "reps": 30,
+      "result": "lose",
+      "score": 45,
+      "partners": [
+        "user789", "user012", "user152", 
+        "user111", "user222", "user333", 
+        "user444", "user555", "user666"]
+    },
+    {
+      "date": "2025-01-25",
+      "time": "07:45:00",
+      "type": "burpee",
+      "reps": 25,
+      "result": "win",
+      "score": 65,
+      "partners": ["user567", "user234"]
+    },
+    {
+      "date": "2025-01-24",
+      "time": "15:20:00",
+      "type": "plank",
+      "reps": 1,
+      "result": "win",
+      "score": 85,
+      "partners": ["user123", "user890"]
+    },
+    {
+      "date": "2025-01-23",
+      "time": "09:10:00",
+      "type": "push-up",
+      "reps": 60,
+      "result": "lose",
+      "score": 55,
+      "partners": ["user111", "user222"]
+    },
+    {
+      "date": "2025-01-22",
+      "time": "17:00:00",
+      "type": "squat",
+      "reps": 40,
+      "result": "win",
+      "score": 90,
+      "partners": ["user345", "user678"]
+    },
+    {
+      "date": "2025-01-21",
+      "time": "08:30:00",
+      "type": "push-up",
+      "reps": 45,
+      "result": "lose",
+      "score": 40,
+      "partners": ["user111", "user567"]
+    },
+    {
+      "date": "2025-01-20",
+      "time": "16:00:00",
+      "type": "burpee",
+      "reps": 20,
+      "result": "win",
+      "score": 60,
+      "partners": ["user789", "user345"]
+    },
+    {
+      "date": "2025-01-19",
+      "time": "20:15:00",
+      "type": "plank",
+      "reps": 1,
+      "result": "lose",
+      "score": 30,
+      "partners": ["user234", "user890"]
+    },
+    {
+      "date": "2025-01-18",
+      "time": "12:45:00",
+      "type": "squat",
+      "reps": 35,
+      "result": "win",
+      "score": 70,
+      "partners": ["user123", "user678"]
+    },
+    {
+      "date": "2025-01-17",
+      "time": "09:30:00",
+      "type": "push-up",
+      "reps": 55,
+      "result": "win",
+      "score": 80,
+      "partners": ["user567", "user222"]
+    },
+    {
+      "date": "2025-01-16",
+      "time": "14:15:00",
+      "type": "burpee",
+      "reps": 30,
+      "result": "lose",
+      "score": 50,
+      "partners": ["user345", "user012"]
+    },
+    {
+      "date": "2025-01-15",
+      "time": "18:20:00",
+      "type": "plank",
+      "reps": 1,
+      "result": "win",
+      "score": 95,
+      "partners": ["user789", "user123"]
+    },
+    {
+      "date": "2025-01-14",
+      "time": "10:00:00",
+      "type": "squat",
+      "reps": 25,
+      "result": "win",
+      "score": 85,
+      "partners": ["user111", "user678"]
+    },
+    {
+      "date": "2025-01-13",
+      "time": "11:45:00",
+      "type": "push-up",
+      "reps": 70,
+      "result": "lose",
+      "score": 35,
+      "partners": ["user567", "user890"]
+    },
+    {
+      "date": "2025-01-12",
+      "time": "15:10:00",
+      "type": "burpee",
+      "reps": 15,
+      "result": "win",
+      "score": 55,
+      "partners": ["user234", "user012"]
+    },
+    {
+      "date": "2025-01-11",
+      "time": "17:30:00",
+      "type": "plank",
+      "reps": 1,
+      "result": "win",
+      "score": 100,
+      "partners": ["user345", "user678"]
+    },
+    {
+      "date": "2025-01-10",
+      "time": "07:50:00",
+      "type": "squat",
+      "reps": 45,
+      "result": "lose",
+      "score": 40,
+      "partners": ["user123", "user789"]
+    },
+    {
+      "date": "2025-01-09",
+      "time": "19:25:00",
+      "type": "push-up",
+      "reps": 65,
+      "result": "win",
+      "score": 75,
+      "partners": ["user111", "user890"]
+    },
+    {
+      "date": "2025-01-08",
+      "time": "08:40:00",
+      "type": "burpee",
+      "reps": 10,
+      "result": "lose",
+      "score": 20,
+      "partners": ["user567", "user012"]
+    }
+  ]
+  

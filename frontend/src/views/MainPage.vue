@@ -8,7 +8,16 @@
     </div>
 
     <!-- 상태창 -->
-    <StatusModal v-if="showStatusModal" @closeStatus="closeStatusModal" />
+    <StatusModal v-if="showStatusModal" 
+      @closeStatus="closeStatusModal" 
+      @openRecord="openRecordModal"
+      />
+
+    <!-- 전적창 -->
+    <MatchRecordModal v-if="showRecordModal" 
+    @closeRecord="closeRecordModal" 
+    @openStatus="openStatusModal"
+    />
 
     <div class="footer">
       <!-- class명 추가해서 쓰기 -->
@@ -46,6 +55,12 @@ import StatusModal from '@/components/modal/StatusModal.vue'
 const showStatusModal = ref(false)
 const openStatusModal = () => { showStatusModal.value = true }
 const closeStatusModal = () => { showStatusModal.value = false}
+
+// 전적창 관련 변수 및 함수
+import MatchRecordModal from '@/components/modal/MatchRecordModal.vue'
+const showRecordModal = ref(false)
+const openRecordModal = () => { showRecordModal.value = true }
+const closeRecordModal = () => { showRecordModal.value = false}
 
 </script>
 
