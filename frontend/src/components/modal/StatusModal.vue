@@ -40,7 +40,7 @@
           <div class="status-graph"></div>
         </div>
         <!-- 전적 확인 버튼 -->
-        <button id="record-btn">전적확인</button>
+        <button id="record-btn" @click="openRecordModal">전적확인</button>
       </div>
     </div>
   </template>
@@ -68,13 +68,20 @@ const getUserStatusInfo = () => {
 
 // 모달이 열릴 때 onMounted 훅 사용
 onMounted(() => {
-    getUserStatusInfo()  // 모달이 열릴 때 함수 실행
+    getUserStatusInfo(localStorage.getItem('userId'), localStorage.getItem('authToken'))  // 모달이 열릴 때 함수 실행
 })
 
-const emit = defineEmits(['closeStatus'])
+const emit = defineEmits(['closeStatus', 'openRecord'])
 
 // 모달 외부 클릭 시 상태창 모달 종료
 const closeStatusModal = () => { emit('closeStatus') }
+
+// 전적버튼 클릭시 상태창 끄기 & 전적창 열기
+const openRecordModal = () => { 
+    emit('closeStatus')
+    emit('openRecord')
+}
+
 </script>
 
 <style scoped>
