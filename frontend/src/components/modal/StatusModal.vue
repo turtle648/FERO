@@ -49,10 +49,6 @@
 import { defineEmits, onMounted, ref } from 'vue'
 import { getStatus } from '@/api/userAPI'; // API import
 
-const nickName = ref('')
-const level = ref('')
-const rank = ref('')
-
 // 모달이 켜질 때 실행할 함수
 const getUserStatusInfo = () => {
     // 1. 백에서 정보 불러오기
@@ -62,9 +58,12 @@ const getUserStatusInfo = () => {
     nickName.value = localStorage.getItem('nickName')
     level.value = localStorage.getItem('level')
     rank.value = localStorage.getItem('rank')
-
-    alert('User Status 정보 불러왔다이')
 }
+
+const nickName = ref('')
+const level = ref('')
+const rank = ref('')
+
 
 // 모달이 열릴 때 onMounted 훅 사용
 onMounted(() => {
