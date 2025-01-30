@@ -3,21 +3,18 @@
   <div class="container" v-if="!isDesktop">
     <div class="header">
       <div class="header-item level" @click="openStatusModal">레벨, 경험치 (상태창)</div>
-      <div class="header-item experience">설정</div>
+      <div class="header-item experience" @click="openSettingModal">설정</div>
       <div class="header-item quest">퀘스트</div>
     </div>
 
     <!-- 상태창 -->
-    <StatusModal v-if="showStatusModal" 
-      @closeStatus="closeStatusModal" 
-      @openRecord="openRecordModal"
-      />
+    <StatusModal v-if="showStatusModal" @closeStatus="closeStatusModal" @openRecord="openRecordModal" />
 
     <!-- 전적창 -->
-    <MatchRecordModal v-if="showRecordModal" 
-    @closeRecord="closeRecordModal" 
-    @openStatus="openStatusModal"
-    />
+    <MatchRecordModal v-if="showRecordModal" @closeRecord="closeRecordModal" @openStatus="openStatusModal" />
+
+    <!-- 설정 -->
+    <SettingModal v-if="showSettingModal" @closeSetting="closeSettingModal" @openSetting="openSettingModal" />
 
     <div class="footer">
       <!-- class명 추가해서 쓰기 -->
@@ -51,17 +48,35 @@ onUnmounted(() => {
 })
 
 // 상태창 관련 변수 및 함수
-import StatusModal from '@/components/modal/StatusModal.vue'
+import StatusModal from "@/components/modal/StatusModal.vue"
 const showStatusModal = ref(false)
-const openStatusModal = () => { showStatusModal.value = true }
-const closeStatusModal = () => { showStatusModal.value = false}
+const openStatusModal = () => {
+  showStatusModal.value = true
+}
+const closeStatusModal = () => {
+  showStatusModal.value = false
+}
 
 // 전적창 관련 변수 및 함수
-import MatchRecordModal from '@/components/modal/MatchRecordModal.vue'
+import MatchRecordModal from "@/components/modal/MatchRecordModal.vue"
 const showRecordModal = ref(false)
-const openRecordModal = () => { showRecordModal.value = true }
-const closeRecordModal = () => { showRecordModal.value = false}
+const openRecordModal = () => {
+  showRecordModal.value = true
+}
+const closeRecordModal = () => {
+  showRecordModal.value = false
+}
 
+// 설정 모달
+import SettingModal from "@/components/modal/SettingModal.vue"
+
+const showSettingModal = ref(false)
+const openSettingModal = () => {
+  showSettingModal.value = true
+}
+const closeSettingModal = () => {
+  showSettingModal.value = false
+}
 </script>
 
 <style scoped>
