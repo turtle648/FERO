@@ -19,12 +19,13 @@
     <div class="footer">
       <!-- class명 추가해서 쓰기 -->
       <div class="grid-item">운동</div>
-      <div class="grid-item">달력</div>
+      <div class="grid-item" @click="openCalendarModal">달력</div>
       <div class="grid-item" @click="openFriendModal">친구</div>
       <div class="grid-item">????</div>
     </div>
 
-    <FriendListModal v-if="showFriendModal" @closeFriend="closeFriendModal" @openFriend="openFriendModal"></FriendListModal>
+    <FriendListModal v-if="showFriendModal" @closeFriend="closeFriendModal" @openFriend="openFriendModal" />
+    <CalendarModal v-if="showCalendarModal" @closeCalendar="closeCalendarModal" @openCalendar="openCalendarModal" />
   </div>
   <div v-else class="qr-code">
     <h1>(나중에 큐알 들어갈 자리)</h1>
@@ -89,6 +90,17 @@ const openFriendModal = () => {
 }
 const closeFriendModal = () => {
   showFriendModal.value = false
+}
+
+// 달력 모달
+import CalendarModal from "@/components/modal/CalendarModal.vue"
+
+const showCalendarModal = ref(false)
+const openCalendarModal = () => {
+  showCalendarModal.value = true
+}
+const closeCalendarModal = () => {
+  showCalendarModal.value = false
 }
 </script>
 
