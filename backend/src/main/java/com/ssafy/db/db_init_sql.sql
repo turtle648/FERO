@@ -25,3 +25,13 @@ CREATE TABLE user_character (
     points SMALLINT UNSIGNED NOT NULL DEFAULT 0 CHECK (points <= 50000),
     FOREIGN KEY (user_id) REFERENCES user_info(user_id) ON DELETE CASCADE
 );
+
+CREATE TABLE chat_message (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    sender_id VARCHAR(30) NOT NULL,
+    receiver_id VARCHAR(30) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sender_id) REFERENCES user_info(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (receiver_id) REFERENCES user_info(user_id) ON DELETE CASCADE
+);
