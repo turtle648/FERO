@@ -20,9 +20,11 @@
       <!-- class명 추가해서 쓰기 -->
       <div class="grid-item">운동</div>
       <div class="grid-item">달력</div>
-      <div class="grid-item">친구</div>
+      <div class="grid-item" @click="openFriendModal">친구</div>
       <div class="grid-item">????</div>
     </div>
+
+    <FriendListModal v-if="showFriendModal" @closeFriend="closeFriendModal" @openFriend="openFriendModal"></FriendListModal>
   </div>
   <div v-else class="qr-code">
     <h1>(나중에 큐알 들어갈 자리)</h1>
@@ -76,6 +78,17 @@ const openSettingModal = () => {
 }
 const closeSettingModal = () => {
   showSettingModal.value = false
+}
+
+// 친구리스트 모달
+import FriendListModal from "@/components/modal/FriendListModal.vue"
+
+const showFriendModal = ref(false)
+const openFriendModal = () => {
+  showFriendModal.value = true
+}
+const closeFriendModal = () => {
+  showFriendModal.value = false
 }
 </script>
 
