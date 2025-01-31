@@ -56,6 +56,9 @@ onUnmounted(() => {
   window.removeEventListener("resize", checkScreenSize)
 })
 
+// 활성화된 모달이 있는 경우 다른 모달 띄우지 않도록
+// const activeModal = ref(null)
+
 // 상태창 관련 변수 및 함수
 import StatusModal from "@/components/modal/StatusModal.vue"
 const showStatusModal = ref(false)
