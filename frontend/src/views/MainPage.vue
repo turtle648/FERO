@@ -1,5 +1,5 @@
 <template>
-  <img class="background-image" src="@/assets/images/background_image.jpg" alt="배경이미지" />
+  <img class="background-image" src="@/assets/images/background_image2.png" alt="배경이미지" />
   <div class="container" v-if="!isDesktop">
     <div class="header">
       <div class="header-item level" @click="openStatusModal">레벨, 경험치 (상태창)</div>
@@ -128,7 +128,8 @@ const closeFitnessModal = () => {
 .background-image {
   max-width: 100%;
   height: 100vh; /* 뷰포트 기준 100% */
-  object-fit: cover;
+  /* object-fit: cover; */
+  background-size: cover;
   display: block; /* 이미지가 인라인 요소로 처리X */
   margin: 0 auto; /* 가로 기준 가운데 정렬 */
 }
