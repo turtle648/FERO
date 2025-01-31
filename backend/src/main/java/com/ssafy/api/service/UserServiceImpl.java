@@ -52,6 +52,7 @@ public class UserServiceImpl implements UserService {
 	public User getUserByUserId(String userId) {
 		// 디비에 유저 정보 조회 (userId 를 통한 조회).
 		User user = userRepositorySupport.findUserByUserId(userId).get();
+		System.out.println("user::" + user);
 		return user;
 	}
 }

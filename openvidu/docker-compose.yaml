@@ -40,11 +40,26 @@ services:
     command: >
       redis-server
       --bind 0.0.0.0
+<<<<<<< HEAD
+<<<<<<< HEAD
     depends_on:
       setup:
         condition: service_completed_successfully
     networks:
       - redis-network
+=======
+      --requirepass ${REDIS_PASSWORD:-}
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+>>>>>>> cbad129 (fix(docker): openvidu 분리 - #S12P11E103-286)
+=======
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+    networks:
+      - redis-network
+>>>>>>> 906ece2 (fix(docker): redis 통합 완료 - #S12P11E103-303)
 
   minio:
     image: docker.io/bitnami/minio:2024.10.13-debian-12-r1
