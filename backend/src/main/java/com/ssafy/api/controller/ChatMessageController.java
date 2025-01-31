@@ -33,7 +33,7 @@ public class ChatMessageController {
     public ResponseEntity<ChatMessageRes> sendMessage(
             @RequestBody @ApiParam(value = "메시지 정보", required = true) ChatMessageSendReq request) {
 
-        ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId()).orElseThrow();
+        ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId()).orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다."));
         ChatMessage chatMessage = chatMessageService.sendMessage(chatRoom, request.getSenderId(), request.getMessage());
 
         return ResponseEntity.ok(ChatMessageRes.of(chatMessage));
@@ -42,7 +42,7 @@ public class ChatMessageController {
     @GetMapping("/{chatRoomId}")
     @ApiOperation(value = "메시지 조회", notes = "채팅방의 모든 메시지를 조회합니다.")
     public ResponseEntity<List<ChatMessageRes>> getMessages(@PathVariable Long chatRoomId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow();
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다."));
         List<ChatMessageRes> messages = chatMessageService.getMessages(chatRoom).stream()
                 .map(ChatMessageRes::of)
                 .collect(Collectors.toList());

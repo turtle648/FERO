@@ -35,11 +35,6 @@ public class User extends BaseEntity{
     String userPassword;
 
     // 1:1 관계 매핑 추가
-<<<<<<< HEAD
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserCharacter userCharacter;
-=======
-    @OneToOne(mappedBy = "userInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    UserCharacter userCharacter;
->>>>>>> 906ece2 (fix(docker): redis 통합 완료 - #S12P11E103-303)
 }
