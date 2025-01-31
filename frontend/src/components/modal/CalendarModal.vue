@@ -158,4 +158,10 @@ onMounted(() => {
 .days .inactive {
   color: white !important; /* 이전/다음 달 날짜를 흰색으로 설정했는데 왜 안됨? */
 }
+
+#close-btn {
+  position: absolute;
+  top: 2%;
+  right: 2%;
+}
 </style>

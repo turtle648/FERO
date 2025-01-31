@@ -34,4 +34,10 @@ const closeFitnessModal = () => {
 .fitness-modal div {
   margin-bottom: 10px; /* 각 div 사이 간격 추가 */
 }
+
+#close-btn {
+  position: absolute;
+  top: 2%;
+  right: 2%;
+}
 </style>
