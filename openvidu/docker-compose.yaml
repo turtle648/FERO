@@ -45,9 +45,6 @@ services:
         condition: service_completed_successfully
     networks:
       - redis-network
-    depends_on:
-      setup:
-        condition: service_completed_successfully
 
   minio:
     image: docker.io/bitnami/minio:2024.10.13-debian-12-r1
