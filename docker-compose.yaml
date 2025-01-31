@@ -1,6 +1,4 @@
 services:
-<<<<<<< Updated upstream
-=======
   jenkins:
     build:
       context: ./
@@ -17,7 +15,6 @@ services:
       - /home/ubuntu/jenkins-data:/var/jenkins_home
     restart: always
 
->>>>>>> Stashed changes
   spring-boot:
     build:
       context: ./backend
