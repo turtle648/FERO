@@ -58,6 +58,7 @@
           <div class="status-graph">
             <!-- 지울예정 -->
             <div style="color:hsl(0, 0%, 0%, 0.4);"><div>owmoc,20x2 ajdiwankn dwmomalm ;mwa mnxinsp</div><span> kd0wm</span><div>a b   c d    e f   g h   i j k l m n o p q r s t u </div><span> kd0wm</span><div>a    b c d  e   f g h    i j k    l m    n o p q r s </div><span> kd0wm</span><div>owmoc,20x2 ajdiwankn   dwmomalm   ;mwa mnxinsp</div><div>owmoc,20x2 ajdiwankn     dwmomalm ;    mwa   mnxinsp</div><span> kd0wm</span><span> kd0wm</span><div>a  b c  d  e f g  h i  j k l    m    n o  p q r s</div><span> kd0wm</span><div>owmoc,20x2 ajdiwankn   dwmomalm ;    mwa    mnxinsp</div><span> kd0wm</span><div>owmoc,20x2 ajdiwankn   dwmomalm ; mwa  mnxinsp</div><span> kd0wm</span></div>
+            .
           </div>
         </div>
         <!-- 전적 확인 버튼 -->
