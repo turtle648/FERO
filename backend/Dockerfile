@@ -7,7 +7,6 @@ WORKDIR /build
 COPY build.gradle settings.gradle /build/
 RUN gradle build -x test --parallel --continue > /dev/null 2>&1 || true
 
-# 스프링 프로젝트 복사
 COPY . /build
 RUN gradle clean build --parallel 
 

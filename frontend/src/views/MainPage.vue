@@ -1,31 +1,37 @@
 <template>
-  <img class="background-image" src="@/assets/images/background_image.jpg" alt="배경이미지" />
+  <img class="background-image" src="@/assets/images/background_image2.png" alt="배경이미지" />
   <div class="container" v-if="!isDesktop">
     <div class="header">
       <div class="header-item level" @click="openStatusModal">레벨, 경험치 (상태창)</div>
-      <div class="header-item experience">설정</div>
+      <div class="header-item experience" @click="openSettingModal">설정</div>
       <div class="header-item quest">퀘스트</div>
     </div>
 
     <!-- 상태창 -->
-    <StatusModal v-if="showStatusModal" 
-      @closeStatus="closeStatusModal" 
-      @openRecord="openRecordModal"
-      />
+    <StatusModal v-if="showStatusModal" @closeStatus="closeStatusModal" @openRecord="openRecordModal" />
 
     <!-- 전적창 -->
-    <MatchRecordModal v-if="showRecordModal" 
-    @closeRecord="closeRecordModal" 
-    @openStatus="openStatusModal"
-    />
+    <MatchRecordModal v-if="showRecordModal" @closeRecord="closeRecordModal" @openStatus="openStatusModal" />
+
+    <!-- 설정 -->
+    <SettingModal v-if="showSettingModal" @closeSetting="closeSettingModal" @openSetting="openSettingModal" />
 
     <div class="footer">
       <!-- class명 추가해서 쓰기 -->
-      <div class="grid-item">운동</div>
-      <div class="grid-item">달력</div>
-      <div class="grid-item">친구</div>
+      <div class="grid-item" @click="openFitnessModal">운동</div>
+      <div class="grid-item" @click="openCalendarModal">달력</div>
+      <div class="grid-item" @click="openFriendModal">친구</div>
       <div class="grid-item">????</div>
     </div>
+
+    <!-- 친구모달 -->
+    <FriendListModal v-if="showFriendModal" @closeFriend="closeFriendModal" @openFriend="openFriendModal" />
+
+    <!-- 달력 모달 -->
+    <CalendarModal v-if="showCalendarModal" @closeCalendar="closeCalendarModal" @openCalendar="openCalendarModal" />
+
+    <!-- 운동 모달 -->
+    <FitnessModal v-if="showFitnessModal" @closeFitness="closeFitnessModal" @openFitness="openFitnessModal" />
   </div>
   <div v-else class="qr-code">
     <h1>(나중에 큐알 들어갈 자리)</h1>
@@ -50,25 +56,80 @@ onUnmounted(() => {
   window.removeEventListener("resize", checkScreenSize)
 })
 
+// 활성화된 모달이 있는 경우 다른 모달 띄우지 않도록
+// const activeModal = ref(null)
+
 // 상태창 관련 변수 및 함수
-import StatusModal from '@/components/modal/StatusModal.vue'
+import StatusModal from "@/components/modal/StatusModal.vue"
 const showStatusModal = ref(false)
-const openStatusModal = () => { showStatusModal.value = true }
-const closeStatusModal = () => { showStatusModal.value = false}
+const openStatusModal = () => {
+  showStatusModal.value = true
+}
+const closeStatusModal = () => {
+  showStatusModal.value = false
+}
 
 // 전적창 관련 변수 및 함수
-import MatchRecordModal from '@/components/modal/MatchRecordModal.vue'
+import MatchRecordModal from "@/components/modal/MatchRecordModal.vue"
 const showRecordModal = ref(false)
-const openRecordModal = () => { showRecordModal.value = true }
-const closeRecordModal = () => { showRecordModal.value = false}
+const openRecordModal = () => {
+  showRecordModal.value = true
+}
+const closeRecordModal = () => {
+  showRecordModal.value = false
+}
 
+// 설정 모달
+import SettingModal from "@/components/modal/SettingModal.vue"
+
+const showSettingModal = ref(false)
+const openSettingModal = () => {
+  showSettingModal.value = true
+}
+const closeSettingModal = () => {
+  showSettingModal.value = false
+}
+
+// 친구리스트 모달
+import FriendListModal from "@/components/modal/FriendListModal.vue"
+
+const showFriendModal = ref(false)
+const openFriendModal = () => {
+  showFriendModal.value = true
+}
+const closeFriendModal = () => {
+  showFriendModal.value = false
+}
+
+// 달력 모달
+import CalendarModal from "@/components/modal/CalendarModal.vue"
+
+const showCalendarModal = ref(false)
+const openCalendarModal = () => {
+  showCalendarModal.value = true
+}
+const closeCalendarModal = () => {
+  showCalendarModal.value = false
+}
+
+// 운동 모달
+import FitnessModal from "@/components/modal/FitnessModal.vue"
+
+const showFitnessModal = ref(false)
+const openFitnessModal = () => {
+  showFitnessModal.value = true
+}
+const closeFitnessModal = () => {
+  showFitnessModal.value = false
+}
 </script>
 
 <style scoped>
 .background-image {
   max-width: 100%;
   height: 100vh; /* 뷰포트 기준 100% */
-  object-fit: cover;
+  /* object-fit: cover; */
+  background-size: cover;
   display: block; /* 이미지가 인라인 요소로 처리X */
   margin: 0 auto; /* 가로 기준 가운데 정렬 */
 }
