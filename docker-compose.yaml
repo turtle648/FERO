@@ -1,20 +1,4 @@
 services:
-  jenkins:
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    container_name: jenkins-main
-    user: root
-    ports:
-      - "9060:8080"
-      - "50000:50000"
-    environment:
-      - JAVA_OPS=-Xmx1g
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /home/ubuntu/jenkins-data:/var/jenkins_home
-    restart: always
-
   spring-boot:
     build:
       context: ./backend
