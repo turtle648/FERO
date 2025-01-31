@@ -22,13 +22,16 @@ public class ChatMessageRes {
     @ApiModelProperty(name = "메시지 내용", example = "안녕하세요!")
     private String message;
 
+    @ApiModelProperty(name = "전송 시간", example = "2025-01-31T16:11:22")
+    private String sendAt;
+
     public static ChatMessageRes of(ChatMessage chatMessage) {
         ChatMessageRes res = new ChatMessageRes();
         res.setMessageId(chatMessage.getId());
         res.setChatRoomId(chatMessage.getChatRoom().getId());
         res.setSenderId(chatMessage.getSenderId());
         res.setMessage(chatMessage.getMessage());
-        res.setMessage(chatMessage.getSentAt().toString());
+        res.setSendAt(chatMessage.getSentAt().toString());
         return res;
     }
 }
