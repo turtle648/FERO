@@ -26,8 +26,13 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - JAVA_OPTS=-Xms512m -Xmx1024m
+    networks:
+      - redis-network
+      - my-sql-network
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+      # - web-redis
 
   vue-app:
     build:
@@ -50,6 +55,32 @@ services:
     volumes:
       - my-sql-volume:/var/lib/mysql
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - my-sql-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+
+  # web-redis:
+  #   image: docker.io/redis:7.4.1-alpine
+  #   platform: linux/amd64
+  #   container_name: web-redis
+  #   restart: unless-stopped
+  #   ports:
+  #     - 6380:6379
+  #   volumes:
+  #     - web-redis:/data
 
 volumes:
   my-sql-volume:
+  # web-redis:
+
+networks:
+  redis-network:
+    driver: bridge
+    external: true
+  my-sql-network:
+    driver: bridge
+    external: true
