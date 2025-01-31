@@ -50,7 +50,7 @@ public class RegistrationService {
 
             // 캐릭터 생성 및 연결
             UserCharacter character = new UserCharacter();
-            character.setUserInfo(user);
+            character.setUser(user);
             character.setUserNickname(characterInfo.getUserNickname());
             character.setGender(characterInfo.getGender());
             character.setPushupRecord((short) 0);

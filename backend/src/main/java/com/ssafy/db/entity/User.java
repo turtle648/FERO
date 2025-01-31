@@ -34,6 +34,6 @@ public class User extends BaseEntity{
     private String userPassword;
 
     // 1:1 관계 매핑 추가
-    @OneToOne(mappedBy = "userInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserCharacter userCharacter;
 }
