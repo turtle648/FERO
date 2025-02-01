@@ -156,8 +156,7 @@ public class AuthController {
 		// 사용자 캐릭터 닉네임 업데이트
 		UserCharacter updatedCharacter = userCharacterService.updateUserCharacter(userId, updateInfo);
 
-		User userInfo = userRepository.findByUserId(userId).orElseThrow(() -> new RuntimeException("User not found"));
-		UserInfoRes userInfoRes = UserInfoRes.of(userInfo, updatedCharacter);
+		UserInfoRes userInfoRes = getUserInfo(request).getBody();
 
 		// 두 개의 업데이트된 데이터를 반환
 		return ResponseEntity.ok(userInfoRes);
