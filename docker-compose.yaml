@@ -1,9 +1,8 @@
 version: "3.8"
+
 services:
   web:
-    build:
-      context: ./frontend  # Vue 애플리케이션 디렉토리
-      dockerfile: Dockerfile  # 위에서 작성한 Dockerfile
+    image: nginx:latest
     container_name: nginx
     restart: always
     ports:
@@ -11,18 +10,23 @@ services:
       - 443:443
     volumes:
       - ./work_dir/conf.d:/etc/nginx/conf.d
-      - ./work_dir/certbot/conf:/etc/nginx/ssl
+      - ./work_dir/certbot/conf:/etc/letsencrypt
       - ./work_dir/certbot/data:/var/www/certbot
+      - ./work_dir/certbot/conf/live/i12e103.p.ssafy.io:/etc/nginx/ssl
     networks:
       - my-sql-network
 
   certbot:
     image: certbot/certbot:latest
-    command: certonly --webroot --webroot-path=/var/www/certbot --email hjcho9510@google.com --agree-tos --no-eff-email -d i12e103.p.ssafy.io
+    container_name: certbot
+    depends_on:
+      - web
+    entrypoint: "/bin/sh -c 'certbot certonly --webroot --webroot-path=/var/www/certbot --email hjcho9510@google.com --agree-tos --no-eff-email -d i12e103.p.ssafy.io && certbot renew --dry-run'"
     volumes:
       - ./work_dir/certbot/conf:/etc/letsencrypt
       - ./work_dir/certbot/logs:/var/log/letsencrypt
       - ./work_dir/certbot/data:/var/www/certbot
+
   spring-boot:
     build:
       context: ./backend
