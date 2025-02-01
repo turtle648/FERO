@@ -208,6 +208,33 @@ public class AuthController {
 		return ResponseEntity.ok(BaseResponseBody.of(200, "Password updated successfully"));
 	}
 
+	@PutMapping("/delete")
+	@ApiOperation(value = "회원 탈퇴", notes = "로그인한 사용자의 계정을 비활성화(is_valid=false) 처리한다.")
+	@ApiResponses({
+			@ApiResponse(code = 200, message = "성공", response = BaseResponseBody.class),
+			@ApiResponse(code = 401, message = "인증 실패", response = BaseResponseBody.class),
+			@ApiResponse(code = 404, message = "사용자 없음", response = BaseResponseBody.class),
+			@ApiResponse(code = 500, message = "서버 오류", response = BaseResponseBody.class)
+	})
+	public ResponseEntity<BaseResponseBody> deleteUser(HttpServletRequest request) {
+		// 헤더에서 Authorization 토큰을 가져옴
+		String authHeader = request.getHeader("Authorization");
+		// 토큰에서 userId 추출
+		String userId = extractUserIdFromToken(authHeader);
+
+		// 사용자 조회
+		User user = userRepository.findByUserId(userId)
+				.orElseThrow(() -> new RuntimeException("User not found"));
+
+		// is_valid 값을 false로 변경
+		user.setIsValid(false);
+		userRepository.save(user);
+		logout(request);
+
+		return ResponseEntity.ok(BaseResponseBody.of(200, "User successfully deactivated"));
+	}
+
+
 
 //	public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request) {
 //		String token = request.getHeader("Authorization").replace("Bearer ", "");

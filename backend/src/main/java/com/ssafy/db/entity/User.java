@@ -33,6 +33,9 @@ public class User{
     @Column(name = "phone_number", unique = true, nullable = false)
     String phoneNumber;
 
+    @Column(name = "is_valid", columnDefinition = "boolean default true")
+    private Boolean isValid;
+
     @JsonIgnore
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "user_password", nullable = false)
