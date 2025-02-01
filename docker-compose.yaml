@@ -7,7 +7,7 @@ services:
     container_name: nginx
     restart: always
     ports:
-      - 80:80
+      - 8080:80
       - 443:443
     volumes:
       - ./work_dir/conf.d:/etc/nginx/conf.d
