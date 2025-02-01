@@ -1,12 +1,10 @@
 package com.ssafy.api.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.ssafy.api.request.UserLoginPostReq;
 import com.ssafy.api.response.UserLoginPostRes;
@@ -21,6 +19,12 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 /**
  * 인증 관련 API 요청 처리를 위한 컨트롤러 정의.
  */
@@ -33,7 +37,7 @@ public class AuthController {
 	
 	@Autowired
 	PasswordEncoder passwordEncoder;
-	
+
 	@PostMapping("/login")
 	@ApiOperation(value = "로그인", notes = "<strong>아이디와 패스워드</strong>를 통해 로그인 한다.") 
     @ApiResponses({
@@ -58,4 +62,49 @@ public class AuthController {
 		// 유효하지 않는 패스워드인 경우, 로그인 실패로 응답.
 		return ResponseEntity.status(401).body(UserLoginPostRes.of(401, "Invalid Password", null));
 	}
+
+	@PostMapping("/logout")
+	@ApiOperation(value = "로그아웃", notes = "로그아웃을 수행한다.")
+	@ApiResponses({
+			@ApiResponse(code = 200, message = "성공", response = BaseResponseBody.class),
+			@ApiResponse(code = 401, message = "인증 실패", response = BaseResponseBody.class),
+			@ApiResponse(code = 500, message = "서버 오류", response = BaseResponseBody.class)
+	})
+	public ResponseEntity<BaseResponseBody> logout(HttpServletRequest request) {
+		String authHeader = request.getHeader("Authorization");
+
+		if (authHeader == null || authHeader.startsWith("Bearer ")) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(BaseResponseBody.of(401, "Unauthorized"));
+		}
+
+		String accessToken = authHeader.replace(JwtTokenUtil.TOKEN_PREFIX, "");
+
+		// 토큰 검증
+		if (!JwtTokenUtil.validateToken(accessToken)) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(BaseResponseBody.of(401, "Invalid Access Token"));
+		}
+
+		String userId = JwtTokenUtil.getUserIdFromJWT(accessToken);
+
+		return ResponseEntity.ok(BaseResponseBody.of(200, "Logout Successful"));
+	}
+
+//	public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request) {
+//		String token = request.getHeader("Authorization").replace("Bearer ", "");
+//
+//		// JWT의 만료 시간 가져오기
+//		Date expiration = JwtTokenUtil.getVerifier().verify(token).getExpiresAt();
+//		long expirationTime = expiration.getTime() - System.currentTimeMillis();
+//		System.out.println("JWT 만료시간 : "+ expirationTime);
+//
+//		// Redis에 토큰 저장 (만료 시간만큼 유효하게 설정)
+//		redisTemplate.opsForValue().set(token, "logout", expirationTime, TimeUnit.MILLISECONDS);
+//
+//		Map<String, Object> response = new HashMap<>();
+//		response.put("message", "Success");
+//		response.put("statusCode", 200);
+//		return ResponseEntity.ok(response);
+//	}
+
 }
