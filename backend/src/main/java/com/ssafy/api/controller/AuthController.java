@@ -129,7 +129,7 @@ public class AuthController {
 		// 조회된 사용자 정보
 		User userInfo = userRepository.findByUserId(userId).get();
 		System.out.println("2 사용자 정보 ? : "+userInfo);
-		UserCharacter userCharacter = userCharacterRepository.findUserCharacterByUserId(userId).get();
+		UserCharacter userCharacter = userCharacterRepository.findByUser_UserId(userId).get();
 		System.out.println("3 사용자 정보 ? : "+userCharacter);
 
 		// UserInfoRes로 변환하여 응답 준비

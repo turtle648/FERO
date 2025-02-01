@@ -1,9 +1,7 @@
 package com.ssafy.db.repository;
 
 import com.ssafy.db.entity.UserCharacter;
-import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -13,6 +11,5 @@ import java.util.Optional;
  */
 @Repository
 public interface UserCharacterRepository extends JpaRepository<UserCharacter, Long> {
-    @Query("SELECT uc FROM UserCharacter uc JOIN FETCH uc.user u WHERE u.userId = :userId")
-    Optional<UserCharacter> findUserCharacterByUserId(@Param("userId") String userId);
+    Optional<UserCharacter> findByUser_UserId(String userId);
 }
