@@ -16,7 +16,11 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Table(name = "user_info")
-public class User extends BaseEntity{
+public class User{
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id = null;
+
+    @Id
     @Column(name = "user_id", unique = true, nullable = false)
     String userId;
 
@@ -28,6 +32,12 @@ public class User extends BaseEntity{
 
     @Column(name = "phone_number", unique = true, nullable = false)
     String phoneNumber;
+
+    @Column(name = "is_valid", columnDefinition = "boolean default true")
+    private Boolean isValid;
+
+    @Column(name = "is_temporary_pw", columnDefinition = "boolean default false")
+    private Boolean isTemporaryPw;
 
     @JsonIgnore
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

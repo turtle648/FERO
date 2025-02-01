@@ -1,7 +1,7 @@
 package com.ssafy.api.service;
 
 import com.ssafy.api.request.UserCharacterRegisterPostReq;
-import com.ssafy.api.request.UserRegisterPostReq;
+import com.ssafy.api.request.UserUpdateReq;
 import com.ssafy.db.entity.User;
 import com.ssafy.db.entity.UserCharacter;
 
@@ -10,4 +10,6 @@ import com.ssafy.db.entity.UserCharacter;
  */
 public interface UserCharacterService {
 	UserCharacter createUserCharacter(UserCharacterRegisterPostReq userCharacterRegisterInfo, User user);
+	UserCharacter updateUserCharacter(String userId, UserUpdateReq updateInfo);
+
 }

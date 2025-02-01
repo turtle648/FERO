@@ -1,6 +1,6 @@
 package com.ssafy.api.service;
 
-import com.ssafy.api.request.UserCharacterRegisterPostReq;
+import com.ssafy.api.request.UserUpdateReq;
 import com.ssafy.db.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import com.ssafy.db.repository.UserRepositorySupport;
 public class UserServiceImpl implements UserService {
 	@Autowired
 	UserRepository userRepository;
-	
+
 	@Autowired
 	UserRepositorySupport userRepositorySupport;
 	
@@ -55,4 +55,24 @@ public class UserServiceImpl implements UserService {
 		System.out.println("user::" + user);
 		return user;
 	}
+
+	@Override
+	public User updateUser(UserUpdateReq updateInfo, String userId) {
+		User user = getUserByUserId(userId);
+
+		// 수정할 필드가 있으면 수정
+		if (updateInfo.getUserEmail() != null && !updateInfo.getUserEmail().isEmpty()) {
+			user.setUserEmail(updateInfo.getUserEmail());
+		}
+
+		if (updateInfo.getPhoneNumber() != null && !updateInfo.getPhoneNumber().isEmpty()) {
+			user.setPhoneNumber(updateInfo.getPhoneNumber());
+		}
+
+		userRepository.save(user);  // user 수정
+
+		return user;
+	}
+
+
 }
