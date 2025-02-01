@@ -162,7 +162,51 @@ public class AuthController {
 		return ResponseEntity.ok(userInfoRes);
 	}
 
+	@PostMapping("/check-password")
+	@ApiOperation(value = "기존 비밀번호 검증", notes = "사용자의 기존 비밀번호를 검증")
+	@ApiResponses({
+			@ApiResponse(code = 200, message = "성공", response = BaseResponseBody.class),
+			@ApiResponse(code = 401, message = "잘못된 비밀번호", response = BaseResponseBody.class),
+			@ApiResponse(code = 500, message = "서버 오류", response = BaseResponseBody.class)
+	})
+	public ResponseEntity<BaseResponseBody> checkCurrentPassword(
+			@RequestParam String currentPassword, HttpServletRequest request) {
+		String authHeader = request.getHeader("Authorization");
+		String userId = extractUserIdFromToken(authHeader);
 
+		User user = userRepository.findByUserId(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+		// 기존 비밀번호와 DB에 저장된 비밀번호를 비교
+		if (passwordEncoder.matches(currentPassword, user.getUserPassword())) {
+			return ResponseEntity.ok(BaseResponseBody.of(200, "기존 비밀번호와 일치"));
+		}
+
+		// 잘못된 비밀번호인 경우
+		return ResponseEntity.status(401).body(BaseResponseBody.of(401, "일치하지 않음"));
+	}
+
+	@PutMapping("/update-password")
+	@ApiOperation(value = "새 비밀번호로 업데이트", notes = "새 비밀번호로 사용자의 비밀번호를 업데이트한다.")
+	@ApiResponses({
+			@ApiResponse(code = 200, message = "성공", response = BaseResponseBody.class),
+			@ApiResponse(code = 400, message = "잘못된 요청", response = BaseResponseBody.class),
+			@ApiResponse(code = 500, message = "서버 오류", response = BaseResponseBody.class)
+	})
+	public ResponseEntity<BaseResponseBody> updatePassword(
+			@RequestParam String newPassword, HttpServletRequest request) {
+
+		String authHeader = request.getHeader("Authorization");
+		String userId = extractUserIdFromToken(authHeader);
+
+		User user = userRepository.findByUserId(userId)
+				.orElseThrow(() -> new RuntimeException("User not found"));
+
+		// 새 비밀번호 암호화 후 저장
+		user.setUserPassword(passwordEncoder.encode(newPassword));
+		userRepository.save(user);
+
+		return ResponseEntity.ok(BaseResponseBody.of(200, "Password updated successfully"));
+	}
 
 
 //	public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request) {

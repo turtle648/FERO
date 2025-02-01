@@ -11,4 +11,5 @@ public interface UserService {
 	User createUser(UserRegisterPostReq userRegisterInfo);
 	User getUserByUserId(String userId);
 	User updateUser(UserUpdateReq updateInfo, String userId);
+
 }
