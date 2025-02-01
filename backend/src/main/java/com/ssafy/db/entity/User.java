@@ -36,6 +36,9 @@ public class User{
     @Column(name = "is_valid", columnDefinition = "boolean default true")
     private Boolean isValid;
 
+    @Column(name = "is_temporary_pw", columnDefinition = "boolean default false")
+    private Boolean isTemporaryPw;
+
     @JsonIgnore
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "user_password", nullable = false)

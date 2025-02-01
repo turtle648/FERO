@@ -1,6 +1,7 @@
 package com.ssafy.api.controller;
 
-import com.ssafy.api.request.FindUserRequest;
+import com.ssafy.api.request.FindUserIdReq;
+import com.ssafy.api.request.FindUserPwReq;
 import com.ssafy.api.request.UserUpdateReq;
 import com.ssafy.api.response.UserInfoRes;
 import com.ssafy.api.service.EmailService;
@@ -28,7 +29,10 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Random;
 
 /**
  * 인증 관련 API 요청 처리를 위한 컨트롤러 정의.
@@ -69,24 +73,29 @@ public class AuthController {
     @ApiResponses({
         @ApiResponse(code = 200, message = "성공", response = UserLoginPostRes.class),
         @ApiResponse(code = 401, message = "인증 실패", response = BaseResponseBody.class),
+		@ApiResponse(code = 403, message = "임시 비밀번호 사용중", response = BaseResponseBody.class),
         @ApiResponse(code = 404, message = "사용자 없음", response = BaseResponseBody.class),
         @ApiResponse(code = 500, message = "서버 오류", response = BaseResponseBody.class)
     })
 	public ResponseEntity<UserLoginPostRes> login(@RequestBody @ApiParam(value="로그인 정보", required = true) UserLoginPostReq loginInfo) {
 		String userId = loginInfo.getId();
 		String password = loginInfo.getPassword();
-		System.out.println("Login ID: " + userId); // Check the userId being passed
-		System.out.println("Password: " + password); // Check the password being passed
+//		System.out.println("Login ID: " + userId); // Check the userId being passed
+//		System.out.println("Password: " + password); // Check the password being passed
 
 		User user = userService.getUserByUserId(userId);
 
 		// 로그인 요청한 유저로부터 입력된 패스워드와 디비에 저장된 유저의 암호화된 패스워드가 같은지 확인.(유효한 패스워드인지 여부 확인)
 		if(passwordEncoder.matches(password, user.getUserPassword())) {
+			// 임시 비밀번호로 로그인 된 경우 비밀번호 변경 필요하다는 응답.
+			if(user.getIsTemporaryPw()) {
+				return ResponseEntity.ok(UserLoginPostRes.of(200, "임시 비밀번호로 로그인되었습니다. 비밀번호를 변경해주세요.", JwtTokenUtil.getToken(userId), true));
+			}
 			// 유효한 패스워드가 맞는 경우, 로그인 성공으로 응답.(액세스 토큰을 포함하여 응답값 전달)
-			return ResponseEntity.ok(UserLoginPostRes.of(200, "Success", JwtTokenUtil.getToken(userId)));
+			return ResponseEntity.ok(UserLoginPostRes.of(200, "Success", JwtTokenUtil.getToken(userId), false));
 		}
 		// 유효하지 않는 패스워드인 경우, 로그인 실패로 응답.
-		return ResponseEntity.status(401).body(UserLoginPostRes.of(401, "Invalid Password", null));
+		return ResponseEntity.status(401).body(UserLoginPostRes.of(401, "Invalid Password", null, false));
 	}
 
 	@PostMapping("/logout")
@@ -113,6 +122,7 @@ public class AuthController {
 
 		String userId = JwtTokenUtil.getUserIdFromJWT(accessToken);
 
+		System.out.println("로그아웃!!");
 		return ResponseEntity.ok(BaseResponseBody.of(200, "Logout Successful"));
 	}
 
@@ -209,9 +219,10 @@ public class AuthController {
 
 		// 새 비밀번호 암호화 후 저장
 		user.setUserPassword(passwordEncoder.encode(newPassword));
+		user.setIsTemporaryPw(false); // 임시 비밀번호 아님
 		userRepository.save(user);
 
-		return ResponseEntity.ok(BaseResponseBody.of(200, "Password updated successfully"));
+		return ResponseEntity.ok(BaseResponseBody.of(200, "비밀번호가 변경되었습니다."));
 	}
 
 	@PutMapping("/delete")
@@ -247,7 +258,7 @@ public class AuthController {
 			@ApiResponse(code = 404, message = "사용자 없음", response = BaseResponseBody.class),
 			@ApiResponse(code = 500, message = "서버 오류", response = BaseResponseBody.class)
 	})
-	public ResponseEntity<BaseResponseBody> findUserId(@RequestBody FindUserRequest request) {
+	public ResponseEntity<BaseResponseBody> findUserId(@RequestBody FindUserIdReq request) {
 		// 1. user_name과 user_email이 일치하는 사용자 찾기
 		Optional<User> userOptional = userRepository.findByUserNameAndUserEmail(request.getUserName(), request.getUserEmail());
 
@@ -266,6 +277,70 @@ public class AuthController {
 		}
 
 		return ResponseEntity.ok(BaseResponseBody.of(200, "이메일로 user_id를 전송했습니다."));
+	}
+
+	@PostMapping("/find-password")
+	@ApiOperation(value = "비밀번호 찾기", notes = "사용자에게 임시 비밀번호를 이메일로 전송한다.")
+	@ApiResponses({
+			@ApiResponse(code = 200, message = "성공", response = BaseResponseBody.class),
+			@ApiResponse(code = 404, message = "사용자 없음", response = BaseResponseBody.class),
+			@ApiResponse(code = 500, message = "서버 오류", response = BaseResponseBody.class)
+	})
+	public ResponseEntity<BaseResponseBody> findPassword(@RequestBody FindUserPwReq request){
+		// 1. 사용자 찾기 (user_email - user_id)
+		Optional<User> userOptional = userRepository.findByUserEmailAndUserId(request.getUserEmail(), request.getUserId());
+
+		if (!userOptional.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(BaseResponseBody.of(404, "해당하는 회원이 없습니다."));
+		}
+		User user = userOptional.get();
+
+		// 2. 임시 비밀번호 생성
+		String tempPW = generateTempPw();
+		user.setUserPassword(passwordEncoder.encode(tempPW));
+		user.setIsTemporaryPw(true);
+
+		// 3. 이메일로 임시 비밀번호 전송
+		boolean emailSent = emailService.sendUserPwEmail(user.getUserEmail(), tempPW);
+		if (!emailSent) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(BaseResponseBody.of(500, "이메일 전송 실패"));
+		}
+
+		user.setIsTemporaryPw(true);
+		userRepository.save(user);
+		return ResponseEntity.ok(BaseResponseBody.of(200, "이메일로 임시 비밀번호를 전송했습니다."));
+	}
+
+	// 임시 비밀번호 생성 (숫자, 영문자, 특수문자 포함 9자 이상)
+	private String generateTempPw() {
+		String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+";
+		Random random = new Random();
+		StringBuilder password = new StringBuilder();
+
+		// 최소 9자 이상, 숫자, 영문자, 특수문자 포함
+		password.append(characters.charAt(random.nextInt(62))); // 영문 대문자, 소문자, 숫자 중 하나
+		password.append(characters.charAt(random.nextInt(62)));
+		password.append(characters.charAt(random.nextInt(62)));
+		password.append(characters.charAt(random.nextInt(62)));
+		password.append(characters.charAt(random.nextInt(62)));
+		password.append(characters.charAt(random.nextInt(62)));
+		password.append(characters.charAt(random.nextInt(62)));
+		password.append(characters.charAt(random.nextInt(62)));
+		password.append("!"); // 특수문자
+
+		// 문자열을 문자 배열로 변환하고 섞기
+		char[] chars = password.toString().toCharArray();
+		for (int i = chars.length - 1; i > 0; i--) {
+			int j = random.nextInt(i + 1);
+			char temp = chars[i];
+			chars[i] = chars[j];
+			chars[j] = temp;
+		}
+
+		// 섞인 문자 배열을 다시 문자열로 변환
+		return new String(chars);
 	}
 
 

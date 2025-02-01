@@ -24,4 +24,19 @@ public class EmailService {
             return false;
         }
     }
+
+    public boolean sendUserPwEmail(String toEmail, String newPw) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(toEmail);
+            message.setSubject("싸피트니스 : 회원님의 임시 비밀번호입니다.");
+            message.setText("안녕하세요,\n\n회원님의 임시 비밀번호는 다음과 같습니다: " + newPw + "\n\n로그인 후 비밀번호를 꼭 변경하세요. \n\n감사합니다.");
+
+            mailSender.send(message);  // 이메일 발송
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

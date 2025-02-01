@@ -10,9 +10,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @ApiModel("FindUserRequest")
-public class FindUserRequest {
-    @ApiModelProperty(name = "유저 이름", example = "ans")
-    private String userName;
+public class FindUserPwReq {
+    @ApiModelProperty(name = "유저 아이디", example = "ans")
+    private String userId;
     @ApiModelProperty(name = "유저 이메일", example = "ans@test.com")
     private String userEmail;
 }
+
