@@ -1,6 +1,7 @@
 package com.ssafy.api.service;
 
 import com.ssafy.api.request.UserCharacterRegisterPostReq;
+import com.ssafy.api.request.UserUpdateReq;
 import com.ssafy.db.entity.User;
 import com.ssafy.db.entity.UserCharacter;
 import com.ssafy.db.repository.UserCharacterRepository;
@@ -43,5 +44,20 @@ public class UserCharacterServiceImpl implements UserCharacterService {
         userCharacter.setPoints((short) 0);
 
         return userCharacterRepository.save(userCharacter);
+    }
+
+    @Override
+    public UserCharacter updateUserCharacter(String userId, UserUpdateReq updateInfo) {
+        UserCharacter userCharacter = userCharacterRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new RuntimeException("UserCharacter not found for userId: " + userId));
+
+        // userNickname 수정
+        if (updateInfo.getUserNickname() != null && !updateInfo.getUserNickname().isEmpty()) {
+            userCharacter.setUserNickname(updateInfo.getUserNickname());
+        }
+
+        userCharacterRepository.save(userCharacter);
+
+        return userCharacter;
     }
 }
