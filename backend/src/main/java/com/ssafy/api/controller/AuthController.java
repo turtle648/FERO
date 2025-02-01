@@ -1,7 +1,9 @@
 package com.ssafy.api.controller;
 
+import com.ssafy.api.request.FindUserRequest;
 import com.ssafy.api.request.UserUpdateReq;
 import com.ssafy.api.response.UserInfoRes;
+import com.ssafy.api.service.EmailService;
 import com.ssafy.api.service.UserCharacterService;
 import com.ssafy.db.entity.UserCharacter;
 import com.ssafy.db.repository.UserCharacterRepository;
@@ -26,6 +28,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 /**
  * 인증 관련 API 요청 처리를 위한 컨트롤러 정의.
@@ -44,6 +47,9 @@ public class AuthController {
 	UserRepository userRepository;
 	@Autowired
 	UserCharacterRepository userCharacterRepository;
+	@Autowired
+	private EmailService emailService;
+
 
 	private String extractUserIdFromToken(String token) {
 		// 'Bearer ' 부분 제거
@@ -234,6 +240,33 @@ public class AuthController {
 		return ResponseEntity.ok(BaseResponseBody.of(200, "User successfully deactivated"));
 	}
 
+	@PostMapping("/find-id")
+	@ApiOperation(value = "회원 ID 찾기", notes = "이름과 이메일을 입력받아 회원의 user_id를 찾고, 이메일로 전송한다.")
+	@ApiResponses({
+			@ApiResponse(code = 200, message = "성공", response = BaseResponseBody.class),
+			@ApiResponse(code = 404, message = "사용자 없음", response = BaseResponseBody.class),
+			@ApiResponse(code = 500, message = "서버 오류", response = BaseResponseBody.class)
+	})
+	public ResponseEntity<BaseResponseBody> findUserId(@RequestBody FindUserRequest request) {
+		// 1. user_name과 user_email이 일치하는 사용자 찾기
+		Optional<User> userOptional = userRepository.findByUserNameAndUserEmail(request.getUserName(), request.getUserEmail());
+
+		if (!userOptional.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(BaseResponseBody.of(404, "해당하는 회원이 없습니다."));
+		}
+
+		// 2. 사용자 존재 시 이메일 전송
+		User user = userOptional.get();
+		boolean emailSent = emailService.sendUserIdEmail(user.getUserEmail(), user.getUserId());
+
+		if (!emailSent) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(BaseResponseBody.of(500, "이메일 전송 실패"));
+		}
+
+		return ResponseEntity.ok(BaseResponseBody.of(200, "이메일로 user_id를 전송했습니다."));
+	}
 
 
 //	public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request) {
