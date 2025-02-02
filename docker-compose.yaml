@@ -29,19 +29,7 @@ services:
       retries: 3
     depends_on:
       - frontend
-
-  certbot:
-    image: certbot/certbot:latest
-    container_name: certbot
-    depends_on:
-      web:
-        condition: service_healthy
-    entrypoint: "/bin/sh -c 'certbot certonly --webroot --webroot-path=/var/www/certbot --email hjcho9510@google.com --agree-tos --no-eff-email -d i12e103.p.ssafy.io && certbot renew --dry-run'"
-    volumes:
-      - ./work_dir/certbot/conf:/etc/letsencrypt
-      - ./work_dir/certbot/logs:/var/log/letsencrypt
-      - ./work_dir/certbot/data:/var/www/certbot
-
+      
   spring-boot:
     build:
       context: ./backend
