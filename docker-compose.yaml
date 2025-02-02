@@ -6,8 +6,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     volumes:
-      - frontend_dist:/app/dist
-    container_name: frontend_build
+      - ./frontend/dist:/app/dist
+    container_name: frontend
 
   web:
     image: nginx:latest
@@ -70,7 +70,6 @@ services:
       start_period: 10s
 
 volumes:
-  frontend_dist:
   my-sql-volume:
 
 networks:
