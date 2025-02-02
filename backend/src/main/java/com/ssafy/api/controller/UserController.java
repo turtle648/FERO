@@ -2,6 +2,8 @@ package com.ssafy.api.controller;
 
 import com.ssafy.api.request.UserCharacterRegisterPostReq;
 import com.ssafy.api.response.UserInfoRes;
+import org.springframework.data.redis.core.ReactiveRedisOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import com.ssafy.api.service.RegistrationService;
 import com.ssafy.api.service.UserCharacterService;
 import com.ssafy.common.util.JwtTokenUtil;
@@ -23,6 +25,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.Duration;
 import java.util.Optional;
 
 /**
@@ -38,9 +41,10 @@ public class UserController {
 
 	@Autowired
     UserCharacterService userCharacterService;
-
     @Autowired
     private RegistrationService registrationService;
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
 
     @PostMapping()
@@ -53,9 +57,7 @@ public class UserController {
     })
     public ResponseEntity<? extends BaseResponseBody> saveUserInfo(
             @RequestBody @ApiParam(value = "회원가입 정보", required = true) UserRegisterPostReq registerInfo) {
-
         String sessionId = registrationService.initializeRegistration(registerInfo);
-
         return ResponseEntity.status(200).body(BaseResponseBody.of(200, sessionId));
     }
 
@@ -69,4 +71,25 @@ public class UserController {
 
         return ResponseEntity.status(200).body(BaseResponseBody.of(200, "Join Success"));
     }
+
+    // 이메일 인증 요청
+    @PostMapping("/verify-email")
+    @ApiOperation(value = "이메일 인증", notes = "이메일 인증 코드 확인")
+    public ResponseEntity<BaseResponseBody> verifyEmail(
+            @RequestParam String email, @RequestParam String code) {
+
+        String storedCode = (String) redisTemplate.opsForValue().get("email:" + email);
+
+
+        if (storedCode == null || !storedCode.equals(code)) {
+            return ResponseEntity.status(400).body(BaseResponseBody.of(400, "인증 코드가 유효하지 않습니다."));
+        }
+
+        // 인증 완료 → 해당 세션 ID의 verified 상태 true로 변경
+        redisTemplate.opsForValue().set("verified:" + email, true, Duration.ofMinutes(30));
+        redisTemplate.delete("email:" + email);
+
+        return ResponseEntity.ok(BaseResponseBody.of(200, "이메일 인증 성공"));
+    }
+
 }

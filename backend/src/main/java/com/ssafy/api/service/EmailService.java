@@ -39,4 +39,20 @@ public class EmailService {
             return false;
         }
     }
+
+    // 회원가입 이메일 인증
+    public boolean sendVerificationEmail(String toEmail, String verificationCode) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(toEmail);
+            message.setSubject("회원가입 이메일 인증코드 입니다.");
+            message.setText("인증 코드 : " + verificationCode +
+                    "\n\n4분 내에 입력해주세요!");
+
+            mailSender.send(message);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
