@@ -1,3 +1,5 @@
+<!-- 일단 사용하지 않음. -->
+
 <template>
   <div class="fitness-modal">
     <button id="close-btn" @click="closeFitnessModal">X</button>

@@ -22,6 +22,10 @@
       <div class="option-item" @click="handleMultiExercise">같이하기</div>
     </div>
 
+    <!-- 새로운 모달 추가 -->
+    <AloneModal v-if="showAloneModal" @closeAlone="closeAloneModal" />
+    <WithModal v-if="showWithModal" @closeWith="closeWithModal" />
+
     <div class="footer">
       <!-- class명 추가해서 쓰기 -->
       <div class="grid-item" @click="toggleExerciseOptions">운동</div>
@@ -129,7 +133,13 @@ const closeCalendarModal = () => {
 //   showFitnessModal.value = false
 // }
 
-// 운동 옵션 관련 상태와 메서드
+// 운동 모달 (NEW)
+import AloneModal from "@/components/modal/AloneModal.vue"
+import WithModal from "@/components/modal/WithModal.vue"
+
+// 모달 상태 관리
+const showAloneModal = ref(false)
+const showWithModal = ref(false)
 const showExerciseOptions = ref(false)
 
 const toggleExerciseOptions = () => {
@@ -137,13 +147,21 @@ const toggleExerciseOptions = () => {
 }
 
 const handleSoloExercise = () => {
-  console.log('혼자하기 선택')
-  // 혼자하기 관련 로직
+  showExerciseOptions.value = false
+  showAloneModal.value = true
 }
 
 const handleMultiExercise = () => {
-  console.log('같이하기 선택')
-  // 같이하기 관련 로직
+  showExerciseOptions.value = false
+  showWithModal.value = true
+}
+
+const closeAloneModal = () => {
+  showAloneModal.value = false
+}
+
+const closeWithModal = () => {
+  showWithModal.value = false
 }
 </script>
 
