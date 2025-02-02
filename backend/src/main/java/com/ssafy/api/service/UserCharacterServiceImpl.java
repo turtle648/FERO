@@ -38,9 +38,9 @@ public class UserCharacterServiceImpl implements UserCharacterService {
         userCharacter.setUserNickname(userCharacterRegisterInfo.getUserNickname());
         userCharacter.setGender(userCharacterRegisterInfo.getGender());
 
-        userCharacter.setPushupRecord((short) 0);
-        userCharacter.setSquatRecord((short) 0);
-        userCharacter.setPullupRecord((short) 0);
+//        userCharacter.setPushupRecord((short) 0);
+//        userCharacter.setSquatRecord((short) 0);
+//        userCharacter.setPullupRecord((short) 0);
         userCharacter.setPoints((short) 0);
 
         return userCharacterRepository.save(userCharacter);
@@ -59,5 +59,12 @@ public class UserCharacterServiceImpl implements UserCharacterService {
         userCharacterRepository.save(userCharacter);
 
         return userCharacter;
+    }
+
+    @Override
+    public UserCharacter getUserCharacterByUserId(String userId) {
+
+        return userCharacterRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저에 대한 캐릭터 정보를 찾을 수 없습니다."));
     }
 }

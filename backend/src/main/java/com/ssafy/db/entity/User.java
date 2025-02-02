@@ -37,7 +37,7 @@ public class User{
     private Boolean isValid;
 
     @Column(name = "is_temporary_pw", columnDefinition = "boolean default false")
-    private Boolean isTemporaryPw;
+    private Boolean isTemporaryPw = false;
 
     @JsonIgnore
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
