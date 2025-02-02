@@ -12,7 +12,8 @@ CREATE TABLE user_info (
                            user_email VARCHAR(300) NOT NULL UNIQUE,
                            phone_number VARCHAR(13) NOT NULL UNIQUE,
                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                           is_valid boolean default 1
+                           is_valid boolean not null default 1,
+                            is_temporary_pw boolean not null default 0
 );
 
 CREATE TABLE user_character (

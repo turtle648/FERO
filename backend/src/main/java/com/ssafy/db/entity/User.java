@@ -33,11 +33,11 @@ public class User{
     @Column(name = "phone_number", unique = true, nullable = false)
     String phoneNumber;
 
-    @Column(name = "is_valid", columnDefinition = "boolean default true")
-    private Boolean isValid;
+    @Column(name = "is_valid", columnDefinition = "boolean default true", nullable = false)
+    private Boolean isValid = true;
 
-    @Column(name = "is_temporary_pw", columnDefinition = "boolean default false")
-    private Boolean isTemporaryPw;
+    @Column(name = "is_temporary_pw", columnDefinition = "boolean default false", nullable = false)
+    private Boolean isTemporaryPw = false;
 
     @JsonIgnore
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
