@@ -92,4 +92,18 @@ public class UserController {
         return ResponseEntity.ok(BaseResponseBody.of(200, "이메일 인증 성공"));
     }
 
+    // 이메일 중복 확인
+    @GetMapping("/check-email")
+    @ApiOperation(value = "이메일 중복 확인", notes = "사용자가 입력한 이메일이 중복인지 확인")
+    public ResponseEntity<BaseResponseBody> checkEmailDuplication(@RequestParam String email) {
+        boolean exists = userService.existsByUserEmail(email);
+
+        if (exists) {
+            return ResponseEntity.status(409).body(BaseResponseBody.of(409, "이미 사용 중인 이메일입니다."));
+        } else {
+            return ResponseEntity.status(200).body(BaseResponseBody.of(200, "사용 가능한 이메일입니다."));
+        }
+    }
+
+
 }
