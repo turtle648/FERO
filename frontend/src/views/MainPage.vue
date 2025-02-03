@@ -29,9 +29,9 @@
     <div class="footer">
       <!-- class명 추가해서 쓰기 -->
       <div class="grid-item" @click="toggleExerciseOptions">운동</div>
-      <div class="grid-item" @click="openCalendarModal">달력</div>
+      <div class="grid-item" @click="openCalendarModal">기록</div>
       <div class="grid-item" @click="openFriendModal">친구</div>
-      <div class="grid-item">????</div>
+      <div class="grid-item" @click="openAlarmModal"><img src="@/assets/images/icon/alarm.png" alt="알림" /></div>
     </div>
 
     <!-- 친구모달 -->
@@ -42,6 +42,9 @@
 
     <!-- 운동 모달 -->
     <FitnessModal v-if="showFitnessModal" @closeFitness="closeFitnessModal" @openFitness="openFitnessModal" />
+
+    <!-- 알림 모달 -->
+    <AlarmModal v-if="showAlarmModal" @closeAlarm="closeAlarmModal" @openAlarm="openAlarmModal" />
   </div>
   <div v-else class="qr-code">
     <h1>(나중에 큐알 들어갈 자리)</h1>
@@ -163,6 +166,18 @@ const closeAloneModal = () => {
 const closeWithModal = () => {
   showWithModal.value = false
 }
+
+// 알림 모달
+import AlarmModal from "@/components/modal/AlarmModal.vue"
+
+const showAlarmModal = ref(false)
+const openAlarmModal = () => {
+  showAlarmModal.value = true
+}
+
+const closeAlarmModal = () => {
+  showAlarmModal.value = false
+}
 </script>
 
 <style scoped>
@@ -183,7 +198,7 @@ const closeWithModal = () => {
   z-index: 1;
   gap: 2%;
   background-color: rgb(255, 255, 255);
-  height: 5%;
+  height: 7%;
   width: calc(100% - 20px);
 }
 
@@ -220,7 +235,7 @@ const closeWithModal = () => {
 
 .exercise-options {
   position: absolute;
-  bottom: 5%; /* footer의 height와 동일 */
+  bottom: 7%; /* footer의 height와 동일 */
   left: 0;
   width: calc(100% - 20px);
   display: grid;
