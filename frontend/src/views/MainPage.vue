@@ -16,9 +16,19 @@
     <!-- 설정 -->
     <SettingModal v-if="showSettingModal" @closeSetting="closeSettingModal" @openSetting="openSettingModal" />
 
+    <!-- 운동 모드 선택 버튼들 -->
+    <div class="exercise-options" v-show="showExerciseOptions">
+      <div class="option-item" @click="handleSoloExercise">혼자하기</div>
+      <div class="option-item" @click="handleMultiExercise">같이하기</div>
+    </div>
+
+    <!-- 새로운 모달 추가 -->
+    <AloneModal v-if="showAloneModal" @closeAlone="closeAloneModal" />
+    <WithModal v-if="showWithModal" @closeWith="closeWithModal" />
+
     <div class="footer">
       <!-- class명 추가해서 쓰기 -->
-      <div class="grid-item" @click="openFitnessModal">운동</div>
+      <div class="grid-item" @click="toggleExerciseOptions">운동</div>
       <div class="grid-item" @click="openCalendarModal">달력</div>
       <div class="grid-item" @click="openFriendModal">친구</div>
       <div class="grid-item">????</div>
@@ -112,15 +122,46 @@ const closeCalendarModal = () => {
   showCalendarModal.value = false
 }
 
-// 운동 모달
-import FitnessModal from "@/components/modal/FitnessModal.vue"
+// // 운동 모달
+// import FitnessModal from "@/components/modal/FitnessModal.vue"
 
-const showFitnessModal = ref(false)
-const openFitnessModal = () => {
-  showFitnessModal.value = true
+// const showFitnessModal = ref(false)
+// const openFitnessModal = () => {
+//   showFitnessModal.value = true
+// }
+// const closeFitnessModal = () => {
+//   showFitnessModal.value = false
+// }
+
+// 운동 모달 (NEW)
+import AloneModal from "@/components/modal/AloneModal.vue"
+import WithModal from "@/components/modal/WithModal.vue"
+
+// 모달 상태 관리
+const showAloneModal = ref(false)
+const showWithModal = ref(false)
+const showExerciseOptions = ref(false)
+
+const toggleExerciseOptions = () => {
+  showExerciseOptions.value = !showExerciseOptions.value
 }
-const closeFitnessModal = () => {
-  showFitnessModal.value = false
+
+const handleSoloExercise = () => {
+  showExerciseOptions.value = false
+  showAloneModal.value = true
+}
+
+const handleMultiExercise = () => {
+  showExerciseOptions.value = false
+  showWithModal.value = true
+}
+
+const closeAloneModal = () => {
+  showAloneModal.value = false
+}
+
+const closeWithModal = () => {
+  showWithModal.value = false
 }
 </script>
 
@@ -175,6 +216,26 @@ const closeFitnessModal = () => {
   transform: translate(-50%, -50%);
   z-index: 2;
   text-align: center;
+}
+
+.exercise-options {
+  position: absolute;
+  bottom: 5%; /* footer의 height와 동일 */
+  left: 0;
+  width: calc(100% - 20px);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2%;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  z-index: 1;
+}
+
+.option-item {
+  background-color: rgba(88, 104, 255, 0.8);
+  text-align: center;
+  padding: 10px;
+  cursor: pointer;
 }
 
 /* 모바일 */
