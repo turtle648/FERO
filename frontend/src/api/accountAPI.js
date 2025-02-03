@@ -2,7 +2,8 @@
 
 import axios from 'axios';
 
-const BASE_URL = '/api/v1'; // API 기본 URL 설정
+const BASE_URL = 'http://i12e103.p.ssafy.io:8076/api/v1'
+
 
 
 // 로그인 API 호출
@@ -20,54 +21,64 @@ export const login = async (userId, password) => {
 };
 
 
-// 회원가입 API 호출 테스트용(세션 무조건 발급)
-export const signUp = async () => {
-    try {
-      localStorage.setItem('sessionId', 1234)
-      console.log("세션 Id 제대로 받아왔음")
-    } catch (error) {
-      throw new Error('회원가입 실패');
+// 회원가입 API 호출 (세션 발급)
+export const signUp = async (userId, password, userName, phoneNumber, userEmail) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/users`, 
+      { userId, password, userName, phoneNumber, userEmail }
+    )
+    console.log('회원가입 1단계 API 호출 결과:', response)
+    return response.data
+  } catch (error) {
+    console.error(error)
+    throw new Error('회원가입 실패')
+  }
+}
+
+
+// 이메일 중복확인 API
+export const checkEmailDuplicateAPI = async (email) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/users/check-email`, {
+      params: { email }
+    })
+    if (response.data.statusCode === 200) {  
+      console.log('이메일 중복 확인 결과:', response)
+      return true
     }
-};
+  } catch (error) {
+    alert('이메일 중복 확인 실패')
+  }
+}
 
-// 회원가입 API 호출
-// export const signUp = async (userData) => {
-//         try {
-//           const response = await axios.post(`${BASE_URL}/users`, userData)
-//           localStorage.setItem('sessionId', response.data)
-//           console.log("세션 Id 제대로 받아왔음")
-//         } catch (error) {
-//           throw new Error('회원가입 실패');
-//         }
-//     };
-
+// 이메일 인증확인 API
+export const verifyEmail = async (code, email) => {
+  try {
+    // `code`와 `email`을 쿼리스트링으로 전달
+    const response = await axios.post(
+      `${BASE_URL}/users/verify-email?code=${code}&email=${encodeURIComponent(email)}`
+    )
+    console.log('이메일 인증 결과:', response)
+    return response.data?.statusCode === 200
+  } catch (error) {
+    console.error('이메일 인증 실패:', error)
+    alert('이메일 인증에 실패했습니다.')
+    return false // 실패 시 false 반환
+  }
+}
 
 // 캐릭터 등록 API 호출
-export const registerCharacter = async (userId, gender, userNickname) => {
-  const sessionId = localStorage.getItem('sessionId');  // localStorage에서 sessionId 가져오기
-  // 세션 ID가 없으면 에러 처리
-  if (!sessionId) {
-    throw new Error('세션 ID가 존재하지 않습니다.');
-  }
+export const registerCharacter = async (gender, sessionId) => {
   try {
     const response = await axios.post(
-      `${BASE_URL}/users/character?sessionId=${sessionId}`,
-      {
-        gender,
-        userId,
-        userNickname
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-    console.log('성공적으로 받음')
-    return response.data;  // 응답 데이터 반환
+      `${BASE_URL}/users/character?sessionId=${encodeURIComponent(sessionId)}`, 
+      { gender }
+    )
+    console.log('캐릭터 등록 결과:', response);
+    return response.data?.statusCode === 200;
   } catch (error) {
-    console.error('API 호출 오류:', error);
-    throw error;  // 에러 발생 시 오류를 던짐
+    console.error('캐릭터 등록 실패:', error);
+    throw new Error('캐릭터 등록 실패');
   }
 };
 
