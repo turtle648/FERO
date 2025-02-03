@@ -2,7 +2,8 @@
 
 import axios from 'axios';
 
-const BASE_URL = '/api/v1'; // API 기본 URL 설정
+const BASE_URL = 'http://i12e103.p.ssafy.io:8076/api/v1'
+
 
 
 // 로그인 API 호출
@@ -20,27 +21,40 @@ export const login = async (userId, password) => {
 };
 
 
-// 회원가입 API 호출 테스트용(세션 무조건 발급)
-export const signUp = async () => {
-    try {
-      localStorage.setItem('sessionId', 1234)
-      console.log("세션 Id 제대로 받아왔음")
-    } catch (error) {
-      throw new Error('회원가입 실패');
-    }
+// 회원가입 API 호출 (세션 발급)
+
+export const signUp1 = async (userId, password, userName, phoneNumber, userEmail) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/users`, {
+      userId,
+      password,
+      userName,
+      phoneNumber,
+      userEmail,
+    });
+    // 요청 성공 시 처리
+    return response.data; // 예시로 응답 데이터 반환
+  } catch (error) {
+    console.error(error);
+    throw new Error('회원가입 실패');
+  }
 };
 
-// 회원가입 API 호출
-// export const signUp = async (userData) => {
-//         try {
-//           const response = await axios.post(`${BASE_URL}/users`, userData)
-//           localStorage.setItem('sessionId', response.data)
-//           console.log("세션 Id 제대로 받아왔음")
-//         } catch (error) {
-//           throw new Error('회원가입 실패');
-//         }
-//     };
 
+// 이메일 중복확인 API
+export const checkEmailDuplicateAPI = async (email) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/users/check-email`, {
+      params: { email }
+    })
+    if (response.data.statusCode === 200) {  
+      console.log(response.data)
+      return true
+    }
+  } catch (error) {
+    alert('이메일 중복 확인 실패')
+  }
+};
 
 // 캐릭터 등록 API 호출
 export const registerCharacter = async (userId, gender, userNickname) => {
