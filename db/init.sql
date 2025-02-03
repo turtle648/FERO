@@ -1,9 +1,3 @@
-DROP DATABASE IF EXISTS E103_DB;
-
-CREATE DATABASE E103_DB;
-
-USE E103_DB;
-
 CREATE TABLE user_info (
                            id Bigint PRIMARY KEY AUTO_INCREMENT,
                            user_id VARCHAR(30) NOT NULL UNIQUE,
