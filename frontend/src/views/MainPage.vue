@@ -31,7 +31,7 @@
       <div class="grid-item" @click="toggleExerciseOptions">운동</div>
       <div class="grid-item" @click="openCalendarModal">기록</div>
       <div class="grid-item" @click="openFriendModal">친구</div>
-      <div class="grid-item"><img src="@/assets/images/icon/alarm.png" alt="알림" /></div>
+      <div class="grid-item" @click="openAlarmModal"><img src="@/assets/images/icon/alarm.png" alt="알림" /></div>
     </div>
 
     <!-- 친구모달 -->
