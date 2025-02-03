@@ -1,3 +1,5 @@
+USE E103_DB;
+
 CREATE TABLE user_info (
                            id Bigint PRIMARY KEY AUTO_INCREMENT,
                            user_id VARCHAR(30) NOT NULL UNIQUE,
