@@ -123,7 +123,7 @@ const gender = ref('')
 
 
 // 변수 초기화
-const setObjectDefault = () => {
+const resetFields = () => {
   id.value = ''
   password.value = ''
   confirmPassword.value = ''
@@ -135,22 +135,14 @@ const setObjectDefault = () => {
   emailConfirmCode.value = ''
 }
 
+// 로그인 API 호출
 const handleSubmit = async () => {
-  try {
-    const data = await login(id.value, password.value)
-    if (data.token) {
-      userStore.setAccessToken(data.token) // Pinia에서 accessToken 설정
-      alert('로그인 성공^.^')
-      setObjectDefault()
-      router.push('/main')
-    } else {
-      alert('로그인 실패: 서버에서 토큰을 반환하지 않았습니다.')
-    }
-  } catch (error) {
-    console.error('로그인 처리 중 에러 발생:', error)
-    alert('로그인 처리 중 문제가 발생했습니다.')
+  const result = login(id.value, password.value)
+  if (result) { 
+    userStore.setAccessToken(result)
+    router.push('/main') 
   }
-};
+}
 
 // 이메일 중복확인 API
 const checkEmailDuplicate = (email) => {
@@ -209,15 +201,6 @@ const openSignUp = () => {
 const closeSignUp = () => {
   isSignUpMode.value = false
   resetFields()
-}
-
-const resetFields = () => {
-  id.value = ''
-  password.value = ''
-  confirmPassword.value = ''
-  email.value = ''
-  phone.value = ''
-  name.value = ''
 }
 
 const close = () => {
