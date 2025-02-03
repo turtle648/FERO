@@ -70,165 +70,165 @@
         <form v-if="signUpPage === 2" @submit.prevent="handleSignUp2">
           <div class="input-group">
             <input type="text" v-model="emailConfirmCode" placeholder="인증 코드를 입력하세요" required />
-            <button type="button" @click="verifyEmailCode">인증 확인</button>
-          </div>
-          <div>
-            <button type="submit">다음</button>
+            <button type="submit">인증 확인</button>
           </div>
         </form>
 
-        <form v-if="signUpPage === 3" @submit.prevent="handleSignUp2">
+        <form v-if="signUpPage === 3" @submit.prevent="handleSignUp3">
           <div class="input-group">
-            <label for="user-gender">Gender</label>
+            <label for="user-gender">Character Gender</label>
             <input type="text" id="gender" v-model="gender" placeholder="남 = M / 여 = F" required />
           </div>
-          <div class="input-group">
-            <label for="user-nickname">Nickname</label>
-            <input type="text" id="user-nickname" v-model="userNickname" placeholder="닉네임을 입력하세요" required />
+          <div>
+            <hr>
+            캐릭터 고르는 칸으로 만들 예정입니다.
+            <hr>
+            캐릭터 고르는 칸으로 만들 예정입니다.
+            <hr>
+            캐릭터 고르는 칸으로 만들 예정입니다.
+            <hr>
+            캐릭터 고르는 칸으로 만들 예정입니다.
           </div>
           <div>
             <button type="submit">완료</button>
           </div>
         </form>
-
-        <div>
-          <button @click="closeSignUp">로그인 페이지로 가기</button>
-        </div>
       </div>
     </div>
   </div>
 </template>
   
 <script setup>
-import { ref } from 'vue';
-import { defineEmits } from 'vue';
-import { useRouter } from 'vue-router';
-import { login, registerCharacter } from '@/api/accountAPI';
-import { useUserStore } from '@/stores/store'; // Pinia store import
+import { ref } from 'vue'
+import { defineEmits } from 'vue'
+import { useRouter } from 'vue-router'
+import { login, checkEmailDuplicateAPI, signUp, verifyEmail, registerCharacter} from '@/api/accountAPI'
+import { useUserStore } from '@/stores/store'
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close'])
+const userStore = useUserStore() // Pinia store 사용
+const router = useRouter()
+const isSignUpMode = ref(false)
+const signUpPage = ref(1)
 
-const userStore = useUserStore(); // Pinia store 사용
+const id = ref('')
+const password = ref('')
+const confirmPassword = ref('')
+const name = ref('')
+const phone = ref('')
+const email = ref('')
+const isEmailAvailable = ref(false)
+const emailConfirmCode = ref('')
+const gender = ref('')
 
-const isSignUpMode = ref(false);
-
-const id = ref('');
-const password = ref('');
-const confirmPassword = ref('');
-const name = ref('');
-const phone = ref('');
-const email = ref('');
-const isEmailAvailable = ref(false);
-const emailConfirmCode = ref('');
-const gender = ref('');
-const userNickname = ref('');
-
-const signUpPage = ref(1);
-
-const router = useRouter();
 
 // 변수 초기화
 const setObjectDefault = () => {
-  id.value = '';
-  password.value = '';
-  confirmPassword.value = '';
-  email.value = '';
-  phone.value = '';
-  name.value = '';
-  gender.value = '';
-  userNickname.value = '';
-  isEmailAvailable.value = false;
-};
+  id.value = ''
+  password.value = ''
+  confirmPassword.value = ''
+  email.value = ''
+  phone.value = ''
+  name.value = ''
+  gender.value = ''
+  isEmailAvailable.value = false
+  emailConfirmCode.value = ''
+}
 
 const handleSubmit = async () => {
   try {
-    const data = await login(id.value, password.value);
+    const data = await login(id.value, password.value)
     if (data.token) {
-      userStore.setAccessToken(data.token); // Pinia에서 accessToken 설정
-      alert('로그인 성공^.^');
-      setObjectDefault();
-      router.push('/main');
+      userStore.setAccessToken(data.token) // Pinia에서 accessToken 설정
+      alert('로그인 성공^.^')
+      setObjectDefault()
+      router.push('/main')
     } else {
-      alert('로그인 실패: 서버에서 토큰을 반환하지 않았습니다.');
+      alert('로그인 실패: 서버에서 토큰을 반환하지 않았습니다.')
     }
   } catch (error) {
-    console.error('로그인 처리 중 에러 발생:', error);
-    alert('로그인 처리 중 문제가 발생했습니다.');
+    console.error('로그인 처리 중 에러 발생:', error)
+    alert('로그인 처리 중 문제가 발생했습니다.')
   }
 };
 
 // 이메일 중복확인 API
-import { checkEmailDuplicateAPI } from '@/api/accountAPI';
 const checkEmailDuplicate = (email) => {
   checkEmailDuplicateAPI(email)
     .then((result) => {
       if (result) {
-        isEmailAvailable.value = true;
+        isEmailAvailable.value = true
+        alert('이메일 중복확인이 완료되었습니다.')
       }
-    });
-};
+    })
+}
 
 // 회원가입 API 1번
-import { signUp1 } from '@/api/accountAPI';
 const handleSignUp1 = () => {
   if (password.value !== confirmPassword.value) {
-    alert('비밀번호가 일치하지 않습니다.');
-    return;
+    alert('비밀번호가 일치하지 않습니다.')
+    return
   } else if (!isEmailAvailable.value) {
-    alert('이메일 중복체크를 진행해 주세요.');
-    return;
+    alert('이메일 중복체크를 진행해 주세요.')
+    return
   } else {
-    signUp1(id.value, password.value, name.value, userNickname.value, email.value)
+    signUp(id.value, password.value, name.value, phone.value, email.value)
       .then((result) => {
-        userStore.setSessionId(result.message); // Pinia에서 sessionId 설정
-        signUpPage.value = 2;
+        userStore.setSessionId(result.message) // Pinia에서 sessionId 설정
+        signUpPage.value = 2
       });
   }
 };
 
+// 인증 코드 확인 후 3페이지로 이동
 const handleSignUp2 = async () => {
-  try {
-    await registerCharacter(id.value, gender.value, userNickname.value);
-    alert('회원가입 완료!');
-    closeSignUp();
-  } catch (error) {
-    console.error('회원가입 처리 중 에러 발생:', error);
-    alert('회원가입 처리 중 문제가 발생했습니다.');
+  const result = await verifyEmail(emailConfirmCode.value, email.value)
+  if (result) { signUpPage.value = 3} 
+  else { alert('인증 코드가 유효하지 않습니다. 다시 시도해주세요.')}
+}
+
+const handleSignUp3 = async () => {
+  const result = await registerCharacter(gender.value, userStore.sessionId)
+  if (result) {
+    userStore.setUserId(id.value)
+    userStore.setAccessToken(result.data.message)
+    alert('회원가입이 완료되었습니다.')
   }
-};
+  closeSignUp()
+}
 
 const handleSocialLogin = (platform) => {
-  alert(`${platform} 소셜 로그인! 아직 구현 안했습니다.`);
-};
+  alert(`${platform} 소셜 로그인! 아직 구현 안했습니다.`)
+}
 
 const openSignUp = () => {
-  isSignUpMode.value = true;
-  resetFields();
-};
+  isSignUpMode.value = true
+  resetFields()
+}
 
 const closeSignUp = () => {
-  isSignUpMode.value = false;
-  resetFields();
-};
+  isSignUpMode.value = false
+  resetFields()
+}
 
 const resetFields = () => {
-  id.value = '';
-  password.value = '';
-  confirmPassword.value = '';
-  email.value = '';
-  phone.value = '';
-  name.value = '';
-};
+  id.value = ''
+  password.value = ''
+  confirmPassword.value = ''
+  email.value = ''
+  phone.value = ''
+  name.value = ''
+}
 
 const close = () => {
-  resetFields();
-  emit('close');
-};
+  resetFields()
+  emit('close')
+}
 
 const closeModalOutside = () => {
-  resetFields();
-  emit('close');
-};
+  resetFields()
+  emit('close')
+}
 </script>
   
   <style scoped>
@@ -260,6 +260,7 @@ const closeModalOutside = () => {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    background-color: blanchedalmond;
   }
   
   button.close-btn {
