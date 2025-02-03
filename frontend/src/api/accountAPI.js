@@ -18,6 +18,7 @@ export const login = async (id, password) => {
   }
 }
 
+// 로그아웃 API 호출
 
 // 회원가입 API 호출 (세션 발급)
 export const signUp = async (userId, password, userName, phoneNumber, userEmail) => {

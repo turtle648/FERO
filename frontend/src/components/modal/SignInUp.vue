@@ -137,11 +137,13 @@ const resetFields = () => {
 
 // 로그인 API 호출
 const handleSubmit = async () => {
-  const result = login(id.value, password.value)
-  if (result) { 
-    userStore.setAccessToken(result)
-    router.push('/main') 
-  }
+  try {
+    const result = await login(id.value, password.value)
+    if (result) { 
+      userStore.setAccessToken(result)
+      router.push('/main') 
+    }
+  } catch (error) {console.log(error)}
 }
 
 // 이메일 중복확인 API
