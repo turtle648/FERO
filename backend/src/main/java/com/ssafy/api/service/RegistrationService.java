@@ -5,6 +5,7 @@ import com.ssafy.api.request.UserRegisterPostReq;
 import com.ssafy.common.exception.handler.RegistrationException;
 import com.ssafy.db.entity.User;
 import com.ssafy.db.entity.UserCharacter;
+import com.ssafy.db.repository.UserCharacterRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -53,6 +54,9 @@ public class RegistrationService {
         return false;
     }
 
+    @Autowired
+    UserCharacterRepository userCharacterRepository;
+
     public String initializeRegistration(UserRegisterPostReq userInfo) {
         String sessionId = UUID.randomUUID().toString();
 
@@ -92,19 +96,23 @@ public class RegistrationService {
             // 캐릭터 생성 및 연결
             UserCharacter character = new UserCharacter();
             character.setUser(user);
+            character.setId(user.getId());
             character.setUserNickname(characterInfo.getUserNickname());
             character.setGender(characterInfo.getGender());
-            character.setPushupRecord((short) 0);
-            character.setSquatRecord((short) 0);
-            character.setPullupRecord((short) 0);
+//            character.setPushupRecord((short) 0);
+//            character.setSquatRecord((short) 0);
+//            character.setPullupRecord((short) 0);
             character.setPoints((short) 0);
 
             user.setUserCharacter(character); // 양방향 관계 설정
+
+            userCharacterRepository.save(character);
+
             redisTemplate.delete("reg:" + sessionId);
 
             log.info("Completed registration for user: {}", user.getUserId());
         } catch (Exception e) {
-            log.error("Registration failed: {}", e.getMessage());
+            log.error("Registration failed", e);
             throw new RegistrationException("회원가입 처리 중 오류가 발생했습니다.");
         }
     }

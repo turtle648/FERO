@@ -11,5 +11,5 @@ import com.ssafy.db.entity.UserCharacter;
 public interface UserCharacterService {
 	UserCharacter createUserCharacter(UserCharacterRegisterPostReq userCharacterRegisterInfo, User user);
 	UserCharacter updateUserCharacter(String userId, UserUpdateReq updateInfo);
-
+	UserCharacter getUserCharacterByUserId(String userId);
 }
