@@ -19,16 +19,21 @@ services:
       retries: 3
       
   spring-boot:
+    user: "root"
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: spring-boot
     restart: unless-stopped
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     ports:
       - 8076:8076
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - JAVA_OPTS=-Xms512m -Xmx1024m
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-}
     networks:
       - redis-network
       - my-sql-network
