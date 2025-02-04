@@ -17,17 +17,17 @@ public class ExerciseStatsRatioRes {
     @ApiModelProperty(name="exercise_type")
     private String exerciseType;
     @ApiModelProperty(name="chest_ratio")
-    private BigDecimal chestRatio;
+    private Float chestRatio;
     @ApiModelProperty(name="back_ratio")
-    private BigDecimal backRatio;
+    private Float backRatio;
     @ApiModelProperty(name="stamina_ratio")
-    private BigDecimal staminaRatio;
+    private Float staminaRatio;
     @ApiModelProperty(name="arms_ratio")
-    private BigDecimal armsRatio;
+    private Float armsRatio;
     @ApiModelProperty(name="legs_ratio")
-    private BigDecimal legsRatio;
+    private Float legsRatio;
     @ApiModelProperty(name="abs_ratio")
-    private BigDecimal absRatio;
+    private Float absRatio;
 
     public static ExerciseStatsRatioRes of(ExerciseStatsRatio entity) {
         ExerciseStatsRatioRes res = new ExerciseStatsRatioRes();

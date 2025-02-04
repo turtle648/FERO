@@ -39,15 +39,6 @@ public class UserServiceImpl implements UserService {
 		return userRepository.save(user);
 	}
 
-//	public UserCharacter createCharacter(UserCharacterRegisterPostReq userCharacterInfo){
-//		UserCharacter usercharacter = new UserCharacter();
-//
-//		usercharacter.setUserNickname(userCharacterInfo.getUserNickname());
-//		usercharacter.setGender(userCharacterInfo.getGender());
-//
-//		return userRepository.save(usercharacter);  // 올바른 레포지토리 사용
-//	}
-
 	@Override
 	public User getUserByUserId(String userId) {
 		// 디비에 유저 정보 조회 (userId 를 통한 조회).

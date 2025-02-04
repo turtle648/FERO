@@ -96,7 +96,7 @@ CREATE TABLE exercise_log (
                               exercise_stats_ratio_id BIGINT NOT NULL,  -- exercise_stats_ratio 테이블과 연결
                               exercise_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 운동 일시
                               FOREIGN KEY (user_id) REFERENCES user_character(user_id) ON DELETE CASCADE,
-                              FOREIGN KEY (exercise_score_ratio_id) REFERENCES exercise_stats_ratio(id) ON DELETE CASCADE
+                              FOREIGN KEY (exercise_stats_ratio_id) REFERENCES exercise_stats_ratio(id) ON DELETE CASCADE
 );
 
 
@@ -111,7 +111,7 @@ SELECT
     MAX(CASE WHEN el.exercise_duration = 600 THEN el.exercise_cnt END) as best_count_10min
 FROM
     exercise_log el
-        JOIN exercise_stats_ratio esr ON el.exercise_score_ratio_id = esr.id
+        JOIN exercise_stats_ratio esr ON el.exercise_stats_ratio_id = esr.id
 GROUP BY
     el.user_id, esr.exercise_type;
 
