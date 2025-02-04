@@ -10,7 +10,7 @@ import AudioComponent from '@/components/AudioComponent.vue';
 // When running OpenVidu locally, leave these variables empty
 // For other deployment type, configure them with correct URLs depending on your deployment
 let APPLICATION_SERVER_URL = '';
-let LIVEKIT_URL = 'ws://localhost:7880/';
+let LIVEKIT_URL = 'ws://'+ window.location.hostname + ':7880/';
 configureUrls();
 
 function configureUrls() {
