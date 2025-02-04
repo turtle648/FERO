@@ -34,10 +34,9 @@ CREATE TABLE user_character (
                                 FOREIGN KEY (user_id) REFERENCES user_info(user_id) ON DELETE CASCADE
 );
 
-DELIMITER //
-
 
 -- 경험치에 대한 레벨 업데이트
+DELIMITER //
 CREATE TRIGGER update_user_level
     BEFORE UPDATE ON user_character
     FOR EACH ROW
@@ -51,7 +50,33 @@ BEGIN
         SET NEW.user_level = 999;
 END IF;
 END; //
+DELIMITER ;
 
+
+-- 유저 캐릭터 생성하면 자동으로 스테이터스 정보 생성
+DELIMITER //
+CREATE TRIGGER create_user_stats
+AFTER INSERT ON user_character
+FOR EACH ROW
+BEGIN
+    INSERT INTO user_stats (
+        user_id,
+        arms_stats,
+        legs_stats,
+        chest_stats,
+        abs_stats,
+        back_stats,
+        stamina_stats
+    ) VALUES (
+        NEW.user_id,
+        10,  -- DEFAULT 값들
+        10,
+        10,
+        10,
+        10,
+        10
+    );
+END //
 DELIMITER ;
 
 
