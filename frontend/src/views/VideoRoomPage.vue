@@ -19,7 +19,7 @@ function configureUrls() {
         if (window.location.hostname === 'localhost') {
             APPLICATION_SERVER_URL = 'http://localhost:8076/api/v1/video-room/';
         } else {
-            APPLICATION_SERVER_URL = 'https://' + window.location.hostname + ':8076/api/v1/video-room/';
+            APPLICATION_SERVER_URL = '/api/v1/video-room/';
         }
     }
 
