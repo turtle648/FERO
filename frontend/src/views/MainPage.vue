@@ -17,18 +17,19 @@
     <SettingModal v-if="showSettingModal" @closeSetting="closeSettingModal" @openSetting="openSettingModal" />
 
     <!-- 운동 모드 선택 버튼들 -->
-    <div class="exercise-options" v-show="showExerciseOptions">
-      <div class="option-item" @click="handleSoloExercise">혼자하기</div>
-      <div class="option-item" @click="handleMultiExercise">같이하기</div>
-    </div>
+    <!-- <div class="exercise-options" v-show="showExerciseOptions"> -->
+      <!-- <div class="option-item" @click="handleSoloExercise">혼자하기</div> -->
+      <!-- <div class="option-item" @click="handleMultiExercise">같이하기</div> -->
+    <!-- </div> -->
 
     <!-- 새로운 모달 추가 -->
-    <AloneModal v-if="showAloneModal" @closeAlone="closeAloneModal" />
-    <WithModal v-if="showWithModal" @closeWith="closeWithModal" />
+    <!-- <AloneModal v-if="showAloneModal" @closeAlone="closeAloneModal" /> -->
+    <!-- <WithModal v-if="showWithModal" @closeWith="closeWithModal" /> -->
 
     <div class="footer">
       <!-- class명 추가해서 쓰기 -->
-      <div class="grid-item" @click="toggleExerciseOptions">운동</div>
+      <!-- <div class="grid-item" @click="toggleExerciseOptions">운동</div> -->
+      <div class="grid-item" @click="openFitnessModal">운동</div>
       <div class="grid-item" @click="openCalendarModal">기록</div>
       <div class="grid-item" @click="openFriendModal">친구</div>
       <div class="grid-item" @click="openAlarmModal"><img src="@/assets/images/icon/alarm.png" alt="알림" /></div>
@@ -134,47 +135,47 @@ const closeCalendarModal = () => {
   showCalendarModal.value = false
 }
 
-// // 운동 모달
-// import FitnessModal from "@/components/modal/FitnessModal.vue"
+// 운동 모달
+import FitnessModal from "@/components/modal/FitnessModal.vue"
 
-// const showFitnessModal = ref(false)
-// const openFitnessModal = () => {
-//   showFitnessModal.value = true
+const showFitnessModal = ref(false)
+const openFitnessModal = () => {
+  showFitnessModal.value = true
+}
+const closeFitnessModal = () => {
+  showFitnessModal.value = false
+}
+
+// // 혼자함께 잠시 보류
+// import AloneModal from "@/components/modal/AloneModal.vue"
+// import WithModal from "@/components/modal/WithModal.vue"
+
+// // 상태 관리
+// const showAloneModal = ref(false)
+// const showWithModal = ref(false)
+// const showExerciseOptions = ref(false)
+
+// const toggleExerciseOptions = () => {
+//   showExerciseOptions.value = !showExerciseOptions.value
 // }
-// const closeFitnessModal = () => {
-//   showFitnessModal.value = false
+
+// const handleSoloExercise = () => {
+//   showExerciseOptions.value = false
+//   showAloneModal.value = true
 // }
 
-// 운동 모달 (NEW)
-import AloneModal from "@/components/modal/AloneModal.vue"
-import WithModal from "@/components/modal/WithModal.vue"
+// const handleMultiExercise = () => {
+//   showExerciseOptions.value = false
+//   showWithModal.value = true
+// }
 
-// 모달 상태 관리
-const showAloneModal = ref(false)
-const showWithModal = ref(false)
-const showExerciseOptions = ref(false)
+// const closeAloneModal = () => {
+//   showAloneModal.value = false
+// }
 
-const toggleExerciseOptions = () => {
-  showExerciseOptions.value = !showExerciseOptions.value
-}
-
-const handleSoloExercise = () => {
-  showExerciseOptions.value = false
-  showAloneModal.value = true
-}
-
-const handleMultiExercise = () => {
-  showExerciseOptions.value = false
-  showWithModal.value = true
-}
-
-const closeAloneModal = () => {
-  showAloneModal.value = false
-}
-
-const closeWithModal = () => {
-  showWithModal.value = false
-}
+// const closeWithModal = () => {
+//   showWithModal.value = false
+// }
 
 // 알림 모달
 import AlarmModal from "@/components/modal/AlarmModal.vue"
