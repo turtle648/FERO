@@ -79,6 +79,10 @@
             <label for="user-gender">Character Gender</label>
             <input type="text" id="gender" v-model="gender" placeholder="남 = M / 여 = F" required />
           </div>
+          <div class="input-group">
+            <label for="user-nickname">User Nickname</label>
+            <input type="text" id="user-nickname" v-model="userNickname" placeholder="유저 닉네임" required />
+          </div>
           <div>
             <hr>
             캐릭터 고르는 칸으로 만들 예정입니다.
@@ -120,7 +124,7 @@ const email = ref('')
 const isEmailAvailable = ref(false)
 const emailConfirmCode = ref('')
 const gender = ref('')
-
+const userNickname = ref('')
 
 // 변수 초기화
 const resetFields = () => {
@@ -133,6 +137,7 @@ const resetFields = () => {
   gender.value = ''
   isEmailAvailable.value = false
   emailConfirmCode.value = ''
+  userNickname.value = ''
 }
 
 // 로그인 API 호출
@@ -182,10 +187,8 @@ const handleSignUp2 = async () => {
 }
 
 const handleSignUp3 = async () => {
-  const result = await registerCharacter(gender.value, userStore.sessionId)
+  const result = await registerCharacter(gender.value, userNickname.value, userStore.sessionId)
   if (result) {
-    userStore.setUserId(id.value)
-    userStore.setAccessToken(result.data.message)
     alert('회원가입이 완료되었습니다.')
   }
   closeSignUp()

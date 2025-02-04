@@ -102,43 +102,29 @@ public class UserController {
         }
     }
 
-    @GetMapping("/character/status")
-    @ApiOperation(value = "캐릭터 스테이터스 불러오기", notes = "캐릭터의 스테이터스 및 레벨, 랭크를 확인할 수 있다.")
-    public ResponseEntity<UserStatusGetRes> getCharacterStatus(HttpServletRequest request) {
-
-//        String authHeader = request.getHeader("Authorization");
+//    @GetMapping("/character/status")
+//    @ApiOperation(value = "캐릭터 스테이터스 불러오기", notes = "캐릭터의 스테이터스 및 레벨, 랭크를 확인할 수 있다.")
+//    public ResponseEntity<UserStatusGetRes> getCharacterStatus(HttpServletRequest request) {
 //
-//        if (authHeader == null || authHeader.startsWith("Bearer ")) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                    .body(BaseResponseBody.of(401, "Unauthorized"));
-//        }
+//        String token = request.getHeader("Authorization");
+//        String userId = JwtTokenUtil.getUserIdFromJWT(token);  // JWT 토큰에서 userId 추출
 //
-//        String accessToken = authHeader.replace(JwtTokenUtil.TOKEN_PREFIX, "");
-//
-//        // 토큰 검증
-//        if (!JwtTokenUtil.validateToken(accessToken)) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(BaseResponseBody.of(401, "Invalid Access Token"));
-//        }
+//        UserCharacter userCharacter = userCharacterService.getUserCharacterByUserId(userId);
 
-        String token = request.getHeader("Authorization");
-        String userId = JwtTokenUtil.getUserIdFromJWT(token);  // JWT 토큰에서 userId 추출
+//        UserStatusGetRes response = UserStatusGetRes.builder()
+//                .armsStats(userCharacter.getArmsStats())
+//                .legsStatus(userCharacter.getUserLegsStats())
+//                .chestStatus(userCharacter.getUserChestStatus())
+//                .absStatus(userCharacter.getUserAbsStatus())
+//                .backStatus(userCharacter.getUserBackStatus())
+//                .staminaStatus(userCharacter.getUserStaminaStatus())
+//                .userNickname(userCharacter.getUserNickname())
+//                .userLevel(userCharacter.getUserLevel())
+//                .userRank(userCharacter.getUserRank())
+//                .build();
 
-        UserCharacter userCharacter = userCharacterService.getUserCharacterByUserId(userId);
-
-        UserStatusGetRes response = UserStatusGetRes.builder()
-                .armsStatus(userCharacter.getUserArmsStatus())
-                .legsStatus(userCharacter.getUserLegsStatus())
-                .chestStatus(userCharacter.getUserChestStatus())
-                .absStatus(userCharacter.getUserAbsStatus())
-                .backStatus(userCharacter.getUserBackStatus())
-                .staminaStatus(userCharacter.getUserStaminaStatus())
-                .userNickname(userCharacter.getUserNickname())
-                .userLevel(userCharacter.getUserLevel())
-                .userRank(userCharacter.getUserRank())
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
+//        return ResponseEntity.ok(response);
+//    }
 
     // 이메일 인증 요청
     @PostMapping("/verify-email")

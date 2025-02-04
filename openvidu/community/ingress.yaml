@@ -1,7 +1,6 @@
 redis:
     address: redis:6379
     username: ""
-    password: redispassword
     db: 0
     use_tls: false
 api_key: devkey
