@@ -27,7 +27,7 @@ function configureUrls() {
         if (window.location.hostname === 'localhost') {
             LIVEKIT_URL = 'ws://localhost:7880/';
         } else {
-            LIVEKIT_URL = 'wss://' + window.location.hostname + ':7443/';
+            LIVEKIT_URL = 'ws://' + window.location.hostname + ':7443/';
         }
     }
 }
