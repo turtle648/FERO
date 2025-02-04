@@ -24,22 +24,24 @@ public class RegistrationService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final EmailService emailService;
     private final UserRepository userRepository;
-    private final UserCharacterRepository characterRepository;
+    private final UserCharacterRepository usercharacterRepository;
 
     @Autowired
     public RegistrationService(UserService userService, UserCharacterService userCharacterService, 
                              RedisTemplate<String, Object> redisTemplate,
                                EmailService emailService,
-                               UserRepository userRepository, UserCharacterRepository characterRepository) {
+                               UserRepository userRepository, UserCharacterRepository usercharacterRepository) {
         this.userService = userService;
         this.userCharacterService = userCharacterService;
         this.redisTemplate = redisTemplate;
         this.emailService = emailService;
         this.userRepository = userRepository;
-        this.characterRepository = characterRepository;
+        this.usercharacterRepository = usercharacterRepository;
     }
 
-    // 이메일 인증 요청 (인증 코드 생성 후 이메일 전송)
+    /**
+     * 2. 이메일 인증 요청 (코드 발송)
+     */
     public void sendVerificationEmail(String userEmail) {
         String verificationCode = UUID.randomUUID().toString().substring(0, 6);
         redisTemplate.opsForValue().set("email_verification:"+userEmail,
@@ -49,20 +51,23 @@ public class RegistrationService {
         if (!emailSent) throw new RuntimeException("이메일 전송 실패");
     }
 
-    // 이메일 인증 확인 (사용자가 입력한 코드 검증)
+    /**
+     * 3. 이메일 인증 확인
+     */
     public boolean verifyEmail(String useremail, String inputCode) {
         String storedCode = (String) redisTemplate.opsForValue().get("email_verification:"+useremail);
         redisTemplate.delete("email_verification:" + useremail); // 항상 삭제해야 함!
         if (storedCode == null || !storedCode.equals(inputCode)) {
+            redisTemplate.opsForValue().set("verified:" + useremail, true, Duration.ofMinutes(4));
             redisTemplate.delete("email_verification:"+useremail); // 인증 성공하면 삭제함
             return true;
         }
         return false;
     }
 
-    @Autowired
-    UserCharacterRepository userCharacterRepository;
-
+    /**
+     * 4. 회원 기본 정보 입력 (이메일 인증 확인)
+     */
     public String initializeRegistration(UserRegisterPostReq userInfo) {
         // 중복 체크
         if (userRepository.existsByUserId(userInfo.getUserId())) {
@@ -77,21 +82,23 @@ public class RegistrationService {
 
         String sessionId = UUID.randomUUID().toString();
 
-        // 이메일 인증 코드 생성
-        String verificationCode = UUID.randomUUID().toString().substring(0, 6); // 6자리 랜덤 코드
+//        // 이메일 인증 코드 생성
+//        String verificationCode = UUID.randomUUID().toString().substring(0, 6); // 6자리 랜덤 코드
 
         // Redis에 저장 (이메일 인증 상태 포함)
         redisTemplate.opsForValue().set("reg:" + sessionId, userInfo, Duration.ofMinutes(30));
-        redisTemplate.opsForValue().set("email:" + userInfo.getUserEmail(), verificationCode, Duration.ofMinutes(10));
-        redisTemplate.opsForValue().set("verified:" + sessionId, false, Duration.ofMinutes(30));
+//        redisTemplate.opsForValue().set("email:" + userInfo.getUserEmail(), verificationCode, Duration.ofMinutes(10));
+//        redisTemplate.opsForValue().set("verified:" + sessionId, false, Duration.ofMinutes(30));
 
-        // 이메일 전송 (이메일 인증 코드)
-        emailService.sendVerificationEmail(userInfo.getUserEmail(), verificationCode);
+//        // 이메일 전송 (이메일 인증 코드)
+//        emailService.sendVerificationEmail(userInfo.getUserEmail(), verificationCode);
 
         log.info("Started registration process for user: {}", userInfo.getUserId());
         return sessionId;
     }
-
+    /**
+     * 5. 회원 캐릭터 정보 입력 및 회원가입 완료
+     */
     @Transactional
     public void completeRegistration(String sessionId, UserCharacterRegisterPostReq characterInfo) {
         // 세션 체크
@@ -104,7 +111,7 @@ public class RegistrationService {
         if (userRepository.existsByUserId(userInfo.getUserId())) {
             throw new RegistrationException("이미 존재하는 아이디입니다.");
         }
-        if (userCharacterRepository.existsByUserNickname(characterInfo.getUserNickname())) {
+        if (usercharacterRepository.existsByUserNickname(characterInfo.getUserNickname())) {
             throw new RegistrationException("이미 존재하는 닉네임입니다.");
         }
 
@@ -121,7 +128,7 @@ public class RegistrationService {
             character.setPoints((short) 0);
 
             user.setUserCharacter(character); // 양방향 관계 설정
-            userCharacterRepository.save(character);
+            usercharacterRepository.save(character);
 
             redisTemplate.delete("reg:" + sessionId);
             log.info("Completed registration for user: {}", user.getUserId());
