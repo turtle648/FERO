@@ -6,7 +6,7 @@
       <div class="header-item experience" @click="openSettingModal">설정</div>
       <div class="header-item quest">퀘스트</div>
     </div>
-
+    <button class="logout-button" @click="goToStart">Logout</button>
     <!-- 상태창 -->
     <StatusModal v-if="showStatusModal" @closeStatus="closeStatusModal" @openRecord="openRecordModal" />
 
@@ -53,8 +53,12 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue"
+import { useUserStore } from '@/stores/store'
+// import { useRouter } from 'vue-router'
 
 const isDesktop = ref(false)
+const userStore = useUserStore()
+// const router = useRouter()
 
 const checkScreenSize = () => {
   isDesktop.value = window.innerWidth > 821
@@ -68,6 +72,11 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("resize", checkScreenSize)
 })
+
+// 로그아웃 함수
+const goToStart = async () => {
+  await userStore.logOut() // Pinia store에서 제공하는 goToStart 호출
+}
 
 // 활성화된 모달이 있는 경우 다른 모달 띄우지 않도록
 // const activeModal = ref(null)

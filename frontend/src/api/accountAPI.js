@@ -4,22 +4,21 @@ import axios from 'axios';
 
 const BASE_URL = 'http://i12e103.p.ssafy.io:8076/api/v1'
 
-
-
 // 로그인 API 호출
-export const login = async (userId, password) => {
+export const login = async (id, password) => {
   try {
-    const response = await axios.post(`${BASE_URL}/login`, {
-      userId,
-      password,
-    });
-    return response.data;
+    const response = await axios.post(`${BASE_URL}/auth/login`, 
+      { id, password }
+    )
+    console.log(response.data)
+    return response.data['accessToken']
   } catch (error) {
-    console.error(`로그인 요청 중 에러 발생: 입력받은 아이디 ${userId} 입력받은 비밀번호 ${password} `, error);
-    throw error;
+    console.error(`로그인 요청 중 에러 발생: `, error)
+    return false
   }
-};
+}
 
+// 로그아웃 API 호출
 
 // 회원가입 API 호출 (세션 발급)
 export const signUp = async (userId, password, userName, phoneNumber, userEmail) => {
