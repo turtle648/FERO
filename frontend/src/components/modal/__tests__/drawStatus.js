@@ -1,6 +1,6 @@
-// drawStatus의 사용 예시
-// // App.vue
 {/* 
+drawStatus의 사용 예시
+App.vue
 <template>
   <div id="app">
     <router-view />
@@ -10,7 +10,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { drawStatus } from '@/components/modal/drawStatus.js' // 수정: drawStatus에서 export 수정
+import { drawStatus } from '@/components/modal/_tests_/drawStatus.js' // 수정: drawStatus에서 export 수정
 const graphData = ref([70, 30, 15, 72, 50, 75]);
 
 const drawGraph = async () => {

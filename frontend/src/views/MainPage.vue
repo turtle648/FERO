@@ -6,7 +6,7 @@
       <div class="header-item experience" @click="openSettingModal">설정</div>
       <div class="header-item quest">퀘스트</div>
     </div>
-
+    <button class="logout-button" @click="goToStart">Logout</button>
     <!-- 상태창 -->
     <StatusModal v-if="showStatusModal" @closeStatus="closeStatusModal" @openRecord="openRecordModal" />
 
@@ -17,21 +17,22 @@
     <SettingModal v-if="showSettingModal" @closeSetting="closeSettingModal" @openSetting="openSettingModal" />
 
     <!-- 운동 모드 선택 버튼들 -->
-    <div class="exercise-options" v-show="showExerciseOptions">
-      <div class="option-item" @click="handleSoloExercise">혼자하기</div>
-      <div class="option-item" @click="handleMultiExercise">같이하기</div>
-    </div>
+    <!-- <div class="exercise-options" v-show="showExerciseOptions"> -->
+      <!-- <div class="option-item" @click="handleSoloExercise">혼자하기</div> -->
+      <!-- <div class="option-item" @click="handleMultiExercise">같이하기</div> -->
+    <!-- </div> -->
 
     <!-- 새로운 모달 추가 -->
-    <AloneModal v-if="showAloneModal" @closeAlone="closeAloneModal" />
-    <WithModal v-if="showWithModal" @closeWith="closeWithModal" />
+    <!-- <AloneModal v-if="showAloneModal" @closeAlone="closeAloneModal" /> -->
+    <!-- <WithModal v-if="showWithModal" @closeWith="closeWithModal" /> -->
 
     <div class="footer">
       <!-- class명 추가해서 쓰기 -->
-      <div class="grid-item" @click="toggleExerciseOptions">운동</div>
-      <div class="grid-item" @click="openCalendarModal">달력</div>
+      <!-- <div class="grid-item" @click="toggleExerciseOptions">운동</div> -->
+      <div class="grid-item" @click="openFitnessModal">운동</div>
+      <div class="grid-item" @click="openCalendarModal">기록</div>
       <div class="grid-item" @click="openFriendModal">친구</div>
-      <div class="grid-item">????</div>
+      <div class="grid-item" @click="openAlarmModal"><img src="@/assets/images/icon/alarm.png" alt="알림" /></div>
     </div>
 
     <!-- 친구모달 -->
@@ -42,6 +43,9 @@
 
     <!-- 운동 모달 -->
     <FitnessModal v-if="showFitnessModal" @closeFitness="closeFitnessModal" @openFitness="openFitnessModal" />
+
+    <!-- 알림 모달 -->
+    <AlarmModal v-if="showAlarmModal" @closeAlarm="closeAlarmModal" @openAlarm="openAlarmModal" />
   </div>
   <div v-else class="qr-code">
     <h1>(나중에 큐알 들어갈 자리)</h1>
@@ -50,8 +54,12 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue"
+import { useUserStore } from '@/stores/store'
+// import { useRouter } from 'vue-router'
 
 const isDesktop = ref(false)
+const userStore = useUserStore()
+// const router = useRouter()
 
 const checkScreenSize = () => {
   isDesktop.value = window.innerWidth > 821
@@ -65,6 +73,11 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("resize", checkScreenSize)
 })
+
+// 로그아웃 함수
+const goToStart = async () => {
+  await userStore.logOut() // Pinia store에서 제공하는 goToStart 호출
+}
 
 // 활성화된 모달이 있는 경우 다른 모달 띄우지 않도록
 // const activeModal = ref(null)
@@ -122,46 +135,58 @@ const closeCalendarModal = () => {
   showCalendarModal.value = false
 }
 
-// // 운동 모달
-// import FitnessModal from "@/components/modal/FitnessModal.vue"
+// 운동 모달
+import FitnessModal from "@/components/modal/FitnessModal.vue"
 
-// const showFitnessModal = ref(false)
-// const openFitnessModal = () => {
-//   showFitnessModal.value = true
+const showFitnessModal = ref(false)
+const openFitnessModal = () => {
+  showFitnessModal.value = true
+}
+const closeFitnessModal = () => {
+  showFitnessModal.value = false
+}
+
+// // 혼자함께 잠시 보류
+// import AloneModal from "@/components/modal/AloneModal.vue"
+// import WithModal from "@/components/modal/WithModal.vue"
+
+// // 상태 관리
+// const showAloneModal = ref(false)
+// const showWithModal = ref(false)
+// const showExerciseOptions = ref(false)
+
+// const toggleExerciseOptions = () => {
+//   showExerciseOptions.value = !showExerciseOptions.value
 // }
-// const closeFitnessModal = () => {
-//   showFitnessModal.value = false
+
+// const handleSoloExercise = () => {
+//   showExerciseOptions.value = false
+//   showAloneModal.value = true
 // }
 
-// 운동 모달 (NEW)
-import AloneModal from "@/components/modal/AloneModal.vue"
-import WithModal from "@/components/modal/WithModal.vue"
+// const handleMultiExercise = () => {
+//   showExerciseOptions.value = false
+//   showWithModal.value = true
+// }
 
-// 모달 상태 관리
-const showAloneModal = ref(false)
-const showWithModal = ref(false)
-const showExerciseOptions = ref(false)
+// const closeAloneModal = () => {
+//   showAloneModal.value = false
+// }
 
-const toggleExerciseOptions = () => {
-  showExerciseOptions.value = !showExerciseOptions.value
+// const closeWithModal = () => {
+//   showWithModal.value = false
+// }
+
+// 알림 모달
+import AlarmModal from "@/components/modal/AlarmModal.vue"
+
+const showAlarmModal = ref(false)
+const openAlarmModal = () => {
+  showAlarmModal.value = true
 }
 
-const handleSoloExercise = () => {
-  showExerciseOptions.value = false
-  showAloneModal.value = true
-}
-
-const handleMultiExercise = () => {
-  showExerciseOptions.value = false
-  showWithModal.value = true
-}
-
-const closeAloneModal = () => {
-  showAloneModal.value = false
-}
-
-const closeWithModal = () => {
-  showWithModal.value = false
+const closeAlarmModal = () => {
+  showAlarmModal.value = false
 }
 </script>
 
@@ -183,7 +208,7 @@ const closeWithModal = () => {
   z-index: 1;
   gap: 2%;
   background-color: rgb(255, 255, 255);
-  height: 5%;
+  height: 7%;
   width: calc(100% - 20px);
 }
 
@@ -220,7 +245,7 @@ const closeWithModal = () => {
 
 .exercise-options {
   position: absolute;
-  bottom: 5%; /* footer의 height와 동일 */
+  bottom: 7%; /* footer의 height와 동일 */
   left: 0;
   width: calc(100% - 20px);
   display: grid;
