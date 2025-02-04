@@ -6,6 +6,7 @@ import com.ssafy.common.exception.handler.RegistrationException;
 import com.ssafy.db.entity.User;
 import com.ssafy.db.entity.UserCharacter;
 import com.ssafy.db.repository.UserCharacterRepository;
+import com.ssafy.db.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,15 +23,20 @@ public class RegistrationService {
     private final UserCharacterService userCharacterService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final EmailService emailService;
+    private final UserRepository userRepository;
+    private final UserCharacterRepository characterRepository;
 
     @Autowired
     public RegistrationService(UserService userService, UserCharacterService userCharacterService, 
                              RedisTemplate<String, Object> redisTemplate,
-                               EmailService emailService) {
+                               EmailService emailService,
+                               UserRepository userRepository, UserCharacterRepository characterRepository) {
         this.userService = userService;
         this.userCharacterService = userCharacterService;
         this.redisTemplate = redisTemplate;
         this.emailService = emailService;
+        this.userRepository = userRepository;
+        this.characterRepository = characterRepository;
     }
 
     // 이메일 인증 요청 (인증 코드 생성 후 이메일 전송)
@@ -58,6 +64,17 @@ public class RegistrationService {
     UserCharacterRepository userCharacterRepository;
 
     public String initializeRegistration(UserRegisterPostReq userInfo) {
+        // 중복 체크
+        if (userRepository.existsByUserId(userInfo.getUserId())) {
+            throw new RegistrationException("이미 존재하는 아이디입니다.");
+        }
+        if (userRepository.existsByUserEmail(userInfo.getUserEmail())) {
+            throw new RegistrationException("이미 존재하는 이메일입니다.");
+        }
+        if (userRepository.existsByPhoneNumber(userInfo.getPhoneNumber())) {
+            throw new RegistrationException("이미 존재하는 전화번호입니다.");
+        }
+
         String sessionId = UUID.randomUUID().toString();
 
         // 이메일 인증 코드 생성
@@ -77,16 +94,18 @@ public class RegistrationService {
 
     @Transactional
     public void completeRegistration(String sessionId, UserCharacterRegisterPostReq characterInfo) {
+        // 세션 체크
         UserRegisterPostReq userInfo = (UserRegisterPostReq) redisTemplate.opsForValue().get("reg:" + sessionId);
-
         if (userInfo == null) {
             throw new RegistrationException("세션이 만료되었습니다. 처음부터 다시 시도해주세요.");
         }
 
-        // 이메일 인증 여부 확인
-        Boolean isVerified = (Boolean) redisTemplate.opsForValue().get("verified:" + userInfo.getUserEmail());
-        if (isVerified == null || !isVerified) {
-            throw new RegistrationException("이메일 인증이 완료되지 않았습니다.");
+        // 중복 체크
+        if (userRepository.existsByUserId(userInfo.getUserId())) {
+            throw new RegistrationException("이미 존재하는 아이디입니다.");
+        }
+        if (userCharacterRepository.existsByUserNickname(characterInfo.getUserNickname())) {
+            throw new RegistrationException("이미 존재하는 닉네임입니다.");
         }
 
         try {
@@ -99,21 +118,17 @@ public class RegistrationService {
             character.setId(user.getId());
             character.setUserNickname(characterInfo.getUserNickname());
             character.setGender(characterInfo.getGender());
-//            character.setPushupRecord((short) 0);
-//            character.setSquatRecord((short) 0);
-//            character.setPullupRecord((short) 0);
             character.setPoints((short) 0);
 
             user.setUserCharacter(character); // 양방향 관계 설정
-
             userCharacterRepository.save(character);
 
             redisTemplate.delete("reg:" + sessionId);
-
             log.info("Completed registration for user: {}", user.getUserId());
+
         } catch (Exception e) {
             log.error("Registration failed", e);
-            throw new RegistrationException("회원가입 처리 중 오류가 발생했습니다.");
+            throw new RegistrationException("회원가입 처리 중 오류가 발생했습니다."+e.getMessage());
         }
     }
 }

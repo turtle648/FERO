@@ -12,4 +12,7 @@ import java.util.Optional;
 @Repository
 public interface UserCharacterRepository extends JpaRepository<UserCharacter, Long> {
     Optional<UserCharacter> findByUser_UserId(String userId);
+
+    // 중복 확인
+    boolean existsByUserNickname(String userNickname);
 }

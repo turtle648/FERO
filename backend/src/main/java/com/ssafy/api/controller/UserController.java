@@ -2,6 +2,7 @@ package com.ssafy.api.controller;
 
 import com.ssafy.api.request.UserCharacterRegisterPostReq;
 import com.ssafy.api.response.UserInfoRes;
+import com.ssafy.common.exception.handler.RegistrationException;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import com.ssafy.api.response.UserStatusGetRes;
@@ -52,19 +53,30 @@ public class UserController {
 
 
     @PostMapping()
-    @ApiOperation(value = "회원 가입", notes = "회원가입")
+    @ApiOperation(value = "회원 가입", notes = "신규 회원의 기본 정보를 등록합니다.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "성공"),
-            @ApiResponse(code = 401, message = "인증 실패"),
-            @ApiResponse(code = 404, message = "사용자 없음"),
+            @ApiResponse(code = 200, message = "회원가입 초기화 성공 (세션 ID 반환)"),
+            @ApiResponse(code = 400, message = "잘못된 요청 (필수 정보 누락)"),
+            @ApiResponse(code = 409, message = "중복된 데이터 존재 (아이디/이메일/전화번호)"),
             @ApiResponse(code = 500, message = "서버 오류")
     })
     public ResponseEntity<? extends BaseResponseBody> saveUserInfo(
             @RequestBody @ApiParam(value = "회원가입 정보", required = true) UserRegisterPostReq registerInfo) {
 
-        String sessionId = registrationService.initializeRegistration(registerInfo);
-
-        return ResponseEntity.status(200).body(BaseResponseBody.of(200, sessionId));
+        try {
+            String sessionId = registrationService.initializeRegistration(registerInfo);
+            return ResponseEntity.ok(BaseResponseBody.of(200, sessionId));
+        } catch (RegistrationException e) {
+            if (e.getMessage().contains("이미 존재하는")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(BaseResponseBody.of(409, e.getMessage()));
+            }
+            return ResponseEntity.badRequest()
+                    .body(BaseResponseBody.of(400, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(BaseResponseBody.of(500, "서버 오류: " + e.getMessage()));
+        }
     }
 
     @PostMapping("/character")
@@ -73,9 +85,21 @@ public class UserController {
             @RequestParam @ApiParam(value = "세션 ID", required = true) String sessionId,
             @RequestBody @ApiParam(value = "캐릭터 정보", required = true) UserCharacterRegisterPostReq characterRegisterinfo) {
 
-        registrationService.completeRegistration(sessionId, characterRegisterinfo);
-
-        return ResponseEntity.status(200).body(BaseResponseBody.of(200, "Join Success"));
+        try {
+            registrationService.completeRegistration(sessionId, characterRegisterinfo);
+            return ResponseEntity.ok(BaseResponseBody.of(200, "회원가입이 완료되었습니다."));
+        } catch (RegistrationException e) {
+            if (e.getMessage().contains("이미 존재하는")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(BaseResponseBody.of(409, e.getMessage()));
+            } else if (e.getMessage().contains("세션이 만료") ||
+                    e.getMessage().contains("이메일 인증")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(BaseResponseBody.of(401, e.getMessage()));
+            }
+            return ResponseEntity.badRequest()
+                    .body(BaseResponseBody.of(400, e.getMessage()));
+        }
     }
 
     @GetMapping("/character/status")
