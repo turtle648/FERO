@@ -3,7 +3,6 @@ package com.ssafy.db.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import com.ssafy.api.response.UserStatusGetRes;
 import lombok.Getter;
 import lombok.Setter;
 

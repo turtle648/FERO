@@ -8,14 +8,10 @@ import lombok.Builder;
 @Setter
 @Builder
 public class UserStatusGetRes {
-    private Short armsStatus;
-    private Short legsStatus;
-    private Short chestStatus;
-    private Short absStatus;
-    private Short backStatus;
-    private Short staminaStatus;
-
-    private String userNickname;
-    private Short userLevel;
-    private String userRank;
+    private Short armsStats;
+    private Short legsStats;
+    private Short chestStats;
+    private Short absStats;
+    private Short backStats;
+    private Short staminaStats;
 }
