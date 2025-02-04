@@ -8,10 +8,10 @@
     </div>
     <!-- <button class="logout-button" @click="goToStart">Logout</button> -->
     <!-- 상태창 -->
-    <StatusModal v-if="showStatusModal" @closeStatus="closeStatusModal" @openRecord="openRecordModal" />
+    <StatusModal v-if="showStatusModal" @closeStatus="closeStatusModal" />
 
     <!-- 전적창 -->
-    <MatchRecordModal v-if="showRecordModal" @closeRecord="closeRecordModal" @openStatus="openStatusModal" />
+    <MatchRecordModal v-if="showRecordModal" @closeRecord="closeRecordModal" />
 
     <!-- 설정 -->
     <SettingModal v-if="showSettingModal" @closeSetting="closeSettingModal" @openSetting="openSettingModal" />
@@ -36,7 +36,7 @@
       <div class="grid-item" @click="openFriendModal">친구</div>
       <div class="grid-item" @click="openCalendarModal">달력</div>
       <div class="grid-item" @click="openFitnessModal">운동</div>
-      <div class="grid-item">전적</div>
+      <div class="grid-item" @click="openRecordModal">전적</div>
       <div class="grid-item">퀘스트</div>
     </div>
 
@@ -77,11 +77,6 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("resize", checkScreenSize)
 })
-
-// 로그아웃 함수
-// const goToStart = async () => {
-//   await userStore.logOut() // Pinia store에서 제공하는 goToStart 호출
-// }
 
 // 상태창 관련 변수 및 함수
 import StatusModal from "@/components/modal/StatusModal.vue"
