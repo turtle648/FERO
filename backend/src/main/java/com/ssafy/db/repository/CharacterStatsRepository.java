@@ -19,5 +19,5 @@ public interface CharacterStatsRepository extends JpaRepository<UserStats, Long>
     // user_email 과 user_id 이 일치하는 회원 조회
 //    Optional<User> findByUserEmailAndUserId(String userEmail, String userId);
     // user_email 중복 확인
-    boolean existsByUserEmail(String userEmail);
+//    boolean existsByUserEmail(String userEmail);
 }

@@ -52,8 +52,49 @@ public class UserController {
     private RedisTemplate<String, Object> redisTemplate;
 
 
+    /**
+     * 1. 이메일 중복 확인
+     */
+    @GetMapping("/check-email")
+    @ApiOperation(value = "1. 이메일 중복 확인", notes = "사용자가 입력한 이메일이 중복인지 확인")
+    public ResponseEntity<BaseResponseBody> checkEmailDuplication(@RequestParam String email) {
+        boolean exists = userService.existsByUserEmail(email);
+
+        if (exists) {
+            return ResponseEntity.status(409).body(BaseResponseBody.of(409, "이미 사용 중인 이메일입니다."));
+        } else {
+            return ResponseEntity.status(200).body(BaseResponseBody.of(200, "사용 가능한 이메일입니다."));
+        }
+    }
+
+    /**
+     * 2. 이메일 인증 요청 (코드 발송)
+     */
+    @PostMapping("/send-email")
+    @ApiOperation(value = "2. 이메일 인증 코드 발송", notes = "사용자의 이메일로 인증 코드를 보냅니다.")
+    public ResponseEntity<BaseResponseBody> sendVerificationEmail(@RequestParam String email) {
+        registrationService.sendVerificationEmail(email);
+        return ResponseEntity.ok(BaseResponseBody.of(200, "이메일 인증 코드가 발송되었습니다."));
+    }
+
+    /**
+     * 3. 이메일 인증 확인
+     */
+    @PostMapping("/verify-email")
+    @ApiOperation(value = "3. 이메일 인증 코드 확인하기", notes = "이메일 인증 코드 확인")
+    public ResponseEntity<BaseResponseBody> verifyEmail(@RequestParam String email, @RequestParam String code) {
+        boolean verified = registrationService.verifyEmail(email, code);
+        if (!verified) {
+            return ResponseEntity.status(400).body(BaseResponseBody.of(400, "인증 코드가 유효하지 않습니다."));
+        }
+        return ResponseEntity.ok(BaseResponseBody.of(200, "이메일 인증 성공"));
+    }
+
+    /**
+     * 4. 회원 기본 정보 입력
+     */
     @PostMapping()
-    @ApiOperation(value = "회원 가입", notes = "신규 회원의 기본 정보를 등록합니다.")
+    @ApiOperation(value = "4. 회원 기본 정보 입력", notes = "이메일 인증이 완료된 후 회원 기본 정보 입력 반영")
     @ApiResponses({
             @ApiResponse(code = 200, message = "회원가입 초기화 성공 (세션 ID 반환)"),
             @ApiResponse(code = 400, message = "잘못된 요청 (필수 정보 누락)"),
@@ -64,6 +105,13 @@ public class UserController {
             @RequestBody @ApiParam(value = "회원가입 정보", required = true) UserRegisterPostReq registerInfo) {
 
         try {
+            // 이메일 인증 여부 확인
+            Boolean isVerified = (Boolean) redisTemplate.opsForValue().get("verified:" + registerInfo.getUserEmail());
+            if (isVerified == null || !isVerified) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(BaseResponseBody.of(401, "이메일 인증을 먼저 완료해주세요."));
+            }
+
             String sessionId = registrationService.initializeRegistration(registerInfo);
             return ResponseEntity.ok(BaseResponseBody.of(200, sessionId));
         } catch (RegistrationException e) {
@@ -78,9 +126,11 @@ public class UserController {
                     .body(BaseResponseBody.of(500, "서버 오류: " + e.getMessage()));
         }
     }
-
+    /**
+     * 5. 캐릭터 정보 입력
+     */
     @PostMapping("/character")
-    @ApiOperation(value = "캐릭터 정보입력", notes = "닉네임을 지을 수 있고, 캐릭터의 성별을 결정할 수 있다.")
+    @ApiOperation(value = "5. 캐릭터 정보입력", notes = "닉네임을 지을 수 있고, 캐릭터의 성별을 결정할 수 있다.")
     public ResponseEntity<? extends BaseResponseBody> CharacterRegister(
             @RequestParam @ApiParam(value = "세션 ID", required = true) String sessionId,
             @RequestBody @ApiParam(value = "캐릭터 정보", required = true) UserCharacterRegisterPostReq characterRegisterinfo) {
@@ -101,63 +151,4 @@ public class UserController {
                     .body(BaseResponseBody.of(400, e.getMessage()));
         }
     }
-
-//    @GetMapping("/character/status")
-//    @ApiOperation(value = "캐릭터 스테이터스 불러오기", notes = "캐릭터의 스테이터스 및 레벨, 랭크를 확인할 수 있다.")
-//    public ResponseEntity<UserStatusGetRes> getCharacterStatus(HttpServletRequest request) {
-//
-//        String token = request.getHeader("Authorization");
-//        String userId = JwtTokenUtil.getUserIdFromJWT(token);  // JWT 토큰에서 userId 추출
-//
-//        UserCharacter userCharacter = userCharacterService.getUserCharacterByUserId(userId);
-
-//        UserStatusGetRes response = UserStatusGetRes.builder()
-//                .armsStats(userCharacter.getArmsStats())
-//                .legsStatus(userCharacter.getUserLegsStats())
-//                .chestStatus(userCharacter.getUserChestStatus())
-//                .absStatus(userCharacter.getUserAbsStatus())
-//                .backStatus(userCharacter.getUserBackStatus())
-//                .staminaStatus(userCharacter.getUserStaminaStatus())
-//                .userNickname(userCharacter.getUserNickname())
-//                .userLevel(userCharacter.getUserLevel())
-//                .userRank(userCharacter.getUserRank())
-//                .build();
-
-//        return ResponseEntity.ok(response);
-//    }
-
-    // 이메일 인증 요청
-    @PostMapping("/verify-email")
-    @ApiOperation(value = "이메일 인증", notes = "이메일 인증 코드 확인")
-    public ResponseEntity<BaseResponseBody> verifyEmail(
-            @RequestParam String email, @RequestParam String code) {
-
-        String storedCode = (String) redisTemplate.opsForValue().get("email:" + email);
-
-
-        if (storedCode == null || !storedCode.equals(code)) {
-            return ResponseEntity.status(400).body(BaseResponseBody.of(400, "인증 코드가 유효하지 않습니다."));
-        }
-
-        // 인증 완료 → 해당 세션 ID의 verified 상태 true로 변경
-        redisTemplate.opsForValue().set("verified:" + email, true, Duration.ofMinutes(30));
-        redisTemplate.delete("email:" + email);
-
-        return ResponseEntity.ok(BaseResponseBody.of(200, "이메일 인증 성공"));
-    }
-
-    // 이메일 중복 확인
-    @GetMapping("/check-email")
-    @ApiOperation(value = "이메일 중복 확인", notes = "사용자가 입력한 이메일이 중복인지 확인")
-    public ResponseEntity<BaseResponseBody> checkEmailDuplication(@RequestParam String email) {
-        boolean exists = userService.existsByUserEmail(email);
-
-        if (exists) {
-            return ResponseEntity.status(409).body(BaseResponseBody.of(409, "이미 사용 중인 이메일입니다."));
-        } else {
-            return ResponseEntity.status(200).body(BaseResponseBody.of(200, "사용 가능한 이메일입니다."));
-        }
-    }
-
-
 }
