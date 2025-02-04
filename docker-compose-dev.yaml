@@ -9,7 +9,9 @@ services:
     volumes:
       - ./frontend:/app
       - ./certs:/app/certs 
-    command: npm run serve 
+    command: npm run serve:dev
+    environment:
+      - NODE_ENV=development
 
   spring-boot:
     build:
