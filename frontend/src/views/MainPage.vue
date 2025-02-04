@@ -101,7 +101,9 @@ onUnmounted(() => {
 import StatusModal from "@/components/modal/StatusModal.vue"
 const showStatusModal = ref(false)
 const openStatusModal = () => {
-  showStatusModal.value = true
+  if (!isAnyModalOpen()) {
+    showStatusModal.value = true
+  }
 }
 const closeStatusModal = () => {
   showStatusModal.value = false
@@ -111,7 +113,9 @@ const closeStatusModal = () => {
 import MatchRecordModal from "@/components/modal/MatchRecordModal.vue"
 const showRecordModal = ref(false)
 const openRecordModal = () => {
-  showRecordModal.value = true
+  if (!isAnyModalOpen()) {
+    showRecordModal.value = true
+  }
 }
 const closeRecordModal = () => {
   showRecordModal.value = false
@@ -122,7 +126,9 @@ import SettingModal from "@/components/modal/SettingModal.vue"
 
 const showSettingModal = ref(false)
 const openSettingModal = () => {
-  showSettingModal.value = true
+  if (!isAnyModalOpen()) {
+    showSettingModal.value = true
+  }
 }
 const closeSettingModal = () => {
   showSettingModal.value = false
@@ -133,7 +139,9 @@ import FriendListModal from "@/components/modal/FriendListModal.vue"
 
 const showFriendModal = ref(false)
 const openFriendModal = () => {
-  showFriendModal.value = true
+  if (!isAnyModalOpen()) {
+    showFriendModal.value = true
+  }
 }
 const closeFriendModal = () => {
   showFriendModal.value = false
@@ -144,7 +152,9 @@ import CalendarModal from "@/components/modal/CalendarModal.vue"
 
 const showCalendarModal = ref(false)
 const openCalendarModal = () => {
-  showCalendarModal.value = true
+  if (!isAnyModalOpen()) {
+    showCalendarModal.value = true
+  }
 }
 const closeCalendarModal = () => {
   showCalendarModal.value = false
@@ -155,7 +165,9 @@ import FitnessModal from "@/components/modal/FitnessModal.vue"
 
 const showFitnessModal = ref(false)
 const openFitnessModal = () => {
-  showFitnessModal.value = true
+  if (!isAnyModalOpen()) {
+    showFitnessModal.value = true
+  }
 }
 const closeFitnessModal = () => {
   showFitnessModal.value = false
@@ -197,11 +209,17 @@ import AlarmModal from "@/components/modal/AlarmModal.vue"
 
 const showAlarmModal = ref(false)
 const openAlarmModal = () => {
-  showAlarmModal.value = true
+  if (!isAnyModalOpen()) {
+    showAlarmModal.value = true
+  }
 }
-
 const closeAlarmModal = () => {
   showAlarmModal.value = false
+}
+
+// 현재 활성화된 모든 모달 상태를 확인하는 함수
+const isAnyModalOpen = () => {
+  return showStatusModal.value || showRecordModal.value || showSettingModal.value || showAlarmModal.value || showFriendModal.value || showCalendarModal.value || showFitnessModal.value
 }
 </script>
 
