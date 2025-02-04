@@ -7,6 +7,7 @@
         <li>설정에 들어올 정보들</li>
         <li>회원정보</li>
         <li>회원탈퇴</li>
+        <li><button class="logout-button" @click="goToStart">Logout</button></li>
       </ul>
     </div>
   </div>
@@ -14,10 +15,17 @@
 
 <script setup>
 import { defineEmits } from "vue"
+import { useUserStore } from "@/stores/store"
 
 const emit = defineEmits(["closeSetting"])
 const closeSettingModal = () => {
   emit("closeSetting")
+}
+
+const userStore = useUserStore()
+// 로그아웃 함수
+const goToStart = async () => {
+  await userStore.logOut() // Pinia store에서 제공하는 goToStart 호출
 }
 </script>
 

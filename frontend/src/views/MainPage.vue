@@ -4,9 +4,9 @@
     <div class="header">
       <div class="header-item level" @click="openStatusModal">레벨, 경험치 (상태창)</div>
       <div class="header-item experience" @click="openSettingModal">설정</div>
-      <div class="header-item quest">퀘스트</div>
+      <div class="header-item experience" @click="openAlarmModal"><img src="@/assets/images/icon/alarm.png" alt="" /></div>
     </div>
-    <button class="logout-button" @click="goToStart">Logout</button>
+    <!-- <button class="logout-button" @click="goToStart">Logout</button> -->
     <!-- 상태창 -->
     <StatusModal v-if="showStatusModal" @closeStatus="closeStatusModal" @openRecord="openRecordModal" />
 
@@ -16,10 +16,13 @@
     <!-- 설정 -->
     <SettingModal v-if="showSettingModal" @closeSetting="closeSettingModal" @openSetting="openSettingModal" />
 
+    <!-- 알림 모달 -->
+    <AlarmModal v-if="showAlarmModal" @closeAlarm="closeAlarmModal" @openAlarm="openAlarmModal" />
+
     <!-- 운동 모드 선택 버튼들 -->
     <!-- <div class="exercise-options" v-show="showExerciseOptions"> -->
-      <!-- <div class="option-item" @click="handleSoloExercise">혼자하기</div> -->
-      <!-- <div class="option-item" @click="handleMultiExercise">같이하기</div> -->
+    <!-- <div class="option-item" @click="handleSoloExercise">혼자하기</div> -->
+    <!-- <div class="option-item" @click="handleMultiExercise">같이하기</div> -->
     <!-- </div> -->
 
     <!-- 새로운 모달 추가 -->
@@ -29,10 +32,12 @@
     <div class="footer">
       <!-- class명 추가해서 쓰기 -->
       <!-- <div class="grid-item" @click="toggleExerciseOptions">운동</div> -->
-      <div class="grid-item" @click="openFitnessModal">운동</div>
-      <div class="grid-item" @click="openCalendarModal">기록</div>
+
       <div class="grid-item" @click="openFriendModal">친구</div>
-      <div class="grid-item" @click="openAlarmModal"><img src="@/assets/images/icon/alarm.png" alt="알림" /></div>
+      <div class="grid-item" @click="openCalendarModal">달력</div>
+      <div class="grid-item" @click="openFitnessModal">운동</div>
+      <div class="grid-item">전적</div>
+      <div class="grid-item">퀘스트</div>
     </div>
 
     <!-- 친구모달 -->
@@ -44,8 +49,7 @@
     <!-- 운동 모달 -->
     <FitnessModal v-if="showFitnessModal" @closeFitness="closeFitnessModal" @openFitness="openFitnessModal" />
 
-    <!-- 알림 모달 -->
-    <AlarmModal v-if="showAlarmModal" @closeAlarm="closeAlarmModal" @openAlarm="openAlarmModal" />
+    <!-- 퀘스트 모달 -->
   </div>
   <div v-else class="qr-code">
     <h1>(나중에 큐알 들어갈 자리)</h1>
@@ -54,11 +58,11 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue"
-import { useUserStore } from '@/stores/store'
+// import { useUserStore } from "@/stores/store"
 // import { useRouter } from 'vue-router'
 
 const isDesktop = ref(false)
-const userStore = useUserStore()
+// const userStore = useUserStore()
 // const router = useRouter()
 
 const checkScreenSize = () => {
@@ -75,18 +79,31 @@ onUnmounted(() => {
 })
 
 // 로그아웃 함수
-const goToStart = async () => {
-  await userStore.logOut() // Pinia store에서 제공하는 goToStart 호출
-}
+// const goToStart = async () => {
+//   await userStore.logOut() // Pinia store에서 제공하는 goToStart 호출
+// }
 
 // 활성화된 모달이 있는 경우 다른 모달 띄우지 않도록
 // const activeModal = ref(null)
+
+// 각 모달 열기 및 닫기 함수
+// const openModal = (modalNAme) => {
+//   if (!activeModal.value) {
+//     activeModal.value = modalNAme
+//   }
+// }
+
+// const closeModal = () => {
+//   activeModal.value = null
+// }
 
 // 상태창 관련 변수 및 함수
 import StatusModal from "@/components/modal/StatusModal.vue"
 const showStatusModal = ref(false)
 const openStatusModal = () => {
-  showStatusModal.value = true
+  if (!isAnyModalOpen()) {
+    showStatusModal.value = true
+  }
 }
 const closeStatusModal = () => {
   showStatusModal.value = false
@@ -96,7 +113,9 @@ const closeStatusModal = () => {
 import MatchRecordModal from "@/components/modal/MatchRecordModal.vue"
 const showRecordModal = ref(false)
 const openRecordModal = () => {
-  showRecordModal.value = true
+  if (!isAnyModalOpen()) {
+    showRecordModal.value = true
+  }
 }
 const closeRecordModal = () => {
   showRecordModal.value = false
@@ -107,7 +126,9 @@ import SettingModal from "@/components/modal/SettingModal.vue"
 
 const showSettingModal = ref(false)
 const openSettingModal = () => {
-  showSettingModal.value = true
+  if (!isAnyModalOpen()) {
+    showSettingModal.value = true
+  }
 }
 const closeSettingModal = () => {
   showSettingModal.value = false
@@ -118,7 +139,9 @@ import FriendListModal from "@/components/modal/FriendListModal.vue"
 
 const showFriendModal = ref(false)
 const openFriendModal = () => {
-  showFriendModal.value = true
+  if (!isAnyModalOpen()) {
+    showFriendModal.value = true
+  }
 }
 const closeFriendModal = () => {
   showFriendModal.value = false
@@ -129,7 +152,9 @@ import CalendarModal from "@/components/modal/CalendarModal.vue"
 
 const showCalendarModal = ref(false)
 const openCalendarModal = () => {
-  showCalendarModal.value = true
+  if (!isAnyModalOpen()) {
+    showCalendarModal.value = true
+  }
 }
 const closeCalendarModal = () => {
   showCalendarModal.value = false
@@ -140,7 +165,9 @@ import FitnessModal from "@/components/modal/FitnessModal.vue"
 
 const showFitnessModal = ref(false)
 const openFitnessModal = () => {
-  showFitnessModal.value = true
+  if (!isAnyModalOpen()) {
+    showFitnessModal.value = true
+  }
 }
 const closeFitnessModal = () => {
   showFitnessModal.value = false
@@ -182,11 +209,17 @@ import AlarmModal from "@/components/modal/AlarmModal.vue"
 
 const showAlarmModal = ref(false)
 const openAlarmModal = () => {
-  showAlarmModal.value = true
+  if (!isAnyModalOpen()) {
+    showAlarmModal.value = true
+  }
 }
-
 const closeAlarmModal = () => {
   showAlarmModal.value = false
+}
+
+// 현재 활성화된 모든 모달 상태를 확인하는 함수
+const isAnyModalOpen = () => {
+  return showStatusModal.value || showRecordModal.value || showSettingModal.value || showAlarmModal.value || showFriendModal.value || showCalendarModal.value || showFitnessModal.value
 }
 </script>
 
@@ -204,7 +237,7 @@ const closeAlarmModal = () => {
   position: absolute;
   bottom: 0%;
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 열 4개로로 */
+  grid-template-columns: repeat(5, 1fr); /* 열 4개로로 */
   z-index: 1;
   gap: 2%;
   background-color: rgb(255, 255, 255);
@@ -278,7 +311,7 @@ const closeAlarmModal = () => {
   }
 
   .footer {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 2%;
     width: calc(100% - 20px);
     padding: 10px;
