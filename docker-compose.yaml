@@ -19,6 +19,7 @@ services:
       retries: 3
       
   spring-boot:
+    user: "root"
     build:
       context: ./backend
       dockerfile: Dockerfile
