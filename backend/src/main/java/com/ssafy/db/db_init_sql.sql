@@ -71,11 +71,11 @@ VALUES
 -- 운동 기록 테이블 (user_character.id를 외래 키로 사용)
 CREATE TABLE exercise_log (
                               id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                              user_id BIGINT NOT NULL,  -- user_character 테이블의 id 외래 키
+                              user_id VARCHAR(30) NOT NULL,  -- user_character 테이블의 id 외래 키
                               exercise_duration INT UNSIGNED NOT NULL,  -- 운동 시간 (초 단위)
                               exercise_cnt INT UNSIGNED NOT NULL,  -- 운동 횟수 (예: 푸시업 횟수, 스쿼트 횟수 등)
-                              exercise_score_ratio_id BIGINT NOT NULL,  -- exercise_stats_ratio 테이블과 연결
+                              exercise_stats_ratio_id BIGINT NOT NULL,  -- exercise_stats_ratio 테이블과 연결
                               exercise_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 운동 일시
                               FOREIGN KEY (user_id) REFERENCES user_character(id) ON DELETE CASCADE,
-                              FOREIGN KEY (exercise_score_ratio_id) REFERENCES exercise_stats_ratio(id) ON DELETE CASCADE
+                              FOREIGN KEY (exercise_stats_ratio_id) REFERENCES exercise_stats_ratio(id) ON DELETE CASCADE
 );
