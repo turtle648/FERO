@@ -24,6 +24,8 @@ services:
       dockerfile: Dockerfile
     container_name: spring-boot
     restart: unless-stopped
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     ports:
       - 8076:8076
     environment:
