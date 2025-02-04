@@ -83,20 +83,6 @@ onUnmounted(() => {
 //   await userStore.logOut() // Pinia store에서 제공하는 goToStart 호출
 // }
 
-// 활성화된 모달이 있는 경우 다른 모달 띄우지 않도록
-// const activeModal = ref(null)
-
-// 각 모달 열기 및 닫기 함수
-// const openModal = (modalNAme) => {
-//   if (!activeModal.value) {
-//     activeModal.value = modalNAme
-//   }
-// }
-
-// const closeModal = () => {
-//   activeModal.value = null
-// }
-
 // 상태창 관련 변수 및 함수
 import StatusModal from "@/components/modal/StatusModal.vue"
 const showStatusModal = ref(false)
