@@ -3,10 +3,12 @@ package com.ssafy.db.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import com.ssafy.api.response.UserStatusGetRes;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * 유저 모델 정의.
@@ -47,4 +49,10 @@ public class User{
     // 1:1 관계 매핑 추가
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserCharacter userCharacter;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private UserStats userStats;
+
+    @OneToMany(mappedBy = "user")
+    private List<UserTutorialProgress> tutorialProgress;
 }
