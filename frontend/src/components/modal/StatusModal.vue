@@ -61,8 +61,6 @@
             .
           </div>
         </div>
-        <!-- 전적 확인 버튼 -->
-        <button id="record-btn" @click="openRecordModal">전적확인</button>
       </div>
     </div>
   </template>
@@ -105,12 +103,6 @@ const emit = defineEmits(['closeStatus', 'openRecord'])
 
 // 모달 외부 클릭 시 상태창 모달 종료
 const closeStatusModal = () => { emit('closeStatus') }
-
-// 전적버튼 클릭시 상태창 끄기 & 전적창 열기
-const openRecordModal = () => { 
-    emit('closeStatus')
-    emit('openRecord')
-}
 
 </script>
 
