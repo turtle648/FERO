@@ -9,12 +9,20 @@ import AudioComponent from '@/components/AudioComponent.vue';
 
 // When running OpenVidu locally, leave these variables empty
 // For other deployment type, configure them with correct URLs depending on your deployment
-let APPLICATION_SERVER_URL = 'http://localhost:8076/api/v1/video-room/';
+let APPLICATION_SERVER_URL = '';
 let LIVEKIT_URL = '';
 configureUrls();
 
 function configureUrls() {
     // If LIVEKIT_URL is not configured, use default value from OpenVidu Local deployment
+    if (!APPLICATION_SERVER_URL) {
+        if (window.location.hostname === 'localhost') {
+            APPLICATION_SERVER_URL = 'http://localhost:8076/api/v1/video-room/';
+        } else {
+            APPLICATION_SERVER_URL = 'http://' + window.location.hostname + ':8076/api/v1/video-room/';
+        }
+    }
+
     if (!LIVEKIT_URL) {
         if (window.location.hostname === 'localhost') {
             LIVEKIT_URL = 'ws://localhost:7880/';
