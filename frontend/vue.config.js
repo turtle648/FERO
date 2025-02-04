@@ -1,16 +1,27 @@
+// vue.config.js
 const fs = require('fs');
 const path = require('path');
 const { defineConfig } = require('@vue/cli-service');
 
-module.exports = defineConfig({
+const devConfig = {
   transpileDependencies: true,
   devServer: {
-    host: '0.0.0.0',  // 모든 IP에서의 접근 허용
-    allowedHosts: 'all',  // 모든 호스트 허용
+    host: '0.0.0.0',
+    allowedHosts: 'all',
     https: {
-      key: fs.readFileSync(path.join(__dirname, 'certs/localhost.key')),  // 개인 키 경로
-      cert: fs.readFileSync(path.join(__dirname, 'certs/localhost.crt')),  // SSL 인증서 경로
+      key: fs.readFileSync(path.join(__dirname, 'certs/localhost.key')),
+      cert: fs.readFileSync(path.join(__dirname, 'certs/localhost.crt')),
     },
-    port: 5173,  // 원하는 포트로 설정
+    port: 5173,
   },
-});
+};
+
+const prodConfig = {
+  transpileDependencies: true,
+  // 프로덕션 환경 설정
+};
+
+module.exports = defineConfig(
+  process.env.NODE_ENV === 'development' ? devConfig : prodConfig
+);
+
