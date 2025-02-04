@@ -1,0 +1,63 @@
+services:
+  vue-app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: vue-app
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - ./certs:/app/certs 
+    command: npm run serve:dev
+    environment:
+      - NODE_ENV=development
+
+  spring-boot:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: spring-boot
+    restart: unless-stopped
+    ports:
+      - "8076:8076"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - JAVA_OPTS=-Xms512m -Xmx1024m
+    networks:
+      - redis-network
+      - my-sql-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "E103_DB"
+    ports:
+      - "3307:3306"
+    volumes:
+      - my-sql-volume:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - my-sql-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  my-sql-volume:
+
+networks:
+  redis-network:
+    driver: bridge
+    external: true
+  my-sql-network:
+    driver: bridge
+    external: true

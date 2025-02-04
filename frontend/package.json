@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve --port 8077",
+    "serve:dev": "NODE_ENV=development vue-cli-service serve",
+    "serve:prod": "NODE_ENV=production vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "test:unit": "jest"
@@ -15,6 +16,8 @@
     "axios": "^1.7.9",
     "bootstrap-vue-3": "^0.5.1",
     "core-js": "^3.8.3",
+    "easytimer.js": "^4.6.0",
+    "livekit-client": "^2.8.1",
     "pinia": "^2.3.1",
     "vue": "^3.2.13",
     "vue-fontawesome": "^0.0.2",

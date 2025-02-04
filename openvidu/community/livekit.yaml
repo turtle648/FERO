@@ -17,7 +17,6 @@ rtc:
 redis:
     address: redis:6379
     username: ""
-    password: redispassword
     db: 0
     use_tls: false
 turn:
@@ -30,8 +29,8 @@ keys:
 webhook:
     api_key: devkey
     urls:
-        - http://host.docker.internal:6080/livekit/webhook
-        - http://default-app:6080/livekit/webhook
+        - http://host.docker.internal:8076/livekit/webhook
+        - http://localhost:8076/livekit/webhook
 ingress:
     rtmp_base_url: rtmp://localhost:1935/rtmp
     whip_base_url: http://localhost:8085/whip

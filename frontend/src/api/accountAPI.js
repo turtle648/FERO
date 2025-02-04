@@ -67,11 +67,11 @@ export const verifyEmail = async (code, email) => {
 }
 
 // 캐릭터 등록 API 호출
-export const registerCharacter = async (gender, sessionId) => {
+export const registerCharacter = async (gender, userNickname, sessionId) => {
   try {
     const response = await axios.post(
       `${BASE_URL}/users/character?sessionId=${encodeURIComponent(sessionId)}`, 
-      { gender }
+      { gender, userNickname }
     )
     console.log('캐릭터 등록 결과:', response);
     return response.data?.statusCode === 200;

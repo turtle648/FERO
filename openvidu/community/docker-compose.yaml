@@ -27,6 +27,9 @@ services:
     depends_on:
       setup:
         condition: service_completed_successfully
+    networks:
+      - redis-network
+
 
   redis:
     image: docker.io/redis:7.4.1-alpine
@@ -65,7 +68,8 @@ services:
     depends_on:
       setup:
         condition: service_completed_successfully
-
+    networks:
+      - redis-network
   mongo:
     image: docker.io/bitnami/mongodb:7.0.15
     platform: linux/amd64
@@ -83,6 +87,8 @@ services:
       - MONGODB_REPLICA_SET_NAME=rs0
       - MONGODB_REPLICA_SET_KEY=devreplicasetkey
       - EXPERIMENTAL_DOCKER_DESKTOP_FORCE_QEMU=${EXPERIMENTAL_DOCKER_DESKTOP_FORCE_QEMU:-0}
+    networks:
+      - mongo-network
     depends_on:
       setup:
         condition: service_completed_successfully
@@ -100,6 +106,9 @@ services:
     depends_on:
       setup:
         condition: service_completed_successfully
+    networks:
+      - redis-network
+      - mongo-network
 
   openvidu:
     image: docker.io/openvidu/openvidu-server:3.0.0
@@ -122,6 +131,9 @@ services:
     depends_on:
       setup:
         condition: service_completed_successfully
+    networks:
+      - redis-network
+      - mongo-network
 
   ingress:
     image: docker.io/livekit/ingress:v1.4.2
@@ -139,6 +151,8 @@ services:
     depends_on:
       setup:
         condition: service_completed_successfully
+    networks:
+      - redis-network
 
   egress:
     image: docker.io/livekit/egress:v1.8.4
@@ -155,6 +169,8 @@ services:
     depends_on:
       setup:
         condition: service_completed_successfully
+    networks:
+      - redis-network
 
   default-app:
     image: docker.io/openvidu/openvidu-call:3.0.0-demo
@@ -166,7 +182,7 @@ services:
       - LAN_MODE=${LAN_MODE:-false}
       - LAN_DOMAIN=${LAN_DOMAIN:-}
       - LAN_PRIVATE_IP=${LAN_PRIVATE_IP:-}
-      - SERVER_PORT=6080
+      - SERVER_PORT=8076
       - CALL_NAME_ID=OpenViduCall-LOCAL
       - LIVEKIT_URL_PRIVATE=ws://openvidu:7880/
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY}
@@ -191,6 +207,8 @@ services:
     depends_on:
       setup:
         condition: service_completed_successfully
+    networks:
+      - redis-network
 
   ready-check:
     image: docker.io/curlimages/curl:8.11.0
@@ -248,5 +266,8 @@ volumes:
 
 networks:
   redis-network:
+    driver: bridge
+    external: true
+  mongo-network:
     driver: bridge
     external: true
