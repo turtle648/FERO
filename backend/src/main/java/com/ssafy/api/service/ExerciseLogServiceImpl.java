@@ -64,41 +64,41 @@ public class ExerciseLogServiceImpl implements ExerciseLogService {
         if (exerciseStatsRatio.getArmsRatio() > 0) {
             userStats.setArmsStats((short) Math.min(
                     userStats.getArmsStats() + (exerciseStatsRatio.getArmsRatio() * exerciseCnt),
-                    100 // 최대 스탯 100으로 제한
+                    1000 // 최대 스탯 1000으로 제한
             ));
         }
         if (exerciseStatsRatio.getLegsRatio() > 0) {
             userStats.setLegsStats((short) Math.min(
                     userStats.getLegsStats() + (exerciseStatsRatio.getLegsRatio() * exerciseCnt),
-                    100
+                    1000
             ));
         }
 
         if (exerciseStatsRatio.getChestRatio() > 0) {
             userStats.setChestStats((short) Math.min(
                     userStats.getChestStats() + (exerciseStatsRatio.getChestRatio() * exerciseCnt),
-                    100
+                    1000
             ));
         }
 
         if (exerciseStatsRatio.getAbsRatio() > 0) {
             userStats.setAbsStats((short) Math.min(
                     userStats.getAbsStats() + (exerciseStatsRatio.getAbsRatio() * exerciseCnt),
-                    100
+                    1000
             ));
         }
 
         if (exerciseStatsRatio.getBackRatio() > 0) {
             userStats.setBackStats((short) Math.min(
                     userStats.getBackStats() + (exerciseStatsRatio.getBackRatio() * exerciseCnt),
-                    100
+                    1000
             ));
         }
 
         if (exerciseStatsRatio.getStaminaRatio() > 0) {
             userStats.setStaminaStats((short) Math.min(
                     userStats.getStaminaStats() + (exerciseStatsRatio.getStaminaRatio() * exerciseCnt),
-                    100
+                    1000
             ));
         }
 
