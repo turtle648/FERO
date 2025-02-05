@@ -27,7 +27,7 @@ CREATE TABLE user_character (
                                 gender CHAR(1) NOT NULL CHECK (gender IN ('M', 'F')),
 
                                 user_rank_score SMALLINT NOT NULL DEFAULT '1000',
-                                user_level SMALLINT UNSIGNED NOT NULL DEFAULT 1 CHECK (user_level <= 999),
+                                user_level SMALLINT UNSIGNED NOT NULL DEFAULT 1 CHECK (user_level <= 100),
                                 user_experience INT NOT NULL DEFAULT 0,
 
                                 points SMALLINT UNSIGNED NOT NULL DEFAULT 0 CHECK (points <= 50000),
@@ -47,8 +47,8 @@ BEGIN
     SET NEW.user_level = FLOOR(NEW.user_experience / 200) + 1;
 
     -- 최대 레벨(999) 제한 확인
-    IF NEW.user_level > 999 THEN
-        SET NEW.user_level = 999;
+    IF NEW.user_level > 100 THEN
+        SET NEW.user_level = 100;
 END IF;
 END; //
 
@@ -87,7 +87,7 @@ CREATE TABLE exercise_stats_ratio (
 );
 
 
--- 운동 기록 테이블 (user_character.id를 외래 키로 사용)
+-- 운동 기록 테이블 (user_character.user_id를 외래 키로 사용)
 CREATE TABLE exercise_log (
                               id BIGINT PRIMARY KEY AUTO_INCREMENT,
                               user_id VARCHAR(30) NOT NULL,  -- user_character 테이블의 id 외래 키
