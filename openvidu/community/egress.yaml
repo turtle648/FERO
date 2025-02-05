@@ -3,8 +3,8 @@ redis:
     username: ""
     db: 0
     use_tls: false
-api_key: devkey
-api_secret: secret
+api_key: APIvUVrV9J2oem4
+api_secret: bfKEA7T8sqG4pPEfWF89txe1UdGcaT2kxC0dvin18lLA
 ws_url: ws://openvidu:7880
 health_port: 9091
 

@@ -25,12 +25,12 @@ turn:
     relay_range_start: 40000
     relay_range_end: 50000
 keys:
-    devkey: secret
+    APIvUVrV9J2oem4: bfKEA7T8sqG4pPEfWF89txe1UdGcaT2kxC0dvin18lLA
 webhook:
-    api_key: devkey
+    api_key: APIvUVrV9J2oem4
     urls:
         - http://host.docker.internal:8076/livekit/webhook
-        - http://localhost:8076/livekit/webhook
+        - https://i12e103.p.ssafy.io:8076/api/v1/video-room/livekit/webhook
 ingress:
     rtmp_base_url: rtmp://localhost:1935/rtmp
     whip_base_url: http://localhost:8085/whip
@@ -38,7 +38,7 @@ logging:
     # Logging level for the LiveKit server.
     # Values: debug, info, warn, error.
     # Default: info.
-    level: info
+    level: debug
 
     # Logging level for the Pion WebRTC engine.
     # Values: trace, debug, info, warn, error.

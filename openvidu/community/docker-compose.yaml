@@ -19,6 +19,9 @@ services:
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-}
     volumes:
       - ./custom-layout:/var/www/custom-layout
+      - ./caddy/Caddyfile:/config/caddy/Caddyfile  
+      - /etc/letsencrypt/live/i12e103.p.ssafy.io/fullchain.pem:/etc/letsencrypt/live/i12e103.p.ssafy.io/fullchain.pem
+      - /etc/letsencrypt/live/i12e103.p.ssafy.io/privkey.pem:/etc/letsencrypt/live/i12e103.p.ssafy.io/privkey.pem
     ports:
       - 5443:5443
       - 6443:6443
@@ -29,7 +32,7 @@ services:
         condition: service_completed_successfully
     networks:
       - redis-network
-
+      - mongo-network
 
   redis:
     image: docker.io/redis:7.4.1-alpine
@@ -177,6 +180,8 @@ services:
     platform: linux/amd64
     container_name: openvidu-call
     restart: on-failure
+    extra_hosts:
+      - host.docker.internal:host-gateway
     environment:
       - USE_HTTPS=${USE_HTTPS:-false}
       - LAN_MODE=${LAN_MODE:-false}
@@ -209,6 +214,7 @@ services:
         condition: service_completed_successfully
     networks:
       - redis-network
+      - mongo-network
 
   ready-check:
     image: docker.io/curlimages/curl:8.11.0
