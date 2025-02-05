@@ -54,20 +54,6 @@ public class AuthController {
 	@Autowired
 	private EmailService emailService;
 
-
-	private String extractUserIdFromToken(String token) {
-		// 'Bearer ' 부분 제거
-		String accessToken = token.replace("Bearer ", "");
-
-		// 토큰 검증
-		if (!JwtTokenUtil.validateToken(accessToken)) {
-			throw new IllegalArgumentException("Invalid Access Token");
-		}
-
-		// 사용자 ID 추출
-		return JwtTokenUtil.getUserIdFromJWT(accessToken);
-	}
-
 	@PostMapping("/login")
 	@ApiOperation(value = "로그인", notes = "<strong>아이디와 패스워드</strong>를 통해 로그인 한다.")
     @ApiResponses({
@@ -138,7 +124,7 @@ public class AuthController {
 		String authHeader = request.getHeader("Authorization");
 
 		// 헤더에서 토큰을 통해 사용자 ID 추출
-		String userId = extractUserIdFromToken(authHeader);
+		String userId = JwtTokenUtil.extractUserIdFromToken(authHeader);
 
 		// 조회된 사용자 정보
 		User userInfo = userRepository.findByUserId(userId).orElseThrow(() -> new RuntimeException("User not found"));
@@ -164,7 +150,7 @@ public class AuthController {
 
 		// 헤더에서 토큰을 통해 사용자 ID 추출
 		String authHeader = request.getHeader("Authorization");
-		String userId = extractUserIdFromToken(authHeader);
+		String userId = JwtTokenUtil.extractUserIdFromToken(authHeader);
 
 		// 사용자 이메일, 전화번호 업데이트
 		User updatedUser = userService.updateUser(updateInfo, userId);
@@ -188,7 +174,7 @@ public class AuthController {
 	public ResponseEntity<BaseResponseBody> checkCurrentPassword(
 			@RequestParam String currentPassword, HttpServletRequest request) {
 		String authHeader = request.getHeader("Authorization");
-		String userId = extractUserIdFromToken(authHeader);
+		String userId = JwtTokenUtil.extractUserIdFromToken(authHeader);
 
 		User user = userRepository.findByUserId(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -212,7 +198,7 @@ public class AuthController {
 			@RequestParam String newPassword, HttpServletRequest request) {
 
 		String authHeader = request.getHeader("Authorization");
-		String userId = extractUserIdFromToken(authHeader);
+		String userId = JwtTokenUtil.extractUserIdFromToken(authHeader);
 
 		User user = userRepository.findByUserId(userId)
 				.orElseThrow(() -> new RuntimeException("User not found"));
@@ -237,7 +223,7 @@ public class AuthController {
 		// 헤더에서 Authorization 토큰을 가져옴
 		String authHeader = request.getHeader("Authorization");
 		// 토큰에서 userId 추출
-		String userId = extractUserIdFromToken(authHeader);
+		String userId = JwtTokenUtil.extractUserIdFromToken(authHeader);
 
 		// 사용자 조회
 		User user = userRepository.findByUserId(userId)

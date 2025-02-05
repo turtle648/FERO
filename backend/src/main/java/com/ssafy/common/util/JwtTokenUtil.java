@@ -100,4 +100,17 @@ public class JwtTokenUtil {
         return JWT.decode(token.replace(TOKEN_PREFIX, "")).getSubject();
     }
 
+    public static String extractUserIdFromToken(String token) {
+        // 'Bearer ' 부분 제거
+        String accessToken = token.replace("Bearer ", "");
+
+        // 토큰 검증
+        if (!JwtTokenUtil.validateToken(accessToken)) {
+            throw new IllegalArgumentException("Invalid Access Token");
+        }
+
+        // 사용자 ID 추출
+        return JwtTokenUtil.getUserIdFromJWT(accessToken);
+    }
+
 }

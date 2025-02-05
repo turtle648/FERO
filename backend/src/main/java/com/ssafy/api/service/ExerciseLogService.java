@@ -1,18 +1,12 @@
 package com.ssafy.api.service;
 
+import com.ssafy.api.request.ExerciseLogReq;
 import com.ssafy.api.response.ExerciseStatsRatioRes;
-import com.ssafy.db.repository.ExerciseStatsRatioRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.ssafy.db.entity.ExerciseLog;
 
-@Service
-@RequiredArgsConstructor
-public class ExerciseLogService {
-    private final ExerciseStatsRatioRepository exerciseStatsRatioRepository;
-
-    public ExerciseStatsRatioRes getStatsByExerciseLog(Long exerciseStatsRatioId) {
-        return exerciseStatsRatioRepository.findById(exerciseStatsRatioId)
-                .map(ExerciseStatsRatioRes::of)
-                .orElseThrow(() -> new RuntimeException("해당 ID의 운동 통계를 찾을 수 없습니다."));
-    }
+public interface ExerciseLogService {
+    // 운동 종목의 스탯 조회
+    ExerciseStatsRatioRes getStatsByExerciseLog(Long exerciseStatsRatioId);
+    // 운동 기록 추가 및 스탯 업데이트
+    ExerciseLog addExerciseLogAndUpdateStats(String userId, ExerciseLogReq request);
 }
