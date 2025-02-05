@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @Table(name = "user_stats")
 public class UserStats extends BaseEntity {
 
-
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false, unique = true)
     private User user;

@@ -34,30 +34,6 @@ CREATE TABLE user_character (
                                 FOREIGN KEY (user_id) REFERENCES user_info(user_id) ON DELETE CASCADE
 );
 
-DELIMITER //
-
-
--- 경험치에 대한 레벨 업데이트
-CREATE TRIGGER update_user_level
-    BEFORE UPDATE ON user_character
-    FOR EACH ROW
-BEGIN
-    -- 경험치를 기반으로 새로운 레벨 계산
-    -- FLOOR(경험치/200) + 1 공식 사용
-    SET NEW.user_level = FLOOR(NEW.user_experience / 200) + 1;
-
-    -- 최대 레벨(100) 제한 확인
-    IF NEW.user_level > 100 THEN
-        SET NEW.user_level = 100;
-    END IF;
-
-    -- 경험치가 200 이상이면 나머지를 유지하고 200 단위로 초기화
-    SET NEW.user_experience = NEW.user_experience % 200;
-
-END; //
-
-DELIMITER ;
-
 
 -- 유저 스테이터스
 CREATE TABLE user_stats(
@@ -159,6 +135,53 @@ CREATE TABLE chat_message (
                               FOREIGN KEY (room_id) REFERENCES chat_room(id) ON DELETE CASCADE,
                               FOREIGN KEY (sender_id) REFERENCES user_info(user_id) ON DELETE CASCADE
 );
+
+
+-- -- -- -- -- 트리거 작업 -- -- -- -- --
+
+
+-- 유저 캐릭터 생성하면 자동으로 스테이터스 정보 생성
+DELIMITER //
+CREATE TRIGGER create_user_stats
+    AFTER INSERT ON user_character
+    FOR EACH ROW
+BEGIN
+    INSERT INTO user_stats (
+        user_id,
+        arms_stats,
+        legs_stats,
+        chest_stats,
+        abs_stats,
+        back_stats,
+        stamina_stats
+    ) VALUES (
+                 NEW.user_id,
+                 10,  -- DEFAULT 값들
+                 10,
+                 10,
+                 10,
+                 10,
+                 10
+             );
+END //
+DELIMITER ;
+
+
+-- 경험치에 대한 레벨업 트리거 작업
+DELIMITER //
+
+CREATE TRIGGER update_level_before_insert BEFORE UPDATE ON user_character
+    FOR EACH ROW
+BEGIN
+    WHILE NEW.user_experience >= 200 DO
+        SET NEW.user_experience = NEW.user_experience - 200;
+        SET NEW.user_level = NEW.user_level + 1;
+END WHILE;
+END;
+//
+
+DELIMITER ;
+
 
 
 -- -- -- -- -- 데이터 삽입 -- -- -- -- --
