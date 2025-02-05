@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class ExerciseLogServiceImpl implements ExerciseLogService {
     private final ExerciseStatsRatioRepository exerciseStatsRatioRepository;
     private final ExerciseLogRepository exerciseLogRepository;
-    private final CharacterStatsRepository characterStatsRepository;
+    private final UserStatsRepository userStatsRepository;
     private final UserCharacterRepository userCharacterRepository;
 
     @Override
@@ -50,7 +50,7 @@ public class ExerciseLogServiceImpl implements ExerciseLogService {
         System.out.println("사용자 스탯?? : "+userCharacter.getUser());
 
         // 4. 사용자 스탯 업데이트
-        UserStats userStats = characterStatsRepository.findByUser_UserId(userCharacter.getUser().getUserId())
+        UserStats userStats = userStatsRepository.findByUser(userCharacter.getUser())
                 .orElseThrow(() -> new EntityNotFoundException("사용자 스탯을 찾을 수 없습니다."));
 
         // 5. 운동 종류별 스탯 업데이트 로직
@@ -103,7 +103,7 @@ public class ExerciseLogServiceImpl implements ExerciseLogService {
         }
 
         userStats.setUpdatedAt(LocalDateTime.now());
-        characterStatsRepository.save(userStats);
+        userStatsRepository.save(userStats);
     }
 
 }
