@@ -24,9 +24,6 @@ public class UserCharacter extends BaseEntity{
     @Column(nullable = false)
     private char gender;
 
-    @Column(name = "user_rank_score", nullable = false)
-    private Short userRankScore = 1000;
-
     @Column(name = "user_level", nullable = false, columnDefinition = "SMALLINT UNSIGNED DEFAULT 1")
     private Short userLevel = 1;
 
