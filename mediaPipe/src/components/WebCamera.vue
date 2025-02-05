@@ -26,6 +26,10 @@ export default {
       canvasCtx.save();
       canvasCtx.clearRect(0, 0, canvasElement.value.width, canvasElement.value.height);
 
+      // 좌우 반전 적용
+      canvasCtx.translate(canvasElement.value.width, 0);
+      canvasCtx.scale(-1, 1);
+
       canvasCtx.drawImage(
         results.image,
         0,
