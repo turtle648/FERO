@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @Table(name = "exercise_log")
 public class ExerciseLog extends BaseEntity {
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
+    private UserCharacter userCharacter;
 
     @Column(name = "exercise_duration", nullable = false)
     private Integer exerciseDuration;
