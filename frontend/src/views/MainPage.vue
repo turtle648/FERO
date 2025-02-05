@@ -6,7 +6,6 @@
       <div class="header-item experience" @click="openSettingModal">설정</div>
       <div class="header-item experience" @click="openAlarmModal"><img src="@/assets/images/icon/alarm.png" alt="" /></div>
     </div>
-    <!-- <button class="logout-button" @click="goToStart">Logout</button> -->
     <!-- 상태창 -->
     <StatusModal v-if="showStatusModal" @closeStatus="closeStatusModal" />
 
@@ -58,12 +57,8 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue"
-// import { useUserStore } from "@/stores/store"
-// import { useRouter } from 'vue-router'
 
 const isDesktop = ref(false)
-// const userStore = useUserStore()
-// const router = useRouter()
 
 const checkScreenSize = () => {
   isDesktop.value = window.innerWidth > 821
