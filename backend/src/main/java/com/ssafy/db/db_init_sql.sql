@@ -46,10 +46,14 @@ BEGIN
     -- FLOOR(경험치/200) + 1 공식 사용
     SET NEW.user_level = FLOOR(NEW.user_experience / 200) + 1;
 
-    -- 최대 레벨(999) 제한 확인
+    -- 최대 레벨(100) 제한 확인
     IF NEW.user_level > 100 THEN
         SET NEW.user_level = 100;
-END IF;
+    END IF;
+
+    -- 경험치가 200 이상이면 나머지를 유지하고 200 단위로 초기화
+    SET NEW.user_experience = NEW.user_experience % 200;
+
 END; //
 
 DELIMITER ;
