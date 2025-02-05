@@ -56,22 +56,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue"
-
-const isDesktop = ref(false)
-
-const checkScreenSize = () => {
-  isDesktop.value = window.innerWidth > 821
-}
-
-onMounted(() => {
-  checkScreenSize()
-  window.addEventListener("resize", checkScreenSize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener("resize", checkScreenSize)
-})
+import { ref } from "vue"
 
 // 상태창 관련 변수 및 함수
 import StatusModal from "@/components/modal/StatusModal.vue"
@@ -241,15 +226,6 @@ const isAnyModalOpen = () => {
 .header-item {
   background-color: rgb(194, 255, 96);
   flex: 1;
-}
-
-.qr-code {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  text-align: center;
 }
 
 .exercise-options {
