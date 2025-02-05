@@ -35,8 +35,4 @@ public class UserStatsServiceImpl implements UserStatsService {
         return null;
     }
 
-    @Override
-    public UserCharacter getUserRankScore(String userId) {
-        return null;
-    }
 }
