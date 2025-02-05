@@ -11,6 +11,9 @@
       <router-link to="/plank">
         <button class="exercise-btn">플랭크</button>
       </router-link>
+      <router-link to="/squat">
+        <button class="exercise-btn">스쿼트</button>
+      </router-link>
     </div>
   </div>
 </template>

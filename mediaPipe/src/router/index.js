@@ -3,6 +3,7 @@ import HomeView from "../views/HomeView.vue";
 import PushUpView from "../views/PushUpView.vue";
 import LungeView from "../views/LungeView.vue";
 import PlankView from "../views/PlankView.vue";
+import SquatView from "@/views/SquatView.vue";
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: "/plank",
     name: "plank",
     component: PlankView,
+  },
+  {
+    path: "/squat",
+    name: "squat",
+    component: SquatView,
   },
 ];
 
