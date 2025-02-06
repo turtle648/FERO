@@ -2,9 +2,22 @@
   <img class="background-image" src="@/assets/images/background_image2.png" alt="배경이미지" />
   <div class="container" v-if="!isDesktop">
     <div class="header">
-      <div class="header-item level" @click="openStatusModal">레벨, 경험치 (상태창)</div>
+      <div class="header-item header-profile" @click="openStatusModal">
+        <img src="@/assets/images/profile/default_profile.png">
+        <div class="info-box">
+          <div>
+            Lv. {{ level }}
+          </div>
+          <div class="level-gauge">
+            <!-- 경험치에 맞게 게이지 채우기 -->
+            <div class="gauge-bar" :style="{ width: exp + '%' }"></div>
+          </div>
+        </div>
+      </div>
       <div class="header-item experience" @click="openSettingModal">설정</div>
-      <div class="header-item experience" @click="openAlarmModal"><img src="@/assets/images/icon/alarm.png" alt="" /></div>
+      <div class="header-item experience" @click="openAlarmModal">
+        <img src="@/assets/images/icon/alarm.png" alt="" />
+      </div>
     </div>
     <!-- 상태창 -->
     <StatusModal v-if="showStatusModal" @closeStatus="closeStatusModal" />
@@ -56,7 +69,14 @@
 </template>
 
 <script setup>
-import { ref } from "vue"
+import { ref, onMounted } from "vue"
+import { useUserStore } from "@/stores/store"
+import { useUserDataStore } from "@/stores/userDataStore"
+const userStore = useUserStore()
+const userDataStore = useUserDataStore()
+const nickName = ref('')
+const level = ref('')
+const exp = ref('')
 
 // 상태창 관련 변수 및 함수
 import StatusModal from "@/components/modal/StatusModal.vue"
@@ -182,6 +202,12 @@ const closeAlarmModal = () => {
 const isAnyModalOpen = () => {
   return showStatusModal.value || showRecordModal.value || showSettingModal.value || showAlarmModal.value || showFriendModal.value || showCalendarModal.value || showFitnessModal.value
 }
+
+onMounted(() => {
+  nickName.value = userStore.userNickname
+  level.value = userDataStore.userLevel
+  exp.value = userDataStore.userExperience
+})
 </script>
 
 <style scoped>
@@ -226,6 +252,27 @@ const isAnyModalOpen = () => {
 .header-item {
   background-color: rgb(194, 255, 96);
   flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.info-box {
+  margin-left: 10px;
+}
+
+.level-gauge {
+  position: relative;
+  width: 100px;
+  height: 10px;
+  background-color: #e0e0e0; /* 게이지 배경 */
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.gauge-bar {
+  height: 100%;
+  background-color: #4caf50; /* 게이지 색 */
+  transition: width 0.3s ease; /* 부드럽게 변화 */
 }
 
 .exercise-options {
@@ -270,6 +317,9 @@ const isAnyModalOpen = () => {
   }
 }
 
+.header-profile {
+  width: 50%;
+}
 /* 추후 수정필요 */
 /* 태블릿
 @media screen and (min-device-width: 700px) and (max-device-width: 821px) {
