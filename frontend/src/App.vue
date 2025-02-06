@@ -5,7 +5,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue"
-import QRComponent from '@/views/QRComponent.vue'
+import QRComponent from '@/components/QRComponent.vue'
 
 const isDesktop = ref(false)
 const checkScreenSize = () => {
