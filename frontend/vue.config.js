@@ -5,15 +5,15 @@ const devConfig = {
   devServer: process.env.NODE_ENV === 'development' ? {
     host: '0.0.0.0',
     allowedHosts: 'all',
-    // https: (() => {
-    //   const fs = require('fs');
-    //   const path = require('path');
-    //   return {
-    //     key: fs.readFileSync(path.join(__dirname, 'certs/localhost.key')),
-    //     cert: fs.readFileSync(path.join(__dirname, 'certs/localhost.crt')),
-    //   };
-    // })(),
-    https: false,
+    https: (() => {
+      const fs = require('fs');
+      const path = require('path');
+      return {
+        key: fs.readFileSync(path.join(__dirname, 'certs/localhost.key')),
+        cert: fs.readFileSync(path.join(__dirname, 'certs/localhost.crt')),
+      };
+    })(),
+    // https: false,
     port: 5173,
   } : {}
 };

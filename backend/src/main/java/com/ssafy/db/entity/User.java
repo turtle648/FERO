@@ -46,9 +46,11 @@ public class User{
     String userPassword;
 
     // 1:1 관계 매핑 추가
+    @JsonIgnore
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserCharacter userCharacter;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserStats userStats;
 

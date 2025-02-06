@@ -64,7 +64,7 @@ export const useUserStore = defineStore('user', () => {
       }
 
       // 로그아웃 API 호출
-      const response = await axios.post('http://i12e103.p.ssafy.io:8076/api/v1/auth/logout', {}, { headers })
+      const response = await axios.post('https://i12e103.p.ssafy.io:8076/api/v1/auth/logout', {}, { headers })
 
       if (response.data.statusCode === 200) {
         console.log('로그아웃 성공')
@@ -83,6 +83,6 @@ export const useUserStore = defineStore('user', () => {
 
   return { accessToken, sessionId, userId,
            setAccessToken, setSessionId, clearSession, isTokenValid, setUserId, 
-           logOut,
+           logOut, 
          }
 })

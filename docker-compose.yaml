@@ -17,8 +17,6 @@ services:
       interval: 10s
       timeout: 10s
       retries: 3
-    networks:
-      - openvidu-network
       
   spring-boot:
     user: "root"
@@ -37,9 +35,8 @@ services:
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-}
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-}
     networks:
-      - redis-network
       - my-sql-network
-      - openvidu-network
+      - redis-network
     depends_on:
       mysql:
         condition: service_healthy
@@ -63,16 +60,28 @@ services:
       interval: 10s
       retries: 5
       start_period: 10s
+    
+  redis:
+    image: docker.io/redis:7.4.1-alpine
+    platform: linux/amd64
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    volumes:
+      - redis:/data
+    command: >
+      redis-server
+      --bind 0.0.0.0
+    networks:
+      - redis-network
 
 volumes:
   my-sql-volume:
+  redis:
 
 networks:
-  redis-network:
-    driver: bridge
-    external: true
   my-sql-network:
     driver: bridge
-    external: true
-  openvidu-network:
+  redis-network:
     driver: bridge

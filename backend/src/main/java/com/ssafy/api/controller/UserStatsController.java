@@ -103,23 +103,6 @@ public class UserStatsController {
         return ResponseEntity.ok(userCharacter.getUserExperience().intValue());
     }
 
-//    @GetMapping("/rankScore")
-//    @ApiOperation(value = "캐릭터 랭크점수 불러오기", notes = "캐릭터의 랭크 점수를 확인할 수 있다.")
-//    public ResponseEntity<Integer> getCharacterRankScore(HttpServletRequest request) {
-//
-//        String token = request.getHeader("Authorization");
-//        String userId = JwtTokenUtil.getUserIdFromJWT(token);  // JWT 토큰에서 userId 추출
-//
-//        UserCharacter userCharacter = userCharacterService.getUserCharacterByUserId(userId);
-//
-//        if (userCharacter == null) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//        }
-//
-//        return ResponseEntity.ok(userCharacter.getUserRankScore().intValue());  // Short -> Integer 변환
-//
-//    }
-    
 
 
 }
