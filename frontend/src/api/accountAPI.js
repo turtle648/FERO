@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 
-const BASE_URL = 'http://i12e103.p.ssafy.io:8076/api/v1'
+const BASE_URL = 'https://i12e103.p.ssafy.io:8076/api/v1'
 
 // 로그인 API 호출
 export const login = async (id, password) => {
@@ -47,6 +47,22 @@ export const checkEmailDuplicateAPI = async (email) => {
     }
   } catch (error) {
     alert('이메일 중복 확인 실패')
+  }
+}
+
+// 이메일 인증코드 발송 API
+export const sendEmail = async (email) => {
+  try {
+    // `email`을 쿼리스트링으로 전달
+    const response = await axios.post(
+      `${BASE_URL}/users/send-email?email=${encodeURIComponent(email)}`
+    )
+    console.log('인증메일 발송 결과:', response)
+    return response.data?.statusCode === 200
+  } catch (error) {
+    console.error('인증메일 발송 실패:', error)
+    alert('인증메일 발송 실패')
+    return false // 실패 시 false 반환
   }
 }
 
