@@ -37,9 +37,7 @@ services:
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-}
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-}
     networks:
-      - redis-network
       - my-sql-network
-      - openvidu-network
     depends_on:
       mysql:
         condition: service_healthy
@@ -68,19 +66,5 @@ volumes:
   my-sql-volume:
 
 networks:
-  redis-network:
-    driver: bridge
-    external: true
   my-sql-network:
     driver: bridge
-    external: true
-  openvidu-network:
-<<<<<<< HEAD
-<<<<<<< HEAD
-    driver: bridge
-=======
-    driver: bridge
->>>>>>> 9c8d33c (feat(videoroom): signaling server를 통한 화상 통신 구축)
-=======
-    driver: bridge
->>>>>>> 9c8d33cea5d2ff9ee589ed91086c179bbfe08143
