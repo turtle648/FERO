@@ -10,7 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 유저 튜토리얼 관련 API를 정의하기 위한 컨트롤러 정의.
@@ -53,13 +55,17 @@ public class TutorialController {
 
     @PostMapping("/complete/{tutorialId}")
     @ApiOperation(value = "튜토리얼 완료 처리", notes = "유저가 특정 튜토리얼을 완료했다고 기록한다.")
-    public ResponseEntity<Boolean> completeTutorial(@PathVariable Long tutorialId, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> completeTutorial(@PathVariable Long tutorialId, HttpServletRequest request) {
 
         String token = request.getHeader("Authorization");
         String userId = JwtTokenUtil.getUserIdFromJWT(token);
 
         userTutorialProgressService.completeTutorial(userId, tutorialId);
 
-        return ResponseEntity.ok().build();
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "튜토리얼이 성공적으로 완료되었습니다.");
+        response.put("tutorialId", tutorialId);
+
+        return ResponseEntity.ok(response);
     }
 }
