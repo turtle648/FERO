@@ -1,24 +1,37 @@
 <template>
   <img class="background-image" src="@/assets/images/background_image2.png" alt="배경이미지" />
   <div class="container" v-if="!isDesktop">
-    <div class="header">
-      <div class="header-item header-profile" @click="openStatusModal">
-        <img src="@/assets/images/profile/default_profile.png">
-        <div class="info-box">
-          <div>
-            Lv. {{ level }}
-          </div>
-          <div class="level-gauge">
-            <!-- 경험치에 맞게 게이지 채우기 -->
-            <div class="gauge-bar" :style="{ width: exp + '%' }"></div>
-          </div>
-        </div>
+    <div class="header flex justify-between items-center w-full h-[5vh]">
+  <!-- 헤더 프로필 (40% 너비) --> 
+  <div class="header-item header-profile w-2/5 h-full flex items-center" @click="openStatusModal">
+    <!-- 프로필 이미지 (정사각형, 작은 사이즈로 동그랗게 만들기) -->
+    <img src="@/assets/images/profile/default_profile.png" class="w-12 h-12 rounded-full object-cover">
+    
+    <!-- LV 및 게이지 영역 -->
+    <div class="info-box ml-4 flex-1 h-full">
+      <div class="h-1/2">
+        Lv. {{ level }}
       </div>
-      <div class="header-item experience" @click="openSettingModal">설정</div>
-      <div class="header-item experience" @click="openAlarmModal">
-        <img src="@/assets/images/icon/alarm.png" alt="" />
+      <div class="level-gauge relative w-full h-3 bg-gray-200 rounded-full mt-1">
+        <!-- 경험치에 맞게 게이지 채우기 -->
+        <div class="gauge-bar bg-blue-500 h-full rounded-full" :style="{ width: Math.min(exp, 100) + '%' }"></div>
       </div>
     </div>
+  </div>
+  <div class="flex justify-between items-center">
+    <!-- 설정 버튼 -->
+    <div class="header-item experience cursor-pointer" @click="openSettingModal">설정</div>
+  
+    <!-- 알림 아이콘 -->
+    <div class="header-item experience cursor-pointer" @click="openAlarmModal">
+      <img src="@/assets/images/icon/alarm.png" alt="" />
+    </div>
+  </div>
+</div>
+
+
+
+
     <!-- 상태창 -->
     <StatusModal v-if="showStatusModal" @closeStatus="closeStatusModal" />
 
@@ -239,40 +252,9 @@ onMounted(() => {
 }
 
 .header {
-  display: flex;
   top: 0;
-  left: 0;
-  z-index: 2;
-  justify-content: space-around;
-  width: 100%;
-  height: 5vh;
   position: absolute;
-}
-
-.header-item {
   background-color: rgb(194, 255, 96);
-  flex: 1;
-  display: flex;
-  align-items: center;
-}
-
-.info-box {
-  margin-left: 10px;
-}
-
-.level-gauge {
-  position: relative;
-  width: 100px;
-  height: 10px;
-  background-color: #e0e0e0; /* 게이지 배경 */
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.gauge-bar {
-  height: 100%;
-  background-color: #4caf50; /* 게이지 색 */
-  transition: width 0.3s ease; /* 부드럽게 변화 */
 }
 
 .exercise-options {
@@ -317,9 +299,6 @@ onMounted(() => {
   }
 }
 
-.header-profile {
-  width: 50%;
-}
 /* 추후 수정필요 */
 /* 태블릿
 @media screen and (min-device-width: 700px) and (max-device-width: 821px) {
