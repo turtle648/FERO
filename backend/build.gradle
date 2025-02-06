@@ -66,6 +66,9 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
+    implementation 'org.webjars:sockjs-client:1.5.1' // stompJS
+    implementation 'org.webjars:stomp-websocket:2.3.4'
+
     implementation('commons-io:commons-io:2.6')
     implementation("org.apache.commons:commons-collections4:4.4")
     implementation("org.apache.commons:commons-lang3:3.9")
@@ -121,8 +124,6 @@ dependencies {
 
     // SMTP 이메일 인증 기능
     implementation 'org.springframework.boot:spring-boot-starter-mail'
-
-    implementation 'io.livekit:livekit-server:0.8.2'
 }
 
 test {

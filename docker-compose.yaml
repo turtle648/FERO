@@ -75,4 +75,12 @@ networks:
     driver: bridge
     external: true
   openvidu-network:
+<<<<<<< HEAD
+<<<<<<< HEAD
     driver: bridge
+=======
+    driver: bridge
+>>>>>>> 9c8d33c (feat(videoroom): signaling server를 통한 화상 통신 구축)
+=======
+    driver: bridge
+>>>>>>> 9c8d33cea5d2ff9ee589ed91086c179bbfe08143
