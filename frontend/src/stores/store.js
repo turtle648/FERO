@@ -83,6 +83,6 @@ export const useUserStore = defineStore('user', () => {
 
   return { accessToken, sessionId, userId,
            setAccessToken, setSessionId, clearSession, isTokenValid, setUserId, 
-           logOut,
+           logOut, 
          }
 })
