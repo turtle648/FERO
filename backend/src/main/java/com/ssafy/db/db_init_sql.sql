@@ -26,7 +26,6 @@ CREATE TABLE user_character (
                                 user_nickname VARCHAR(15) NOT NULL UNIQUE,
                                 gender CHAR(1) NOT NULL CHECK (gender IN ('M', 'F')),
 
-                                user_rank_score SMALLINT NOT NULL DEFAULT '1000',
                                 user_level SMALLINT UNSIGNED NOT NULL DEFAULT 1 CHECK (user_level <= 999),
                                 user_experience INT NOT NULL DEFAULT 0,
 
@@ -34,25 +33,18 @@ CREATE TABLE user_character (
                                 FOREIGN KEY (user_id) REFERENCES user_info(user_id) ON DELETE CASCADE
 );
 
-DELIMITER //
 
+-- 유저의 각 운동별 랭크 점수
+CREATE TABLE user_rank_scores (
+                                  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                                  user_id VARCHAR(30) NOT NULL,
+                                  exercise_type VARCHAR(50) NOT NULL,  -- 운동 종류 (예: 스쿼트, 푸쉬업 등)
+                                  rank_score SMALLINT NOT NULL DEFAULT 1000,
 
--- 경험치에 대한 레벨 업데이트
-CREATE TRIGGER update_user_level
-    BEFORE UPDATE ON user_character
-    FOR EACH ROW
-BEGIN
-    -- 경험치를 기반으로 새로운 레벨 계산
-    -- FLOOR(경험치/200) + 1 공식 사용
-    SET NEW.user_level = FLOOR(NEW.user_experience / 200) + 1;
+                                  FOREIGN KEY (user_id) REFERENCES user_character(user_id) ON DELETE CASCADE,
+                                  UNIQUE (user_id, exercise_type)  -- 동일 유저의 동일 운동에 대한 중복 데이터 방지
+);
 
-    -- 최대 레벨(999) 제한 확인
-    IF NEW.user_level > 999 THEN
-        SET NEW.user_level = 999;
-END IF;
-END; //
-
-DELIMITER ;
 
 
 -- 유저 스테이터스
@@ -87,7 +79,7 @@ CREATE TABLE exercise_stats_ratio (
 );
 
 
--- 운동 기록 테이블 (user_character.id를 외래 키로 사용)
+-- 운동 기록 테이블 (user_character.user_id를 외래 키로 사용)
 CREATE TABLE exercise_log (
                               id BIGINT PRIMARY KEY AUTO_INCREMENT,
                               user_id VARCHAR(30) NOT NULL,  -- user_character 테이블의 id 외래 키
@@ -155,6 +147,104 @@ CREATE TABLE chat_message (
                               FOREIGN KEY (room_id) REFERENCES chat_room(id) ON DELETE CASCADE,
                               FOREIGN KEY (sender_id) REFERENCES user_info(user_id) ON DELETE CASCADE
 );
+
+
+-- -- -- -- -- 트리거 작업 -- -- -- -- --
+
+
+-- 유저 캐릭터 생성하면 자동으로 스테이터스 정보 생성
+DELIMITER //
+CREATE TRIGGER create_user_stats
+    AFTER INSERT ON user_character
+    FOR EACH ROW
+BEGIN
+    INSERT INTO user_stats (
+        user_id,
+        arms_stats,
+        legs_stats,
+        chest_stats,
+        abs_stats,
+        back_stats,
+        stamina_stats
+    ) VALUES (
+                 NEW.user_id,
+                 10,  -- DEFAULT 값들
+                 10,
+                 10,
+                 10,
+                 10,
+                 10
+             );
+END //
+DELIMITER ;
+
+
+-- 경험치에 대한 레벨업 트리거 작업
+DELIMITER //
+
+CREATE TRIGGER update_level_before_insert BEFORE UPDATE ON user_character
+    FOR EACH ROW
+BEGIN
+    WHILE NEW.user_experience >= 200 DO
+        SET NEW.user_experience = NEW.user_experience - 200;
+        SET NEW.user_level = NEW.user_level + 1;
+END WHILE;
+END;
+//
+
+DELIMITER ;
+
+-- 마지막 운동날짜 8일 초과 유저 스탯 5씩 감소
+-- 2주이상 안 한 사람 스탯 10으로 초기화
+-- 이벤트 스케줄러로 매일 자정 시행
+SET GLOBAL event_scheduler = ON;
+
+DELIMITER //
+CREATE EVENT decrease_and_reset_stats_event
+ON SCHEDULE EVERY 1 DAY STARTS TIMESTAMP(CURRENT_DATE, '00:00:00')
+DO
+BEGIN
+    -- 2주(14일) 초과 운동 안 한 유저: 스탯을 10으로 초기화
+UPDATE user_stats
+SET
+    arms_stats = 10,
+    legs_stats = 10,
+    chest_stats = 10,
+    abs_stats = 10,
+    back_stats = 10,
+    stamina_stats = 10,
+    updated_at = CURRENT_TIMESTAMP
+WHERE updated_at < NOW() - INTERVAL 14 DAY;
+
+-- 8일 ~ 14일 사이 운동 안 한 유저: 스탯 -5 감소 (최소값 10 유지)
+UPDATE user_stats
+SET
+    arms_stats = GREATEST(arms_stats - 5, 10),
+    legs_stats = GREATEST(legs_stats - 5, 10),
+    chest_stats = GREATEST(chest_stats - 5, 10),
+    abs_stats = GREATEST(abs_stats - 5, 10),
+    back_stats = GREATEST(back_stats - 5, 10),
+    stamina_stats = GREATEST(stamina_stats - 5, 10),
+    updated_at = CURRENT_TIMESTAMP
+WHERE updated_at BETWEEN NOW() - INTERVAL 14 DAY AND NOW() - INTERVAL 8 DAY;
+END;
+//
+DELIMITER ;
+
+
+-- 유저 생성시 각 운동별 랭크 스코어 초기화
+DELIMITER //
+
+CREATE TRIGGER create_user_rank_scores
+    AFTER INSERT ON user_character
+    FOR EACH ROW
+BEGIN
+    INSERT INTO user_rank_scores (user_id, exercise_type, rank_score)
+    SELECT NEW.user_id, exercise_type, 1000  -- 기본 랭크 점수
+    FROM exercise_stats_ratio;  -- 등록된 모든 운동 종류를 가져와 삽입
+END //
+
+DELIMITER ;
 
 
 -- -- -- -- -- 데이터 삽입 -- -- -- -- --
