@@ -9,6 +9,7 @@ export const useUserDataStore = defineStore('userData', () => {
   const BASE_URL = 'https://i12e103.p.ssafy.io:8076/api/v1'
   const userStore = useUserStore()
 
+  const userNickname = ref('')
   const userLevel = ref('1')
   const userExperience = ref('30')
 
@@ -25,7 +26,10 @@ export const useUserDataStore = defineStore('userData', () => {
 
       const response = await axios.get('https://i12e103.p.ssafy.io:8076/api/v1/auth/me', { headers })
 
-      if (response.status === 200) { console.log('조회 성공', response.data) } 
+      if (response.status === 200) { 
+        console.log('조회 성공', response.data) 
+        userNickname.value = response.data['userNickname']
+      } 
       else { console.error('조회 실패: 서버에서 응답 실패') }
     } catch (error) {
       console.error('조회 요청 중 에러 발생: ', error)
@@ -81,7 +85,7 @@ export const useUserDataStore = defineStore('userData', () => {
   }
 
   return { 
-    userLevel, userExperience,
+    userNickname, userLevel, userExperience,
     checkUserInfo, checkUserLevel, checkUserExperience,
          }
 })
