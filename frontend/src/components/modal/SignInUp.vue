@@ -101,9 +101,17 @@
               </div>
             </div>
             <hr>
-            <div> 
-              <img class="" src="@/assets/images/character/defalt_character_M.png">
-              <img class="" src="@/assets/images/character/defalt_character_F.png">
+            <div class="select-box"> 
+              <img class="defalt-character" 
+              :class="{'selected-character': gender === 'M'}"
+              src="@/assets/images/character/defalt_character_M.png"
+              @click="selectCharacter('M')"
+              >
+              <img class="defalt-character" 
+              :class="{'selected-character': gender === 'F'}"
+              src="@/assets/images/character/defalt_character_F.png"
+              @click="selectCharacter('F')"
+              >
             </div>
           <div>
             <button type="submit">완료</button>
@@ -207,6 +215,7 @@ const handleSignUp3 = async () => {
   closeSignUp()
 }
 
+const selectCharacter = (gen) => { gender.value = gen}
 
 
 const handleSocialLogin = (platform) => { alert(`${platform} 소셜 로그인! 미구현`) }
@@ -250,8 +259,8 @@ button {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  background-color: #ff7f50;
-  color: white;
+  background-color: #dcdcdc;
+  color: #333;
   font-size: 14px;
   transition: background-color 0.3s;
 }
@@ -396,6 +405,23 @@ input:disabled {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;
+}
+
+.select-box {
+  display: flex;
+  justify-content: space-around; /* 이미지들이 가로로 고르게 분포되도록 */
+  align-items: center; /* 이미지들이 세로로 정렬되도록 */
+}
+
+.defalt-character {
+  /* select박스의 width기준 */
+  width: 40%;
+  border: 3px solid;
+  border-color:white;
+}
+
+.selected-character {
+  border: 3px solid #ff9f9f; /* 선택된 캐릭터에 테두리 추가 */
 }
 </style>
   

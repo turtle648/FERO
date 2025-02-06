@@ -8,6 +8,9 @@
         <li>회원정보</li>
         <li>회원탈퇴</li>
         <li><button class="logout-button" @click="goToStart">Logout</button></li>
+        <li><button class="logout-button" @click="checkUserInfo">본인정보조회</button></li>
+        <li><button class="logout-button" @click="checkUserLevel">본인레벨조회</button></li>
+        <li><button class="logout-button" @click="checkUserExperience">본인경험치조회</button></li>
       </ul>
     </div>
   </div>
@@ -16,6 +19,7 @@
 <script setup>
 import { defineEmits } from "vue"
 import { useUserStore } from "@/stores/store"
+import { useUserDataStore } from "@/stores/userDataStore"
 
 const emit = defineEmits(["closeSetting"])
 const closeSettingModal = () => {
@@ -23,10 +27,19 @@ const closeSettingModal = () => {
 }
 
 const userStore = useUserStore()
+const userDataStore = useUserDataStore()
+
 // 로그아웃 함수
 const goToStart = async () => {
   await userStore.logOut() // Pinia store에서 제공하는 goToStart 호출
 }
+
+// 본인정보조회
+const checkUserInfo = () => { userDataStore.checkUserInfo() }
+// 본인레벨조회
+const checkUserLevel = () => { userDataStore.checkUserLevel() }
+// 본인경험치조회
+const checkUserExperience = () => {userDataStore.checkUserExperience() }
 </script>
 
 <style scoped>
