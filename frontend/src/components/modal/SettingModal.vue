@@ -10,6 +10,7 @@
         <li><button class="logout-button" @click="goToStart">Logout</button></li>
         <li><button class="logout-button" @click="checkUserInfo">본인정보조회</button></li>
         <li><button class="logout-button" @click="checkUserLevel">본인레벨조회</button></li>
+        <li><button class="logout-button" @click="checkUserExperience">본인경험치조회</button></li>
       </ul>
     </div>
   </div>
@@ -35,10 +36,10 @@ const goToStart = async () => {
 
 // 본인정보조회
 const checkUserInfo = () => { userDataStore.checkUserInfo() }
-
 // 본인레벨조회
 const checkUserLevel = () => { userDataStore.checkUserLevel() }
-
+// 본인경험치조회
+const checkUserExperience = () => {userDataStore.checkUserExperience() }
 </script>
 
 <style scoped>
