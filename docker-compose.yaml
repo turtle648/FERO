@@ -36,6 +36,7 @@ services:
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-}
     networks:
       - my-sql-network
+      - redis-network
     depends_on:
       mysql:
         condition: service_healthy
@@ -59,10 +60,28 @@ services:
       interval: 10s
       retries: 5
       start_period: 10s
+    
+  redis:
+    image: docker.io/redis:7.4.1-alpine
+    platform: linux/amd64
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    volumes:
+      - redis:/data
+    command: >
+      redis-server
+      --bind 0.0.0.0
+    networks:
+      - redis-network
 
 volumes:
   my-sql-volume:
+  redis:
 
 networks:
   my-sql-network:
+    driver: bridge
+  redis-network:
     driver: bridge
