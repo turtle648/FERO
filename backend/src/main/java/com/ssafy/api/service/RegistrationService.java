@@ -56,13 +56,14 @@ public class RegistrationService {
      */
     public boolean verifyEmail(String useremail, String inputCode) {
         String storedCode = (String) redisTemplate.opsForValue().get("email_verification:"+useremail);
-        redisTemplate.delete("email_verification:" + useremail); // 항상 삭제해야 함!
+        
         if (storedCode == null || !storedCode.equals(inputCode)) {
-            redisTemplate.opsForValue().set("verified:" + useremail, true, Duration.ofMinutes(4));
-            redisTemplate.delete("email_verification:"+useremail); // 인증 성공하면 삭제함
-            return true;
+            return false;
         }
-        return false;
+        // 인증 성공 할 때만 Redis에서 삭제 및 인증 저장
+        redisTemplate.opsForValue().set("verified:" + useremail, true, Duration.ofMinutes(4));
+        redisTemplate.delete("email_verification:"+useremail); // 인증 성공하면 삭제함
+        return true;
     }
 
     /**

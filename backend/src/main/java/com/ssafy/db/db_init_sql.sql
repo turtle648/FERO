@@ -79,7 +79,7 @@ CREATE TABLE exercise_stats_ratio (
 );
 
 
--- 운동 기록 테이블 (user_character.id를 외래 키로 사용)
+-- 운동 기록 테이블 (user_character.user_id를 외래 키로 사용)
 CREATE TABLE exercise_log (
                               id BIGINT PRIMARY KEY AUTO_INCREMENT,
                               user_id VARCHAR(30) NOT NULL,  -- user_character 테이블의 id 외래 키
@@ -192,6 +192,43 @@ END WHILE;
 END;
 //
 
+DELIMITER ;
+
+-- 마지막 운동날짜 8일 초과 유저 스탯 5씩 감소
+-- 2주이상 안 한 사람 스탯 10으로 초기화
+-- 이벤트 스케줄러로 매일 자정 시행
+SET GLOBAL event_scheduler = ON;
+
+DELIMITER //
+CREATE EVENT decrease_and_reset_stats_event
+ON SCHEDULE EVERY 1 DAY STARTS TIMESTAMP(CURRENT_DATE, '00:00:00')
+DO
+BEGIN
+    -- 2주(14일) 초과 운동 안 한 유저: 스탯을 10으로 초기화
+UPDATE user_stats
+SET
+    arms_stats = 10,
+    legs_stats = 10,
+    chest_stats = 10,
+    abs_stats = 10,
+    back_stats = 10,
+    stamina_stats = 10,
+    updated_at = CURRENT_TIMESTAMP
+WHERE updated_at < NOW() - INTERVAL 14 DAY;
+
+-- 8일 ~ 14일 사이 운동 안 한 유저: 스탯 -5 감소 (최소값 10 유지)
+UPDATE user_stats
+SET
+    arms_stats = GREATEST(arms_stats - 5, 10),
+    legs_stats = GREATEST(legs_stats - 5, 10),
+    chest_stats = GREATEST(chest_stats - 5, 10),
+    abs_stats = GREATEST(abs_stats - 5, 10),
+    back_stats = GREATEST(back_stats - 5, 10),
+    stamina_stats = GREATEST(stamina_stats - 5, 10),
+    updated_at = CURRENT_TIMESTAMP
+WHERE updated_at BETWEEN NOW() - INTERVAL 14 DAY AND NOW() - INTERVAL 8 DAY;
+END;
+//
 DELIMITER ;
 
 

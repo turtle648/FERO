@@ -1,6 +1,8 @@
 package com.ssafy.api.service;
 
 import com.ssafy.api.request.ExerciseLogReq;
+import com.ssafy.api.request.ExerciseLogSearchReq;
+import com.ssafy.api.response.ExerciseLogRes;
 import com.ssafy.api.response.ExerciseStatsRatioRes;
 import com.ssafy.db.entity.*;
 import com.ssafy.db.repository.*;
@@ -10,6 +12,9 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -58,7 +63,45 @@ public class ExerciseLogServiceImpl implements ExerciseLogService {
 
         return savedLog;
     }
-    
+    @Override
+    public List<ExerciseLogRes> searchExerciseLog(String userId, ExerciseLogSearchReq request) {
+        System.out.println("조회 옵션 : " + request.toString());
+
+        Long exerciseStatsRatioId = request.getExerciseStatsRatioId();
+        LocalDateTime startOfDay = null;
+        LocalDateTime endOfDay = null;
+
+        if (request.getSearchDate() != null) {
+            startOfDay = request.getSearchDate().atStartOfDay();
+            endOfDay = request.getSearchDate().atTime(LocalTime.MAX);
+        }
+
+        List<ExerciseLog> exerciseLogs;
+
+        if (exerciseStatsRatioId != null && startOfDay != null) {
+            // 날짜 + 운동 종류 필터
+            exerciseLogs = exerciseLogRepository.findByUserCharacter_User_UserIdAndExerciseDateBetweenAndExerciseStatsRatio_IdOrderByExerciseDateDesc(
+                    userId, startOfDay, endOfDay, exerciseStatsRatioId);
+        } else if (startOfDay != null) {
+            // 날짜만 필터
+            exerciseLogs = exerciseLogRepository.findByUserCharacter_User_UserIdAndExerciseDateBetweenOrderByExerciseDateDesc(
+                    userId, startOfDay, endOfDay);
+        } else if (exerciseStatsRatioId != null) {
+            // 운동 종류만 필터
+            exerciseLogs = exerciseLogRepository.findByUserCharacter_User_UserIdAndExerciseStatsRatio_IdOrderByExerciseDateDesc(
+                    userId, exerciseStatsRatioId);
+        } else {
+            // 전체 조회
+            System.out.println("전체 조회하려는 사용자 정보 : " + userId);
+            exerciseLogs = exerciseLogRepository.findByUserCharacter_User_UserIdOrderByExerciseDateDesc(userId);
+        }
+
+        return exerciseLogs.stream()
+                .map(ExerciseLogRes::from)
+                .collect(Collectors.toList());
+    }
+
+
     private void updateCharacterStats(UserStats userStats, ExerciseStatsRatio exerciseStatsRatio, int exerciseCnt) {
         // 운동 종류별 스탯 반영 로직
         if (exerciseStatsRatio.getArmsRatio() > 0) {

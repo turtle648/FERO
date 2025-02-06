@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * 유저 캐릭터 모델 정의.
@@ -12,7 +14,8 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Table(name = "user_character")
-public class UserCharacter extends BaseEntity{
+public class UserCharacter extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false, unique = true)
@@ -32,4 +35,7 @@ public class UserCharacter extends BaseEntity{
 
     @Column(nullable = false, columnDefinition = "SMALLINT UNSIGNED DEFAULT 0")
     private Short points = 0;
+
+    @OneToMany(mappedBy = "userCharacter", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ExerciseLog> exerciseLogs;
 }
