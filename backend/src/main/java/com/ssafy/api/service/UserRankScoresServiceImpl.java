@@ -7,6 +7,7 @@ import com.ssafy.db.entity.UserStats;
 import com.ssafy.db.repository.UserRankScoresRepository;
 import com.ssafy.db.repository.UserRepository;
 import com.ssafy.db.repository.UserStatsRepository;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -28,9 +29,11 @@ public class UserRankScoresServiceImpl implements UserRankScoresService {
         return userRankScoresRepository.findByUser_UserId(userId);
     }
 
+
+
     @Override
-    public UserRankScores getRankScoreByUserIdAndType(String userId, String exerciseType) {
-        return userRankScoresRepository.findByUser_UserIdAndExerciseType(userId, exerciseType)
+    public UserRankScores getRankScoreByUserIdAndId(String userId, Long exerciseId) {
+        return userRankScoresRepository.findByUser_UserIdAndId(userId, exerciseId)
                 .orElse(null);  // 값이 없으면 null 반환
     }
 }

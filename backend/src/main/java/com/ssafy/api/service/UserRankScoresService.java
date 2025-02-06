@@ -11,5 +11,5 @@ import java.util.List;
  */
 public interface UserRankScoresService {
 	List<UserRankScores> getAllRankScoresByUserId(String userId);  // 특정 유저의 모든 운동 점수 조회
-	UserRankScores getRankScoreByUserIdAndType(String userId, String exerciseType);  // 특정 운동 점수 조회
+	UserRankScores getRankScoreByUserIdAndId(String userId, Long Id);  // 특정 운동 점수 조회
 }

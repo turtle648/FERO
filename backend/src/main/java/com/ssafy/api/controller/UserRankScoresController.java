@@ -36,13 +36,13 @@ public class UserRankScoresController {
     @GetMapping
     @ApiOperation(value = "캐릭터 랭크 점수 조회", notes = "특정 운동 또는 전체 운동의 랭크 점수를 확인할 수 있다.")
     public ResponseEntity<?> getCharacterRankScore(HttpServletRequest request,
-                                                   @RequestParam(required = false) String exerciseType) {
+                                                   @RequestParam(required = false) Long exerciseId) {
 
         String token = request.getHeader("Authorization");
         String userId = JwtTokenUtil.getUserIdFromJWT(token);
 
-        if (exerciseType != null) {
-            UserRankScores rankScore = userRankScoresService.getRankScoreByUserIdAndType(userId, exerciseType);
+        if (exerciseId != null) {
+            UserRankScores rankScore = userRankScoresService.getRankScoreByUserIdAndId(userId, exerciseId);
             if (rankScore == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid exercise type or no data found.");
             }
