@@ -14,7 +14,7 @@ let LIVEKIT_URL = '';
 configureUrls();
 
 function configureUrls() {
-    // If LIVEKIT_URL is not configured, use default value from OpenVidu Local deployment
+    // Spring Boot API 서버 URL 설정
     if (!APPLICATION_SERVER_URL) {
         if (window.location.hostname === 'localhost') {
             APPLICATION_SERVER_URL = 'http://localhost:8076/api/v1/video-room/';
@@ -23,6 +23,7 @@ function configureUrls() {
         }
     }
 
+    // LiveKit WebSocket URL 설정
     if (!LIVEKIT_URL) {
         if (window.location.hostname === 'localhost') {
             LIVEKIT_URL = 'ws://localhost:7880/';
@@ -30,6 +31,7 @@ function configureUrls() {
             LIVEKIT_URL = 'wss://' + window.location.hostname + ':7443/';
         }
     }
+
 }
 
 const room = ref();

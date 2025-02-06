@@ -17,6 +17,8 @@ services:
       interval: 10s
       timeout: 10s
       retries: 3
+    networks:
+      - openvidu-network
       
   spring-boot:
     user: "root"
@@ -37,6 +39,7 @@ services:
     networks:
       - redis-network
       - my-sql-network
+      - openvidu-network
     depends_on:
       mysql:
         condition: service_healthy
@@ -71,3 +74,5 @@ networks:
   my-sql-network:
     driver: bridge
     external: true
+  openvidu-network:
+    driver: bridge

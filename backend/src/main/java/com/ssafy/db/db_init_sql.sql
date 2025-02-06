@@ -26,13 +26,25 @@ CREATE TABLE user_character (
                                 user_nickname VARCHAR(15) NOT NULL UNIQUE,
                                 gender CHAR(1) NOT NULL CHECK (gender IN ('M', 'F')),
 
-                                user_rank_score SMALLINT NOT NULL DEFAULT '1000',
-                                user_level SMALLINT UNSIGNED NOT NULL DEFAULT 1 CHECK (user_level <= 100),
+                                user_level SMALLINT UNSIGNED NOT NULL DEFAULT 1 CHECK (user_level <= 999),
                                 user_experience INT NOT NULL DEFAULT 0,
 
                                 points SMALLINT UNSIGNED NOT NULL DEFAULT 0 CHECK (points <= 50000),
                                 FOREIGN KEY (user_id) REFERENCES user_info(user_id) ON DELETE CASCADE
 );
+
+
+-- 유저의 각 운동별 랭크 점수
+CREATE TABLE user_rank_scores (
+                                  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                                  user_id VARCHAR(30) NOT NULL,
+                                  exercise_type VARCHAR(50) NOT NULL,  -- 운동 종류 (예: 스쿼트, 푸쉬업 등)
+                                  rank_score SMALLINT NOT NULL DEFAULT 1000,
+
+                                  FOREIGN KEY (user_id) REFERENCES user_character(user_id) ON DELETE CASCADE,
+                                  UNIQUE (user_id, exercise_type)  -- 동일 유저의 동일 운동에 대한 중복 데이터 방지
+);
+
 
 
 -- 유저 스테이터스
@@ -217,6 +229,21 @@ SET
 WHERE updated_at BETWEEN NOW() - INTERVAL 14 DAY AND NOW() - INTERVAL 8 DAY;
 END;
 //
+DELIMITER ;
+
+
+-- 유저 생성시 각 운동별 랭크 스코어 초기화
+DELIMITER //
+
+CREATE TRIGGER create_user_rank_scores
+    AFTER INSERT ON user_character
+    FOR EACH ROW
+BEGIN
+    INSERT INTO user_rank_scores (user_id, exercise_type, rank_score)
+    SELECT NEW.user_id, exercise_type, 1000  -- 기본 랭크 점수
+    FROM exercise_stats_ratio;  -- 등록된 모든 운동 종류를 가져와 삽입
+END //
+
 DELIMITER ;
 
 

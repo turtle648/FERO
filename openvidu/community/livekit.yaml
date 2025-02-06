@@ -27,7 +27,7 @@ turn:
 keys:
     APIvUVrV9J2oem4: bfKEA7T8sqG4pPEfWF89txe1UdGcaT2kxC0dvin18lLA
 webhook:
-    api_key: APIvUVrV9J2oem4
+    api_key: APIvUVrV9J2oem4 
     urls:
         - http://host.docker.internal:8076/livekit/webhook
         - https://i12e103.p.ssafy.io:8076/api/v1/video-room/livekit/webhook
