@@ -1,4 +1,5 @@
 package com.ssafy.db.entity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Table(name = "user_tutorial_progress")
+@JsonIgnoreProperties("user")
 public class UserTutorialProgress extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
