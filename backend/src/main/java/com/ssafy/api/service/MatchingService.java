@@ -46,6 +46,7 @@ public class MatchingService {
         String queueKey = WAITING_QUEUE + exerciseType;
         String sortedKey = SCORE_SORTED_SET + exerciseType;
         String userInfoKey = USER_INFO + exerciseType;
+        System.out.printf("생성되는 운동 타입 키 : %s, %s, %s\n", queueKey, sortedKey, userInfoKey);
 
         // 유저 정보 저장
         redisTemplate.opsForHash().put(userInfoKey, userId, waitingUser);
@@ -108,16 +109,29 @@ public class MatchingService {
         String sortedSetKey = getSortedSetKey(exerciseType);
         String userInfoKey = getUserInfoKey(exerciseType);
 
-        // 유저가 실제로 대기방에 있는지 확인
-        WaitingUser user = (WaitingUser) redisTemplate.opsForHash().get(userInfoKey, userId);
-        if (user == null) {
+        // 디버깅을 위한 로그 추가
+        System.out.println("[DEBUG] userId: " + userId);
+        System.out.println("[DEBUG] exerciseType: " + exerciseType);
+        System.out.println("[DEBUG] userInfoKey: " + userInfoKey);
+
+        // 해시에 저장된 모든 키 출력
+        Map<Object, Object> allEntries = redisTemplate.opsForHash().entries(userInfoKey);
+        System.out.println("[DEBUG] All entries in hash:");
+        allEntries.forEach((key, value) ->
+                System.out.println("Key: " + key + ", Value: " + value));
+
+        // 유저 정보 조회 시도
+        Object userObj = redisTemplate.opsForHash().get(userInfoKey, userId);
+        System.out.println("[DEBUG] Retrieved user object: " + userObj);
+
+        if (userObj == null) {
             log.warn("User {} not found in waiting room {}", userId, exerciseType);
             return;
         }
 
-        // 대기열에서 제거
+        System.out.println("나가기 시도!!!!");
+        // 나머지 로직 유지
         removeFromWaitingRoom(exerciseType, userId);
-        log.info("User {} left waiting room for {}", userId, exerciseType);
     }
 
     // 대기방 현재 상태 조회 메서드
@@ -239,9 +253,32 @@ public class MatchingService {
         String sortedSetKey = getSortedSetKey(exerciseType);
         String userInfoKey = getUserInfoKey(exerciseType);
 
-        redisTemplate.opsForList().remove(queueKey, 1, userId);
-        redisTemplate.opsForZSet().remove(sortedSetKey, userId);
-        redisTemplate.opsForHash().delete(userInfoKey, userId);
+        // 로그 추가
+        log.info("Removing user {} from waiting room for {}", userId, exerciseType);
+        System.out.println("[REDIS REMOVE] Removing user " + userId + " from waiting room for " + exerciseType);
+
+        System.out.println("[REDIS KEYS]");
+        System.out.println("Queue Key: " + queueKey);
+        System.out.println("Sorted Set Key: " + sortedSetKey);
+        System.out.println("User Info Key: " + userInfoKey);
+
+        System.out.println("[REDIS REMOVE] 원본 userId: " + userId);
+        // 따옴표 포함된 userId 형식으로 변경
+        String quotedUserId = "\"" + userId + "\"";
+        System.out.println("[REDIS REMOVE] 따옴표 포함 userId: " + quotedUserId);
+
+        // 큐에서 제거 로직 검증
+        Long removedFromQueue = redisTemplate.opsForList().remove(queueKey, 1, quotedUserId);
+        System.out.println("[REDIS REMOVE] Queue에서 제거된 아이템 수: " + removedFromQueue);
+
+        // 정렬 세트에서 제거 로직 검증
+        Long removedFromSortedSet = redisTemplate.opsForZSet().remove(sortedSetKey, userId);
+        System.out.println("[REDIS REMOVE] 정렬 세트에서 제거된 아이템 수: " + removedFromSortedSet);
+
+        // 사용자 정보 해시에서 제거 로직 검증
+        Long removedFromHash = redisTemplate.opsForHash().delete(userInfoKey, userId);
+        System.out.println("[REDIS REMOVE] 해시에서 제거된 아이템 수: " + removedFromHash);
+
     }
 
     private void notifyMatchSuccess(String user1, String user2, String matchId) {
@@ -267,26 +304,34 @@ public class MatchingService {
     // 5분 타임아웃 체크 (주기적 실행)
     @Scheduled(fixedRate = 30000)  // 30초마다 실행
     public void checkTimeouts() {
-        EXERCISE_TYPES.forEach(exerciseType -> checkTimeoutForExercise(exerciseType));
+        Arrays.asList("pushup", "squat", "lunge", "plank").forEach(this::checkTimeoutForExercise);
     }
 
     private void checkTimeoutForExercise(String exerciseType) {
         String queueKey = getQueueKey(exerciseType);
         String userInfoKey = getUserInfoKey(exerciseType);
+        String sortedSetKey = getSortedSetKey(exerciseType);
 
         // 대기열의 모든 유저 확인
         List<Object> userIds = redisTemplate.opsForList().range(queueKey, 0, -1);
         if (userIds == null || userIds.isEmpty()) return;
 
-        for (Object userId : userIds) {
-            WaitingUser user = (WaitingUser) redisTemplate.opsForHash().get(userInfoKey, userId.toString());
-            if (user != null && user.isExpired()) {
-                // 5분 초과된 유저 제거
-                removeFromWaitingRoom(exerciseType, userId.toString());
+        List<String> timeoutUsers = new ArrayList<>();
 
-                // 타임아웃 알림
-                notifyTimeout(userId.toString());
+        for (Object userId : userIds) {
+            String userIdStr = userId.toString();
+            WaitingUser user = (WaitingUser) redisTemplate.opsForHash().get(userInfoKey, userIdStr);
+
+            if (user != null && user.isExpired()) {
+                timeoutUsers.add(userIdStr);
+                // 타임아웃 알림 전송
+                notifyTimeout(userIdStr);
             }
+        }
+
+        // 한 번에 타임아웃 유저들 제거
+        for (String timeoutUser : timeoutUsers) {
+            removeFromWaitingRoom(exerciseType, timeoutUser);
         }
     }
 
@@ -303,15 +348,17 @@ public class MatchingService {
 
     // Redis Key 생성 유틸리티 메서드들
     private String getQueueKey(String exerciseType) {
-        return String.format("%s:waiting:queue", exerciseType.toLowerCase());
+        // 소문자 변환 제거
+        return String.format("waiting:queue%s", exerciseType);
     }
 
     private String getSortedSetKey(String exerciseType) {
-        return String.format("%s:score:set", exerciseType.toLowerCase());
+        return String.format("score:sorted:set%s", exerciseType);
     }
 
     private String getUserInfoKey(String exerciseType) {
-        return String.format("%s:user:info", exerciseType.toLowerCase());
+        return String.format("user:info%s", exerciseType);
     }
+
 
 }
