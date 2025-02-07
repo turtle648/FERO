@@ -1,5 +1,5 @@
 <template>
-  <router-view v-if="!isDesktop" />
+  <router-view/>
   <QRComponent v-else />
 </template>
 
@@ -7,18 +7,19 @@
 import { ref, onMounted, onUnmounted } from "vue"
 import QRComponent from '@/components/QRComponent.vue'
 
-const isDesktop = ref(false)
+const isDesktop = ref(window.matchMedia("(min-width: 821px)").matches)
 const checkScreenSize = () => {
   isDesktop.value = window.innerWidth > 821
 }
+
 onMounted(() => {
-  checkScreenSize()
   window.addEventListener("resize", checkScreenSize)
 })
 
 onUnmounted(() => {
   window.removeEventListener("resize", checkScreenSize)
 })
+
 </script>
 
 <style scoped></style>
