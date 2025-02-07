@@ -1,7 +1,10 @@
 package com.ssafy.api.handler;
 
 import com.ssafy.common.model.Message;
+import com.ssafy.common.redis.service.RedisService;
 import com.ssafy.common.util.RTCUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -13,7 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static org.kurento.jsonrpc.client.JsonRpcClient.log;
 
+@Component
 public class SignalingHandler extends TextWebSocketHandler {
+    @Autowired
+    private RedisService redisService;
+
     // 어떤 방에 어떤 유저가 들어있는지 저장 -> { 방번호 : [ { id : userUUID1 }, { id: userUUID2 }, …], ... }
     private final Map<String, List<Map<String, String>>> roomInfo = new HashMap<>();
 
