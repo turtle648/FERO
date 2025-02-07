@@ -33,7 +33,7 @@ const remoteUser = ref(null) // 상대방의 ID (all_users 메시지를 통해 �
 const iceServerConfig = {
     iceServers: [
         { 
-            urls: 'turn:13.125.110.247:3478?transport=tcp', 
+            urls: 'turn:43.201.250.216:3478?transport=tcp', 
             username: 'ssafy', 
             credential: 'e103' 
         }
