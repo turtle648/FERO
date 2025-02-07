@@ -4,6 +4,9 @@ import MainPage from "@/views/MainPage.vue"
 import LoginPage from "@/views/LoginPage.vue"
 import TutorialPage from "@/views/tutorial/SquatTutorialPage.vue"
 import VideoRoomPage from "@/views/VideoRoomPage.vue"
+import SingleModePage from "@/views/SingleModePage.vue"
+import MultiModePage from "@/views/MultiModePage.vue"
+import RankModePage from "@/views/RankModePage.vue"
 import mediapipeComponent from "@/components/mediapipeComponent.vue" // fix: 수정예정
 import SquartComponent from "@/components/SquartComponent.vue"
 
@@ -38,6 +41,24 @@ const routes = [
     path: "/mediapipe",
     name: "mediapipe",
     component: mediapipeComponent,
+  },
+  {
+    path: '/single-mode/:exercise/:count',
+    name: 'SingleMode',
+    component: SingleModePage,
+    props: true
+  },
+  {
+    path: '/multi-mode/:exercise',
+    name: 'MultiMode',
+    component: MultiModePage,
+    props: true
+  },
+  {
+    path: '/rank-mode/:exercise',
+    name: 'RankMode',
+    component: RankModePage,
+    props: true
   },
   {
     path: "/squart",

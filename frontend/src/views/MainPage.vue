@@ -102,6 +102,14 @@ const nickName = ref('')
 const level = ref('')
 const exp = ref('')
 
+// 튜토리얼 여부 확인
+import { useMainStore } from "@/stores/mainStore"
+const mainStore = useMainStore()
+
+onMounted(async () => {
+  await mainStore.fetchData()
+})
+
 // 상태창 관련 변수 및 함수
 import StatusModal from "@/components/modal/StatusModal.vue"
 const showStatusModal = ref(false)
@@ -177,37 +185,6 @@ const openFitnessModal = () => {
 const closeFitnessModal = () => {
   showFitnessModal.value = false
 }
-
-// // 혼자함께 잠시 보류
-// import AloneModal from "@/components/modal/AloneModal.vue"
-// import WithModal from "@/components/modal/WithModal.vue"
-
-// // 상태 관리
-// const showAloneModal = ref(false)
-// const showWithModal = ref(false)
-// const showExerciseOptions = ref(false)
-
-// const toggleExerciseOptions = () => {
-//   showExerciseOptions.value = !showExerciseOptions.value
-// }
-
-// const handleSoloExercise = () => {
-//   showExerciseOptions.value = false
-//   showAloneModal.value = true
-// }
-
-// const handleMultiExercise = () => {
-//   showExerciseOptions.value = false
-//   showWithModal.value = true
-// }
-
-// const closeAloneModal = () => {
-//   showAloneModal.value = false
-// }
-
-// const closeWithModal = () => {
-//   showWithModal.value = false
-// }
 
 // 알림 모달
 import AlarmModal from "@/components/modal/AlarmModal.vue"
