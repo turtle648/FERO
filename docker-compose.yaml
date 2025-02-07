@@ -9,7 +9,7 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - ./work_dir/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+      - ./work_dir/conf.d:/etc/nginx/conf.d
       - ./work_dir/certbot:/var/www/certbot
       - /etc/letsencrypt:/etc/letsencrypt:ro
     healthcheck:
