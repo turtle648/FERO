@@ -1,5 +1,6 @@
 package com.ssafy.db.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "user_character")
+@JsonIgnoreProperties("user")  // 🔥 user 필드는 JSON 변환 시 제외
 public class UserCharacter extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

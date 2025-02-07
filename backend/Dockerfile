@@ -21,12 +21,4 @@ EXPOSE 8076
 
 #  root 권한 x, nobody 권한으로 실행함
 USER nobody
-ENTRYPOINT [                                                            \
-   "java",                                                              \
-   "-Dspring.profiles.active=prod",                                     \
-   "-Dfile.encoding=UTF-8",                                             \
-   "-Djava.security.egd=file:/dev/./urandom",                           \
-   "-Dsun.net.inetaddr.ttl=0",                                          \
-   "-jar",                                                              \
-   "/app.jar"                                                         \
-]
+ENTRYPOINT ["/bin/sh", "-c", "java -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -Dfile.encoding=UTF-8 -Djava.security.egd=file:/dev/./urandom -Dsun.net.inetaddr.ttl=0 -jar /app.jar"]

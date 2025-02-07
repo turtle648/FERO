@@ -79,7 +79,7 @@ CREATE TABLE exercise_stats_ratio (
 );
 
 
--- 운동 기록 테이블 (user_character.user_id를 외래 키로 사용)
+-- 운동 기록 테이블 (user_character.id를 외래 키로 사용)
 CREATE TABLE exercise_log (
                               id BIGINT PRIMARY KEY AUTO_INCREMENT,
                               user_id VARCHAR(30) NOT NULL,  -- user_character 테이블의 id 외래 키
@@ -110,7 +110,7 @@ GROUP BY
 
 -- 튜토리얼 종류에 대한 테이블
 CREATE TABLE tutorial_types (
-                                id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                                id SMALLINT PRIMARY KEY AUTO_INCREMENT,
                                 tutorial_name VARCHAR(50) NOT NULL UNIQUE  -- 'UI 기본', '운동 기록', '채팅', '푸시업' 등
 );
 
@@ -119,7 +119,7 @@ CREATE TABLE tutorial_types (
 CREATE TABLE user_tutorial_progress (
                                         id BIGINT PRIMARY KEY AUTO_INCREMENT,
                                         user_id VARCHAR(30) NOT NULL,
-                                        tutorial_id BIGINT NOT NULL,
+                                        tutorial_id SMALLINT NOT NULL,
                                         is_completed BOOLEAN DEFAULT FALSE,
                                         completed_at TIMESTAMP,
                                         FOREIGN KEY (user_id) REFERENCES user_info(user_id) ON DELETE CASCADE,
@@ -194,43 +194,6 @@ END;
 
 DELIMITER ;
 
--- 마지막 운동날짜 8일 초과 유저 스탯 5씩 감소
--- 2주이상 안 한 사람 스탯 10으로 초기화
--- 이벤트 스케줄러로 매일 자정 시행
-SET GLOBAL event_scheduler = ON;
-
-DELIMITER //
-CREATE EVENT decrease_and_reset_stats_event
-ON SCHEDULE EVERY 1 DAY STARTS TIMESTAMP(CURRENT_DATE, '00:00:00')
-DO
-BEGIN
-    -- 2주(14일) 초과 운동 안 한 유저: 스탯을 10으로 초기화
-UPDATE user_stats
-SET
-    arms_stats = 10,
-    legs_stats = 10,
-    chest_stats = 10,
-    abs_stats = 10,
-    back_stats = 10,
-    stamina_stats = 10,
-    updated_at = CURRENT_TIMESTAMP
-WHERE updated_at < NOW() - INTERVAL 14 DAY;
-
--- 8일 ~ 14일 사이 운동 안 한 유저: 스탯 -5 감소 (최소값 10 유지)
-UPDATE user_stats
-SET
-    arms_stats = GREATEST(arms_stats - 5, 10),
-    legs_stats = GREATEST(legs_stats - 5, 10),
-    chest_stats = GREATEST(chest_stats - 5, 10),
-    abs_stats = GREATEST(abs_stats - 5, 10),
-    back_stats = GREATEST(back_stats - 5, 10),
-    stamina_stats = GREATEST(stamina_stats - 5, 10),
-    updated_at = CURRENT_TIMESTAMP
-WHERE updated_at BETWEEN NOW() - INTERVAL 14 DAY AND NOW() - INTERVAL 8 DAY;
-END;
-//
-DELIMITER ;
-
 
 -- 유저 생성시 각 운동별 랭크 스코어 초기화
 DELIMITER //
@@ -242,6 +205,21 @@ BEGIN
     INSERT INTO user_rank_scores (user_id, exercise_type, rank_score)
     SELECT NEW.user_id, exercise_type, 1000  -- 기본 랭크 점수
     FROM exercise_stats_ratio;  -- 등록된 모든 운동 종류를 가져와 삽입
+END //
+
+DELIMITER ;
+
+
+-- 유저 캐릭터 생성시 튜토리얼에 대한 정보도 자동으로 생성(기본적으로 false)
+DELIMITER //
+
+CREATE TRIGGER create_user_tutorial_progress
+    AFTER INSERT ON user_character
+    FOR EACH ROW
+BEGIN
+    -- tutorial_types 테이블의 모든 튜토리얼을 가져와서 user_tutorial_progress에 추가
+    INSERT INTO user_tutorial_progress (user_id, tutorial_id, is_completed, completed_at)
+    SELECT NEW.user_id, id, FALSE, NULL FROM tutorial_types;
 END //
 
 DELIMITER ;
@@ -261,9 +239,7 @@ VALUES
 -- 기본 튜토리얼 데이터 삽입
 INSERT INTO tutorial_types (tutorial_name) VALUES
                                                ('UI 기본'),
-                                               ('운동 기록'),
-                                               ('채팅'),
-                                               ('푸시업'),
                                                ('스쿼트'),
+                                               ('푸시업'),
                                                ('런지'),
                                                ('플랭크');
