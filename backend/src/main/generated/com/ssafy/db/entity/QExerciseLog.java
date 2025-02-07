@@ -35,7 +35,7 @@ public class QExerciseLog extends EntityPathBase<ExerciseLog> {
     //inherited
     public final NumberPath<Long> id = _super.id;
 
-    public final QUser user;
+    public final QUserCharacter userCharacter;
 
     public QExerciseLog(String variable) {
         this(ExerciseLog.class, forVariable(variable), INITS);
@@ -56,7 +56,7 @@ public class QExerciseLog extends EntityPathBase<ExerciseLog> {
     public QExerciseLog(Class<? extends ExerciseLog> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.exerciseStatsRatio = inits.isInitialized("exerciseStatsRatio") ? new QExerciseStatsRatio(forProperty("exerciseStatsRatio")) : null;
-        this.user = inits.isInitialized("user") ? new QUser(forProperty("user"), inits.get("user")) : null;
+        this.userCharacter = inits.isInitialized("userCharacter") ? new QUserCharacter(forProperty("userCharacter"), inits.get("userCharacter")) : null;
     }
 
 }
