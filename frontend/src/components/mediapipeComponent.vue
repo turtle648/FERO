@@ -19,15 +19,23 @@
 
     <!-- 하단 버튼 -->
     <div class="flex justify-between items-center w-full mt-4 z-10">
-      <button class="bg-red-500 text-white px-4 py-2 rounded mx-auto" @click="stopCameraAndNavigate">종료</button>
-      <button class="bg-white text-black px-4 py-2 rounded">신고</button>
+      <ExitButton class="px-4 py-2 rounded mx-auto" @click="stopCameraAndNavigate" />
+      <ReportIssueButton />
     </div>
   </div>
+  <!-- <ExitConfirmationModal v-if="showExitModal" @closeExit="closeExitModal" @openExit="openExitModal" />
+  <ReportModal v-if="showReportModal" /> -->
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue"
 import { useRouter } from "vue-router"
+
+const router = useRouter()
+
+// 버튼
+import ExitButton from "@/assets/button/ExitButton.vue"
+import ReportIssueButton from "@/assets/button/ReportIssueButton.vue"
 
 let intervalId = null // setInterval ID 저장 (타이머 초기화용)
 
@@ -76,7 +84,7 @@ const canvasElement = ref(null)
 let camera = null
 let pose = null
 
-const router = useRouter()
+// const router = useRouter()
 
 const onResults = (results) => {
   if (!canvasElement.value) return
