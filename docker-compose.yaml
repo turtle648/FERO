@@ -52,7 +52,7 @@ services:
       - 3307:3306
     volumes:
       - my-sql-volume:/var/lib/mysql
-      - /var/jenkins_home/workspace/deploy/db:/docker-entrypoint-initdb.d/init.sql
+      - /var/jenkins_home/workspace/deploy/db:/docker-entrypoint-initdb.d
     networks:
       - my-sql-network
     healthcheck:

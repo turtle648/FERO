@@ -1,5 +1,5 @@
 <template>
-  <router-view/>
+  <router-view v-if="isDesktop"/>
   <QRComponent v-else />
 </template>
 
