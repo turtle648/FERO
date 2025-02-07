@@ -5,7 +5,7 @@
       <div class="timer text-white-common z-10">{{ formattedTime }}</div>
 
       <!-- fix: 시간 선택은 앞에서 넘어와야함 -->
-      <select class="z-10" v-model="selectedTime" @change="resetTimer">
+      <select class="absolute z-10" v-model="selectedTime" @change="resetTimer">
         <option :value="1 * 60 * 1000">1분</option>
         <option :value="2 * 60 * 1000">2분</option>
         <option :value="5 * 60 * 1000">5분</option>
@@ -106,6 +106,7 @@ import { Camera } from "@mediapipe/camera_utils"
 import { Pose, POSE_CONNECTIONS } from "@mediapipe/pose"
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils"
 
+const emit = defineEmits(["pose-detected"])
 const videoElement = ref(null)
 const canvasElement = ref(null)
 let camera = null
@@ -130,7 +131,7 @@ const onResults = (results) => {
       lineWidth: 4,
     })
     drawLandmarks(canvasCtx, results.poseLandmarks, { color: "#FF0000", lineWidth: 2 })
-    emit("pose-detected", results.poseLandmarks) // pose-detected
+    emit("pose-detected", results.poseLandmarks)
   }
 
   canvasCtx.restore()

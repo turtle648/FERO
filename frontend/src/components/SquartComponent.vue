@@ -1,6 +1,6 @@
 <template>
   <div class="counter-container">
-    <div class="count z-10 text-white">스쿼트 횟수: {{ count }}</div>
+    <div class="count z-10 text-black">스쿼트 횟수: {{ count }}</div>
     <div class="status">{{ feedback }}</div>
     <div v-if="formFeedback" class="form-feedback">{{ formFeedback }}</div>
     <div v-if="!isReady" class="form-feedback z-10">측면으로 서주세요!</div>
@@ -12,13 +12,14 @@
 import { ref } from "vue"
 import mediapipeComponent from "./mediapipeComponent.vue"
 
+// const emit = defineEmits(["pose-detected"])
+
 // 상태 변수 정의
 const count = ref(0)
 const isDown = ref(false)
 const feedback = ref("준비중...")
 const formFeedback = ref("")
 const isReady = ref(false)
-
 
 // 각도 계산 함수
 const calculateAngle = (a, b, c) => {
@@ -30,6 +31,7 @@ const calculateAngle = (a, b, c) => {
 
 // 자세 체크 함수
 const checkForm = (landmarks) => {
+  console.log(landmarks)
   const leftHip = landmarks[23]
   const rightHip = landmarks[24]
   const leftKnee = landmarks[25]
@@ -58,8 +60,6 @@ const checkForm = (landmarks) => {
 
 // 포즈 처리 함수
 const processPose = (landmarks) => {
-  console.log(landmarks)
-  console.log("포ㅈ,처ㅣ")
   if (!landmarks || landmarks.length === 0) {
     isReady.value = false
     feedback.value = "준비중..."
