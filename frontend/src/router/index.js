@@ -4,7 +4,8 @@ import MainPage from "@/views/MainPage.vue"
 import LoginPage from "@/views/LoginPage.vue"
 import TutorialPage from "@/views/tutorial/SquatTutorialPage.vue"
 import VideoRoomPage from "@/views/VideoRoomPage.vue"
-import mediapipeComponent from "@/components/mediapipeComponent.vue"
+import mediapipeComponent from "@/components/mediapipeComponent.vue" // fix: 수정예정
+import SquartComponent from "@/components/SquartComponent.vue"
 
 const routes = [
   {
@@ -37,6 +38,11 @@ const routes = [
     path: "/mediapipe",
     name: "mediapipe",
     component: mediapipeComponent,
+  },
+  {
+    path: "/squart",
+    name: "squart",
+    component: SquartComponent,
   },
 ]
 

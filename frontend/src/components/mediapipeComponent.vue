@@ -10,7 +10,7 @@
         <option :value="2 * 60 * 1000">2분</option>
         <option :value="5 * 60 * 1000">5분</option>
       </select>
-      <button class="text-white-common z-10" @click="startTimer">시작</button>
+      <!-- <button class="text-white-common z-10" @click="startTimer">시작</button> -->
     </div>
     <!-- 중앙 영역 -->
     <div v-if="countdown > 0" class="countdown text-4xl text-white z-10">{{ countdown }}</div>
@@ -31,6 +31,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue"
 import { useRouter } from "vue-router"
+import { defineEmits } from "vue"
 
 const router = useRouter()
 
@@ -129,6 +130,7 @@ const onResults = (results) => {
       lineWidth: 4,
     })
     drawLandmarks(canvasCtx, results.poseLandmarks, { color: "#FF0000", lineWidth: 2 })
+    emit("pose-detected", results.poseLandmarks) // pose-detected
   }
 
   canvasCtx.restore()
