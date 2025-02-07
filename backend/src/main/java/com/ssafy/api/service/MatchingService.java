@@ -1,21 +1,22 @@
 package com.ssafy.api.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.api.request.WaitingUser;
 import com.ssafy.api.response.MatchSuccessRes;
 import com.ssafy.api.response.MatchTimeoutRes;
+import com.ssafy.api.response.WaitingRoomStatusRes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,6 +25,13 @@ import java.util.stream.Collectors;
 public class MatchingService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final SimpMessagingTemplate messagingTemplate;
+    // 운동 종류 상수 정의
+    private static final List<String> EXERCISE_TYPES = Arrays.asList(
+            "pushup",
+            "squat",
+            "lunge",
+            "plank"
+    );
 
     // Redis Key 상수
     private static final String WAITING_QUEUE = "waiting:queue";
@@ -31,7 +39,7 @@ public class MatchingService {
     private static final String USER_INFO = "user:info";
 
     // 유저를 대기열에 추가함
-    public void enterWaitingRoom(String userId, String exerciseType, int rankScore) {
+    public void enterWaitingRoom(String userId, String exerciseType, Short rankScore) {
         WaitingUser waitingUser = new WaitingUser(userId, exerciseType, rankScore, LocalDateTime.now());
 
         // 운동 타입별 키 생성
@@ -44,22 +52,110 @@ public class MatchingService {
         // 입장 순서 큐에 추가
         redisTemplate.opsForList().rightPush(queueKey, userId);
         // 스코어 정렬셋에 추가
-        redisTemplate.opsForZSet().add(sortedKey, userId, rankScore);
+        redisTemplate.opsForZSet().add(sortedKey, userId, (double) rankScore); // 💡 Short -> Double 변환 필요
 
         log.info("User {} entered waiting room for {}", userId, exerciseType);
+        logWaitingRoomStatus(exerciseType);
+    }
+
+    private void logWaitingRoomStatus(String exerciseType) {
+        String queueKey = WAITING_QUEUE + exerciseType;
+        String userInfoKey = USER_INFO + exerciseType;
+
+        List<Object> userIds = redisTemplate.opsForList().range(queueKey, 0, -1);
+
+        ObjectMapper mapper = new ObjectMapper();
+        // DateTime 모듈 등록
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        System.out.println("총 대기 인원: " + (userIds != null ? userIds.size() : 0));
+
+        if (userIds != null && !userIds.isEmpty()) {
+            System.out.println("대기중인 사용자들:");
+            for (Object userId : userIds) {
+                Map<Object, Object> userMap = redisTemplate.opsForHash().entries(userInfoKey);
+                Object userObj = userMap.get(userId.toString());
+
+                if (userObj != null) {
+                    try {
+                        WaitingUser user = mapper.convertValue(userObj, WaitingUser.class);
+                        long waitingSeconds = Duration.between(user.getJoinTime(), LocalDateTime.now()).getSeconds();
+                        System.out.printf("- ID: %s, 점수: %d, 대기시간: %d초%n",
+                                user.getUserId(),
+                                user.getRankScore(),
+                                waitingSeconds
+                        );
+                    } catch (Exception e) {
+                        System.out.println("Error converting user: " + e.getMessage());
+                    }
+                }
+            }
+        }
+        System.out.println("==========================================\n");
     }
 
     // 매칭 처리 로직 (스케줄러로 주기적으로 실행할 것)
     @Scheduled(fixedRate = 1000) // 매 초마다 실행함
     public void processMatching() {
         // 모든 운동 타입에 대해 처리함
-        Arrays.asList("푸시업", "스쿼트", "런지", "플랭크").forEach(this::processMatchingForExercise);
+        Arrays.asList("pushup", "squat", "lunge", "plank").forEach(this::processMatchingForExercise);
+    }
+
+    // 대기방 퇴장 메서드
+    public void leaveWaitingRoom(String userId, String exerciseType) {
+        String queueKey = getQueueKey(exerciseType);
+        String sortedSetKey = getSortedSetKey(exerciseType);
+        String userInfoKey = getUserInfoKey(exerciseType);
+
+        // 유저가 실제로 대기방에 있는지 확인
+        WaitingUser user = (WaitingUser) redisTemplate.opsForHash().get(userInfoKey, userId);
+        if (user == null) {
+            log.warn("User {} not found in waiting room {}", userId, exerciseType);
+            return;
+        }
+
+        // 대기열에서 제거
+        removeFromWaitingRoom(exerciseType, userId);
+        log.info("User {} left waiting room for {}", userId, exerciseType);
+    }
+
+    // 대기방 현재 상태 조회 메서드
+    public WaitingRoomStatusRes getWaitingRoomStatus(String exerciseType) {
+        String queueKey = getQueueKey(exerciseType);
+        String userInfoKey = getUserInfoKey(exerciseType);
+
+        // 대기열의 모든 유저 조회
+        List<Object> userIds = redisTemplate.opsForList().range(queueKey, 0, -1);
+        if (userIds == null) {
+            return WaitingRoomStatusRes.builder()
+                    .exerciseType(exerciseType)
+                    .waitingCount(0)
+                    .waitingUsers(new ArrayList<>())
+                    .build();
+        }
+
+        // 각 유저의 상세 정보 조회
+        List<WaitingUser> waitingUsers = userIds.stream()
+                .map(userId -> (WaitingUser) redisTemplate.opsForHash().get(userInfoKey, userId.toString()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        return WaitingRoomStatusRes.builder()
+                .exerciseType(exerciseType)
+                .waitingCount(waitingUsers.size())
+                .waitingUsers(waitingUsers)
+                .build();
     }
 
     private void processMatchingForExercise(String exerciseType) {
+        System.out.println("\n========== " + exerciseType + " 대기방 현재 상태 ==========");
+
         String queueKey = WAITING_QUEUE + exerciseType;
         String sortedSetKey = SCORE_SORTED_SET + exerciseType;
         String userInfoKey = USER_INFO + exerciseType;
+
+
 
         // 큐의 첫 번째 유저 확인
         String userId = (String) redisTemplate.opsForList().index(queueKey, 0);
@@ -78,7 +174,9 @@ public class MatchingService {
             log.debug("User {} is waiting for {}s (minimum 30s required)", userId, waitingSeconds);
             return;
         }
-
+        System.out.println("\n========== " + exerciseType + " 매칭 시도 ==========");
+        log.info("=== {} 매칭 시도 ===", exerciseType);
+        logWaitingRoomStatus(exerciseType);
         // 30초 이상 대기한 유저에 대한 매칭 로직
         Double userScore = redisTemplate.opsForZSet().score(sortedSetKey, userId);
         if (userScore == null) {
@@ -114,6 +212,8 @@ public class MatchingService {
                             Math.abs(userScore - score2)
                     );
                 }).orElse(null);
+
+
 
         if (bestMatch != null) {
             // 매칭 성공 처리
@@ -167,7 +267,7 @@ public class MatchingService {
     // 5분 타임아웃 체크 (주기적 실행)
     @Scheduled(fixedRate = 30000)  // 30초마다 실행
     public void checkTimeouts() {
-        Arrays.asList(EXERCISE_TYPES).forEach(this::checkTimeoutForExercise);
+        EXERCISE_TYPES.forEach(exerciseType -> checkTimeoutForExercise(exerciseType));
     }
 
     private void checkTimeoutForExercise(String exerciseType) {
