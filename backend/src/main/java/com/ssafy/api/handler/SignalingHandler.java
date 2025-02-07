@@ -24,8 +24,7 @@ public class SignalingHandler extends TextWebSocketHandler {
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
 
     // 방의 최대 인원수
-    private static final int MAXIMUM = 8;
-
+    private static final int MAXIMUM = 2;
 
     // 시그널링에 사용되는 메시지 타입 :
     // SDP Offer 메시지
@@ -117,7 +116,6 @@ public class SignalingHandler extends TextWebSocketHandler {
                         log.info(">>> [ws] #{}번 방의 유저들 {}", roomId, roomInfo.get(roomId));
 
                     } else {
-
                         // 방이 존재하지 않는다면 값을 생성하고 추가
                         Map<String, String> userDetail = new HashMap<>();
                         userDetail.put("id", userUUID);
