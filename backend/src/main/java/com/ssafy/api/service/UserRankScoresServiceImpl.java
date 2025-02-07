@@ -51,16 +51,15 @@ public class UserRankScoresServiceImpl implements UserRankScoresService {
                 .orElseThrow(() -> new RuntimeException("패자의 랭크 데이터 없음"));
 
         // 현재 점수 가져오기
-        short winnerChange = (short) calculateEloChange(winnerRank.getRankScore(), loserRank.getRankScore(), true);
-        short loserChange = (short) calculateEloChange(loserRank.getRankScore(), winnerRank.getRankScore(), false );
+        short changeScore = (short) calculateEloChange(winnerRank.getRankScore(), loserRank.getRankScore(), true);
 
         // DB 반영
-        userRankScoresRepository.updateUserRankScore(winnerId, exerciseId, winnerChange);
-        userRankScoresRepository.updateUserRankScore(loserId, exerciseId, loserChange);
+        userRankScoresRepository.updateUserRankScore(winnerId, exerciseId, changeScore);
+        userRankScoresRepository.updateUserRankScore(loserId, exerciseId, changeScore);
 
         log.info("Elo 점수 업데이트 완료! [운동 ID: {}] 승자: {} ({} → {}), 패자: {} ({} → {})",
-                exerciseId, winnerId, winnerRank.getRankScore(), winnerRank.getRankScore() + winnerChange,
-                loserId, loserRank.getRankScore(), loserRank.getRankScore() + loserChange);
+                exerciseId, winnerId, winnerRank.getRankScore(), winnerRank.getRankScore() + changeScore,
+                loserId, loserRank.getRankScore(), loserRank.getRankScore() + changeScore);
     }
 
     private short calculateEloChange(short playerScore, short opponentScore, boolean isWinner) {
