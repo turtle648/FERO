@@ -5,13 +5,16 @@
       <div class="timer text-white-common z-10">{{ formattedTime }}</div>
 
       <!-- fix: 시간 선택은 앞에서 넘어와야함 -->
-      <select class="z-10" v-model="selectedTime" @change="resetTimer">
+      <select class="absolute z-10" v-model="selectedTime" @change="resetTimer">
         <option :value="1 * 60 * 1000">1분</option>
         <option :value="2 * 60 * 1000">2분</option>
         <option :value="5 * 60 * 1000">5분</option>
       </select>
-      <button class="text-white-common z-10" @click="startTimer">시작</button>
+      <!-- <button class="text-white-common z-10" @click="startTimer">시작</button> -->
     </div>
+    <!-- 중앙 영역 -->
+    <div v-if="countdown > 0" class="countdown text-4xl text-white z-10">{{ countdown }}</div>
+    <div v-else-if="showStartText" class="start-text text-4xl text-white z-10">START</div>
 
     <!-- 본인 화면 -->
     <video ref="videoElement" class="absolute inset-0 w-full h-full object-cover z-0"></video>
@@ -23,13 +26,12 @@
       <ReportIssueButton />
     </div>
   </div>
-  <!-- <ExitConfirmationModal v-if="showExitModal" @closeExit="closeExitModal" @openExit="openExitModal" />
-  <ReportModal v-if="showReportModal" /> -->
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue"
 import { useRouter } from "vue-router"
+import { defineEmits } from "vue"
 
 const router = useRouter()
 
@@ -39,7 +41,7 @@ import ReportIssueButton from "@/assets/button/ReportIssueButton.vue"
 
 let intervalId = null // setInterval ID 저장 (타이머 초기화용)
 
-const selectedTime = ref(1 * 60 * 1000) // 기본값: 1분
+const selectedTime = ref(2 * 60 * 1000) // 기본값: 2분
 const timeLeft = ref(selectedTime.value) // 남은 시간 (ms)
 const formattedTime = ref(formatTime(timeLeft.value)) // 표시할 시간
 
@@ -74,17 +76,41 @@ function resetTimer() {
   formattedTime.value = formatTime(timeLeft.value)
 }
 
+// 카운트다운
+const countdown = ref(3)
+const showStartText = ref(false)
+
+// 카운트다운 시작 함수
+function startCountdown() {
+  countdown.value = 3 // 카운트다운 초기화
+  showStartText.value = false // 'START' 숨김
+
+  const countdownInterval = setInterval(() => {
+    if (countdown.value > 1) {
+      countdown.value-- // 카운트다운 감소
+    } else {
+      clearInterval(countdownInterval) // 카운트다운 종료
+      countdown.value = null // 숫자 숨김
+      showStartText.value = true // 'START' 표시
+
+      setTimeout(() => {
+        showStartText.value = false // 'START' 숨김 (2초 후)
+        startTimer() // 타이머 자동 시작
+      }, 2000)
+    }
+  }, 1000)
+}
+
 // 미디어파이프 관련
 import { Camera } from "@mediapipe/camera_utils"
 import { Pose, POSE_CONNECTIONS } from "@mediapipe/pose"
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils"
 
+const emit = defineEmits(["pose-detected"])
 const videoElement = ref(null)
 const canvasElement = ref(null)
 let camera = null
 let pose = null
-
-// const router = useRouter()
 
 const onResults = (results) => {
   if (!canvasElement.value) return
@@ -105,6 +131,7 @@ const onResults = (results) => {
       lineWidth: 4,
     })
     drawLandmarks(canvasCtx, results.poseLandmarks, { color: "#FF0000", lineWidth: 2 })
+    emit("pose-detected", results.poseLandmarks)
   }
 
   canvasCtx.restore()
@@ -145,6 +172,7 @@ onMounted(async () => {
 
   try {
     await camera.start()
+    startCountdown() // 카운트다운 시작
   } catch (error) {
     console.error("카메라 시작 오류:", error)
   }
