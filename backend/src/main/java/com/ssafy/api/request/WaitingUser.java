@@ -25,6 +25,6 @@ public class WaitingUser implements Serializable {
 
     @JsonIgnore
     public boolean isExpired() {
-        return Duration.between(joinTime, LocalDateTime.now()).toMinutes() >= 5;
+        return Duration.between(joinTime, LocalDateTime.now()).toMinutes() >= 1; // 타임아웃 체크 5분
     }
 }

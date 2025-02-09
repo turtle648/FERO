@@ -20,6 +20,7 @@ public class MatchingController {
     private final MatchingService matchingService;
     private final UserRankScoresRepository userRankScoresRepository;
 
+    // 1. 대기방 입장
     @PostMapping("/enter")
     public ResponseEntity<?> enterWaitingRoom(@RequestBody MatchingReq request) {
 //        System.out.println("사용자 : "+request.getUserId() + ", 운동 종류 : "+request.getExerciseType());
@@ -30,7 +31,7 @@ public class MatchingController {
 
         Short rankScore = userRankscore.map(UserRankScores::getRankScore).orElse((short) 1000);
 
-        System.out.println("사용자 랭크 점수: " + rankScore);
+//        System.out.println("사용자 랭크 점수: " + rankScore);
 
         try {
             // 대기방 입장 처리
@@ -47,6 +48,7 @@ public class MatchingController {
         }
     }
 
+    // 2. 로그인 한 사용자 대기방 나가기
     @DeleteMapping("/leave")
     public ResponseEntity<?> leaveWaitingRoom(
             @RequestParam String userId,
@@ -57,18 +59,6 @@ public class MatchingController {
         } catch (Exception e) {
             log.error("대기방 퇴장 실패", e);
             return ResponseEntity.badRequest().body("대기방 퇴장 실패: " + e.getMessage());
-        }
-    }
-
-    // 현재 대기방 상태 조회
-    @GetMapping("/status/{exerciseType}")
-    public ResponseEntity<?> getWaitingRoomStatus(@PathVariable String exerciseType) {
-        try {
-            WaitingRoomStatusRes status = matchingService.getWaitingRoomStatus(exerciseType);
-            return ResponseEntity.ok(status);
-        } catch (Exception e) {
-            log.error("대기방 상태 조회 실패", e);
-            return ResponseEntity.badRequest().body("대기방 상태 조회 실패: " + e.getMessage());
         }
     }
 }
