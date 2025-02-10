@@ -7,7 +7,7 @@ import VideoRoomPage from "@/views/VideoRoomPage.vue"
 import SingleModePage from "@/views/SingleModePage.vue"
 import MultiModePage from "@/views/MultiModePage.vue"
 import RankModePage from "@/views/RankModePage.vue"
-import MediapipeComponent from "@/components/MediapipeComponent.vue" // fix: 수정예정
+// import MediapipeComponent from "@/components/MediapipeComponent.vue" // fix: 수정예정
 import SquartComponent from "@/components/SquartComponent.vue"
 import QRComponent from "@/components/QRComponent.vue"
 
@@ -42,12 +42,12 @@ const routes = [
     component: VideoRoomPage,
     meta: { isMobile: true },
   },
-  {
-    path: "/mediapipe",
-    name: "Mediapipe",
-    component: MediapipeComponent,
-    meta: { isMobile: true },
-  },
+  // {
+  //   path: "/mediapipe",
+  //   name: "Mediapipe",
+  //   component: MediapipeComponent,
+  //   meta: { isMobile: true },
+  // },
   {
     path: "/single-mode/:exercise/:count",
     name: "SingleMode",
