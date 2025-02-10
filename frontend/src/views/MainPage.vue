@@ -128,6 +128,10 @@ const body = ref('')
 import { useMainStore } from "@/stores/mainStore"
 const mainStore = useMainStore()
 
+onMounted(async () => {
+  await mainStore.loadTutorial()
+})
+
 // 상태창 관련 변수 및 함수
 import StatusModal from "@/components/modal/StatusModal.vue"
 const showStatusModal = ref(false)
