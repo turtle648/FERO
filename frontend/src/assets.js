@@ -1,5 +1,6 @@
 export const assets = {
     hair: [
+      [ require('@/assets/character/hair/hair0.png'), 0 ],  
       [ require('@/assets/character/hair/hair1.png'), 1 ],  
       [ require('@/assets/character/hair/hair2.png'), 2 ], 
       [ require('@/assets/character/hair/hair3.png'), 3 ],       
@@ -11,6 +12,7 @@ export const assets = {
       [ require('@/assets/character/hair/hair9.png'), 9 ],         
     ],
     face: [
+      [ require('@/assets/character/face/face0.png'), 0 ],
       [ require('@/assets/character/face/face1.png'), 1 ],
       [ require('@/assets/character/face/face2.png'), 2 ],
       [ require('@/assets/character/face/face3.png'), 3 ],
@@ -25,14 +27,15 @@ export const assets = {
       [ require('@/assets/character/face/face12.png'), 12 ],
       [ require('@/assets/character/face/face13.png'), 13 ],
       [ require('@/assets/character/face/face14.png'), 14 ],
-      [ require('@/assets/character/face/face15.png'), 15 ],
     ],
     body: [
+      [ require('@/assets/character/body/body0.png'), 0 ],
       [ require('@/assets/character/body/body1.png'), 1 ],
       [ require('@/assets/character/body/body2.png'), 2 ],
       [ require('@/assets/character/body/body3.png'), 3 ],
       [ require('@/assets/character/body/body4.png'), 4 ],
       [ require('@/assets/character/body/body5.png'), 5 ],
       [ require('@/assets/character/body/body6.png'), 6 ],
+      [ require('@/assets/character/body/body7.png'), 7 ],
     ],
   };

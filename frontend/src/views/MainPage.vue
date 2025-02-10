@@ -1,8 +1,8 @@
 <template>
   <img class="background-image" src="@/assets/images/background_image2.png" alt="배경이미지" />
-  <div class="container" v-if="!isDesktop">
-    <div class="header absolute top-0 w-full h-[7vh] bg-[rgb(194,255,96)] text-white font-bold flex justify-between items-center">
-    <!-- 헤더 프로필 (40% 너비) -->
+  <div class="container absolute top-0 left-0 w-full h-full">
+    <div class="header absolute top-0 w-[100vw] h-[7vh] bg-[rgb(194,255,96)] text-white font-bold flex justify-between items-center">
+    <!-- 헤더 프로필 -->
     <div class="header-item header-profile w-1/2 h-[7vh] flex items-center" @click="openStatusModal">
       <!-- 프로필 이미지 (정사각형, 작은 사이즈로 동그랗게 만들기) -->
       <img src="@/assets/images/profile/default_profile.png" class="w-[7vh] h-[7vh] rounded-full object-cover">        
@@ -40,10 +40,24 @@
     <img src="@/assets/images/icon/alarm2.png" alt="" />
   </div>
   
-    <!-- 캐릭터 들어갈 예정 -->
-    <div class="absolute top-[50vh] right-[50vw]">
-      <button @click="openCharacterModal">캐릭터</button>
+    <!-- 캐릭터 -->
+    <div class="absolute left-1/2 top-[calc(100vh/1.5)] transform -translate-x-1/2 -translate-y-1/2
+      w-[min(45vw,45vh)] h-[min(45vw,45vh)] flex items-center justify-center relative overflow-hidden"
+      @click="openCharacterModal">
+
+      <!-- 얼굴 이미지 -->
+      <img v-if="hair && face && body" :src="face" class="absolute w-[80%] top-0" />
+      <!-- 머리 이미지 -->
+      <img v-if="hair && face && body" :src="hair" class="absolute w-[80%] top-0" />
+      <!-- 몸 이미지 -->
+      <img v-if="hair && face && body" :src="body" class="absolute w-[80%] bottom-0" />
+
+      <!-- 이미지 없을 경우 -->
+      <div v-if="!face && !hair && !body" class="text-gray-500 text-center">
+        캐릭터 없음
+      </div>
     </div>
+ 
   
   
     <!-- 상태창 -->
@@ -68,7 +82,7 @@
     <!-- <AloneModal v-if="showAloneModal" @closeAlone="closeAloneModal" /> -->
     <!-- <WithModal v-if="showWithModal" @closeWith="closeWithModal" /> -->
   
-    <div class="footer w-full h-[7vh]">
+    <div class="footer w-[100vw] h-[7vh]">
       <!-- class명 추가해서 쓰기 -->
       <!-- <div class="grid-item" @click="toggleExerciseOptions">운동</div> -->
   
@@ -93,20 +107,22 @@
   
     <!-- 퀘스트 모달 -->
   </div>
-  <div v-else class="qr-code">
-    <h1>(나중에 큐알 들어갈 자리)</h1>
-  </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue"
 import { useUserStore } from "@/stores/store"
 import { useUserDataStore } from "@/stores/userDataStore"
+import { assets } from '@/assets.js'
+
 const userStore = useUserStore()
 const userDataStore = useUserDataStore()
 const nickName = ref('')
 const level = ref('')
 const exp = ref('')
+const hair = ref('')
+const face = ref('')
+const body = ref('')
 
 // 튜토리얼 여부 확인
 import { useMainStore } from "@/stores/mainStore"
@@ -221,17 +237,27 @@ const isAnyModalOpen = () => {
 onMounted(async () => {
   try {
     userStore
+    // userDataStore.userCharacter = [hairIndex, faceIndex, bodyIndex]
+    const [hairIndex, faceIndex, bodyIndex] = userDataStore.userCharacter    
+    // Base64 이미지 로드
+    hair.value = assets.hair[hairIndex]?.[0] || ""
+    face.value = assets.face[faceIndex]?.[0] || ""
+    body.value = assets.body[bodyIndex]?.[0] || ""
+
     nickName.value = await userDataStore.checkUserNickname()
     level.value = await userDataStore.checkUserLevel()
     exp.value = await userDataStore.checkUserExperience()
+    
     await mainStore.fetchData()
-  } catch (error) { console.log("User Data 로드 중 오류 발생:", error)}
+  } catch (error) {
+    console.log("User Data 로드 중 오류 발생:", error)
+  }
 })
 </script>
 
 <style scoped>
 .background-image {
-  max-width: 100%;
+  max-width: 100vw;
   height: 100vh; /* 뷰포트 기준 100% */
   object-fit: cover;
   /* background-size: cover; */
