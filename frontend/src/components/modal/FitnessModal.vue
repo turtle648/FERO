@@ -94,7 +94,7 @@ const selectNumber = (num) => {
 }
 
 const selectMode = async (mode) => {
-  const exercise = 'squat' // 현재 선택된 운동
+  const exercise = '2' // 현재 선택된 운동
   
   switch(mode) {
     case 'single':
