@@ -7,7 +7,7 @@ import VideoRoomPage from "@/views/VideoRoomPage.vue"
 import SingleModePage from "@/views/SingleModePage.vue"
 import MultiModePage from "@/views/MultiModePage.vue"
 import RankModePage from "@/views/RankModePage.vue"
-import mediapipeComponent from "@/components/mediapipeComponent.vue" // fix: 수정예정
+import mediapipeComponent from "@/components/MediapipeComponent.vue" // fix: 수정예정
 import SquartComponent from "@/components/SquartComponent.vue"
 import QRComponent from "@/components/QRComponent.vue"
 
