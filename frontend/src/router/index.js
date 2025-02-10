@@ -8,7 +8,6 @@ import SingleModePage from "@/views/SingleModePage.vue"
 import MultiModePage from "@/views/MultiModePage.vue"
 import RankModePage from "@/views/RankModePage.vue"
 // import MediapipeComponent from "@/components/MediapipeComponent.vue" // fix: 수정예정
-import SquartComponent from "@/components/SquartComponent.vue"
 import QRComponent from "@/components/QRComponent.vue"
 
 const routes = [
@@ -31,7 +30,7 @@ const routes = [
     meta: { isMobile: true },
   },
   {
-    path: "/tutorial",
+    path: "/tutorial/:exercise",
     name: "Tutorial",
     component: TutorialPage,
     meta: { isMobile: true },
@@ -65,11 +64,6 @@ const routes = [
     name: "RankMode",
     component: RankModePage,
     props: true,
-  },
-  {
-    path: "/squart",
-    name: "squart",
-    component: SquartComponent,
   },
   {
     path: "/qr",
