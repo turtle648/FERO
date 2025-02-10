@@ -1,5 +1,7 @@
 package com.ssafy.api.service;
 
+import com.ssafy.api.request.RankUpdateReq;
+import com.ssafy.api.response.RankUpdateRes;
 import com.ssafy.db.entity.User;
 import com.ssafy.db.entity.UserCharacter;
 import com.ssafy.db.entity.UserRankScores;
@@ -40,7 +42,7 @@ public class UserRankScoresServiceImpl implements UserRankScoresService {
 
     @Override
     @Transactional
-    public void updateRankScore(String winnerId, String loserId, Long exerciseId) {
+    public RankUpdateRes updateRankScore(String winnerId, String loserId, Long exerciseId) {
         // 승자 & 패자의 특정 운동 랭크 점수 조회
         UserRankScores winnerRank = userRankScoresRepository
                 .findByUser_UserIdAndExerciseStatsRatio_Id(winnerId, exerciseId)
@@ -51,7 +53,13 @@ public class UserRankScoresServiceImpl implements UserRankScoresService {
                 .orElseThrow(() -> new RuntimeException("패자의 랭크 데이터 없음"));
 
         // 현재 점수 가져오기
-        short changeScore = (short) calculateEloChange(winnerRank.getRankScore(), loserRank.getRankScore(), true);
+        short winnerPrevScore = winnerRank.getRankScore();
+        short loserPrevScore = loserRank.getRankScore();
+        short changeScore = (short) calculateEloChange(winnerPrevScore, loserPrevScore, true);
+
+        // 새로운 점수 계산
+        short winnerNewScore = (short) (winnerPrevScore + changeScore);
+        short loserNewScore = (short) (loserPrevScore - changeScore);
 
         // DB 반영
         userRankScoresRepository.updateUserRankScore(winnerId, exerciseId, changeScore);
@@ -60,6 +68,11 @@ public class UserRankScoresServiceImpl implements UserRankScoresService {
         log.info("Elo 점수 업데이트 완료! [운동 ID: {}] 승자: {} ({} → {}), 패자: {} ({} → {})",
                 exerciseId, winnerId, winnerRank.getRankScore(), winnerRank.getRankScore() + changeScore,
                 loserId, loserRank.getRankScore(), loserRank.getRankScore() + changeScore);
+
+        return new RankUpdateRes(
+                winnerId, winnerPrevScore, winnerNewScore,
+                loserId, loserPrevScore, loserNewScore
+        );
     }
 
     private short calculateEloChange(short playerScore, short opponentScore, boolean isWinner) {
