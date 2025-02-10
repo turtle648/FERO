@@ -1,11 +1,15 @@
 package com.ssafy.api.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.api.request.EnterWaitingRoomEvent;
 import com.ssafy.api.request.WaitingUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -20,6 +24,7 @@ import java.util.*;
 public class MatchingService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final StringRedisTemplate stringRedisTemplate;
+    private final ApplicationEventPublisher eventPublisher;
 
     // Redis Key 상수
     private static final String WAITING_QUEUE = "waiting:queue"; // 입장 순서
@@ -63,6 +68,9 @@ public class MatchingService {
 
         log.info("✅ {} 사용자가 {} 대기열에 입장 (TTL 설정 완료)", userToken, exerciseType);
         logWaitingRoomStatus(exerciseType);
+
+        // 사용자 입장 이벤트 발생
+        eventPublisher.publishEvent(new EnterWaitingRoomEvent(userToken, exerciseType, rankScore));
     }
 
     // 1-2. 대기방 상태
@@ -126,129 +134,90 @@ public class MatchingService {
         String userInfoKey = getUserInfoKey(exerciseType);
         String expireKey = getUserJoinTimeKey(exerciseType, userToken);
 
-        Long removedFromQueue = redisTemplate.opsForList().remove(queueKey, 1, userToken);
+//        Long removedFromQueue = redisTemplate.opsForList().remove(queueKey, 1, userToken);
         Long removedFromHash = redisTemplate.opsForHash().delete(userInfoKey, userToken);
         Long removedFromSortedSet = redisTemplate.opsForZSet().remove(sortedSetKey, userToken);
         redisTemplate.delete(expireKey);
 
-        log.info("[REDIS REMOVE] Queue에서 제거된 아이템 수: {}", removedFromQueue); // 사실 얘는 삭제 안됨
+//        log.info("[REDIS REMOVE] Queue에서 제거된 아이템 수: {}", removedFromQueue); // 사실 얘는 삭제 안됨
         log.info("[REDIS REMOVE] 해시에서 제거된 아이템 수: {}", removedFromHash);
         log.info("[REDIS REMOVE] 정렬 세트에서 제거된 아이템 수: {}", removedFromSortedSet);
     }
 
 
-    /*private void processMatchingForExercise(String exerciseType) {
-        System.out.println("\n========== " + exerciseType + " 대기방 현재 상태 ==========");
+    // 3-1. 매칭 시도 이벤트 리스너
+    @EventListener
+    public void processMatching(EnterWaitingRoomEvent event){
+        log.info("🎯 매칭 프로세스 시작 - User: {}, Exercise: {}, Score: {}",
+                event.getUserToken(), event.getExerciseId(), event.getRankScore());
 
-        String queueKey = WAITING_QUEUE + exerciseType;
-        String sortedSetKey = SCORE_SORTED_SET + exerciseType;
-        String userInfoKey = USER_INFO + exerciseType;
+        processMatchingLogic(event.getExerciseId());
+    }
 
+    // 3-2. 실제 매칭 시도
+    private void processMatchingLogic(Long exerciseId) {
+        String queueKey = getQueueKey(exerciseId);
+        String sortedSetKey = getSortedSetKey(exerciseId);
 
-
-        // 큐의 첫 번째 유저 확인
-        String userId = (String) redisTemplate.opsForList().index(queueKey, 0);
-        if (userId == null) return;
-
-        // 유저 정보 조회
-        WaitingUser user = (WaitingUser) redisTemplate.opsForHash().get(userInfoKey, userId);
-        if (user == null) {
-            redisTemplate.opsForList().remove(queueKey, 1, userId);
+        // 1. queue 확인 - 첫 번째 유저부터 순차적으로 확인
+        List<Object> queue = redisTemplate.opsForList().range(queueKey, 0, -1);
+        if (queue == null || queue.isEmpty()) {
+            log.info("Queue is empty for exercise type: {}", exerciseId);
             return;
         }
 
-        // 최소 대기시간(30초) 체크
-        long waitingSeconds = Duration.between(user.getJoinTime(), LocalDateTime.now()).getSeconds();
-        if (waitingSeconds < 30) {
-            log.debug("User {} is waiting for {}s (minimum 30s required)", userId, waitingSeconds);
-            return;
+        // 2. queue 순회하면서 매칭 시도하기
+        int queueSize = queue.size();
+        int currentIndex = 0;
+
+        while(currentIndex < queueSize) {
+            String currentUserToken = queue.get(currentIndex).toString();
+
+            // 3. sortedSet에서 현재 유저의 점수 확인
+            Double currentUserScore = redisTemplate.opsForZSet().score(sortedSetKey, currentUserToken);
+
+            // 3-1. sortedSet에 없는 경우 (이미 매칭되어서 나가거나 타임아웃)
+            if (currentUserScore == null) {
+                log.info("User {} not found in sorted set, removing from queue", currentUserToken);
+                redisTemplate.opsForList().remove(queueKey, 1, currentUserToken);
+                currentIndex++;
+                continue;
+            }
+            boolean matchFound = false;
+            // 3-2. 매칭 가능한 상대 찾기 (rankScore +- 100 범위)
+            for (int i=currentIndex+1; i < queueSize; i++) {
+                String candidateUserToken = queue.get(i).toString();
+                Double candidateScore = redisTemplate.opsForZSet().score(sortedSetKey, candidateUserToken);
+
+                // 후보자가 sorted-set 에 없으면 스킵 -- queue에서 삭제
+                if (candidateScore == null) {
+                    redisTemplate.opsForList().remove(queueKey, 1, candidateUserToken);
+                    continue;
+                }
+
+                // 점수 차이가 100 이내인지 확인
+                System.out.println("들어온 애 점수 : "+currentUserScore);
+                System.out.println("후보자 점수 : "+candidateScore);
+                if (Math.abs(currentUserScore - candidateScore) <= 100) {
+                    // 매칭 성공
+                    handleMatchSuccess(currentUserToken, candidateUserToken, exerciseId);
+                    matchFound = true;
+                    return; // 매칭 완료되면 종료
+                }
+            }
+            if (!matchFound) {
+                log.info("적합한 매칭 상대를 찾지 못함 (score: {}), moving to next user",
+                        currentUserScore);
+            }
+            currentIndex++;
         }
-        System.out.println("\n========== " + exerciseType + " 매칭 시도 ==========");
-        log.info("=== {} 매칭 시도 ===", exerciseType);
-        logWaitingRoomStatus(exerciseType);
-        // 30초 이상 대기한 유저에 대한 매칭 로직
-        Double userScore = redisTemplate.opsForZSet().score(sortedSetKey, userId);
-        if (userScore == null) {
-            log.error("User {} not found in sorted set", userId);
-            return;
-        }
+    }
 
-        // 랭크 점수 ±100 범위 내의 후보자들 찾기
-        Set<String> candidates = redisTemplate.opsForZSet().rangeByScore(
-                sortedSetKey,
-                userScore - 100,
-                userScore + 100
-        ).stream().map(Object::toString).collect(Collectors.toSet());
+    private void handleMatchSuccess(String userToken1, String userToken2, Long exerciseId) {
+        removeFromRedis(exerciseId, userToken1);
+        removeFromRedis(exerciseId, userToken2);
 
-        // 자기 자신 제외
-        candidates.remove(userId);
-
-        if (candidates.isEmpty()) {
-            // 매칭 가능한 상대가 없으면 큐의 맨 뒤로 이동
-            redisTemplate.opsForList().remove(queueKey, 1, userId);
-            redisTemplate.opsForList().rightPush(queueKey, userId);
-            log.debug("No matching candidates for user {}, moved to back of queue", userId);
-            return;
-        }
-
-        // 가장 점수 차이가 적은 상대 찾기
-        String bestMatch = candidates.stream()
-                .min((id1, id2) -> {
-                    Double score1 = redisTemplate.opsForZSet().score(sortedSetKey, id1);
-                    Double score2 = redisTemplate.opsForZSet().score(sortedSetKey, id2);
-                    return Double.compare(
-                            Math.abs(userScore - score1),
-                            Math.abs(userScore - score2)
-                    );
-                }).orElse(null);
-
-
-
-        if (bestMatch != null) {
-            // 매칭 성공 처리
-            createMatch(exerciseType, userId, bestMatch);
-
-            // 매칭된 유저들 제거
-            removeFromWaitingRoom(exerciseType, userId);
-            removeFromWaitingRoom(exerciseType, bestMatch);
-        }
-    }*/
-
-    /*private void createMatch(String exerciseType, String user1, String user2) {
-        // 매칭 정보 생성 및 저장 로직
-        String matchId = UUID.randomUUID().toString();
-        // DB에 매칭 정보 저장
-
-        // WebSocket으로 매칭 성공 알림
-        notifyMatchSuccess(user1, user2, matchId);
-    }*/
-    
-
-    /*private void notifyMatchSuccess(String user1, String user2, String matchId) {
-        // 매칭 정보 생성
-        MatchSuccessRes matchInfo = createMatchSuccessDTO(user1, user2, matchId);
-
-        // 각 유저에게 WebSocket으로 매칭 성공 메시지 전송
-        messagingTemplate.convertAndSend("/topic/match/" + user1, matchInfo);
-        messagingTemplate.convertAndSend("/topic/match/" + user2, matchInfo);
-
-        log.info("Match success notification sent to users {} and {}", user1, user2);
-    }*/
-
-    /*private MatchSuccessRes createMatchSuccessDTO(String user1, String user2, String matchId) {
-        return MatchSuccessRes.builder()
-                .matchId(matchId)
-                .player1Id(user1)
-                .player2Id(user2)
-                .matchedAt(LocalDateTime.now())
-                .build();
-    }*/
-
-    /*// 매칭 처리 로직 (스케줄러로 주기적으로 실행할 것)
-    @Scheduled(fixedRate = 1000) // 매 초마다 실행함
-    public void processMatching() {
-        // 모든 운동 타입에 대해 처리함
-        Arrays.asList("pushup", "squat", "lunge", "plank").forEach(this::processMatchingForExercise);
-    }*/
+        log.info("🎊 매칭 성공! User1: {}, User2: {}, Exercise: {}", userToken1, userToken2, exerciseId);
+    }
 
 }
