@@ -7,17 +7,22 @@
 import { ref, onMounted, onUnmounted } from "vue"
 import QRComponent from "@/components/QRComponent.vue"
 
-const isDesktop = ref(window.matchMedia("(min-width: 821px)").matches)
-const checkScreenSize = () => {
-  isDesktop.value = window.innerWidth > 821
+// matchMedia()를 사용하여 초기값 설정
+const mediaQuery = window.matchMedia("(min-width: 821px)")
+const isDesktop = ref(mediaQuery.matches)
+
+// 반응형 감지를 위한 핸들러 함수
+const checkScreenSize = (event) => {
+  isDesktop.value = event.matches
 }
 
 onMounted(() => {
-  window.addEventListener("resize", checkScreenSize)
+  // matchMedia 이벤트 리스너 사용 (resize 대신)
+  mediaQuery.addEventListener("change", checkScreenSize)
 })
 
 onUnmounted(() => {
-  window.removeEventListener("resize", checkScreenSize)
+  mediaQuery.removeEventListener("change", checkScreenSize)
 })
 </script>
 
