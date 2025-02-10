@@ -163,17 +163,28 @@
             async cancelMatching() {
                 try {
                     const token = localStorage.getItem('token');
-                    await axios.delete('/api/v1/matching/leave', {
-                        params: {
-                            userId: this.userId,
-                            exerciseType: this.selectedExercise.id
-                        },
-                        headers: { Authorization: `Bearer ${token}` }
+                    if (!token || !this.selectedExercise) {
+                        throw new Error('인증 정보 또는 운동 정보가 없습니다.');
+                    }
+
+                    const response = await fetch(`/api/v1/matching/leave?exerciseType=${this.selectedExercise.id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
                     });
-                    this.isWaiting = false;
-                    clearInterval(this.waitingInterval);
-                    this.matchStatus = '매칭이 취소되었습니다.';
-                    this.selectedExercise = null;
+
+                    const text = await response.text();
+
+                    if (response.ok) {
+                        this.isWaiting = false;
+                        clearInterval(this.waitingInterval);
+                        this.matchStatus = '매칭이 취소되었습니다.';
+                        this.selectedExercise = null;
+                        this.waitingTime = 0;
+                    } else {
+                        throw new Error(text);
+                    }
                 } catch (error) {
                     console.error('Matching cancel failed:', error);
                     alert('매칭 취소 중 오류가 발생했습니다.');

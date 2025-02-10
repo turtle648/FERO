@@ -1,11 +1,11 @@
 <template>
-  <div class="tutorial-page w-screen h-screen bg-black bg-opacity-50 p-5 flex flex-col items-center relative">
+  <div class="tutorial-page w-screen h-screen flex flex-col items-center relative">
     <!-- 튜토리얼 내용 -->
-    <div class="time"></div>
-    <div class="count"></div>
-    <img src="@/assets/furni_1.png" alt="" class="w-4/5" />
-    <component :is="currentExerciseComponent" />
-    <button @click="completeTutorial">튜토리얼 완료</button>
+    <img src="@/assets/furni_1.png" alt="" class="w-4/5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10" />
+    <div class="w-screen h-screen bg-black bg-opacity-60 z-5"></div>
+    <component :is="currentExerciseComponent" class="z-0" />
+
+    <button @click="completeTutorial" class="absolute bottom-0">튜토리얼 완료</button>
   </div>
   <!-- <div class="desciption"></div> -->
 </template>
@@ -30,14 +30,4 @@ const completeTutorial = () => {
 }
 </script>
 
-<style scoped>
-/* .desciption {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1;
-} */
-</style>
+<style scoped></style>
