@@ -113,7 +113,7 @@ import { useMainStore } from "@/stores/mainStore"
 const mainStore = useMainStore()
 
 onMounted(async () => {
-  await mainStore.fetchData()
+  await mainStore.loadTutorial()
 })
 
 // 상태창 관련 변수 및 함수
