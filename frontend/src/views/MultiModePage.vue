@@ -1,7 +1,7 @@
 <template>
-    <div>
-        <h1>multi</h1>
-    </div>
+  <div>
+    <h1>multi</h1>
+  </div>
 </template>
 
 <script setup>
@@ -17,6 +17,4 @@
 // const defaultCount = ref(2)
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

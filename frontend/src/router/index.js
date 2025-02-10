@@ -49,22 +49,22 @@ const routes = [
     meta: { isMobile: true },
   },
   {
-    path: '/single-mode/:exercise/:count',
-    name: 'SingleMode',
+    path: "/single-mode/:exercise/:count",
+    name: "SingleMode",
     component: SingleModePage,
-    props: true
+    props: true,
   },
   {
-    path: '/multi-mode/:exercise',
-    name: 'MultiMode',
+    path: "/multi-mode/:exercise",
+    name: "MultiMode",
     component: MultiModePage,
-    props: true
+    props: true,
   },
   {
-    path: '/rank-mode/:exercise',
-    name: 'RankMode',
+    path: "/rank-mode/:exercise",
+    name: "RankMode",
     component: RankModePage,
-    props: true
+    props: true,
   },
   {
     path: "/squart",
@@ -75,7 +75,7 @@ const routes = [
     path: "/qr",
     name: "QR",
     component: QRComponent,
-  }
+  },
 ]
 
 const router = createRouter({

@@ -11,6 +11,7 @@ import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Slf4j
@@ -34,6 +35,38 @@ public class UserRankScoresServiceImpl implements UserRankScoresService {
     @Override
     public UserRankScores getRankScoreByUserIdAndId(String userId, Long exerciseId) {
         return userRankScoresRepository.findByUser_UserIdAndId(userId, exerciseId)
-                .orElse(null);  // 값이 없으면 null 반환
+                .orElseThrow(null);  // 값이 없으면 null 반환
     }
+
+    @Override
+    @Transactional
+    public void updateRankScore(String winnerId, String loserId, Long exerciseId) {
+        // 승자 & 패자의 특정 운동 랭크 점수 조회
+        UserRankScores winnerRank = userRankScoresRepository
+                .findByUser_UserIdAndExerciseStatsRatio_Id(winnerId, exerciseId)
+                .orElseThrow(() -> new RuntimeException("승자의 랭크 데이터 없음"));
+
+        UserRankScores loserRank = userRankScoresRepository
+                .findByUser_UserIdAndExerciseStatsRatio_Id(loserId, exerciseId)
+                .orElseThrow(() -> new RuntimeException("패자의 랭크 데이터 없음"));
+
+        // 현재 점수 가져오기
+        short changeScore = (short) calculateEloChange(winnerRank.getRankScore(), loserRank.getRankScore(), true);
+
+        // DB 반영
+        userRankScoresRepository.updateUserRankScore(winnerId, exerciseId, changeScore);
+        userRankScoresRepository.updateUserRankScore(loserId, exerciseId, changeScore);
+
+        log.info("Elo 점수 업데이트 완료! [운동 ID: {}] 승자: {} ({} → {}), 패자: {} ({} → {})",
+                exerciseId, winnerId, winnerRank.getRankScore(), winnerRank.getRankScore() + changeScore,
+                loserId, loserRank.getRankScore(), loserRank.getRankScore() + changeScore);
+    }
+
+    private short calculateEloChange(short playerScore, short opponentScore, boolean isWinner) {
+        int kFactor = 32;
+        double expectedScore = 1 / (1 + Math.pow(10, (opponentScore - playerScore) / 400.0));
+        short scoreChange = (short) (kFactor * ((isWinner ? 1 : 0) - expectedScore));
+        return scoreChange;
+    }
+
 }

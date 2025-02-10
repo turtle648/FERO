@@ -2,15 +2,27 @@ package com.ssafy.common.redis.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.ssafy.common.redis.service.RedisExpirationListener;
+import com.ssafy.common.redis.service.SessionExpiredEvent;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.listener.PatternTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import javax.annotation.PostConstruct;
+import java.util.Objects;
+
+import static org.kurento.jsonrpc.client.JsonRpcClient.log;
 
 @Configuration
 public class RedisConfig {
@@ -53,4 +65,29 @@ public class RedisConfig {
 
         return redistemplate;
     }
+
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(
+            RedisConnectionFactory connectionFactory,
+            ApplicationEventPublisher eventPublisher) {
+
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+
+        container.addMessageListener((message, pattern) -> {
+            String expiredKey = new String(message.getBody());
+            eventPublisher.publishEvent(new SessionExpiredEvent(this, expiredKey)); // 이벤트 발행
+        }, new PatternTopic("__keyevent@*__:expired"));
+
+        return container;
+    }
+
+    @PostConstruct
+    public void enableRedisKeyspaceEvents() {
+        RedisConnection connection = Objects.requireNonNull(redisConnectionFactory()).getConnection();
+        connection.serverCommands().setConfig("notify-keyspace-events", "Ex");
+        connection.close();
+        log.info("Redis Keyspace Events enabled with 'Ex' configuration");
+    }
+
 }

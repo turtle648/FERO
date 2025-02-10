@@ -1,6 +1,7 @@
 package com.ssafy.api.controller;
 
 import com.ssafy.api.response.GetTutorialRes;
+import com.ssafy.api.response.GetTutorialSimpleRes;
 import com.ssafy.api.service.UserTutorialProgressService;
 import com.ssafy.api.service.UserTutorialProgressServiceImpl;
 import com.ssafy.common.util.JwtTokenUtil;
@@ -30,13 +31,32 @@ public class TutorialController {
     }
 
     @GetMapping
-    @ApiOperation(value = "캐릭터의 튜토리얼 정보 불러오기", notes = "캐릭터의 모든 튜토리얼 현황 조회")
+    @ApiOperation(value = "캐릭터의 전체 튜토리얼 현황 불러오기", notes = "캐릭터의 모든 튜토리얼 현황 조회")
     public ResponseEntity<List<GetTutorialRes>> getTutorials(HttpServletRequest request) {
 
         String token = request.getHeader("Authorization");
         String userId = JwtTokenUtil.getUserIdFromJWT(token);  // JWT 토큰에서 userId 추출
 
         List<GetTutorialRes> tutorials = userTutorialProgressService.getTutorials(userId);
+
+        return ResponseEntity.ok(tutorials);
+    }
+
+    @GetMapping("/simple")
+    @ApiOperation(value = "캐릭터의 전체 튜토리얼에 대한 id와 완료여부만 불러오기"
+            , notes = "1. UI 기본 " +
+                      "2. 스쿼트 " +
+                      "3. 푸시업" +
+                      "4. 런지" +
+                      "5. 플랭크")
+
+
+    public ResponseEntity<List<GetTutorialSimpleRes>> getTutorialsSimple(HttpServletRequest request) {
+
+        String token = request.getHeader("Authorization");
+        String userId = JwtTokenUtil.getUserIdFromJWT(token);  // JWT 토큰에서 userId 추출
+
+        List<GetTutorialSimpleRes> tutorials = userTutorialProgressService.getTutorialSimples(userId);
 
         return ResponseEntity.ok(tutorials);
     }
