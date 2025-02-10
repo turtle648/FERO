@@ -78,23 +78,32 @@ const showModeModal = ref(false)
 const selectedNumber = ref(null)
 const isLoading = ref(false)
 
-// 튜토리얼 상태 계산 속성
-const isUICompleted = computed(() => 
-  mainStore.tutorial.some(t => t.tutorialId === TUTORIAL_IDS.UI && t.completed)
-)
-const isSquatCompleted = computed(() =>
-  mainStore.tutorial.some(t => t.tutorialId === TUTORIAL_IDS.SQUAT && t.completed)
-)
+// computed 속성은 유지
+const isUICompleted = computed(() => {
+  const uiTutorial = mainStore.tutorial.find(t => t.tutorialId === TUTORIAL_IDS.UI)
+  return uiTutorial?.completed || false
+})
 
+const isSquatCompleted = computed(() => {
+  const squatTutorial = mainStore.tutorial.find(t => t.tutorialId === TUTORIAL_IDS.SQUAT)
+  return squatTutorial?.completed || false
+})
+
+// handleSquatClick 함수 수정 - computed 속성 활용
 const handleSquatClick = () => {
   if (!isUICompleted.value) {
-    router.push(`/tutorial/${TUTORIAL_IDS.UI}`) // UI 튜토리얼(99)
-  } else if (!isSquatCompleted.value) {
-    router.push(`/tutorial/${TUTORIAL_IDS.SQUAT}`) // 스쿼트 튜토리얼(2)
-  } else {
-    showModeModal.value = true
+    router.push('/ui-tutorial')
+    return
   }
+  
+  if (!isSquatCompleted.value) {
+    router.push(`/tutorial/${TUTORIAL_IDS.SQUAT}`)
+    return
+  }
+  
+  showModeModal.value = true
 }
+
 
 const selectNumber = (num) => {
   selectedNumber.value = selectedNumber.value === num ? null : num
