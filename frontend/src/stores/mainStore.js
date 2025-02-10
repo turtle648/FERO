@@ -51,7 +51,7 @@ export const useMainStore = defineStore("main", () => {
   async function completeTutorial(tutorialId) {
     try {
       console.time(`[⏱️] Tutorial #${tutorialId}`)
-      const { data } = await api.post(`/Tutorial/${tutorialId}`)
+      const { data } = await api.post(`/Tutorial/complete/${tutorialId}`)
 
       // 상태 업데이트
       if (tutorialId === TUTORIAL_IDS.UI) {

@@ -13,13 +13,21 @@ import { useMainStore, TUTORIAL_IDS } from "@/stores/mainStore"
 const router = useRouter()
 const mainStore = useMainStore()
 
-const completeUiTutorial = () => {
-  // 튜토리얼 ID 99번 상태 업데이트
-  const tutorial = mainStore.tutorial.find((t) => t.tutorialId === TUTORIAL_IDS.UI)
-  if (tutorial) tutorial.completed = true
-
-  router.push("/main") // 메인 페이지로 이동
+const completeUiTutorial = async () => {
+  try {
+    // 메인스토어의 completeTutorial 함수 호출
+    const success = await mainStore.completeTutorial(TUTORIAL_IDS.UI)
+    
+    if (success) {
+      router.push('/main')
+    } else {
+      console.error('튜토리얼 완료 처리 실패')
+    }
+  } catch (error) {
+    console.error('튜토리얼 완료 중 오류 발생:', error)
+  }
 }
+
 </script>
 
 <style scoped>
