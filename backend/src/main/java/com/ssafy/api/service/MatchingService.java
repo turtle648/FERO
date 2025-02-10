@@ -21,14 +21,6 @@ public class MatchingService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final StringRedisTemplate stringRedisTemplate;
 
-    // 운동 종류 상수 정의
-    private static final List<String> EXERCISE_TYPES = Arrays.asList(
-            "pushup",
-            "squat",
-            "lunge",
-            "plank"
-    );
-
     // Redis Key 상수
     private static final String WAITING_QUEUE = "waiting:queue"; // 입장 순서
     private static final String SCORE_SORTED_SET = "score:sorted:set"; // 점수 정렬
@@ -36,60 +28,60 @@ public class MatchingService {
     private static final String USER_JOIN_TIME = "waiting:expire:"; // 5분 타임아웃 체크 (주기적 실행)
 
     // Redis Key 생성 유틸리티 메서드들
-    private String getQueueKey(String exerciseType) {
+    private String getQueueKey(Long exerciseType) {
         return String.format("waiting:queue%s", exerciseType);
     }
-    private String getSortedSetKey(String exerciseType) {
+    private String getSortedSetKey(Long exerciseType) {
         return String.format("score:sorted:set%s", exerciseType);
     }
-    private String getUserInfoKey(String exerciseType) {
+    private String getUserInfoKey(Long exerciseType) {
         return String.format("user:info%s", exerciseType);
     }
-    private String getUserJoinTimeKey(String exerciseType, String userId) {
-        return String.format("waiting:expire:%s:%s", exerciseType, userId);
+    private String getUserJoinTimeKey(Long exerciseType, String userToken) {
+        return String.format("waiting:expire:%s:%s", exerciseType, userToken);
     }
 
     // 1-1. 유저를 대기열에 추가함
-    public void enterWaitingRoom(String userId, String exerciseType, Short rankScore) {
-        WaitingUser waitingUser = new WaitingUser(userId, exerciseType, rankScore, LocalDateTime.now());
+    public void enterWaitingRoom(String userToken, Long exerciseType, Short rankScore) {
+        WaitingUser waitingUser = new WaitingUser(userToken, exerciseType, rankScore, LocalDateTime.now());
 
         // 운동 타입별 키 생성
         String queueKey = getQueueKey(exerciseType);
         String sortedKey = getSortedSetKey(exerciseType);
         String userInfoKey = getUserInfoKey(exerciseType);
-        String expireKey = getUserJoinTimeKey(exerciseType, userId);
+        String expireKey = getUserJoinTimeKey(exerciseType, userToken);
 //        System.out.printf("생성되는 운동 타입 키 : %s, %s, %s\n", queueKey, sortedKey, userInfoKey);
 
         // 유저 정보 저장
-        redisTemplate.opsForHash().put(userInfoKey, userId, waitingUser);
+        redisTemplate.opsForHash().put(userInfoKey, userToken, waitingUser);
         // 입장 순서 큐에 추가
-        redisTemplate.opsForList().rightPush(queueKey, userId);
+        redisTemplate.opsForList().rightPush(queueKey, userToken);
         // 스코어 정렬셋에 추가
-        redisTemplate.opsForZSet().add(sortedKey, userId, (double) rankScore);
+        redisTemplate.opsForZSet().add(sortedKey, userToken, (double) rankScore);
         // 입장 시간 TTL 설정 (5분 만료)
         stringRedisTemplate.opsForValue().set(expireKey, "EXPIRED", Duration.ofMinutes(5));
 
-        log.info("✅ {} 사용자가 {} 대기열에 입장 (TTL 설정 완료)", userId, exerciseType);
+        log.info("✅ {} 사용자가 {} 대기열에 입장 (TTL 설정 완료)", userToken, exerciseType);
         logWaitingRoomStatus(exerciseType);
     }
 
     // 1-2. 대기방 상태
-    private void logWaitingRoomStatus(String exerciseType) {
+    private void logWaitingRoomStatus(Long exerciseType) {
         String queueKey = getQueueKey(exerciseType);
         String userInfoKey = getUserInfoKey(exerciseType);
 
-        List<Object> userIds = redisTemplate.opsForList().range(queueKey, 0, -1);
+        List<Object> userTokens = redisTemplate.opsForList().range(queueKey, 0, -1);
 
         ObjectMapper mapper = new ObjectMapper();
         // DateTime 모듈 등록
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-        System.out.println("총 큐의 대기 인원: " + (userIds != null ? userIds.size() : 0));
+        System.out.println("총 큐의 대기 인원: " + (userTokens != null ? userTokens.size() : 0));
 
-        if (userIds != null && !userIds.isEmpty()) {
+        if (userTokens != null && !userTokens.isEmpty()) {
             System.out.println("대기중인 사용자들:");
-            for (Object userId : userIds) {
+            for (Object userId : userTokens) {
                 Map<Object, Object> userMap = redisTemplate.opsForHash().entries(userInfoKey);
                 Object userObj = userMap.get(userId.toString());
 
@@ -112,31 +104,31 @@ public class MatchingService {
     }
 
     // 2-1. 대기방 퇴장 메서드 
-    public void leaveWaitingRoom(String userId, String exerciseType) {
+    public void leaveWaitingRoom(String userToken, Long exerciseType) {
         String userInfoKey = getUserInfoKey(exerciseType);
 
 
         // 유저 정보 조회 시도
-        Object userObj = redisTemplate.opsForHash().get(userInfoKey, userId);
+        Object userObj = redisTemplate.opsForHash().get(userInfoKey, userToken);
         if (userObj == null) {
-            log.warn("User {} not found in waiting room {}", userId, exerciseType);
+            log.warn("User {} not found in waiting room {}", userToken, exerciseType);
             return;
         }
-        log.info("Removing user {} from waiting room for {}", userId, exerciseType);
-        removeFromRedis(exerciseType, userId);
+        log.info("Removing user {} from waiting room for {}", userToken, exerciseType);
+        removeFromRedis(exerciseType, userToken);
 
     }
     
     // 2-2. 대기 상태 redis 에서 지우기
-    private void removeFromRedis(String exerciseType, String userId) {
+    private void removeFromRedis(Long exerciseType, String userToken) {
         String queueKey = getQueueKey(exerciseType);
         String sortedSetKey = getSortedSetKey(exerciseType);
         String userInfoKey = getUserInfoKey(exerciseType);
-        String expireKey = getUserJoinTimeKey(exerciseType, userId);
+        String expireKey = getUserJoinTimeKey(exerciseType, userToken);
 
-        Long removedFromQueue = redisTemplate.opsForList().remove(queueKey, 1, userId);
-        Long removedFromHash = redisTemplate.opsForHash().delete(userInfoKey, userId);
-        Long removedFromSortedSet = redisTemplate.opsForZSet().remove(sortedSetKey, userId);
+        Long removedFromQueue = redisTemplate.opsForList().remove(queueKey, 1, userToken);
+        Long removedFromHash = redisTemplate.opsForHash().delete(userInfoKey, userToken);
+        Long removedFromSortedSet = redisTemplate.opsForZSet().remove(sortedSetKey, userToken);
         redisTemplate.delete(expireKey);
 
         log.info("[REDIS REMOVE] Queue에서 제거된 아이템 수: {}", removedFromQueue); // 사실 얘는 삭제 안됨

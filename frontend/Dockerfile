@@ -1,13 +1,24 @@
-# 'AS build-stage'로 스테이지 이름을 지정
-FROM node:18 AS build-stage  
+# Build stage
+FROM node:18 AS build-stage
 WORKDIR /app
-COPY package.json ./
-COPY package-lock.json ./
+
+# Clear npm cache first
+RUN npm cache clean --force
+
+# Copy package files
+COPY package*.json ./
 RUN npm install
+
+# Copy project files
 COPY . .
-RUN npm run build --no-cache
+
+# Clean and rebuild
+RUN rm -rf dist node_modules/.cache
+RUN npm run build
 
 # Serve stage
 FROM nginx:alpine
 # Copy dist to Nginx
-COPY --from=build-stage /app/dist /usr/share/nginx/html  
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+# Add nginx configuration if needed
+# COPY nginx.conf /etc/nginx/nginx.conf
