@@ -1,0 +1,559 @@
+[33mcommit 0a36e43dbf0ca197070f4f1e5f34a3332be05044[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature-modifyAppVue[m[33m, [m[1;32mfeature-fixSignUpLogic-395[m[33m)[m
+Author: Jinseong <pnum4095@gmail.com>
+Date:   Wed Feb 5 15:04:34 2025 +0900
+
+    .
+
+[33mcommit 4871bcdbf98c2e6730111412addb5ba92a1f1672[m[33m ([m[1;31morigin/develop[m[33m, [m[1;32mdevelop[m[33m)[m
+Merge: 0f001f4 f42c613
+Author: 조희진 <allana123@naver.com>
+Date:   Wed Feb 5 09:35:16 2025 +0900
+
+    Merge branch 'hotfix-openviduserver' into 'develop'
+    
+    hotfix(openvidu): ssl 인증서 관련 에러 해결
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!90
+
+[33mcommit f42c613a532c33628bc66c587cb9fc1269732e46[m
+Author: root <root@ip-172-26-10-149.ap-northeast-2.compute.internal>
+Date:   Wed Feb 5 00:34:24 2025 +0000
+
+    hotfix(openvidu): ssl 인증서 관련 에러 해결
+
+[33mcommit 0f001f4a68229144edbc646bfc2a9f54c3fb4771[m
+Merge: 3c28f08 5c5ff32
+Author: 손채이 <im_1998@naver.com>
+Date:   Tue Feb 4 17:51:57 2025 +0900
+
+    Merge branch 'feature-tutorial-387' into 'develop'
+    
+    style: 주석 삭제
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!89
+
+[33mcommit 5c5ff3208f4184d8ad7cc0a6d9aa9d9642ab5ed0[m[33m ([m[1;31morigin/feature-tutorial-387[m[33m)[m
+Author: 손채이 <im_1998@naver.com>
+Date:   Tue Feb 4 17:50:53 2025 +0900
+
+    style: 주석 삭제
+
+[33mcommit 3c28f08dc00bbb8718e25c83224f269037142701[m
+Merge: db82ec9 ccfe4ac
+Author: 최진성 <pnum2378@naver.com>
+Date:   Tue Feb 4 17:41:19 2025 +0900
+
+    Merge branch 'feature-moveStausModal' into 'develop'
+    
+    feat: 상태창 위치 변경 및 정리
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!88
+
+[33mcommit ccfe4ac56e3a08ebb14ccc830f735c249846478f[m
+Author: Jinseong <pnum4095@gmail.com>
+Date:   Tue Feb 4 17:35:14 2025 +0900
+
+    feat: 상태창 위치 변경 및 정리
+
+[33mcommit db82ec9afad3518ae810827a07c76836e7f512c7[m
+Merge: f62ade9 5be00a6
+Author: 문영민 <ansdudals8@naver.com>
+Date:   Tue Feb 4 16:40:05 2025 +0900
+
+    Merge branch 'feature-api-192' into 'develop'
+    
+    chore:회원가입 로직 수정
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!87
+
+[33mcommit 5be00a6438055ad913c7880849a112f54e990d75[m[33m ([m[1;31morigin/feature-api-192[m[33m)[m
+Merge: 4432d73 f62ade9
+Author: 문영민 <ansdudals8@naver.com>
+Date:   Tue Feb 4 16:39:05 2025 +0900
+
+    Merge branch 'develop' into 'feature-api-192'
+    
+    # Conflicts:
+    #   backend/src/main/java/com/ssafy/db/repository/CharacterStatsRepository.java
+
+[33mcommit f62ade9463fce83ed643d2acb85db0674785d119[m
+Merge: 1aa4ef5 1e9295b
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 15:44:07 2025 +0900
+
+    Merge branch 'fix-openviduserver' into 'develop'
+    
+    fix(https): 권한 문제 해결
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!86
+
+[33mcommit 1e9295ba2fedb6714dac33596edd6d4ac71760fc[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 15:43:42 2025 +0900
+
+    fix(https): 권한 문제 해결
+
+[33mcommit 1aa4ef5af1a2679bdaaf8998f1bba890c8c48a94[m
+Merge: 3aad6f7 22da7af
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 15:37:36 2025 +0900
+
+    Merge branch 'fix-openviduserver' into 'develop'
+    
+    fix(https): alias 설정
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!85
+
+[33mcommit 22da7af353ce6c6c812b4ad83ac53dd7c5fdead0[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 15:37:13 2025 +0900
+
+    fix(https): alias 설정
+
+[33mcommit 4432d732d2548620ad9263365d34834b766df0b2[m
+Author: ansdudals8 <ansdudals8@naver.com>
+Date:   Tue Feb 4 15:35:49 2025 +0900
+
+    fix:íìchore:회원가입 로직 수정
+    - 이메일 인증 분리
+    - 순서 표시
+    JIRA :  S12P11E103-392
+
+[33mcommit 3aad6f705b992e8d4d85c2ddbc7c1b36053c3db8[m
+Merge: c23e5b1 988c8cc
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 15:31:07 2025 +0900
+
+    Merge branch 'fix-openviduserver' into 'develop'
+    
+    hotfix(https): https 적용 중 에러 해결
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!84
+
+[33mcommit 988c8cca10730659c2d14224bd4cf6bfcc0e3327[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 15:30:42 2025 +0900
+
+    hotfix(https): https 적용 중 에러 해결
+
+[33mcommit c23e5b1bb53998f86bacea8fef0cb2609cf721fe[m
+Merge: 6fe3192 7ce6d63
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 15:23:47 2025 +0900
+
+    Merge branch 'fix-openviduserver' into 'develop'
+    
+    fix(openvidu): 호스트 도메인 변경
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!83
+
+[33mcommit 7ce6d636b1f3ad249b08d63973598debf8f9082c[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 15:23:16 2025 +0900
+
+    fix(openvidu): 호스트 도메인 변경
+
+[33mcommit 6fe3192b2b74bf39219b9889cb562c21cdc6b5e6[m
+Merge: 8812a79 1d9e5f2
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 15:18:40 2025 +0900
+
+    Merge branch 'fix-openviduserver' into 'develop'
+    
+    fix(docker): springboot https 적용
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!82
+
+[33mcommit 1d9e5f27238d30b6985430728b3559ea9bff798e[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 15:18:11 2025 +0900
+
+    fix(docker): springboot https 적용
+
+[33mcommit 8812a7946b156dc85a854356b62edef34ad561e2[m
+Merge: 308dc08 1f45fec
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 15:10:22 2025 +0900
+
+    Merge branch 'fix-openviduserver' into 'develop'
+    
+    fix(openvidu): 호스트네임 변경
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!81
+
+[33mcommit 1f45fec1c0d6f21221b753e7175ccb7637301d11[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 15:09:56 2025 +0900
+
+    fix(openvidu): 호스트네임 변경
+
+[33mcommit 308dc08cd0ace28de4a5aa01c798eacd490dbb83[m
+Merge: b3b6d2c 2c925b1
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 15:08:21 2025 +0900
+
+    Merge branch 'fix-openviduserver' into 'develop'
+    
+    fix(openvidu): 호스트네임 변경
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!80
+
+[33mcommit 2c925b19764b2c865a40f4d09f2ecd33ce003ad9[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 15:07:47 2025 +0900
+
+    fix(openvidu): 호스트네임 변경
+
+[33mcommit b3b6d2cc381b4eac38dc9aa1a4d6622e1ae196c4[m
+Merge: e3c8265 55aa16c
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 15:02:35 2025 +0900
+
+    Merge branch 'fix-openviduserver' into 'develop'
+    
+    fix(openvidu): 호스트네임 변경
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!79
+
+[33mcommit 55aa16c6795eee8e5254cee61f7b1906c6b882c9[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 15:01:33 2025 +0900
+
+    fix(openvidu): 호스트네임 변경
+
+[33mcommit e3c82650cb0fdc38327871437d34b97c4049ea4c[m
+Author: Kimdowon <dowon999@naver.com>
+Date:   Tue Feb 4 14:58:36 2025 +0900
+
+    fix: error 해결
+
+[33mcommit 1b3769242ee811c9276ba8228ae569504e3129f6[m
+Merge: 509f2e3 79e87f3
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 14:50:14 2025 +0900
+
+    Merge branch 'fix-openviduserver' into 'develop'
+    
+    Fix openviduserver
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!78
+
+[33mcommit 79e87f36e3e6439e7a853b594e7b4be1fb955717[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 14:49:24 2025 +0900
+
+    add ignore
+
+[33mcommit d9313935ed1c04037ef37268eba34865552c22ba[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 14:49:02 2025 +0900
+
+    fix(openvidu): add api key
+
+[33mcommit 509f2e3a44cce04235a7dff8f3c6054b9f545ea1[m
+Merge: 6a5beea 369a9dd
+Author: ansdudals8 <ansdudals8@naver.com>
+Date:   Tue Feb 4 14:40:53 2025 +0900
+
+    Merge branch 'develop' into feature-api-192
+
+[33mcommit 6a5beeab51b55719bb65584004cd61671a286577[m
+Author: ansdudals8 <ansdudals8@naver.com>
+Date:   Tue Feb 4 14:40:07 2025 +0900
+
+    fix:에러 수정
+
+[33mcommit 369a9ddddbdaab20193acb38ccfec19919c0e3f5[m
+Merge: 72eea25 2cb7aa2
+Author: 최진성 <pnum2378@naver.com>
+Date:   Tue Feb 4 14:37:55 2025 +0900
+
+    Merge branch 'feature-moveStausModal' into 'develop'
+    
+    feat: 전적창 메인페이지로 위치 변경
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!77
+
+[33mcommit 2cb7aa231bbbbfa7662e7095dee463241f421ddd[m
+Author: Jinseong <pnum4095@gmail.com>
+Date:   Tue Feb 4 14:36:45 2025 +0900
+
+    feat: 전적창 메인페이지로 위치 변경
+
+[33mcommit 72eea25df4f2eb3a0e3c5b72de546b882db4411b[m
+Merge: 337b739 0eb59b3
+Author: Kimdowon <dowon999@naver.com>
+Date:   Tue Feb 4 14:29:10 2025 +0900
+
+    Merge branch 'develop' of https://lab.ssafy.com/s12-webmobile1-sub1/S12P11E103 into develop
+
+[33mcommit 0eb59b3e8a49672bfc0d764c38d596f24f6e6d29[m
+Merge: d079669 e6110cf
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 14:26:34 2025 +0900
+
+    Merge branch 'fix-openviduserver' into 'develop'
+    
+    fix(openvidu): webhook url 변경
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!76
+
+[33mcommit 337b739ef5dd522d31982e9ec13f5c1cc5e4a74f[m
+Author: Kimdowon <dowon999@naver.com>
+Date:   Tue Feb 4 14:26:22 2025 +0900
+
+    fix: CharacterStatsReporisory Error 해결
+
+[33mcommit e6110cf711a6851c0f50e9327975e23ac7ceddb7[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 14:25:58 2025 +0900
+
+    fix(openvidu): webhook url 변경
+
+[33mcommit ff38e84d3088dcab1da2f54843cff2af3b0c20db[m
+Merge: 7bed9d2 d079669
+Author: ansdudals8 <ansdudals8@naver.com>
+Date:   Tue Feb 4 14:11:25 2025 +0900
+
+    fix:git conflict resolving
+
+[33mcommit d07966949a3e715cce1f4c5d67a6c6951ea70575[m
+Merge: 5b2ea9b 422ca3b
+Author: Kimdowon <dowon999@naver.com>
+Date:   Tue Feb 4 13:58:58 2025 +0900
+
+    fix: 충돌해결
+
+[33mcommit 5b2ea9b3fd0b57f6442045935817598eb1b79d59[m
+Author: Kimdowon <dowon999@naver.com>
+Date:   Tue Feb 4 13:49:28 2025 +0900
+
+    feat(Stats API  DEV)
+    - entity 완성
+    >- userStats관련 API 생성 필요
+
+[33mcommit 422ca3b4a092131dd8eea14be032d83be1a44712[m
+Merge: 5286673 864438a
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 13:38:30 2025 +0900
+
+    Merge branch 'fix-openviduserver' into 'develop'
+    
+    fix(openvidu): 서버 url 변경
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!75
+
+[33mcommit 864438ac1ae5a81877c50f115edc55801e79020e[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 13:38:08 2025 +0900
+
+    fix(openvidu): 서버 url 변경
+
+[33mcommit 5286673e5de751a657811377af7effe39f9ebfeb[m
+Merge: f3fc700 7d40540
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 12:46:22 2025 +0900
+
+    Merge branch 'fix-openviduserver' into 'develop'
+    
+    fix(openvidu): 서버 프록시 설정
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!74
+
+[33mcommit 7d405408f91e5e5aa2bf497638b740b053179950[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 12:43:48 2025 +0900
+
+    fix(openvidu): 서버 프록시 설정
+
+[33mcommit 7bed9d20a1075a2210796cc2ce39c019160dfd95[m
+Author: ansdudals8 <ansdudals8@naver.com>
+Date:   Tue Feb 4 12:41:53 2025 +0900
+
+    feat : 운동 종목별 스탯 조회
+    - exercise_logì의 운동 기록 별 ì스탯 조회 가능
+    JIRA : S12P11E103-379
+
+[33mcommit f3fc7000a2f1289c6b3305545b98c57e6e82e5d6[m
+Merge: cbae56d b480b50
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 12:40:45 2025 +0900
+
+    Merge branch 'fix-openviduserver' into 'develop'
+    
+    fix(nginx): 프록시 설정 변경
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!73
+
+[33mcommit b480b50423788a46702edc9f7c46e21d201af2e2[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 12:40:17 2025 +0900
+
+    fix(nginx): 프록시 설정 변경
+
+[33mcommit cbae56d986006d5d3960c7e304f6f158db69b049[m
+Merge: 1d5817c f4a5c5e
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 12:38:26 2025 +0900
+
+    Merge branch 'fix-openviduserver' into 'develop'
+    
+    fix(openvidu): 서버 https 적용
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!72
+
+[33mcommit 1d5817cc7abd48e92a52708857cf2b4ef57f5041[m
+Merge: b450d29 7f319f0
+Author: 손채이 <im_1998@naver.com>
+Date:   Tue Feb 4 12:38:14 2025 +0900
+
+    Merge branch 'feature-tutorial-387' into 'develop'
+    
+    feat: 메인페이지
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!71
+
+[33mcommit 7f319f0c13bf67157f90e597989defc3e300d9cc[m
+Author: 손채이 <im_1998@naver.com>
+Date:   Tue Feb 4 12:37:39 2025 +0900
+
+    feat: 메인페이지
+
+[33mcommit f4a5c5e4f962d4f96030a0808c2f5fc31e9e2d61[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 12:37:38 2025 +0900
+
+    fix(openvidu): 서버 https 적용
+
+[33mcommit b450d29c599e959265e30f707857266ebb856710[m
+Merge: 6c1e59b 7d24435
+Author: 최진성 <pnum2378@naver.com>
+Date:   Tue Feb 4 12:36:28 2025 +0900
+
+    Merge branch 'feature-signInUpConnect-332' into 'develop'
+    
+    feat: 회원가입 userNickname 수정
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!70
+
+[33mcommit 6c1e59b1bfe2f323180d676b13f4cd6686fc9512[m
+Merge: b880da5 53382eb
+Author: 손채이 <im_1998@naver.com>
+Date:   Tue Feb 4 12:36:04 2025 +0900
+
+    Merge branch 'feature-tutorial-387' into 'develop'
+    
+    Feature tutorial 387
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!69
+
+[33mcommit 53382eb79b29b8834556a1b6e9ad7ea9330a4a91[m
+Author: 손채이 <im_1998@naver.com>
+Date:   Tue Feb 4 12:32:23 2025 +0900
+
+    fix: 모달 상태 관리
+
+[33mcommit b880da584819cebecf776c68a09dad3bdd0ace8f[m
+Merge: 4960e8a 1dbf20d
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 12:31:29 2025 +0900
+
+    Merge branch 'fix-openviduconn' into 'develop'
+    
+    fix(openvidu): 서버 주소 변경
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!68
+
+[33mcommit 1dbf20dbfcc2500d498731815b1d21aa26947428[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 12:30:56 2025 +0900
+
+    fix(openvidu): 서버 주소 변경
+
+[33mcommit 759b2ae0176311b69b278826bf8937e24bd07374[m
+Author: Kimdowon <dowon999@naver.com>
+Date:   Tue Feb 4 12:21:05 2025 +0900
+
+    feat(SQL문 수정)
+
+[33mcommit 4b8b8d48dd5dc90e4b48d5dccc270fdc39c8cfe4[m
+Author: Kimdowon <dowon999@naver.com>
+Date:   Tue Feb 4 12:19:43 2025 +0900
+
+    feat(entity  modify)
+    - DB 수정에 따른 entity ì 정ìy 정의 및 수정 완료
+    JIRA: S12P11E103-390
+
+[33mcommit 4960e8a0a8781fa255942d2f7ca7bb0b86aa06f1[m
+Merge: abe25f9 416065f
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 12:19:21 2025 +0900
+
+    Merge branch 'hotfix-package' into 'develop'
+    
+    hotfix(fronend): 개발 환경 분리중 에러 해결
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!66
+
+[33mcommit 416065f5f0e978d6e0d473e9b2673d8744ade779[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 12:19:00 2025 +0900
+
+    hotfix(fronend): 개발 환경 분리중 에러 해결
+
+[33mcommit abe25f909c093d7a3e111c4ef41942f572dc045c[m
+Merge: 972fa2f 7f1c9f4
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 12:14:54 2025 +0900
+
+    Merge branch 'hotfix-package' into 'develop'
+    
+    hotfix(frontend): 개발 환경 분리
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!65
+
+[33mcommit ec2e0f7d0a5654ad82f1e0f1022c0775d0997eb1[m
+Author: 손채이 <im_1998@naver.com>
+Date:   Tue Feb 4 12:12:58 2025 +0900
+
+    style: 메인 페이지 스타일링 변경
+
+[33mcommit 7d2443547292c8c5b5b7884288d7e8c40782d9e9[m
+Author: Jinseong <pnum4095@gmail.com>
+Date:   Tue Feb 4 12:08:58 2025 +0900
+
+    feat: 회원가입 userNickname 수정
+
+[33mcommit 7f1c9f4f3dd84ff526e3f7925d1bfa18b3cd59d3[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 12:07:59 2025 +0900
+
+    hotfix(frontend): 개발 환경 분리
+
+[33mcommit 972fa2ff091590041bd91deff8ef42801160e14b[m
+Merge: af47a1c 2092fd4
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 11:59:27 2025 +0900
+
+    Merge branch 'hotfix-package' into 'develop'
+    
+    hotfix(front): package-log.json 누락 수정
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!64
+
+[33mcommit 2092fd4a5618d9549acbcf466641842af95b6a43[m
+Author: choheejin <hjcho9510@gmail.com>
+Date:   Tue Feb 4 11:59:02 2025 +0900
+
+    hotfix(front): package-log.json 누락 수정
+
+[33mcommit af47a1c838652799332795c34cb117b74ea88041[m
+Merge: 644bf4e 3bdb3d4
+Author: 조희진 <allana123@naver.com>
+Date:   Tue Feb 4 11:55:56 2025 +0900
+
+    Merge branch 'feature-settingdev-371' into 'develop'
+    
+    Feature settingdev 371
+    
+    See merge request s12-webmobile1-sub1/S12P11E103!63
