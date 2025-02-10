@@ -44,7 +44,7 @@ const routes = [
   },
   {
     path: "/mediapipe",
-    name: "mediapipe",
+    name: "Mediapipe",
     component: MediapipeComponent,
     meta: { isMobile: true },
   },
@@ -103,4 +103,3 @@ const router = createRouter({
 // })
 
 export default router
-
