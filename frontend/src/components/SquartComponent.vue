@@ -12,7 +12,7 @@
 
 <script setup>
 import { ref } from "vue"
-import MediapipeComponent from "./MediapipeComponent.vue"
+import MediapipeComponent from "@/components/MediapipeComponent.vue"
 
 // const emit = defineEmits(["pose-detected"])
 
