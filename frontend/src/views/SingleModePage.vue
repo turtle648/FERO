@@ -5,18 +5,18 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+// import { defineProps } from 'vue';
 
-defineProps({
-  exercise: {
-    type: String,
-    required: true
-  },
-  count: {
-    type: String,
-    required: true
-  }
-})
+// defineProps({
+//   exercise: {
+//     type: String,
+//     required: true
+//   },
+//   count: {
+//     type: String,
+//     required: true
+//   }
+// })
 </script>
 
 <style scoped>

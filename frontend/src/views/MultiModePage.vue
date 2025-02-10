@@ -5,16 +5,16 @@
 </template>
 
 <script setup>
-import { defineProps, ref } from "vue"
+// import { defineProps, ref } from 'vue'
 
-defineProps({
-  exercise: {
-    type: String,
-    required: true,
-  },
-})
-// eslint-disable-next-line
-const defaultCount = ref(2)
+// defineProps({
+//   exercise: {
+//     type: String,
+//     required: true
+//   }
+// })
+
+// const defaultCount = ref(2)
 </script>
 
 <style scoped></style>
