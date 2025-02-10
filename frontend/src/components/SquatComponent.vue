@@ -1,4 +1,4 @@
-<!-- <template>
+<template>
   <div class="counter-container relative">
     <div class="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 text-center">
       <div class="count z-10 text-black">스쿼트 횟수: {{ count }}</div>
@@ -124,6 +124,4 @@ const processPose = (landmarks) => {
   color: #888;
   font-style: italic;
 }
-</style> -->
-
-vue
+</style>
