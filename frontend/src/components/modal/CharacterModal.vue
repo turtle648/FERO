@@ -1,95 +1,91 @@
 <template>
-    <div class="modal">
-        <div class="modal-content flex flex-col items-center p-4">
-          <button id="close-btn" @click="closeCharacterModal">X</button>
-          <!-- 선택된 캐릭터 미리보기 -->
-          <div class="relative w-40 h-40 flex items-center justify-center mb-4 border-2 border-gray-500">
-            <!-- 얼굴 -->
-            <img v-if="selected.face" :src="selected.face" class="absolute w-20 top-20">  
-            <!-- 머리 -->
-            <img v-if="selected.hair" :src="selected.hair" class="absolute w-20 top-20">
-            <!-- 몸 (머리와 얼굴보다 아래) -->
-            <img v-if="selected.body" :src="selected.body" class="absolute w-20" style="top: 35%;">
-          </div>
+  <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" @click="closeCharacterModal">
+    <div class="relative w-[70vw] h-[85vh] bg-white/90 rounded-lg shadow-xl overflow-hidden flex flex-col items-center p-6"
+         @click.stop>
       
-          <!-- 카테고리 선택 -->
-          <div class="flex space-x-4 mb-4">
-            <button v-for="category in categories" :key="category"
-              @click="currentCategory = category"
-              class="px-4 py-2 border rounded-md"
-              :class="{ 'bg-blue-500 text-white': currentCategory === category }">
-              {{ category }}
-            </button>
-          </div>
-      
-          <!-- 선택 가능한 요소들 -->
-          <div class="grid grid-cols-3 gap-2">
-            <img v-for="item in assets[currentCategory]" :key="item"
-              :src="item" @click="selectItem(currentCategory, item)"
-              class="w-16 h-16 border-2 p-1 cursor-pointer"
-              :class="{ 'border-blue-500': selected[currentCategory] === item }"/>
-          </div>
+      <!-- 모달 종료 버튼 -->
+      <button @click="closeCharacterModal"
+              class="absolute top-2 right-2 text-gray-600 hover:text-black text-lg">
+        ✖
+      </button>
+
+      <!-- 선택된 캐릭터 미리보기 -->
+      <div class="relative w-[40vw] aspect-square flex items-center justify-center mb-4 border-2 border-gray-500 bg-gray-100 rounded-md">
+        <img v-if="selected.face" :src="selected.face" class="absolute w-[80%] top-0">
+        <img v-if="selected.hair" :src="selected.hair" class="absolute w-[80%] top-0">
+        <img v-if="selected.body" :src="selected.body" class="absolute w-[80%] bottom-0">
+      </div>
+
+      <!-- 카테고리 선택 -->
+      <div class="flex space-x-4 mb-4">
+        <button v-for="category in categories" :key="category"
+          @click="currentCategory = category"
+          class="w-[15vw] px-4 py-2 border rounded-md transition duration-200 ease-in-out"
+          :class="{ 'bg-blue-500 text-white': currentCategory === category }">
+          {{ category }}
+        </button>
+      </div>
+
+      <hr class="w-full border-gray-300 mb-4">
+
+      <!-- 선택 가능한 요소들 -->
+      <div class="flex flex-col items-center w-full overflow-y-auto" :style="{ maxHeight: selectionBoxHeight }">
+        <div class="grid grid-cols-3 gap-2 p-3 rounded-md">
+          <img v-for="item in assets[currentCategory]" :key="item"
+            :src="item" @click="selectItem(currentCategory, item)"
+            class="w-[15vw] aspect-square border-2 p-1 bg-white cursor-pointer rounded-md transition duration-200 ease-in-out"
+            :class="{ 'border-blue-500': selected[currentCategory] === item }"/>
         </div>
+      </div>
+
+      <!-- 완료 버튼 -->
+      <div class="absolute bottom-0 left-0 w-full flex justify-center p-4 rounded-b-lg">
+        <button @click="confirmSelection"
+                class="w-[15vw] mt-4 px-4 py-2 border rounded-md bg-blue-500 text-white hover:bg-green-600 transition duration-200 ease-in-out">
+          완료
+        </button>
+      </div>
+
     </div>
-  </template>
+  </div>
+</template>
   
-  <script setup>
-  import { ref, defineEmits } from 'vue'
-  import { assets } from '@/assets.js'
+<script setup>
+import { ref, computed, defineEmits } from 'vue'
+import { assets } from '@/assets.js'
 
-  // 모달 닫기
-  const emit = defineEmits(["closeCharacter"])
-  const closeCharacterModal = () => {
-    emit("closeCharacter")
-  }
-  
-  const categories = ['hair', 'face', 'body']
-  const currentCategory = ref('hair')
-  
-  const selected = ref({
-    hair: null,
-    face: null,
-    body: null
-  })
-  
-  const selectItem = (category, item) => {
-    // 이미 선택된 경우, 선택 해제
-    if (selected.value[category] === item) {
-      selected.value[category] = null
-    } else {
-      selected.value[category] = item
-    }
-  }
-  </script>
-  
-  <style scoped>
-  .absolute {
-    position: absolute;
-  }
+// 모달 닫기
+const emit = defineEmits(["closeCharacter"])
+const closeCharacterModal = () => {
+  emit("closeCharacter")
+}
 
-  .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.5); /* 배경에 반투명 검정색 추가 */
-  }
+// 완료 버튼 클릭 시 선택 데이터 처리
+const confirmSelection = () => {
+  console.log("선택 완료:", selected.value);
+  closeCharacterModal();
+}
 
-  .modal-content {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.8); /* 콘텐츠 영역 배경을 반투명 흰색으로 설정 */
-    padding: 0;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    width: 90%;
-    height: 70%;
-    text-align: center;
-    display: flex;
-    flex-direction: column; /* 요소들을 세로로 나열 */
+const categories = ['hair', 'face', 'body']
+const currentCategory = ref('hair')
+
+const selected = ref({
+  hair: null,
+  face: null,
+  body: null
+})
+
+const selectItem = (category, item) => {
+  // 이미 선택된 경우, 선택 해제
+  if (selected.value[category] === item) {
+    selected.value[category] = null
+  } else {
+    selected.value[category] = item
   }
-  </style>
-  
+}
+
+// 선택 요소 박스의 maxHeight 동적 계산
+const selectionBoxHeight = computed(() => {
+  return `calc(70vh - 5rem - 40vw)`;
+})
+</script>
