@@ -112,10 +112,13 @@ const exp = ref('')
 import { useMainStore } from "@/stores/mainStore"
 const mainStore = useMainStore()
 
+<<<<<<< HEAD
 onMounted(async () => {
   await mainStore.loadTutorial()
 })
 
+=======
+>>>>>>> 4a8fd177f53e3fd4ae6fd2127bc1402bdb437e6c
 // 상태창 관련 변수 및 함수
 import StatusModal from "@/components/modal/StatusModal.vue"
 const showStatusModal = ref(false)
@@ -228,6 +231,7 @@ onMounted(async () => {
     nickName.value = await userDataStore.checkUserNickname()
     level.value = await userDataStore.checkUserLevel()
     exp.value = await userDataStore.checkUserExperience()
+    await mainStore.fetchData()
   } catch (error) { console.log("User Data 로드 중 오류 발생:", error)}
 })
 </script>
