@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import StartPage from "@/views/StartPage.vue"
 import MainPage from "@/views/MainPage.vue"
 import LoginPage from "@/views/LoginPage.vue"
-import TutorialPage from "@/views/tutorial/SquatTutorialPage.vue"
+import TutorialPage from "@/views/TutorialPage.vue"
 import VideoRoomPage from "@/views/VideoRoomPage.vue"
 import SingleModePage from "@/views/SingleModePage.vue"
 import MultiModePage from "@/views/MultiModePage.vue"
@@ -86,13 +86,13 @@ const router = createRouter({
 // 네비게이션 가드 설정
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem("authToken")
-  const isMobile = "ontouchstart" in window || navigator.maxTouchPoints > 0 // 터치스크린 기기 감지
+  // const isMobile = "ontouchstart" in window || navigator.maxTouchPoints > 0 // 터치스크린 기기 감지
 
-  if (to.path !== "/qr" && to.meta.isMobile && !isMobile) {
-    next("/qr")
-    console.log("모바일이 아닙니다 → /qr로 이동")
-    return
-  }
+  // if (to.path !== "/qr" && to.meta.isMobile && !isMobile) {
+  //   next("/qr")
+  //   console.log("모바일이 아닙니다 → /qr로 이동")
+  //   return
+  // }
 
   if (to.meta.requiresAuth && !token) {
     next("/start")

@@ -1,13 +1,12 @@
 <template>
-  <div class="tutorial-page">
-    <h1>스쿼트 튜토리얼</h1>
+  <div class="tutorial-page w-screen h-screen bg-black bg-opacity-50 p-5 flex flex-col items-center relative">
     <!-- 튜토리얼 내용 -->
     <div class="time"></div>
     <div class="count"></div>
-
+    <img src="@/assets/furni_1.png" alt="" class="w-4/5" />
     <button @click="completeTutorial">튜토리얼 완료</button>
   </div>
-  <div class="desciption"></div>
+  <!-- <div class="desciption"></div> -->
 </template>
 
 <script setup>
@@ -22,16 +21,7 @@ const completeTutorial = () => {
 </script>
 
 <style scoped>
-.tutorial-page {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border: 1px solid black;
-  position: relative;
-}
-
-.desciption {
+/* .desciption {
   position: absolute;
   top: 0;
   left: 0;
@@ -39,5 +29,5 @@ const completeTutorial = () => {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1;
-}
+} */
 </style>
