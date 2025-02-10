@@ -68,10 +68,24 @@ public class MatchingController {
     // 2. 로그인 한 사용자 대기방 나가기
     @DeleteMapping("/leave")
     public ResponseEntity<?> leaveWaitingRoom(
-            @RequestParam String userId,
-            @RequestParam Long exerciseType) {
+            @RequestParam Long exerciseType,
+            HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(BaseResponseBody.of(401, "Unauthorized"));
+        }
+
+        String accessToken = authHeader.replace(JwtTokenUtil.TOKEN_PREFIX, "");
+        if (!JwtTokenUtil.validateToken(accessToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(BaseResponseBody.of(401, "Invalid Access Token"));
+        }
+
+//        String userId = JwtTokenUtil.getUserIdFromJWT(accessToken);
+
         try {
-            matchingService.leaveWaitingRoom(userId, exerciseType);
+            matchingService.leaveWaitingRoom(accessToken, exerciseType);
             return ResponseEntity.ok().body("대기방 퇴장 성공");
         } catch (Exception e) {
             log.error("대기방 퇴장 실패", e);
