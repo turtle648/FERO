@@ -15,7 +15,6 @@ import { useRouter } from "vue-router"
 const router = useRouter()
 
 const completeTutorial = () => {
-  // 여기에 튜토리얼 완료 로직 추가
   router.push("/main")
 }
 </script>
