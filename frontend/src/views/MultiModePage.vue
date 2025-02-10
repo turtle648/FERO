@@ -4,7 +4,7 @@
     </div>
 </template>
 
-<script setup>
+<!-- <script setup>
 import { defineProps, ref } from 'vue'
 
 defineProps({
@@ -15,7 +15,7 @@ defineProps({
 })
 
 const defaultCount = ref(2)
-</script>
+</script> -->
 
 <style scoped>
 

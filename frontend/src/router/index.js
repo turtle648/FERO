@@ -10,6 +10,7 @@ import RankModePage from "@/views/RankModePage.vue"
 import mediapipeComponent from "@/components/mediapipeComponent.vue" // fix: 수정예정
 import SquartComponent from "@/components/SquartComponent.vue"
 import QRComponent from "@/components/QRComponent.vue"
+import RankMatchPage from "@/views/RankMatchPage.vue"
 
 const routes = [
   {
@@ -75,7 +76,13 @@ const routes = [
     path: "/qr",
     name: "QR",
     component: QRComponent,
-  }
+  },
+  {
+    path: '/rank-match/:exercise',
+    name: 'RankMatch',
+    component: RankMatchPage,
+    props: true
+  },
 ]
 
 const router = createRouter({
@@ -86,13 +93,13 @@ const router = createRouter({
 // 네비게이션 가드 설정
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem("authToken")
-  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+  // const isMobile = /Mobi|Android/i.test(navigator.userAgent);
 
-  if(to.meta.isMobile && !isMobile) {
-    next("/qr");
-    console.log("📱 모바일이 아닙니다");
-    return;
-  } 
+  // if(to.meta.isMobile && !isMobile) {
+  //   next("/qr");
+  //   console.log("📱 모바일이 아닙니다");
+  //   return;
+  // } 
 
   if (to.meta.requiresAuth && !token) {
     next("/start")

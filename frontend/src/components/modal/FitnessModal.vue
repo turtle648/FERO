@@ -111,8 +111,9 @@ const selectMode = (mode) => {
       break
       
     case 'rank':
+      // 랭크 모드 선택 시 RankMatch 페이지로 라우팅
       router.push({
-        name: 'RankMode',
+        name: 'RankMatch',
         params: {
           exercise: exercise
         }
@@ -122,6 +123,7 @@ const selectMode = (mode) => {
   
   showModeModal.value = false
 }
+
 
 const closeFitnessModal = () => {
   emit('closeFitness')
