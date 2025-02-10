@@ -26,63 +26,71 @@
         </div>
       </div>
     </div>
-
+  
     <div class="flex justify-between items-center p-[1vh]">
       <!-- 설정 버튼 -->
       <img class="w-[5vh] h-[5vh] rounded-full object-cover" 
         @click="openSettingModal"
         src="@/assets/images/icon/setting.png" alt="" />
     </div>
-</div>
-
+  </div>
+  
   <!-- 알림 아이콘 -->
   <div class="absolute top-[10vh] right-[2vh] w-[4vh] h-[3vh] object-cover" @click="openAlarmModal">
     <img src="@/assets/images/icon/alarm2.png" alt="" />
   </div>
-
-
+  
+    <!-- 캐릭터 들어갈 예정 -->
+    <div class="absolute top-[50vh] right-[50vw]">
+      <button @click="openCharacterModal">캐릭터</button>
+    </div>
+  
+  
     <!-- 상태창 -->
     <StatusModal v-if="showStatusModal" @closeStatus="closeStatusModal" />
-
+  
     <!-- 전적창 -->
     <MatchRecordModal v-if="showRecordModal" @closeRecord="closeRecordModal" />
-
+  
     <!-- 설정 -->
     <SettingModal v-if="showSettingModal" @closeSetting="closeSettingModal" @openSetting="openSettingModal" />
-
+  
     <!-- 알림 모달 -->
     <AlarmModal v-if="showAlarmModal" @closeAlarm="closeAlarmModal" @openAlarm="openAlarmModal" />
-
+  
     <!-- 운동 모드 선택 버튼들 -->
     <!-- <div class="exercise-options" v-show="showExerciseOptions"> -->
     <!-- <div class="option-item" @click="handleSoloExercise">혼자하기</div> -->
     <!-- <div class="option-item" @click="handleMultiExercise">같이하기</div> -->
     <!-- </div> -->
-
+  
     <!-- 새로운 모달 추가 -->
     <!-- <AloneModal v-if="showAloneModal" @closeAlone="closeAloneModal" /> -->
     <!-- <WithModal v-if="showWithModal" @closeWith="closeWithModal" /> -->
-
+  
     <div class="footer w-full h-[7vh]">
       <!-- class명 추가해서 쓰기 -->
       <!-- <div class="grid-item" @click="toggleExerciseOptions">운동</div> -->
-
+  
       <div class="grid-item" @click="openFriendModal">친구</div>
       <div class="grid-item" @click="openCalendarModal">달력</div>
       <div class="grid-item" @click="openFitnessModal">운동</div>
       <div class="grid-item" @click="openRecordModal">전적</div>
       <div class="grid-item">퀘스트</div>
     </div>
-
-    <!-- 친구모달 -->
+  
+    <!-- 캐릭터 모달 -->
+    <CharacterModal v-if="showCharacterModal" @closeCharacter="closeCharacterModal" />
+  
+    <!-- 친구 모달 -->
     <FriendListModal v-if="showFriendModal" @closeFriend="closeFriendModal" @openFriend="openFriendModal" />
-
+  
     <!-- 달력 모달 -->
     <CalendarModal v-if="showCalendarModal" @closeCalendar="closeCalendarModal" @openCalendar="openCalendarModal" />
-
+  
     <!-- 운동 모달 -->
     <FitnessModal v-if="showFitnessModal" @closeFitness="closeFitnessModal" @openFitness="openFitnessModal" />
-
+  
     <!-- 퀘스트 모달 -->
   </div>
   <div v-else class="qr-code">
@@ -197,6 +205,18 @@ const closeAlarmModal = () => {
   showAlarmModal.value = false
 }
 
+// 캐릭터 모달
+import CharacterModal from "@/components/modal/CharacterModal.vue"
+const showCharacterModal = ref(false)
+const openCharacterModal = () => {
+  if (!isAnyModalOpen()) {
+    showCharacterModal.value = true
+  }
+}
+const closeCharacterModal = () => {
+  showCharacterModal.value = false
+
+}
 // 현재 활성화된 모든 모달 상태를 확인하는 함수
 const isAnyModalOpen = () => {
   return showStatusModal.value || showRecordModal.value || showSettingModal.value || showAlarmModal.value || showFriendModal.value || showCalendarModal.value || showFitnessModal.value
