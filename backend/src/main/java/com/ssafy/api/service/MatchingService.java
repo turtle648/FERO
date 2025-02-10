@@ -2,10 +2,12 @@ package com.ssafy.api.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.api.request.WaitingUser;
+import com.ssafy.db.repository.ExerciseStatsRatioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -22,10 +24,11 @@ public class MatchingService {
     private final StringRedisTemplate stringRedisTemplate;
 
     // Redis Key 상수
-    private static final String WAITING_QUEUE = "waiting:queue"; // 입장 순서
-    private static final String SCORE_SORTED_SET = "score:sorted:set"; // 점수 정렬
-    private static final String USER_INFO = "user:info"; // 유저 정보
+    private static final String WAITING_QUEUE = "waiting:queue:"; // 입장 순서
+    private static final String SCORE_SORTED_SET = "score:sorted:set:"; // 점수 정렬
+    private static final String USER_INFO = "user:info:"; // 유저 정보
     private static final String USER_JOIN_TIME = "waiting:expire:"; // 5분 타임아웃 체크 (주기적 실행)
+    private final ExerciseStatsRatioRepository exerciseStatsRatioRepository;
 
     // Redis Key 생성 유틸리티 메서드들
     private String getQueueKey(Long exerciseType) {
@@ -59,7 +62,7 @@ public class MatchingService {
         // 스코어 정렬셋에 추가
         redisTemplate.opsForZSet().add(sortedKey, userToken, (double) rankScore);
         // 입장 시간 TTL 설정 (5분 만료)
-        stringRedisTemplate.opsForValue().set(expireKey, "EXPIRED", Duration.ofMinutes(5));
+        stringRedisTemplate.opsForValue().set(expireKey, "EXPIRED", Duration.ofMinutes(1));
 
         log.info("✅ {} 사용자가 {} 대기열에 입장 (TTL 설정 완료)", userToken, exerciseType);
         logWaitingRoomStatus(exerciseType);
@@ -126,15 +129,59 @@ public class MatchingService {
         String userInfoKey = getUserInfoKey(exerciseType);
         String expireKey = getUserJoinTimeKey(exerciseType, userToken);
 
-        Long removedFromQueue = redisTemplate.opsForList().remove(queueKey, 1, userToken);
+//        Long removedFromQueue = redisTemplate.opsForList().remove(queueKey, 1, userToken);
         Long removedFromHash = redisTemplate.opsForHash().delete(userInfoKey, userToken);
         Long removedFromSortedSet = redisTemplate.opsForZSet().remove(sortedSetKey, userToken);
         redisTemplate.delete(expireKey);
 
-        log.info("[REDIS REMOVE] Queue에서 제거된 아이템 수: {}", removedFromQueue); // 사실 얘는 삭제 안됨
+//        log.info("[REDIS REMOVE] Queue에서 제거된 아이템 수: {}", removedFromQueue); // 사실 얘는 삭제 안됨
         log.info("[REDIS REMOVE] 해시에서 제거된 아이템 수: {}", removedFromHash);
         log.info("[REDIS REMOVE] 정렬 세트에서 제거된 아이템 수: {}", removedFromSortedSet);
     }
+
+    // 매칭 처리 로직 (스케줄러로 주기적으로 실행할 것)
+    @Scheduled(fixedRate = 5000) // 4분마다 실행함
+    public void deleteUsers() {
+        // DB에서 운동별 id에 대한 정보 받아옴
+        List<Long> exerciseTypes = exerciseStatsRatioRepository.findAllExerciseStatsRatioId();
+
+        // 모든 운동 랭크 게임에 대한 사용자 정보 조회
+        for(Long id : exerciseTypes){
+            String queueKey= getQueueKey(id);
+            String sortedSetKey = getSortedSetKey(id);
+            String userInfoKey = getUserInfoKey(id);
+
+            List<Object> waitingUsers = redisTemplate.opsForList().range(queueKey, 0, -1);
+            if(waitingUsers == null || waitingUsers.isEmpty()) continue;
+
+            long currentTime = System.currentTimeMillis();
+            for(Object userToken : waitingUsers){
+                String expireKey = getUserJoinTimeKey(id, userToken.toString());
+                Object expireTimeObj = redisTemplate.opsForValue().get(expireKey);
+
+                if(expireTimeObj == null) continue;
+
+                long joinTime = Long.parseLong(expireTimeObj.toString());
+
+                if(currentTime - joinTime >= 8000){ // 5분 초과 시 삭제
+                    redisTemplate.opsForList().remove(queueKey, 1, userToken);
+                    redisTemplate.opsForZSet().remove(sortedSetKey, userToken);
+                    redisTemplate.opsForHash().delete(userInfoKey, userToken);
+                    redisTemplate.delete(expireKey);
+
+                    log.info("[Matching] 대기 시간이 초과된 사용자 {} 제거완료(운동 타입: {})", userToken, id);
+                }else{
+                    log.info("[Matching] 대기 시간이 남아있는 사용자 {} 발견, 삭제 중단 (운동 타입: {})", userToken, id);
+                    break; // 이후 사용자들은 아직 시간이 남아있으므로 더 이상 확인 x
+                }
+
+            }
+
+        }
+
+    }
+
+
 
 
     /*private void processMatchingForExercise(String exerciseType) {
@@ -242,13 +289,6 @@ public class MatchingService {
                 .player2Id(user2)
                 .matchedAt(LocalDateTime.now())
                 .build();
-    }*/
-
-    /*// 매칭 처리 로직 (스케줄러로 주기적으로 실행할 것)
-    @Scheduled(fixedRate = 1000) // 매 초마다 실행함
-    public void processMatching() {
-        // 모든 운동 타입에 대해 처리함
-        Arrays.asList("pushup", "squat", "lunge", "plank").forEach(this::processMatchingForExercise);
     }*/
 
 }

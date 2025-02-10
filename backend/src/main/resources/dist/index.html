@@ -155,7 +155,7 @@
                 this.waitingTime = 0;
                 this.waitingInterval = setInterval(() => {
                     this.waitingTime++;
-                    if (this.waitingTime >= 300) {
+                    if (this.waitingTime >= 60) {
                         this.handleMatchTimeout();
                     }
                 }, 1000);
