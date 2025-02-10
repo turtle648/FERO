@@ -28,7 +28,7 @@ public class MatchingController {
     public ResponseEntity<?> enterWaitingRoom(@RequestParam Long exerciseType,
                                               HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(BaseResponseBody.of(401, "Unauthorized"));
         }
@@ -53,7 +53,7 @@ public class MatchingController {
         try {
             // 대기방 입장 처리
             matchingService.enterWaitingRoom(
-                    userId,
+                    accessToken,
                     exerciseType,
                     rankScore
             );
