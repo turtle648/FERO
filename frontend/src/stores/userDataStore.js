@@ -49,7 +49,7 @@ export const useUserDataStore = defineStore('userData', () => {
           'Content-Type': 'application/json'
         }
   
-        const response = await axios.get(`${BASE_URL}/UserStats/level`, { headers })
+        const response = await axios.get(`${BASE_URL}/userStats/level`, { headers })
   
         if (response.status === 200) { 
             console.log('조회 성공', response.data) 
@@ -75,7 +75,7 @@ export const useUserDataStore = defineStore('userData', () => {
           'Content-Type': 'application/json'
         }
   
-        const response = await axios.get(`${BASE_URL}/UserStats/exp`, { headers })
+        const response = await axios.get(`${BASE_URL}/userStats/exp`, { headers })
   
         if (response.status === 200) { 
             console.log('경험치 조회 성공', response.data) 
