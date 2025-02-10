@@ -17,7 +17,7 @@
           <div class="absolute inset-0 flex items-center justify-center text-black text-[1.5vh] font-bold">
             Lv. {{ level }}
           </div>
-  
+          <img src="@/assets/character/test_character.webp" alt="">
           <!-- 경험치에 맞게 게이지 채우기 -->
           <div 
             class="gauge-bar bg-blue-500 h-full rounded-full" 
@@ -39,8 +39,6 @@
   <div class="absolute top-[10vh] right-[2vh] w-[4vh] h-[3vh] object-cover" @click="openAlarmModal">
     <img src="@/assets/images/icon/alarm2.png" alt="" />
   </div>
-
-
 
 
     <!-- 상태창 -->
@@ -204,11 +202,13 @@ const isAnyModalOpen = () => {
   return showStatusModal.value || showRecordModal.value || showSettingModal.value || showAlarmModal.value || showFriendModal.value || showCalendarModal.value || showFitnessModal.value
 }
 
-onMounted(() => {
-  userStore
-  nickName.value = userDataStore.userNickname
-  level.value = userDataStore.userLevel
-  exp.value = userDataStore.userExperience
+onMounted(async () => {
+  try {
+    userStore
+    nickName.value = await userDataStore.checkUserNickname()
+    level.value = await userDataStore.checkUserLevel()
+    exp.value = await userDataStore.checkUserExperience()
+  } catch (error) { console.log("User Data 로드 중 오류 발생:", error)}
 })
 </script>
 
