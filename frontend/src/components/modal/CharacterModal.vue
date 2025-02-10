@@ -33,8 +33,11 @@
         <div class="grid grid-cols-3 gap-2 p-3 rounded-md">
           <img v-for="item in assets[currentCategory]" :key="item[1]"
             :src="item[0]" @click="selectItem(currentCategory, item)"
-            class="w-[15vw] aspect-square border-2 p-1 bg-white cursor-pointer rounded-md transition duration-200 ease-in-out"
-            :class="{ 'border-blue-500': selected[currentCategory] === item }"/>
+            class="w-[15vw] aspect-square border-2 p-1 bg-white cursor-pointer rounded-md transition-all duration-200 ease-in-out"
+            :class="{ 
+              'border-blue-600 bg-blue-100': selected[currentCategory] === item,
+              'border-gray-300': selected[currentCategory] !== item
+            }"/>
         </div>
       </div>
 
