@@ -1,20 +1,24 @@
 <template>
-  <!-- main 으로 시작 -->
-  <Main/>
+  <router-view v-if="!isDesktop" />
+  <QRComponent v-else />
 </template>
 
-<script>
-import Main from './views/main/main.vue'
+<script setup>
+import { ref, onMounted, onUnmounted } from "vue"
+import QRComponent from '@/components/QRComponent.vue'
 
-export default {
-  name: 'App',
-
-  components: {
-    Main,
-  },
-
-  data: () => ({
-    //
-  }),
+const isDesktop = ref(false)
+const checkScreenSize = () => {
+  isDesktop.value = window.innerWidth > 821
 }
+onMounted(() => {
+  checkScreenSize()
+  window.addEventListener("resize", checkScreenSize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener("resize", checkScreenSize)
+})
 </script>
+
+<style scoped></style>

@@ -1,0 +1,87 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./work_dir/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+      - ./work_dir/certbot:/var/www/certbot
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      
+  spring-boot:
+    user: "root"
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: spring-boot
+    restart: unless-stopped
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    ports:
+      - 8076:8076
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - JAVA_OPTS=-Xms512m -Xmx1024m
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-}
+    networks:
+      - my-sql-network
+      - redis-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "E103_DB"
+    ports:
+      - 3307:3306
+    volumes:
+      - my-sql-volume:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - my-sql-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+    
+  redis:
+    image: docker.io/redis:7.4.1-alpine
+    platform: linux/amd64
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    volumes:
+      - redis:/data
+    command: >
+      redis-server
+      --bind 0.0.0.0
+    networks:
+      - redis-network
+
+volumes:
+  my-sql-volume:
+  redis:
+
+networks:
+  my-sql-network:
+    driver: bridge
+  redis-network:
+    driver: bridge

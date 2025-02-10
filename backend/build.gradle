@@ -23,6 +23,8 @@ buildscript{
     }
 }
 
+
+
 plugins {
     id 'java'
     id 'idea'
@@ -32,9 +34,6 @@ plugins {
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'eclipse'
 apply plugin: 'com.github.node-gradle.node'
-//이클립스인 경우를 위한 QueryDSL 플러그인. IntelliJ는 불필요.[시작]
-//apply plugin: 'com.ewerk.gradle.plugins.querydsl'
-//[끝]
 
 repositories {
     mavenCentral()
@@ -45,86 +44,16 @@ repositories {
     maven { url "https://build.shibboleth.net/nexus/content/repositories/releases" }
 }
 
-group 'com.ssafy'
-version '1.0-SNAPSHOT'
+group = 'com.ssafy'
+version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
-
-node {
-    download = true
-    version = '14.17.0'
-    // Set the work directory where node_modules should be located
-    nodeModulesDir = file("${project.projectDir}/../frontend")
-}
 
 configurations {
     providedRuntime
 }
 
-/*task npmInstall(type: NpmTask, overwrite: true) {
-    args = ['install']
-}*/
-
-task webpack(type: NpmTask, dependsOn: 'npmInstall') {
-    args = ['run','build']
-}
-
-// processResources is a Java task. Run the webpack bundling before this task using the 'build' task in the package.json
-processResources.dependsOn 'webpack'
-
-//set build time and inject value to application.properties
-def buildTime() {
-    def date = new Date()
-    def formattedDate = date.format('yyyyMMdd_HHmm')
-    return formattedDate
-}
-
-project.ext.set("build.date", buildTime())
-
-processResources {
-    with copySpec {
-        from "src/main/resources"
-        include "**/application*.yml"
-        include "**/application*.yaml"
-        include "**/application*.properties"
-        project.properties.findAll().each {
-            prop ->
-                if (prop.value != null) {
-                    filter(ReplaceTokens, tokens: [ (prop.key): String.valueOf(prop.value)])
-                    filter(ReplaceTokens, tokens: [ ('project.' + prop.key): String.valueOf(prop.value)])
-                    filter(ReplaceTokens, tokens: [ ('project.ext.' + prop.key): String.valueOf(prop.value)])
-                }
-        }
-    }
-}
-
-//이클립스인 경우를 위한 QueryDSL 설정. IntelliJ는 불필요. [시작]
-/*
-def querydslDir = 'src/main/generated'
-querydsl {
-    library = "com.querydsl:querydsl-apt"
-    jpa = true
-    querydslSourcesDir = querydslDir
-}
-
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src/main/java', querydslDir]
-        }
-    }
-}
-
-compileQuerydsl {
-    options.annotationProcessorPath = configurations.querydsl
-}
-
-configurations {
-    querydsl.extendsFrom compileClasspath
-}
-*/
-//[끝]
-
 dependencies {
+    
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -136,6 +65,9 @@ dependencies {
     runtimeOnly("mysql:mysql-connector-java")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
+    implementation 'org.webjars:sockjs-client:1.5.1' // stompJS
+    implementation 'org.webjars:stomp-websocket:2.3.4'
 
     implementation('commons-io:commons-io:2.6')
     implementation("org.apache.commons:commons-collections4:4.4")
@@ -171,7 +103,7 @@ dependencies {
 
     testImplementation("com.jayway.jsonpath:json-path:2.4.0")
 
-    implementation("com.auth0:java-jwt:3.10.3")
+    implementation("com.auth0:java-jwt:4.4.0")
     
     implementation("io.springfox:springfox-swagger2:3.0.0")
     implementation("io.springfox:springfox-swagger-ui:3.0.0")
@@ -185,6 +117,13 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.20")
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
+
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'io.lettuce:lettuce-core'  // Redis 클라이언트
+
+    // SMTP 이메일 인증 기능
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 test {

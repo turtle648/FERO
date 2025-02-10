@@ -34,11 +34,6 @@ public class JwtTokenUtil {
 		this.secretKey = secretKey;
 		this.expirationTime = expirationTime;
 	}
-    
-	public void setExpirationTime() {
-    		//JwtTokenUtil.expirationTime = Integer.parseInt(expirationTime);
-    		JwtTokenUtil.expirationTime = expirationTime;
-	}
 
 	public static JWTVerifier getVerifier() {
         return JWT
@@ -52,15 +47,6 @@ public class JwtTokenUtil {
         return JWT.create()
                 .withSubject(userId)
                 .withExpiresAt(expires)
-                .withIssuer(ISSUER)
-                .withIssuedAt(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()))
-                .sign(Algorithm.HMAC512(secretKey.getBytes()));
-    }
-
-    public static String getToken(Instant expires, String userId) {
-        return JWT.create()
-                .withSubject(userId)
-                .withExpiresAt(Date.from(expires))
                 .withIssuer(ISSUER)
                 .withIssuedAt(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()))
                 .sign(Algorithm.HMAC512(secretKey.getBytes()));
@@ -100,27 +86,31 @@ public class JwtTokenUtil {
         }
     }
 
-    public static void handleError(JWTVerifier verifier, String token) {
+    public static boolean validateToken(String token) { // 토큰 검증
         try {
+            JWTVerifier verifier = getVerifier();
             verifier.verify(token.replace(TOKEN_PREFIX, ""));
-        } catch (AlgorithmMismatchException ex) {
-            throw ex;
-        } catch (InvalidClaimException ex) {
-            throw ex;
-        } catch (SignatureGenerationException ex) {
-            throw ex;
-        } catch (SignatureVerificationException ex) {
-            throw ex;
-        } catch (TokenExpiredException ex) {
-            throw ex;
-        } catch (JWTCreationException ex) {
-            throw ex;
-        } catch (JWTDecodeException ex) {
-            throw ex;
+            return true;
         } catch (JWTVerificationException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw ex;
+            return false;
         }
     }
+
+    public static String getUserIdFromJWT(String token) { // 토큰에서 사용자 ID 추출
+        return JWT.decode(token.replace(TOKEN_PREFIX, "")).getSubject();
+    }
+
+    public static String extractUserIdFromToken(String token) {
+        // 'Bearer ' 부분 제거
+        String accessToken = token.replace("Bearer ", "");
+
+        // 토큰 검증
+        if (!JwtTokenUtil.validateToken(accessToken)) {
+            throw new IllegalArgumentException("Invalid Access Token");
+        }
+
+        // 사용자 ID 추출
+        return JwtTokenUtil.getUserIdFromJWT(accessToken);
+    }
+
 }
