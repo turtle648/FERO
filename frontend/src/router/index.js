@@ -49,22 +49,22 @@ const routes = [
     meta: { isMobile: true },
   },
   {
-    path: '/single-mode/:exercise/:count',
-    name: 'SingleMode',
+    path: "/single-mode/:exercise/:count",
+    name: "SingleMode",
     component: SingleModePage,
-    props: true
+    props: true,
   },
   {
-    path: '/multi-mode/:exercise',
-    name: 'MultiMode',
+    path: "/multi-mode/:exercise",
+    name: "MultiMode",
     component: MultiModePage,
-    props: true
+    props: true,
   },
   {
-    path: '/rank-mode/:exercise',
-    name: 'RankMode',
+    path: "/rank-mode/:exercise",
+    name: "RankMode",
     component: RankModePage,
-    props: true
+    props: true,
   },
   {
     path: "/squart",
@@ -75,7 +75,7 @@ const routes = [
     path: "/qr",
     name: "QR",
     component: QRComponent,
-  }
+  },
 ]
 
 const router = createRouter({
@@ -86,13 +86,13 @@ const router = createRouter({
 // 네비게이션 가드 설정
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem("authToken")
-  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+  const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent)
 
-  if(to.meta.isMobile && !isMobile) {
-    next("/qr");
-    console.log("📱 모바일이 아닙니다");
-    return;
-  } 
+  if (to.meta.isMobile && !isMobile) {
+    next("/qr")
+    console.log("📱 모바일이 아닙니다")
+    return
+  }
 
   if (to.meta.requiresAuth && !token) {
     next("/start")
