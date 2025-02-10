@@ -51,8 +51,14 @@
         <button class="mode-button" @click="selectMode('multi')">
           <p class="mode-label">Multi Mode</p>
         </button>
-        <button class="mode-button" @click="selectMode('rank')">
-          <p class="mode-label">Rank Mode</p>
+        <button 
+          class="mode-button" 
+          @click="selectMode('rank')"
+          :disabled="isLoading || !isTutorialComplete"
+        >
+          <p class="mode-label">
+            {{ isLoading ? '처리중...' : 'Rank Mode' }}
+          </p>
         </button>
       </div>
     </div>
@@ -69,6 +75,7 @@ const emit = defineEmits(['closeFitness'])
 const isTutorialComplete = ref(false)
 const showModeModal = ref(false)
 const selectedNumber = ref(null)
+const isLoading = ref(false)
 
 const toggleTutorialComplete = () => {
   isTutorialComplete.value = !isTutorialComplete.value
@@ -86,7 +93,7 @@ const selectNumber = (num) => {
   selectedNumber.value = selectedNumber.value === num ? null : num
 }
 
-const selectMode = (mode) => {
+const selectMode = async (mode) => {
   const exercise = 'squat' // 현재 선택된 운동
   
   switch(mode) {
@@ -111,12 +118,26 @@ const selectMode = (mode) => {
       break
       
     case 'rank':
-      router.push({
-        name: 'RankMode',
-        params: {
-          exercise: exercise
+      try {
+        isLoading.value = true
+        // 튜토리얼 완료 여부 확인
+        if (!isTutorialComplete.value) {
+          alert('먼저 튜토리얼을 완료해주세요.')
+          return
         }
-      })
+        
+        router.push({
+          name: 'RankMatch',
+          params: {
+            exercise: exercise
+          }
+        })
+      } catch (error) {
+        console.error('랭크 모드 진입 실패:', error)
+      } finally {
+        isLoading.value = false
+        showModeModal.value = false
+      }
       break
   }
   
@@ -190,7 +211,8 @@ const closeFitnessModal = () => {
 .mode-button {
   @apply w-full h-24 px-4 py-3 bg-indigo-500 text-white rounded-lg 
          hover:bg-indigo-600 transition-colors duration-200
-         flex flex-col items-center justify-center;
+         flex flex-col items-center justify-center
+         disabled:bg-gray-400 disabled:cursor-not-allowed;
 }
 
 .mode-label {

@@ -9,6 +9,19 @@ import MultiModePage from "@/views/MultiModePage.vue"
 import RankModePage from "@/views/RankModePage.vue"
 // import MediapipeComponent from "@/components/MediapipeComponent.vue" // fix: 수정예정
 import QRComponent from "@/components/QRComponent.vue"
+import RankMatchPage from "@/views/RankMatchPage.vue"
+
+// 랭크매치, 랭크모드에 인증 관련 메타데이터 고려해볼 것
+// meta: { 
+//   requiresAuth: true,  // 인증 필요
+//   isMobile: true      // 모바일 전용
+
+// 에러페이지 라우팅 고려해볼 것것
+// {
+//   path: '/:pathMatch(.*)*',
+//   name: 'NotFound',
+//   component: NotFoundPage
+// }
 
 const routes = [
   {
@@ -69,6 +82,12 @@ const routes = [
     path: "/qr",
     name: "QR",
     component: QRComponent,
+  },
+  {
+    path: '/rank-match/:exercise',
+    name: 'RankMatch',
+    component: RankMatchPage,
+    props: true
   },
 ]
 
