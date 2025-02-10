@@ -17,7 +17,7 @@ const route = useRoute()
 const exerciseType = route.params.exercise
 
 const exerciseComponents = {
-  1: SquatComponent,
+  2: SquatComponent,
 }
 
 const currentExerciseComponent = exerciseComponents[exerciseType] || null

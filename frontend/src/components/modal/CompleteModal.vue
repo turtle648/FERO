@@ -9,17 +9,16 @@
 
 <script setup>
 import { useRouter, useRoute } from "vue-router"
-import { useMainStore } from "@/stores/mainStore"
+import { useMainStore, TUTORIAL_IDS } from "@/stores/mainStore"
 
 const router = useRouter()
 const route = useRoute()
 const mainStore = useMainStore()
 
 const completeFitnessTutorial = () => {
-  // URL에서 튜토리얼 ID 추출 및 숫자로 변환
-  const tutorialId = Number(route.params.exercise)
-  console.log(tutorialId)
-  
+  // URL에서 튜토리얼 ID 추출
+  const tutorialId = route.params.exercise
+
   if (isNaN(tutorialId)) {
     console.error("Invalid tutorial ID:", route.params.id)
     return
@@ -29,6 +28,7 @@ const completeFitnessTutorial = () => {
   const tutorial = mainStore.tutorial.find((t) => t.tutorialId === tutorialId)
   if (tutorial) tutorial.completed = true
 
+  mainStore.completeTutorial(TUTORIAL_IDS.SQUAT)
   router.push("/main") // 메인 페이지로 이동
 }
 </script>
