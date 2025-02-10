@@ -9,7 +9,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.Filter;
@@ -55,7 +54,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				.addResourceLocations("classpath:/dist/icons/");
         registry.addResourceHandler("/img/**")
 			.addResourceLocations("classpath:/dist/img/");
-        registry.addResourceHandler("/js/**")
+        registry.addResourceHandler("/dist/js/**")
 				.addResourceLocations("classpath:/dist/js/");
     }
 
