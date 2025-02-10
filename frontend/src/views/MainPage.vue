@@ -17,7 +17,7 @@
           <div class="absolute inset-0 flex items-center justify-center text-black text-[1.5vh] font-bold">
             Lv. {{ level }}
           </div>
-          <img src="@/assets/character/test_character.webp" alt="">
+          
           <!-- 경험치에 맞게 게이지 채우기 -->
           <div 
             class="gauge-bar bg-blue-500 h-full rounded-full" 
