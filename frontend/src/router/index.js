@@ -77,15 +77,12 @@ const routes = [
     name: "QR",
     component: QRComponent,
   },
-<<<<<<< HEAD
   {
     path: '/rank-match/:exercise',
     name: 'RankMatch',
     component: RankMatchPage,
     props: true
   },
-=======
->>>>>>> develop
 ]
 
 const router = createRouter({
@@ -94,17 +91,6 @@ const router = createRouter({
 })
 
 // 네비게이션 가드 설정
-<<<<<<< HEAD
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("authToken")
-  // const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-
-  // if(to.meta.isMobile && !isMobile) {
-  //   next("/qr");
-  //   console.log("📱 모바일이 아닙니다");
-  //   return;
-  // } 
-=======
 // router.beforeEach((to, from, next) => {
 //   const token = localStorage.getItem("authToken")
 //   const isMobile = "ontouchstart" in window || navigator.maxTouchPoints > 0 // 터치스크린 기기 감지
@@ -114,7 +100,6 @@ router.beforeEach((to, from, next) => {
 //     console.log("모바일이 아닙니다 → /qr로 이동")
 //     return
 //   }
->>>>>>> develop
 
 //   if (to.meta.requiresAuth && !token) {
 //     next("/start")
