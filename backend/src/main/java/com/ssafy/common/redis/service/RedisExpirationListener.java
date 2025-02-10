@@ -29,7 +29,7 @@ public class RedisExpirationListener implements ApplicationListener<SessionExpir
         log.info("💡 Parsed key parts: {}", Arrays.toString(parts));  // 파싱된 키 부분들 로깅
 
         if (parts.length == 4) {
-            String exerciseType = parts[2];
+            Long exerciseType = Long.parseLong(parts[2]);
             String userId = parts[3];
             log.info("🎯 Attempting to remove user from waiting room - exerciseType: {}, userId: {}",
                     exerciseType, userId);

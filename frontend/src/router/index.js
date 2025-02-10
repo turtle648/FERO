@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import StartPage from "@/views/StartPage.vue"
 import MainPage from "@/views/MainPage.vue"
 import LoginPage from "@/views/LoginPage.vue"
-import TutorialPage from "@/views/tutorial/SquatTutorialPage.vue"
+import TutorialPage from "@/views/TutorialPage.vue"
 import VideoRoomPage from "@/views/VideoRoomPage.vue"
 import SingleModePage from "@/views/SingleModePage.vue"
 import MultiModePage from "@/views/MultiModePage.vue"
@@ -50,22 +50,22 @@ const routes = [
     meta: { isMobile: true },
   },
   {
-    path: '/single-mode/:exercise/:count',
-    name: 'SingleMode',
+    path: "/single-mode/:exercise/:count",
+    name: "SingleMode",
     component: SingleModePage,
-    props: true
+    props: true,
   },
   {
-    path: '/multi-mode/:exercise',
-    name: 'MultiMode',
+    path: "/multi-mode/:exercise",
+    name: "MultiMode",
     component: MultiModePage,
-    props: true
+    props: true,
   },
   {
-    path: '/rank-mode/:exercise',
-    name: 'RankMode',
+    path: "/rank-mode/:exercise",
+    name: "RankMode",
     component: RankModePage,
-    props: true
+    props: true,
   },
   {
     path: "/squart",
@@ -77,12 +77,15 @@ const routes = [
     name: "QR",
     component: QRComponent,
   },
+<<<<<<< HEAD
   {
     path: '/rank-match/:exercise',
     name: 'RankMatch',
     component: RankMatchPage,
     props: true
   },
+=======
+>>>>>>> develop
 ]
 
 const router = createRouter({
@@ -91,6 +94,7 @@ const router = createRouter({
 })
 
 // 네비게이션 가드 설정
+<<<<<<< HEAD
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem("authToken")
   // const isMobile = /Mobi|Android/i.test(navigator.userAgent);
@@ -100,13 +104,25 @@ router.beforeEach((to, from, next) => {
   //   console.log("📱 모바일이 아닙니다");
   //   return;
   // } 
+=======
+// router.beforeEach((to, from, next) => {
+//   const token = localStorage.getItem("authToken")
+//   const isMobile = "ontouchstart" in window || navigator.maxTouchPoints > 0 // 터치스크린 기기 감지
 
-  if (to.meta.requiresAuth && !token) {
-    next("/start")
-    console.log("토큰 없어서 start페이지로 돌아감:)")
-  } else {
-    next()
-  }
-})
+//   if (to.path !== "/qr" && to.meta.isMobile && !isMobile) {
+//     next("/qr")
+//     console.log("모바일이 아닙니다 → /qr로 이동")
+//     return
+//   }
+>>>>>>> develop
+
+//   if (to.meta.requiresAuth && !token) {
+//     next("/start")
+//     console.log("토큰 없어서 /start로 이동")
+//   } else {
+//     next()
+//   }
+// })
 
 export default router
+

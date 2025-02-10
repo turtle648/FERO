@@ -25,10 +25,10 @@ public class MatchingController {
 
     // 1. 대기방 입장
     @PostMapping("/enter")
-    public ResponseEntity<?> enterWaitingRoom(@RequestParam String exerciseType,
+    public ResponseEntity<?> enterWaitingRoom(@RequestParam Long exerciseType,
                                               HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(BaseResponseBody.of(401, "Unauthorized"));
         }
@@ -38,8 +38,10 @@ public class MatchingController {
         }
         String userId = JwtTokenUtil.getUserIdFromJWT(accessToken);
 
+        System.out.printf("사용자 이름 : %s, 운동 ID : %s\n",userId, exerciseType);
+
 //        System.out.println("사용자 : "+request.getUserId() + ", 운동 종류 : "+request.getExerciseType());
-        Optional<UserRankScores> userRankscore = userRankScoresRepository.findByUser_UserIdAndExerciseType(
+        Optional<UserRankScores> userRankscore = userRankScoresRepository.findByUser_UserIdAndExerciseStatsRatio_Id(
                 userId,
                 exerciseType
         );
@@ -51,7 +53,7 @@ public class MatchingController {
         try {
             // 대기방 입장 처리
             matchingService.enterWaitingRoom(
-                    userId,
+                    accessToken,
                     exerciseType,
                     rankScore
             );
@@ -67,7 +69,7 @@ public class MatchingController {
     @DeleteMapping("/leave")
     public ResponseEntity<?> leaveWaitingRoom(
             @RequestParam String userId,
-            @RequestParam String exerciseType) {
+            @RequestParam Long exerciseType) {
         try {
             matchingService.leaveWaitingRoom(userId, exerciseType);
             return ResponseEntity.ok().body("대기방 퇴장 성공");

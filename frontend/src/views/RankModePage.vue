@@ -1,27 +1,20 @@
 <template>
-    <div>
-        <MediapipeComponent />
-    </div>
+  <div>
+    <h1>rank</h1>
+  </div>
 </template>
 
-<!-- <script setup>
-import { defineProps, ref } from 'vue'
-
-defineProps({
-  exercise: {
-    type: String,
-    required: true
-  }
-})
-
-const defaultCount = ref(2)
-</script> -->
 <script setup>
-import MediapipeComponent from '@/components/mediapipeComponent.vue';
+// import { defineProps, ref } from 'vue'
 
+// defineProps({
+//   exercise: {
+//     type: String,
+//     required: true
+//   }
+// })
 
+// const defaultCount = ref(2)
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -34,19 +34,6 @@ CREATE TABLE user_character (
 );
 
 
--- 유저의 각 운동별 랭크 점수
-CREATE TABLE user_rank_scores (
-                                  id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                                  user_id VARCHAR(30) NOT NULL,
-                                  exercise_type VARCHAR(50) NOT NULL,  -- 운동 종류 (예: 스쿼트, 푸쉬업 등)
-                                  rank_score SMALLINT NOT NULL DEFAULT 1000,
-
-                                  FOREIGN KEY (user_id) REFERENCES user_character(user_id) ON DELETE CASCADE,
-                                  UNIQUE (user_id, exercise_type)  -- 동일 유저의 동일 운동에 대한 중복 데이터 방지
-);
-
-
-
 -- 유저 스테이터스
 CREATE TABLE user_stats(
                            id Bigint PRIMARY KEY AUTO_INCREMENT,
@@ -76,6 +63,18 @@ CREATE TABLE exercise_stats_ratio (
                                       arms_ratio DECIMAL(5, 2) NOT NULL,  -- 팔 근육에 대한 비율
                                       legs_ratio DECIMAL(5, 2) NOT NULL,  -- 다리 근육에 대한 비율
                                       abs_ratio DECIMAL(5, 2) NOT NULL  -- 복근에 대한 비율
+);
+
+
+-- 유저의 각 운동별 랭크 점수
+CREATE TABLE user_rank_scores (
+                                  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                                  user_id VARCHAR(30) NOT NULL,
+                                  exercise_id BIGINT NOT NULL,  -- exercise_stats_ratio의 id를 참조
+                                  rank_score SMALLINT NOT NULL DEFAULT 1000,
+                                  FOREIGN KEY (user_id) REFERENCES user_character(user_id) ON DELETE CASCADE,
+                                  FOREIGN KEY (exercise_id) REFERENCES exercise_stats_ratio(id) ON DELETE RESTRICT,
+                                  UNIQUE (user_id, exercise_id)  -- 동일 유저의 동일 운동에 대한 중복 데이터 방지
 );
 
 
@@ -202,8 +201,8 @@ CREATE TRIGGER create_user_rank_scores
     AFTER INSERT ON user_character
     FOR EACH ROW
 BEGIN
-    INSERT INTO user_rank_scores (user_id, exercise_type, rank_score)
-    SELECT NEW.user_id, exercise_type, 1000  -- 기본 랭크 점수
+    INSERT INTO user_rank_scores (user_id, exercise_id, rank_score)
+    SELECT NEW.user_id, id, 1000  -- 기본 랭크 점수
     FROM exercise_stats_ratio;  -- 등록된 모든 운동 종류를 가져와 삽입
 END //
 
@@ -239,7 +238,7 @@ VALUES
 -- 기본 튜토리얼 데이터 삽입
 INSERT INTO tutorial_types (tutorial_name) VALUES
                                                ('UI 기본'),
-                                               ('스쿼트'),
-                                               ('푸시업'),
-                                               ('런지'),
-                                               ('플랭크');
+                                               ('squat'),
+                                               ('pushup'),
+                                               ('lunge'),
+                                               ('plank');

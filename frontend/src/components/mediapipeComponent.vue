@@ -1,8 +1,8 @@
 <template>
   <div class="container flex flex-col items-center justify-between p-4 h-screen w-screen">
     <div class="flex justify-between w-full">
-      <div class="counter text-white-common z-10">(갯수)</div>
-      <div class="timer text-white-common z-10">{{ formattedTime }}</div>
+      <!-- <div class="counter text-white-common z-10">(갯수)</div> -->
+      <div class="timer text-white-common z-20 absolute top-0 right-0">{{ formattedTime }}</div>
 
       <!-- fix: 시간 선택은 앞에서 넘어와야함 -->
       <select class="absolute z-10" v-model="selectedTime" @change="resetTimer">
@@ -36,8 +36,8 @@ import { defineEmits } from "vue"
 const router = useRouter()
 
 // 버튼
-import ExitButton from "@/assets/button/ExitButton.vue"
-import ReportIssueButton from "@/assets/button/ReportIssueButton.vue"
+import ExitButton from "@/components/button/ExitButton.vue"
+import ReportIssueButton from "@/components/button/ReportIssueButton.vue"
 
 let intervalId = null // setInterval ID 저장 (타이머 초기화용)
 

@@ -1,18 +1,17 @@
 package com.ssafy.api.controller;
 
 
+import com.ssafy.api.request.RankUpdateReq;
 import com.ssafy.api.service.UserRankScoresService;
 import com.ssafy.common.util.JwtTokenUtil;
 
+import com.ssafy.api.response.RankUpdateRes;
 import com.ssafy.db.entity.UserRankScores;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -53,9 +52,26 @@ public class UserRankScoresController {
         Map<String, Integer> rankScoresMap = new HashMap<>();
 
         for (UserRankScores rank : rankScoresList) {
-            rankScoresMap.put(rank.getExerciseType(), rank.getRankScore().intValue());
+            rankScoresMap.put(rank.getExerciseStatsRatio().getExerciseType(), rank.getRankScore().intValue());
         }
 
         return ResponseEntity.ok(rankScoresMap);
     }
+
+    @PostMapping("/update")
+    @ApiOperation(value = "랭크 점수 업데이트", notes = "Elo 시스템을 적용하여 승패에 따라 점수를 조정한다.")
+    public ResponseEntity<RankUpdateRes> updateRank(@RequestBody RankUpdateReq rankUpdateReq) {
+
+        String winnerId = rankUpdateReq.getWinnerId();
+        String loserId = rankUpdateReq.getLoserId();
+        Long exerciseId = rankUpdateReq.getExerciseId();
+
+        try {
+            RankUpdateRes response = userRankScoresService.updateRankScore(winnerId, loserId, exerciseId);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
 }

@@ -7,7 +7,7 @@
 import { ref, onMounted, onUnmounted } from "vue"
 import QRComponent from "@/components/QRComponent.vue"
 
-const isDesktop = ref(window.matchMedia("(min-width: 821px)").matches)
+const isDesktop = ref('')
 const checkScreenSize = () => {
   isDesktop.value = window.innerWidth > 821
 }
