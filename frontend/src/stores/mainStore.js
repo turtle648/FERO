@@ -1,7 +1,7 @@
 // stores/mainStore.js
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import axios from 'axios'
+import { defineStore } from "pinia"
+import { ref } from "vue"
+import axios from "axios"
 
 // 튜토리얼 타입 상수화 (확장성 고려)
 export const TUTORIAL_IDS = {
@@ -9,40 +9,43 @@ export const TUTORIAL_IDS = {
   PUSHUP: 1,
   SQUAT: 2,
   LUNGE: 3,
-  PLANK: 4
+  PLANK: 4,
 }
 
-export const useMainStore = defineStore('main', () => {
+export const useMainStore = defineStore("main", () => {
   const tutorial = ref([])
-  const authToken = ref(localStorage.getItem('authToken'))
+  const authToken = ref(localStorage.getItem("authToken"))
   const uiTutorialCompleted = ref(false)
-  
+
   const api = axios.create({
-    baseURL: 'https://i12e103.p.ssafy.io:8076/api/v1',
+    baseURL: "https://i12e103.p.ssafy.io:8076/api/v1",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${authToken.value}`
-    }
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${authToken.value}`,
+    },
   })
 
   // 인터셉터 설정 (디버깅 강화)
-  api.interceptors.request.use(config => {
+  api.interceptors.request.use((config) => {
     console.groupCollapsed(`[🌐 REQ] ${config.method?.toUpperCase()} ${config.url}`)
-    console.log('Headers:', config.headers)
+    console.log("Headers:", config.headers)
     return config
   })
 
-  api.interceptors.response.use(response => {
-    console.log('✅ RES:', response.status)
-    console.table(response.data)
-    console.groupEnd()
-    return response
-  }, error => {
-    console.error('🚨 ERR:', error.response?.status || 'NO_STATUS')
-    console.error('Data:', error.response?.data || 'NO_DATA')
-    console.groupEnd()
-    return Promise.reject(error)
-  })
+  api.interceptors.response.use(
+    (response) => {
+      console.log("✅ RES:", response.status)
+      console.table(response.data)
+      console.groupEnd()
+      return response
+    },
+    (error) => {
+      console.error("🚨 ERR:", error.response?.status || "NO_STATUS")
+      console.error("Data:", error.response?.data || "NO_DATA")
+      console.groupEnd()
+      return Promise.reject(error)
+    }
+  )
 
   // 통합 튜토리얼 완료 함수
   async function completeTutorial(tutorialId) {
@@ -54,7 +57,8 @@ export const useMainStore = defineStore('main', () => {
       if (tutorialId === TUTORIAL_IDS.UI) {
         uiTutorialCompleted.value = true
       } else {
-        const target = tutorial.value.find(t => t.tutorialId === tutorialId)
+        const target = tutorial.value.find((t) => t.tutorialId === tutorialId)
+        console.log("운동데이터", target)
         if (target) target.completed = data.completed
       }
 
@@ -62,7 +66,7 @@ export const useMainStore = defineStore('main', () => {
     } catch (error) {
       console.error(`[🔥] Tutorial #${tutorialId} Error:`, {
         message: error.message,
-        config: error.config
+        config: error.config,
       })
       return false
     } finally {
@@ -73,11 +77,11 @@ export const useMainStore = defineStore('main', () => {
   // 튜토리얼 데이터 로드
   async function loadTutorial() {
     try {
-      const response = await api.get('/Tutorial/simple')
+      const response = await api.get("/Tutorial/simple")
       tutorial.value = response.data
-      console.log('[📊] Tutorial Data:', JSON.parse(JSON.stringify(tutorial.value)))
+      console.log("[📊] Tutorial Data:", JSON.parse(JSON.stringify(tutorial.value)))
     } catch (error) {
-      console.error('[❗] Load Error:', error)
+      console.error("[❗] Load Error:", error)
       throw error
     }
   }
@@ -88,6 +92,6 @@ export const useMainStore = defineStore('main', () => {
     uiTutorialCompleted,
     TUTORIAL_IDS, // 상수 노출
     loadTutorial,
-    completeTutorial
+    completeTutorial,
   }
 })
