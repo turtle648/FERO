@@ -21,14 +21,6 @@ public class MatchingService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final StringRedisTemplate stringRedisTemplate;
 
-    // 운동 종류 상수 정의
-    private static final List<String> EXERCISE_TYPES = Arrays.asList(
-            "pushup",
-            "squat",
-            "lunge",
-            "plank"
-    );
-
     // Redis Key 상수
     private static final String WAITING_QUEUE = "waiting:queue"; // 입장 순서
     private static final String SCORE_SORTED_SET = "score:sorted:set"; // 점수 정렬
@@ -36,21 +28,21 @@ public class MatchingService {
     private static final String USER_JOIN_TIME = "waiting:expire:"; // 5분 타임아웃 체크 (주기적 실행)
 
     // Redis Key 생성 유틸리티 메서드들
-    private String getQueueKey(String exerciseType) {
+    private String getQueueKey(Long exerciseType) {
         return String.format("waiting:queue%s", exerciseType);
     }
-    private String getSortedSetKey(String exerciseType) {
+    private String getSortedSetKey(Long exerciseType) {
         return String.format("score:sorted:set%s", exerciseType);
     }
-    private String getUserInfoKey(String exerciseType) {
+    private String getUserInfoKey(Long exerciseType) {
         return String.format("user:info%s", exerciseType);
     }
-    private String getUserJoinTimeKey(String exerciseType, String userId) {
+    private String getUserJoinTimeKey(Long exerciseType, String userId) {
         return String.format("waiting:expire:%s:%s", exerciseType, userId);
     }
 
     // 1-1. 유저를 대기열에 추가함
-    public void enterWaitingRoom(String userId, String exerciseType, Short rankScore) {
+    public void enterWaitingRoom(String userId, Long exerciseType, Short rankScore) {
         WaitingUser waitingUser = new WaitingUser(userId, exerciseType, rankScore, LocalDateTime.now());
 
         // 운동 타입별 키 생성
@@ -74,7 +66,7 @@ public class MatchingService {
     }
 
     // 1-2. 대기방 상태
-    private void logWaitingRoomStatus(String exerciseType) {
+    private void logWaitingRoomStatus(Long exerciseType) {
         String queueKey = getQueueKey(exerciseType);
         String userInfoKey = getUserInfoKey(exerciseType);
 
@@ -112,7 +104,7 @@ public class MatchingService {
     }
 
     // 2-1. 대기방 퇴장 메서드 
-    public void leaveWaitingRoom(String userId, String exerciseType) {
+    public void leaveWaitingRoom(String userId, Long exerciseType) {
         String userInfoKey = getUserInfoKey(exerciseType);
 
 
@@ -128,7 +120,7 @@ public class MatchingService {
     }
     
     // 2-2. 대기 상태 redis 에서 지우기
-    private void removeFromRedis(String exerciseType, String userId) {
+    private void removeFromRedis(Long exerciseType, String userId) {
         String queueKey = getQueueKey(exerciseType);
         String sortedSetKey = getSortedSetKey(exerciseType);
         String userInfoKey = getUserInfoKey(exerciseType);
