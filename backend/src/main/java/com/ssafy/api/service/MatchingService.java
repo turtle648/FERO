@@ -140,48 +140,57 @@ public class MatchingService {
     }
 
     // 매칭 처리 로직 (스케줄러로 주기적으로 실행할 것)
-    @Scheduled(fixedRate = 5000) // 4분마다 실행함
+    @Scheduled(fixedRate = 5000) // 5초마다 실행
     public void deleteUsers() {
-        // DB에서 운동별 id에 대한 정보 받아옴
         List<Long> exerciseTypes = exerciseStatsRatioRepository.findAllExerciseStatsRatioId();
 
-        // 모든 운동 랭크 게임에 대한 사용자 정보 조회
-        for(Long id : exerciseTypes){
-            String queueKey= getQueueKey(id);
+        for (Long id : exerciseTypes) {
+            String queueKey = getQueueKey(id);
             String sortedSetKey = getSortedSetKey(id);
             String userInfoKey = getUserInfoKey(id);
 
             List<Object> waitingUsers = redisTemplate.opsForList().range(queueKey, 0, -1);
-            if(waitingUsers == null || waitingUsers.isEmpty()) continue;
+            if (waitingUsers == null || waitingUsers.isEmpty()) continue;
 
             long currentTime = System.currentTimeMillis();
-            for(Object userToken : waitingUsers){
+            for (Object userToken : waitingUsers) {
                 String expireKey = getUserJoinTimeKey(id, userToken.toString());
-                Object expireTimeObj = redisTemplate.opsForValue().get(expireKey);
 
-                if(expireTimeObj == null) continue;
+                Object expireTimeObj;
+                try {
+                    expireTimeObj = redisTemplate.opsForValue().get(expireKey);
+                } catch (Exception e) {
+                    log.error("[Matching] Redis 값 조회 중 오류 발생 (운동 타입: {}, 키: {}), 오류: {}", id, expireKey, e.getMessage());
+                    continue;
+                }
 
-                long joinTime = Long.parseLong(expireTimeObj.toString());
+                if (expireTimeObj == null) continue;
 
-                if(currentTime - joinTime >= 8000){ // 5분 초과 시 삭제
+                String expireTimeStr = expireTimeObj.toString();
+
+                // 숫자인지 확인 후 변환 (EXPIRED 같은 값 방지)
+                if (!expireTimeStr.matches("\\d+")) {
+                    log.warn("[Matching] 예상치 못한 값 '{}' 발견, 해당 키 삭제 (운동 타입: {})", expireTimeStr, id);
+                    redisTemplate.delete(expireKey); // 이상한 값이면 삭제
+                    continue;
+                }
+
+                long joinTime = Long.parseLong(expireTimeStr);
+
+                if (currentTime - joinTime >= 17000) { // 17초 초과 시 삭제
                     redisTemplate.opsForList().remove(queueKey, 1, userToken);
                     redisTemplate.opsForZSet().remove(sortedSetKey, userToken);
                     redisTemplate.opsForHash().delete(userInfoKey, userToken);
                     redisTemplate.delete(expireKey);
 
-                    log.info("[Matching] 대기 시간이 초과된 사용자 {} 제거완료(운동 타입: {})", userToken, id);
-                }else{
+                    log.info("[Matching] 대기 시간이 초과된 사용자 {} 제거완료 (운동 타입: {})", userToken, id);
+                } else {
                     log.info("[Matching] 대기 시간이 남아있는 사용자 {} 발견, 삭제 중단 (운동 타입: {})", userToken, id);
-                    break; // 이후 사용자들은 아직 시간이 남아있으므로 더 이상 확인 x
+                    break; // 이후 사용자들은 아직 시간이 남아있으므로 더 이상 확인 X
                 }
-
             }
-
         }
-
     }
-
-
 
 
     /*private void processMatchingForExercise(String exerciseType) {
@@ -190,7 +199,6 @@ public class MatchingService {
         String queueKey = WAITING_QUEUE + exerciseType;
         String sortedSetKey = SCORE_SORTED_SET + exerciseType;
         String userInfoKey = USER_INFO + exerciseType;
-
 
 
         // 큐의 첫 번째 유저 확인
