@@ -21,7 +21,7 @@ export const assets = {
       require('@/assets/character/face/face8.png'),
       require('@/assets/character/face/face9.png'),
       require('@/assets/character/face/face10.png'),
-      require('@/assets/character/face/face11png'),
+      require('@/assets/character/face/face11.png'),
       require('@/assets/character/face/face12.png'),
       require('@/assets/character/face/face13.png'),
       require('@/assets/character/face/face14.png'),
