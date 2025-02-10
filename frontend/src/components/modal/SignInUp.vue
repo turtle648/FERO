@@ -186,7 +186,7 @@ const checkEmailDuplicate = (email) => {
 // 인증 코드 확인 후 3페이지로 이동
 const handleSignUp1 = async () => {
   const result = await verifyEmail(emailConfirmCode.value, email.value)
-  if (result) { signUpPage.value = 3} 
+  if (result) { signUpPage.value = 2} 
   else { alert('인증 코드가 유효하지 않습니다. 다시 시도해주세요.')}
 }
 
@@ -202,7 +202,7 @@ const handleSignUp2 = () => {
     signUp(id.value, password.value, name.value, phone.value, email.value)
       .then((result) => {
         userStore.setSessionId(result.message) // Pinia에서 sessionId 설정
-        signUpPage.value = 2
+        signUpPage.value = 3
       })
   }
 }
