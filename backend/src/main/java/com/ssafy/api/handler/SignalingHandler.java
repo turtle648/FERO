@@ -21,13 +21,13 @@ public class SignalingHandler extends TextWebSocketHandler {
     @Autowired
     private RedisService redisService;
 
-    // 어떤 방에 어떤 유저가 들어있는지 저장 -> { 방번호 : [ { id : userUUID1 }, { id: userUUID2 }, …], ... }
+    // 어떤 방에 어떤 유저가 들어있는지 저장 -> { 방번호 : [ { id : userToken1 }, { id: userToken2 }, …], ... }
     private final Map<String, List<Map<String, String>>> roomInfo = new HashMap<>();
 
-    // userUUID 기준 어떤 방에 들어있는지 저장 -> { userUUID1 : 방번호, userUUID2 : 방번호, ... }
+    // userToken 기준 어떤 방에 들어있는지 저장 -> { userToken1 : 방번호, userToken2 : 방번호, ... }
     private final Map<String, String> userInfo = new HashMap<>();
 
-    // 세션 정보 저장 -> { userUUID1 : 세션객체, userUUID2 : 세션객체, ... }
+    // 세션 정보 저장 -> { userToken1 : 세션객체, userToken2 : 세션객체, ... }
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
 
     // 방의 최대 인원수
@@ -56,12 +56,12 @@ public class SignalingHandler extends TextWebSocketHandler {
         try {
             // 웹 소켓으로부터 전달받은 메시지를 deserialization(JSON -> Java Object)
             Message message = RTCUtil.getObject(textMessage.getPayload());
-            log.info(">>> [ws] 시작!!! 세션 객체 {}", session);
+            log.info(">>> [ws] 시작!!! 세션 객체 {}", message.getToken());
 
             // 유저 uuid 와 roomID 를 저장
-            String userUUID = session.getId(); // 유저 uuid
+            String userToken = message.getToken(); // 유저 uuid
             String roomId = message.getRoom(); // roomId
-            log.info(">>> [ws] 메시지 타입 {}, 보낸 사람 {}", message.getType(), userUUID);
+            log.info(">>> [ws] 메시지 타입 {}, 보낸 사람 {}", message.getType(), userToken);
 
             // 메시지 타입에 따라서 서버에서 하는 역할이 달라진다
             switch (message.getType()) {
@@ -85,7 +85,7 @@ public class SignalingHandler extends TextWebSocketHandler {
                                         .type(message.getType())
                                         .sdp(sdp)
                                         .candidate(candidate)
-                                        .sender(userUUID)
+                                        .token(userToken)
                                         .receiver(receiver).build())));
                             }
                         }
@@ -98,7 +98,7 @@ public class SignalingHandler extends TextWebSocketHandler {
                 // 방 입장
                 case MSG_TYPE_JOIN:
 
-                    log.info(">>> [ws] {} 가 #{}번 방에 들어감", userUUID, roomId);
+                    log.info(">>> [ws] {} 가 #{}번 방에 들어감", userToken, roomId);
 
                     // 방이 기존에 생성되어 있다면
                     if (roomInfo.containsKey(roomId)) {
@@ -112,52 +112,51 @@ public class SignalingHandler extends TextWebSocketHandler {
                             // 해당 유저에게 방이 꽉 찼다는 메시지를 보내준다
                             session.sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
                                     .type("room_full")
-                                    .sender(userUUID).build())));
+                                    .token(userToken).build())));
                             return;
                         }
 
                         // 여분의 자리가 있다면 해당 방 배열에 추가
                         Map<String, String> userDetail = new HashMap<>();
-                        userDetail.put("id", userUUID);
+                        userDetail.put("id", userToken);
                         roomInfo.get(roomId).add(userDetail);
                         log.info(">>> [ws] #{}번 방의 유저들 {}", roomId, roomInfo.get(roomId));
 
                     } else {
                         // 방이 존재하지 않는다면 값을 생성하고 추가
                         Map<String, String> userDetail = new HashMap<>();
-                        userDetail.put("id", userUUID);
+                        userDetail.put("id", userToken);
                         List<Map<String, String>> newRoom = new ArrayList<>();
                         newRoom.add(userDetail);
                         roomInfo.put(roomId, newRoom);
                     }
 
                     // 세션 저장, user 정보 저장 -> 방 입장
-                    sessions.put(userUUID, session);
-                    userInfo.put(userUUID, roomId);
+                    sessions.put(userToken, session);
+                    userInfo.put(userToken, roomId);
 
 
                     // 해당 방에 다른 유저가 있었다면 offer-answer 를 위해 유저 리스트를 만들어 클라이언트에 전달
 
-                    // roomInfo = { 방번호 : [ { id : userUUID1 }, { id: userUUID2 }, …], 방번호 : [ { id : userUUID3 }, { id: userUUID4 }, …], ... }
+                    // roomInfo = { 방번호 : [ { id : userToken1 }, { id: userToken2 }, …], 방번호 : [ { id : userToken3 }, { id: userToken4 }, …], ... }
                     // originRoomUser -> 본인을 제외한 해당 방의 다른 유저들
                     List<Map<String, String>> originRoomUser = new ArrayList<>();
                     for (Map<String, String> userDetail : roomInfo.get(roomId)) {
 
-                        // userUUID 가 본인과 같지 않다면 list 에 추가
-                        if (!(userDetail.get("id").equals(userUUID))) {
+                        // userToken 가 본인과 같지 않다면 list 에 추가
+                        if (!(userDetail.get("id").equals(userToken))) {
                             Map<String, String> userMap = new HashMap<>();
                             userMap.put("id", userDetail.get("id"));
                             originRoomUser.add(userMap);
                         }
                     }
-
-                    log.info(">>> [ws] 본인 {} 을 제외한 #{}번 방의 다른 유저들 {}", userUUID, roomId, originRoomUser);
+                    
 
                     // all_users 라는 타입으로 메시지 전달
                     session.sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
                             .type("all_users")
                             .allUsers(originRoomUser)
-                            .sender(userUUID).build())));
+                            .token(userToken).build())));
                     break;
 
                 // 메시지 타입이 잘못되었을 경우
@@ -175,19 +174,19 @@ public class SignalingHandler extends TextWebSocketHandler {
         log.info(">>> [ws] 클라이언트 접속 해제 : 세션 - {}, 상태 - {}", session, status);
 
         // 유저 uuid 와 roomID 를 저장
-        String userUUID = session.getId(); // 유저 uuid
-        String roomId = userInfo.get(userUUID); // roomId
+        String userToken = session.getId(); // 유저 uuid
+        String roomId = userInfo.get(userToken); // roomId
 
         // 연결이 종료되면 sessions 와 userInfo 에서 해당 유저 삭제
-        sessions.remove(userUUID);
-        userInfo.remove(userUUID);
+        sessions.remove(userToken);
+        userInfo.remove(userToken);
 
-        // roomInfo = { 방번호 : [ { id : userUUID1 }, { id: userUUID2 }, …], 방번호 : [ { id : userUUID3 }, { id: userUUID4 }, …], ... }
-        // 해당하는 방의 value 인 user list 의 element 의 value 가 현재 userUUID 와 같다면 roomInfo 에서 remove
+        // roomInfo = { 방번호 : [ { id : userToken1 }, { id: userToken2 }, …], 방번호 : [ { id : userToken3 }, { id: userToken4 }, …], ... }
+        // 해당하는 방의 value 인 user list 의 element 의 value 가 현재 userToken 와 같다면 roomInfo 에서 remove
         List<Map<String, String>> removed = new ArrayList<>();
         roomInfo.get(roomId).forEach(s -> {
             try {
-                if(s.containsValue(userUUID)) {
+                if(s.containsValue(userToken)) {
                     removed.add(s);
                 }
             }
@@ -200,10 +199,10 @@ public class SignalingHandler extends TextWebSocketHandler {
         // 본인을 제외한 모든 유저에게 user_exit 라는 타입으로 메시지 전달
         sessions.values().forEach(s -> {
             try {
-                if(!(s.getId().equals(userUUID))) {
+                if(!(s.getId().equals(userToken))) {
                     s.sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
                             .type("user_exit")
-                            .sender(userUUID).build())));
+                            .token(userToken).build())));
                 }
             }
             catch (Exception e) {
@@ -211,7 +210,7 @@ public class SignalingHandler extends TextWebSocketHandler {
             }
         });
 
-        log.info(">>> [ws] #{}번 방에서 {} 삭제 완료", roomId, userUUID);
+        log.info(">>> [ws] #{}번 방에서 {} 삭제 완료", roomId, userToken);
         log.info(">>> [ws] #{}번 방에 남은 유저 {}", roomId, roomInfo.get(roomId));
     }
 

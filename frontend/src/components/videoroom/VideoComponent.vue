@@ -1,20 +1,20 @@
 <template>
     <div>
-        <h1>WebRTC &amp; Spring WebSocket Signaling</h1>
+        <h1>WebRTC & Spring WebSocket Signaling</h1>
         <button @click="createOffer">Connection</button>
         <br />
         <div>나</div>
         <video ref="myFace" playsinline autoplay width="300" height="300"></video>
         <br />
         <div>상대</div>
-        <div id="peerZone" style="width:1280px; height:720px; margin:0; padding:0;">
+        <div style="width:1280px; height:720px; margin:0; padding:0;">
             <video ref="peerVideo" playsinline autoplay width="1280" height="720"></video>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, defineProps } from 'vue'
+import { ref, onMounted, onBeforeUnmount, defineProps, watch } from 'vue'
 
 const props = defineProps(['roomId']);
 
@@ -24,10 +24,31 @@ const peerVideo = ref(null)
 
 /* ===== 미디어 및 연결 관련 변수 ===== */
 const myStream = ref(null)
+const remoteStream = ref(null)  // 추가된 부분
 let ws = null  // WebSocket 객체
 const userUUID = ref(null)  // 클라이언트에서 생성한 고유 ID (서버는 session.getId() 사용)
 const room = ref(null)  // 방 ID
 const remoteUser = ref(null) // 상대방의 ID (all_users 메시지를 통해 획득)
+
+/* ===== 스트림 변경 감지 ===== */
+watch(remoteStream, (newStream) => {
+    console.log("🔄 스트림 변경 감지:", {
+        hasStream: !!newStream,
+        hasVideo: !!peerVideo.value
+    })
+    
+    if (newStream && peerVideo.value) {
+        peerVideo.value.srcObject = newStream
+        
+        // 비디오 재생 상태 확인
+        peerVideo.value.onloadedmetadata = () => {
+            console.log("🎬 비디오 메타데이터 로드됨")
+            peerVideo.value.play()
+                .then(() => console.log("▶️ 비디오 재생 시작"))
+                .catch(e => console.error("⚠️ 비디오 재생 실패:", e))
+        }
+    }
+}, { immediate: true })
 
 /* ===== ICE 서버 설정 (STUN + TURN) ===== */
 const iceServerConfig = {
@@ -99,7 +120,7 @@ function handleMessage(message) {
         // 방 입장 후 서버에서 본인을 제외한 기존 유저 목록 전달
         console.log("all_users 메시지:", message.allUsers)
         if (message.allUsers && message.allUsers.length > 0) {
-        // 여기서는 첫 번째 유저를 상대방으로 선택 (복수 피어일 경우 추가 로직 필요)
+            // 여기서는 첫 번째 유저를 상대방으로 선택 (복수 피어일 경우 추가 로직 필요)
             remoteUser.value = message.allUsers[0].id
         }
     } else if (type === "offer") {
@@ -154,14 +175,14 @@ function handleCandidate(message) {
 onMounted(() => {
     room.value = props.roomId;
 
-    // 서버에 연결할 때는 실제 서버 주소와 포트를 사용 (예제에서는 localhost:8080)
+    // 서버에 연결할 때는 실제 서버 주소와 포트를 사용
     ws = new WebSocket("wss://i12e103.p.ssafy.io:8076/api/v1/videorooms")
 
     ws.onopen = () => {
         console.log("WebSocket 연결 성공")
-        // 클라이언트 고유 식별자 생성 (서버에서는 session.getId() 사용)
+        // 클라이언트 고유 식별자 생성
         userUUID.value = generateUUID()
-        // 방 입장을 위한 메시지 전송 (SignalingHandler에서 MSG_TYPE_JOIN 은 "join_room"으로 처리)
+        // 방 입장을 위한 메시지 전송
         send({
             sender: userUUID.value,
             type: "join_room",
@@ -189,7 +210,7 @@ onMounted(() => {
             send({
                 type: "candidate",
                 candidate: event.candidate,
-                receiver: remoteUser.value,  // 상대방 ID (이미 저장되어 있어야 함)
+                receiver: remoteUser.value,
                 sender: userUUID.value,
                 room: room.value
             })
@@ -198,11 +219,20 @@ onMounted(() => {
 
     // 원격 스트림 수신 시 화면에 출력
     myPeerConnection.value.ontrack = (event) => {
-        console.log("📹 원격 스트림 수신:", event.streams[0].getTracks());
-
-        if (peerVideo.value) {
-            peerVideo.value.srcObject = event.streams[0]
+        console.log("📹 원격 스트림 수신:", event.streams[0].getTracks())
+    
+        // 기존 스트림이 있다면 모든 트랙 제거
+        if (remoteStream.value) {
+            remoteStream.value.getTracks().forEach(track => track.stop())
         }
+        
+        // 새 스트림 설정
+        remoteStream.value = event.streams[0]
+        
+        // 각 트랙의 상태 확인
+        event.streams[0].getTracks().forEach(track => {
+            console.log(`트랙 상태 - 종류: ${track.kind}, 활성화: ${track.enabled}, 준비: ${track.readyState}`)
+        })
     }
 })
 
@@ -220,5 +250,4 @@ function generateUUID() {
         return v.toString(16)
     })
 }
-
 </script>
