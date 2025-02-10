@@ -1,17 +1,18 @@
 <template>
-  <div class="counter-container">
-    <div class="count z-10 text-black">스쿼트 횟수: {{ count }}</div>
-    <div class="status">{{ feedback }}</div>
-    <div v-if="formFeedback" class="form-feedback">{{ formFeedback }}</div>
-    <div v-if="!isReady" class="form-feedback z-10">측면으로 서주세요!</div>
-    <mediapipeComponent @pose-detected="processPose" class="z-0" />
+  <div class="counter-container relative">
+    <div class="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 text-center">
+      <div class="count z-10 text-black">스쿼트 횟수: {{ count }}</div>
+      <div class="status">{{ feedback }}</div>
+      <div v-if="formFeedback" class="form-feedback">{{ formFeedback }}</div>
+      <div v-if="!isReady" class="form-feedback z-10">측면으로 서주세요!</div>
+    </div>
+    <MediapipeComponent @pose-detected="processPose" class="z-0" />
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue"
-// import mediapipeComponent from "./mediapipeComponent.vue"
-// import mediapipeComponent from "./mediapipeComponent.vue"
+import MediapipeComponent from "./MediapipeComponent.vue"
 
 // const emit = defineEmits(["pose-detected"])
 
