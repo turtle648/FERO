@@ -4,18 +4,28 @@
     <div class="time"></div>
     <div class="count"></div>
     <img src="@/assets/furni_1.png" alt="" class="w-4/5" />
+    <component :is="currentExerciseComponent" />
     <button @click="completeTutorial">튜토리얼 완료</button>
   </div>
   <!-- <div class="desciption"></div> -->
 </template>
 
 <script setup>
-import { useRouter } from "vue-router"
+import { useRouter, useRoute } from "vue-router"
+import SquatComponent from "@/components/SquatComponent.vue"
 
 const router = useRouter()
+const route = useRoute()
+
+const exerciseType = route.params.exercise
+
+const exerciseComponents = {
+  squat: SquatComponent,
+}
+
+const currentExerciseComponent = exerciseComponents[exerciseType] || null
 
 const completeTutorial = () => {
-  // 여기에 튜토리얼 완료 로직 추가
   router.push("/main")
 }
 </script>
