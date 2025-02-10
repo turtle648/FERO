@@ -18,7 +18,11 @@ export const useMainStore = defineStore('main', () => {
   const uiTutorialCompleted = ref(false)
   
   const api = axios.create({
-    baseURL: 'https://i12e103.p.ssafy.io:8076/api/v1'
+    baseURL: 'https://i12e103.p.ssafy.io:8076/api/v1',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${authToken.value}`
+    }
   })
 
   // 인터셉터 설정 (디버깅 강화)

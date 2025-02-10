@@ -8,14 +8,14 @@
   
   <script setup>
   import { useRouter } from 'vue-router'
-  import { useMainStore } from '@/stores/mainStore'
+  import { useMainStore, TUTORIAL_IDS } from '@/stores/mainStore'
   
   const router = useRouter()
   const mainStore = useMainStore()
   
   const completeUiTutorial = () => {
-    // 튜토리얼 ID 1번 상태 업데이트
-    const tutorial = mainStore.tutorial.find(t => t.tutorialId === 1)
+    // 튜토리얼 ID 99번 상태 업데이트
+    const tutorial = mainStore.tutorial.find(t => t.tutorialId === TUTORIAL_IDS.UI)
     if (tutorial) tutorial.completed = true
   
     router.push('/main') // 메인 페이지로 이동
