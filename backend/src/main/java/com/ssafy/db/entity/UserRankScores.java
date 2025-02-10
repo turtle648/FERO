@@ -26,5 +26,5 @@ public class UserRankScores extends BaseEntity {
     private String exerciseType;
 
     @Column(name = "rank_score", nullable = false)
-    private Short rankScore = 1000; // 기본값 1000 설정
+    private Short rankScore; // 기본값 1000 설정
 }
