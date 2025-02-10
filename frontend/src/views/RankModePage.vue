@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>rank</h1>
+        <MediapipeComponent />
     </div>
 </template>
 
@@ -16,6 +16,11 @@ defineProps({
 
 const defaultCount = ref(2)
 </script> -->
+<script setup>
+import MediapipeComponent from '@/components/mediapipeComponent.vue';
+
+
+</script>
 
 <style scoped>
 

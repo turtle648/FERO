@@ -19,35 +19,43 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
+import { useMatchStore } from '@/stores/matchStore'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
-const matchStatus = ref('searching')
+const matchStore = useMatchStore()
+const { matchStatus } = storeToRefs(matchStore)
+// const { matchStatus, matchedUser } = storeToRefs(matchStore)
 
 // 매칭 수락 처리
 const acceptMatch = () => {
-router.push({
+  matchStore.acceptMatch()
+  router.push({
     name: 'RankMode',
     params: {
-    exercise: 'squat' // 현재는 스쿼트만 지원
+      exercise: 'squat'
     }
-})
+  })
 }
 
 // 매칭 거절 처리
 const declineMatch = () => {
-matchStatus.value = 'searching'
+  matchStore.declineMatch()
 }
 
-// 컴포넌트 마운트 시 매칭 시작
 onMounted(() => {
-// 테스트를 위해 3초 후 매칭 발견으로 상태 변경
-setTimeout(() => {
-    matchStatus.value = 'found'
-}, 3000)
+  matchStore.initializeWebSocket()
+})
+
+onBeforeUnmount(() => {
+  if (matchStore.webSocket) {
+    matchStore.webSocket.close()
+  }
 })
 </script>
+
 
 <style scoped>
 .rank-match-container {
