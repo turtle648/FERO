@@ -229,16 +229,16 @@ DELIMITER ;
 -- 운동 종류별 점수 비율 데이터
 INSERT INTO exercise_stats_ratio (exercise_type, chest_ratio, back_ratio, stamina_ratio, arms_ratio, legs_ratio, abs_ratio)
 VALUES
-    ('푸시업', 0.40, 0.05, 0.20, 0.30, 0.05, 0.05),
-    ('스쿼트', 0.05, 0.05, 0.20, 0.05, 0.50, 0.30),
-    ('런지', 0.05, 0.05, 0.15, 0.05, 0.50, 0.30),
-    ('플랭크', 0.05, 0.05, 0.45, 0.05, 0.20, 0.45);
+    ('pushup', 0.40, 0.05, 0.20, 0.30, 0.05, 0.05),
+    ('squat', 0.05, 0.05, 0.20, 0.05, 0.50, 0.30),
+    ('lunge', 0.05, 0.05, 0.15, 0.05, 0.50, 0.30),
+    ('plank', 0.05, 0.05, 0.45, 0.05, 0.20, 0.45);
 
 
 -- 기본 튜토리얼 데이터 삽입
 INSERT INTO tutorial_types (tutorial_name) VALUES
                                                ('UI 기본'),
-                                               ('스쿼트'),
-                                               ('푸시업'),
-                                               ('런지'),
-                                               ('플랭크');
+                                               ('squat'),
+                                               ('pushup'),
+                                               ('lunge'),
+                                               ('plank');
