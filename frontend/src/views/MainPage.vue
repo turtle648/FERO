@@ -112,13 +112,10 @@ const exp = ref('')
 import { useMainStore } from "@/stores/mainStore"
 const mainStore = useMainStore()
 
-<<<<<<< HEAD
 onMounted(async () => {
   await mainStore.loadTutorial()
 })
 
-=======
->>>>>>> 4a8fd177f53e3fd4ae6fd2127bc1402bdb437e6c
 // 상태창 관련 변수 및 함수
 import StatusModal from "@/components/modal/StatusModal.vue"
 const showStatusModal = ref(false)
