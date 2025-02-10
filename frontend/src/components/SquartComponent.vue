@@ -2,9 +2,10 @@
   <div class="counter-container relative">
     <div class="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 text-center">
       <div class="count z-10 text-black">스쿼트 횟수: {{ count }}</div>
-      <div class="status">{{ feedback }}</div>
-      <div v-if="formFeedback" class="form-feedback">{{ formFeedback }}</div>
-      <div v-if="!isReady" class="form-feedback z-10">측면으로 서주세요!</div>
+      <!-- <div class="status">{{ feedback }}</div> -->
+      <!-- <div v-if="formFeedback" class="form-feedback">{{ formFeedback }}</div> -->
+      <!-- <div v-if="!isReady" class="form-feedback z-10">측면으로 서주세요!</div> -->
+      <div v-if="showGreat" class="great-message text-red text-3xl">Great!</div>
     </div>
     <MediapipeComponent @pose-detected="processPose" class="z-0" />
   </div>
@@ -21,7 +22,7 @@ const count = ref(0)
 const isDown = ref(false)
 const feedback = ref("준비중...")
 const formFeedback = ref("")
-const isReady = ref(false)
+const showGreat = ref(false)
 
 // 각도 계산 함수
 const calculateAngle = (a, b, c) => {
@@ -63,12 +64,12 @@ const checkForm = (landmarks) => {
 // 포즈 처리 함수
 const processPose = (landmarks) => {
   if (!landmarks || landmarks.length === 0) {
-    isReady.value = false
+    // isReady.value = false
     feedback.value = "준비중..."
     return
   }
 
-  isReady.value = true
+  // isReady.value = true
   formFeedback.value = checkForm(landmarks)
 
   const leftHip = landmarks[23]
@@ -90,6 +91,11 @@ const processPose = (landmarks) => {
     isDown.value = false
     count.value++
     feedback.value = `Up! Count: ${count.value}`
+
+    showGreat.value = true
+    setTimeout(() => {
+      showGreat.value = false
+    }, 1000)
   }
 }
 </script>
