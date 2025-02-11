@@ -3,12 +3,17 @@ package com.ssafy.api.controller;
 import com.ssafy.api.request.FindUserIdReq;
 import com.ssafy.api.request.FindUserPwReq;
 import com.ssafy.api.request.UserUpdateReq;
+import com.ssafy.api.response.AllCharacterInfoRes;
 import com.ssafy.api.response.UserInfoRes;
 import com.ssafy.api.service.EmailService;
 import com.ssafy.api.service.UserCharacterService;
 import com.ssafy.db.entity.UserCharacter;
+import com.ssafy.db.entity.UserRankScores;
+import com.ssafy.db.entity.UserStats;
 import com.ssafy.db.repository.UserCharacterRepository;
+import com.ssafy.db.repository.UserRankScoresRepository;
 import com.ssafy.db.repository.UserRepository;
+import com.ssafy.db.repository.UserStatsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,10 +34,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 /**
  * 인증 관련 API 요청 처리를 위한 컨트롤러 정의.
@@ -53,6 +55,10 @@ public class AuthController {
 	UserCharacterRepository userCharacterRepository;
 	@Autowired
 	private EmailService emailService;
+    @Autowired
+    private UserStatsRepository userStatsRepository;
+    @Autowired
+    private UserRankScoresRepository userRankScoresRepository;
 
 	@PostMapping("/login")
 	@ApiOperation(value = "로그인", notes = "<strong>아이디와 패스워드</strong>를 통해 로그인 한다.")
@@ -115,12 +121,12 @@ public class AuthController {
 	@GetMapping("/me")
 	@ApiOperation(value = "회원 본인 정보 조회", notes = "로그인한 회원 본인의 정보를 응답한다.")
 	@ApiResponses({
-			@ApiResponse(code = 200, message = "성공", response = UserInfoRes.class),
+			@ApiResponse(code = 200, message = "성공", response = AllCharacterInfoRes.class),
 			@ApiResponse(code = 401, message = "인증 실패", response = BaseResponseBody.class),
 			@ApiResponse(code = 404, message = "사용자 없음", response = BaseResponseBody.class),
 			@ApiResponse(code = 500, message = "서버 오류", response = BaseResponseBody.class)
 	})
-	public ResponseEntity<UserInfoRes> getUserInfo(HttpServletRequest request) {
+	public ResponseEntity<AllCharacterInfoRes> getUserInfo(HttpServletRequest request) {
 		String authHeader = request.getHeader("Authorization");
 
 		// 헤더에서 토큰을 통해 사용자 ID 추출
@@ -131,15 +137,19 @@ public class AuthController {
 		UserCharacter userCharacter = userCharacterRepository.findByUser_UserId(userId).orElseThrow(() -> new RuntimeException("User character not found"));
 
 		// UserInfoRes로 변환하여 응답 준비
-		UserInfoRes userInfoRes = UserInfoRes.of(userInfo, userCharacter);
+		AllCharacterInfoRes allCharacterInfoRes = AllCharacterInfoRes.of(userInfo, userCharacter);
+		UserStats userStats = userStatsRepository.findByUser(userInfo).orElseThrow(() -> new RuntimeException("UserStats not found"));
 
-		return ResponseEntity.ok(userInfoRes);
+		allCharacterInfoRes.setUserStats(userStats);
+
+		return ResponseEntity.ok(allCharacterInfoRes);
 	}
+
 
 	@PutMapping("/update")
 	@ApiOperation(value = "회원 본인 정보 수정", notes = "로그인한 회원 본인의 정보를 수정한다.")
 	@ApiResponses({
-			@ApiResponse(code = 200, message = "성공", response = UserInfoRes.class),
+			@ApiResponse(code = 200, message = "성공", response = AllCharacterInfoRes.class),
 			@ApiResponse(code = 401, message = "인증 실패", response = BaseResponseBody.class),
 			@ApiResponse(code = 404, message = "사용자 없음", response = BaseResponseBody.class),
 			@ApiResponse(code = 500, message = "서버 오류", response = BaseResponseBody.class)
@@ -152,17 +162,16 @@ public class AuthController {
 		String authHeader = request.getHeader("Authorization");
 		String userId = JwtTokenUtil.extractUserIdFromToken(authHeader);
 
-		// 사용자 이메일, 전화번호 업데이트
+		// 사용자 정보 업데이트
 		User updatedUser = userService.updateUser(updateInfo, userId);
-
-		// 사용자 캐릭터 닉네임 업데이트
 		UserCharacter updatedCharacter = userCharacterService.updateUserCharacter(userId, updateInfo);
 
-		UserInfoRes userInfoRes = getUserInfo(request).getBody();
+		// 응답 DTO 생성
+		UserInfoRes userInfoRes = UserInfoRes.of(updatedUser, updatedCharacter);
 
-		// 두 개의 업데이트된 데이터를 반환
 		return ResponseEntity.ok(userInfoRes);
 	}
+
 
 	@PostMapping("/check-password")
 	@ApiOperation(value = "기존 비밀번호 검증", notes = "사용자의 기존 비밀번호를 검증")

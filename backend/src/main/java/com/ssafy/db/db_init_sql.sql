@@ -20,6 +20,7 @@ CREATE TABLE user_character (
                                 user_id VARCHAR(30) NOT NULL UNIQUE,
                                 user_nickname VARCHAR(15) NOT NULL UNIQUE,
                                 gender CHAR(1) NOT NULL CHECK (gender IN ('M', 'F')),
+                                avatar VARCHAR(30) NOT NULL,
 
                                 user_level SMALLINT UNSIGNED NOT NULL DEFAULT 1 CHECK (user_level <= 999),
                                 user_experience INT NOT NULL DEFAULT 0,
@@ -261,27 +262,28 @@ INSERT INTO user_info (user_id, user_password, user_name, user_email, phone_numb
 ('ryu456', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '류준열', 'ryu456@gmail.com', '010-9999-0000'),
 ('kwon567', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '권상우', 'kwon567@naver.com', '010-0000-1111');
 
-INSERT INTO user_character (user_id, user_nickname, gender, user_level, user_experience, points) VALUES
-('ssafy123', '길동이', 'M', 5, 128, 1000),
-('kim456', '철수123', 'M', 3, 57, 500),
-('lee789', '영희공주', 'F', 7, 184, 1500),
-('park234', '지성축구', 'M', 4, 76, 800),
-('choi567', '민수킹', 'M', 2, 93, 300),
-('jung111', '소희쨩', 'F', 8, 42, 2000),
-('kang222', '동원오빠', 'M', 6, 177, 1200),
-('yoon333', '서준맨', 'M', 9, 25, 2300),
-('shin444', '민아걸', 'F', 3, 134, 600),
-('song555', '혜교님', 'F', 5, 61, 1100),
-('yang666', '현석왕', 'M', 4, 150, 900),
-('han777', '지민공듀', 'F', 7, 92, 1700),
-('oh888', '연서비누', 'F', 2, 189, 400),
-('seo999', '인국왕자', 'M', 6, 78, 1400),
-('bae000', '수지짱', 'F', 8, 46, 1900),
-('cha123', '은우꽃미남', 'M', 5, 173, 1200),
-('moon234', '채원공주', 'F', 3, 55, 700),
-('joo345', '지훈멋짐', 'M', 9, 99, 2200),
-('ryu456', '준열검사', 'M', 4, 37, 1000),
-('kwon567', '상우형님', 'M', 7, 35, 1600);
+INSERT INTO user_character (user_id, user_nickname, gender, avatar, user_level, user_experience, points) VALUES
+('ssafy123', '길동이', 'M', '7-3-9', 5, 128, 1000),
+('kim456', '철수123', 'M', '2-6-4', 3, 57, 500),
+('lee789', '영희공주', 'F', '1-8-10', 7, 184, 1500),
+('park234', '지성축구', 'M', '5-9-2', 4, 76, 800),
+('choi567', '민수킹', 'M', '4-7-1', 2, 93, 300),
+('jung111', '소희쨩', 'F', '10-3-5', 8, 42, 2000),
+('kang222', '동원오빠', 'M', '6-2-8', 6, 177, 1200),
+('yoon333', '서준맨', 'M', '9-4-1', 9, 25, 2300),
+('shin444', '민아걸', 'F', '3-7-6', 3, 134, 600),
+('song555', '혜교님', 'F', '8-5-2', 5, 61, 1100),
+('yang666', '현석왕', 'M', '2-1-10', 4, 150, 900),
+('han777', '지민공듀', 'F', '5-9-7', 7, 92, 1700),
+('oh888', '연서비누', 'F', '7-4-3', 2, 189, 400),
+('seo999', '인국왕자', 'M', '10-6-1', 6, 78, 1400),
+('bae000', '수지짱', 'F', '3-2-9', 8, 46, 1900),
+('cha123', '은우꽃미남', 'M', '4-10-5', 5, 173, 1200),
+('moon234', '채원공주', 'F', '1-8-6', 3, 55, 700),
+('joo345', '지훈멋짐', 'M', '6-7-2', 9, 99, 2200),
+('ryu456', '준열검사', 'M', '9-5-8', 4, 37, 1000),
+('kwon567', '상우형님', 'M', '2-3-4', 7, 35, 1600);
+
 
 
 TRUNCATE TABLE user_rank_scores;
