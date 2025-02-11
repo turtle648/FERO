@@ -2,7 +2,6 @@
   <div class="setting-modal">
     <div class="content">
       <button id="close-btn" @click="closeSettingModal">X</button>
-      <button @click="routeRTC">테스트webRTC</button>
       <ul class="menu-list">
         <li class="title">설정</li>
         <li>설정에 들어올 정보들</li>
@@ -12,6 +11,12 @@
         <li><button class="logout-button" @click="checkUserNickname">본인정보조회</button></li>
         <li><button class="logout-button" @click="checkUserLevel">본인레벨조회</button></li>
         <li><button class="logout-button" @click="checkUserExperience">본인경험치조회</button></li>
+        <li><button @click="routeRTC">테스트webRTC</button></li>
+        <section class="settings-credits">
+          <h2>Music Credits</h2>
+          <p>"Getting it Done" Kevin MacLeod (incompetech.com)
+          Licensed under Creative Commons: By Attribution 3.0</p>
+        </section>
       </ul>
     </div>
   </div>
