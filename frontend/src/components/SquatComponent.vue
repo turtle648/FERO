@@ -8,6 +8,7 @@
     <CompleteModal v-if="showModal" />
 
     <div v-if="showErrorModal" class="landmark-error-modal">전신이 나오도록 카메라 위치를 수정해주세요</div>
+    <button @click="setCountToThree" class="fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded shadow-lg hover:bg-blue-600 z-50">Set Count to 3</button>
   </div>
 </template>
 
@@ -124,6 +125,14 @@ const processPose = (landmarks) => {
     }
   }
 }
+
+// 임시 버튼 클릭 핸들러 함수
+const setCountToThree = () => {
+  count.value = 3
+  if (isTutorialMode) {
+    showModal.value = true // 튜토리얼 모드일 경우 완료 상태로 전환
+  }
+}
 </script>
 
 <style scoped>
@@ -159,6 +168,16 @@ const processPose = (landmarks) => {
   background-color: white;
   padding: 20px;
   border-radius: 8px;
+  z-index: 100;
+}
+.set-count-button {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
   z-index: 100;
 }
 </style>
