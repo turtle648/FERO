@@ -2,6 +2,7 @@ package com.ssafy.api.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.api.request.EnterWaitingRoomEvent;
+import com.ssafy.api.request.MatchSuccessEvent;
 import com.ssafy.api.request.WaitingUser;
 import com.ssafy.db.repository.ExerciseStatsRatioRepository;
 import lombok.RequiredArgsConstructor;
@@ -149,8 +150,8 @@ public class MatchingService {
         redisTemplate.delete(expireKey);
 
 //        log.info("[REDIS REMOVE] Queue에서 제거된 아이템 수: {}", removedFromQueue); // 사실 얘는 삭제 안됨
-        log.info("[REDIS REMOVE] 해시에서 제거된 아이템 수: {}", removedFromHash);
-        log.info("[REDIS REMOVE] 정렬 세트에서 제거된 아이템 수: {}", removedFromSortedSet);
+        log.info("[REDIS REMOVE HASH] 해시에서 제거된 아이템 수: {}", removedFromHash);
+        log.info("[REDIS REMOVE SET] 정렬 세트에서 제거된 아이템 수: {}", removedFromSortedSet);
     }
 
     // 매칭 처리 로직 (스케줄러로 주기적으로 실행할 것)
@@ -273,6 +274,9 @@ public class MatchingService {
     private void handleMatchSuccess(String userToken1, String userToken2, Long exerciseId) {
         removeFromRedis(exerciseId, userToken1);
 //        removeFromRedis(exerciseId, userToken2);
+
+        // eventPublisher 추가해야 함 -> WebSocket 으로
+        eventPublisher.publishEvent(new MatchSuccessEvent(userToken1, userToken2, exerciseId));
 
         log.info("🎊 매칭 성공! User1: {}, User2: {}, Exercise: {}", userToken1, userToken2, exerciseId);
     }
