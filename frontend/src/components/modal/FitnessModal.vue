@@ -141,7 +141,7 @@ const toggleTutorialComplete = () => {
 }
 
 const closeFitnessModal = () => {
-  emit('closeFitness')
+  emit('close-modal')
 }
 </script>
 
