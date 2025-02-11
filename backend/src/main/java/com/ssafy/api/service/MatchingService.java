@@ -2,6 +2,7 @@ package com.ssafy.api.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.api.request.EnterWaitingRoomEvent;
+import com.ssafy.api.request.MatchSuccessEvent;
 import com.ssafy.api.request.WaitingUser;
 import com.ssafy.db.repository.ExerciseStatsRatioRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class MatchingService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final StringRedisTemplate stringRedisTemplate;
     private final ApplicationEventPublisher eventPublisher;
+    private boolean matchFound = false;
 
     // Redis Key 상수
     private static final String WAITING_QUEUE = "waiting:queue:"; // 입장 순서
@@ -49,8 +51,15 @@ public class MatchingService {
         return String.format("waiting:expire:%s:%s", exerciseType, userToken);
     }
 
+
     // 1-1. 유저를 대기열에 추가함
     public void enterWaitingRoom(String userToken, Long exerciseType, Short rankScore) {
+        // 사용자 입장 이벤트 발생
+        matchFound = false;
+        eventPublisher.publishEvent(new EnterWaitingRoomEvent(userToken, exerciseType, rankScore));
+
+        if(matchFound) return;
+
         WaitingUser waitingUser = new WaitingUser(userToken, exerciseType, rankScore, LocalDateTime.now());
 
         // 운동 타입별 키 생성
@@ -58,6 +67,7 @@ public class MatchingService {
         String sortedKey = getSortedSetKey(exerciseType);
         String userInfoKey = getUserInfoKey(exerciseType);
         String expireKey = getUserJoinTimeKey(exerciseType, userToken);
+
 
         // 유저 정보 저장
         redisTemplate.opsForHash().put(userInfoKey, userToken, waitingUser);
@@ -71,8 +81,6 @@ public class MatchingService {
         log.info("✅ {} 사용자가 {} 대기열에 입장 (TTL 설정 완료)", userToken, exerciseType);
         logWaitingRoomStatus(exerciseType);
 
-        // 사용자 입장 이벤트 발생
-        eventPublisher.publishEvent(new EnterWaitingRoomEvent(userToken, exerciseType, rankScore));
     }
 
     // 1-2. 대기방 상태
@@ -142,8 +150,8 @@ public class MatchingService {
         redisTemplate.delete(expireKey);
 
 //        log.info("[REDIS REMOVE] Queue에서 제거된 아이템 수: {}", removedFromQueue); // 사실 얘는 삭제 안됨
-        log.info("[REDIS REMOVE] 해시에서 제거된 아이템 수: {}", removedFromHash);
-        log.info("[REDIS REMOVE] 정렬 세트에서 제거된 아이템 수: {}", removedFromSortedSet);
+        log.info("[REDIS REMOVE HASH] 해시에서 제거된 아이템 수: {}", removedFromHash);
+        log.info("[REDIS REMOVE SET] 정렬 세트에서 제거된 아이템 수: {}", removedFromSortedSet);
     }
 
     // 매칭 처리 로직 (스케줄러로 주기적으로 실행할 것)
@@ -194,11 +202,11 @@ public class MatchingService {
         log.info("🎯 매칭 프로세스 시작 - User: {}, Exercise: {}, Score: {}",
                 event.getUserToken(), event.getExerciseId(), event.getRankScore());
 
-        processMatchingLogic(event.getExerciseId());
+        processMatchingLogic(event.getExerciseId(), event.getUserToken(), event.getRankScore());
     }
 
     // 3-2. 실제 매칭 시도
-    private void processMatchingLogic(Long exerciseId) {
+    private void processMatchingLogic(Long exerciseId, String userToken, Short rankScore) {
         String queueKey = getQueueKey(exerciseId);
         String sortedSetKey = getSortedSetKey(exerciseId);
 
@@ -211,7 +219,7 @@ public class MatchingService {
 
         // 2. queue 순회하면서 매칭 시도하기
         int queueSize = queue.size();
-        int currentIndex = 0;
+        int currentIndex = 0; // 큐에서 맨 밑에 있는 애
 
         while(currentIndex < queueSize) {
             String currentUserToken = queue.get(currentIndex).toString();
@@ -226,9 +234,25 @@ public class MatchingService {
                 currentIndex++;
                 continue;
             }
-            boolean matchFound = false;
             // 3-2. 매칭 가능한 상대 찾기 (rankScore +- 100 범위)
-            for (int i=currentIndex+1; i < queueSize; i++) {
+            // 후보자가 sorted-set 에 없으면 스킵 -- queue에서 삭제
+            Double currentZScore = redisTemplate.opsForZSet().score(sortedSetKey, currentUserToken);
+            if (currentZScore == null) {
+                redisTemplate.opsForList().remove(queueKey, 1, currentUserToken);
+                continue;
+            }
+            // 점수 차이가 100 이내인지 확인
+            System.out.println("들어올 애 점수 : "+rankScore);
+            System.out.println("큐에 있는 후보자 점수 : "+currentUserScore);
+            if (Math.abs(currentUserScore - rankScore) <= 100) {
+                // 매칭 성공
+                handleMatchSuccess(currentUserToken, userToken, exerciseId);
+                matchFound = true;
+                return; // 매칭 완료되면 종료
+            }
+
+
+            for (int i=currentIndex; i < queueSize; i++) {
                 String candidateUserToken = queue.get(i).toString();
                 Double candidateScore = redisTemplate.opsForZSet().score(sortedSetKey, candidateUserToken);
 
@@ -237,17 +261,8 @@ public class MatchingService {
                     redisTemplate.opsForList().remove(queueKey, 1, candidateUserToken);
                     continue;
                 }
-
-                // 점수 차이가 100 이내인지 확인
-                System.out.println("들어온 애 점수 : "+currentUserScore);
-                System.out.println("후보자 점수 : "+candidateScore);
-                if (Math.abs(currentUserScore - candidateScore) <= 100) {
-                    // 매칭 성공
-                    handleMatchSuccess(currentUserToken, candidateUserToken, exerciseId);
-                    matchFound = true;
-                    return; // 매칭 완료되면 종료
-                }
             }
+
             if (!matchFound) {
                 log.info("적합한 매칭 상대를 찾지 못함 (score: {}), moving to next user",
                         currentUserScore);
@@ -258,7 +273,10 @@ public class MatchingService {
 
     private void handleMatchSuccess(String userToken1, String userToken2, Long exerciseId) {
         removeFromRedis(exerciseId, userToken1);
-        removeFromRedis(exerciseId, userToken2);
+//        removeFromRedis(exerciseId, userToken2);
+
+        // eventPublisher 추가해야 함 -> WebSocket 으로
+        eventPublisher.publishEvent(new MatchSuccessEvent(userToken1, userToken2, exerciseId));
 
         log.info("🎊 매칭 성공! User1: {}, User2: {}, Exercise: {}", userToken1, userToken2, exerciseId);
     }

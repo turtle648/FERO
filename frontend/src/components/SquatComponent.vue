@@ -28,6 +28,20 @@ const showErrorModal = ref(false) // 에러 모달 상태 변수
 
 const isTutorialMode = window.location.href.includes("tutorial")
 
+
+// 필수 랜드마크 정의
+const requiredLandmarks = [0, 1, 2, 3, 4, 5, 6, 27, 28, 29, 30, 31, 32]
+
+// 필수 랜드마크 확인 함수
+const checkRequiredLandmarks = (landmarks) => {
+  return requiredLandmarks.every((index) => {
+    const landmark = landmarks[index]
+    return (
+      landmark && landmark.x >= 0 && landmark.x <= 1 && landmark.y >= 0 && landmark.y <= 1 && landmark.visibility !== undefined && landmark.visibility > 0.5 // 가시성 기준 추가
+    )
+  })
+}
+
 const openModal = () => { showModal.value = true }
 // 각도 계산 함수
 const calculateAngle = (a, b, c) => {
@@ -35,17 +49,6 @@ const calculateAngle = (a, b, c) => {
   let degrees = Math.abs((radians * 180.0) / Math.PI)
   if (degrees > 180.0) degrees = 360 - degrees
   return degrees
-}
-
-// 필수 랜드마크 체크
-const checkRequiredLandmarks = (landmarks) => {
-  const requiredIndices = [0, 1, 2, 3, 4, 5, 6, 27, 28]
-  for (let index of requiredIndices) {
-    if (!landmarks[index]) {
-      return false // 필수 랜드마크가 없음
-    }
-  }
-  return true // 모든 필수 랜드마크가 존재
 }
 
 // 자세 체크 함수
@@ -82,47 +85,48 @@ const processPose = (landmarks) => {
     return
   }
 
+  // 필수 랜드마크 확인
   if (!checkRequiredLandmarks(landmarks)) {
-    showErrorModal.value = true // 에러 모달 표시
-    setTimeout(() => {
-      showErrorModal.value = false // 에러 모달 숨기기
-    }, 2000)
-    return
+    showErrorModal.value = true // 필수 랜드마크가 없으면 모달 표시
+  } else {
+    showErrorModal.value = false // 필수 랜드마크가 모두 있으면 모달 숨김
   }
 
   // isReady.value = true
-  formFeedback.value = checkForm(landmarks)
+  if (!showErrorModal.value) {
+    formFeedback.value = checkForm(landmarks)
 
-  const leftHip = landmarks[23]
-  const rightHip = landmarks[24]
-  const leftKnee = landmarks[25]
-  const rightKnee = landmarks[26]
-  const leftAnkle = landmarks[27]
-  const rightAnkle = landmarks[28]
+    const leftHip = landmarks[23]
+    const rightHip = landmarks[24]
+    const leftKnee = landmarks[25]
+    const rightKnee = landmarks[26]
+    const leftAnkle = landmarks[27]
+    const rightAnkle = landmarks[28]
 
-  const leftKneeAngle = calculateAngle(leftHip, leftKnee, leftAnkle)
-  const rightKneeAngle = calculateAngle(rightHip, rightKnee, rightAnkle)
-  const avgKneeAngle = (leftKneeAngle + rightKneeAngle) / 2
+    const leftKneeAngle = calculateAngle(leftHip, leftKnee, leftAnkle)
+    const rightKneeAngle = calculateAngle(rightHip, rightKnee, rightAnkle)
+    const avgKneeAngle = (leftKneeAngle + rightKneeAngle) / 2
 
-  if (isTutorialMode && count.value >= 3) {
-    return
-  }
+    if (isTutorialMode && count.value >= 3) {
+      return
+    }
 
-  if (!isDown.value && avgKneeAngle < 100) {
-    isDown.value = true
-    feedback.value = "Down"
-  } else if (isDown.value && avgKneeAngle > 160) {
-    isDown.value = false
-    count.value++
-    feedback.value = `Up! Count: ${count.value}`
+    if (!isDown.value && avgKneeAngle < 100) {
+      isDown.value = true
+      feedback.value = "Down"
+    } else if (isDown.value && avgKneeAngle > 160) {
+      isDown.value = false
+      count.value++
+      feedback.value = `Up! Count: ${count.value}`
 
-    showGreat.value = true
-    setTimeout(() => {
-      showGreat.value = false
-    }, 1000)
+      showGreat.value = true
+      setTimeout(() => {
+        showGreat.value = false
+      }, 1000)
 
-    if (isTutorialMode && count.value === 3) {
-      showModal.value = true
+      if (isTutorialMode && count.value === 3) {
+        showModal.value = true
+      }
     }
   }
 }

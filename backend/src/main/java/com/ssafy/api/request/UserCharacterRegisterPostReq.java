@@ -16,4 +16,6 @@ public class UserCharacterRegisterPostReq {
     Character gender;
     @ApiModelProperty(name = "유저 Nickname", example = "your_nickname")
     String userNickname;
+    @ApiModelProperty(name = "유저 avatar", example = "1-1-1")
+    String avatar;
 }
