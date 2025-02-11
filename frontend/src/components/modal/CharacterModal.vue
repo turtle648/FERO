@@ -54,44 +54,65 @@
 </template>
   
 <script setup>
-import { ref, computed, defineEmits } from 'vue'
+import { ref, computed, watchEffect, defineEmits } from 'vue'
+import { storeToRefs } from "pinia"
 import { assets } from '@/assets.js'
+import { useUserDataStore } from "@/stores/userDataStore"
 
-// 모달 닫기
+const userDataStore = useUserDataStore()
+const { userInfo } = storeToRefs(userDataStore)
+
+// ✅ 모달 닫기 이벤트
 const emit = defineEmits(['close-modal'])
-const closeCharacterModal = () => {
-  emit('close-modal')
+const closeCharacterModal = () => emit('close-modal')
+
+// ✅ 선택 가능한 카테고리 목록
+const categories = ['hair', 'face', 'body']
+const currentCategory = ref('hair')
+
+// ✅ 선택된 캐릭터 정보 저장 (초기값: 현재 `userInfo.avatar`)
+const selected = ref({ hair: null, face: null, body: null })
+
+// ✅ `userInfo.avatar` 값이 변경될 때 자동으로 `selected` 업데이트
+watchEffect(() => {
+  if (userInfo.value?.avatar) {
+    selected.value.hair = [null, userInfo.value.avatar[0]]
+    selected.value.face = [null, userInfo.value.avatar[1]]
+    selected.value.body = [null, userInfo.value.avatar[2]]
+  }
+})
+
+// ✅ 아이템 선택 (이미 선택된 경우 선택 해제 가능)
+const selectItem = (category, item) => {
+  selected.value[category] = selected.value[category]?.[1] === item[1] ? null : item
 }
 
-// 완료 버튼 클릭 시 선택 데이터 처리
-const confirmSelection = () => {
-  console.log("변환된 숫자 코드:", {
-    hair: selected.value.hair ? selected.value.hair[1] : "0",
-    face: selected.value.face ? selected.value.face[1] : "0",
-    body: selected.value.body ? selected.value.body[1] : "0"
-  })
+// ✅ 완료 버튼 클릭 시 선택 데이터 처리
+const confirmSelection = async () => {
+  const currentAvatar = userInfo.value?.avatar || [0, 0, 0]
+
+  // ✅ 선택된 값이 없으면 기존 `userInfo.avatar` 값 유지
+  const hairIndex = selected.value.hair ? selected.value.hair[1] : currentAvatar[0]
+  const faceIndex = selected.value.face ? selected.value.face[1] : currentAvatar[1]
+  const bodyIndex = selected.value.body ? selected.value.body[1] : currentAvatar[2]
+
+  // ✅ `newAvatar` 문자열 생성 ("머리-얼굴-몸")
+  const newAvatar = `${hairIndex}-${faceIndex}-${bodyIndex}`
+  console.log("변환된 아바타 코드:", newAvatar)
+
+  // ✅ 아바타 업데이트 요청 (API 호출)
+  const success = await userDataStore.updateAvatar(newAvatar)
+
+  if (success) {
+    console.log("아바타가 성공적으로 변경되었습니다!", userDataStore.userInfo.avatar)
+  } else {
+    console.error("아바타 변경 실패")
+  }
 
   closeCharacterModal()
 }
 
-// 선택 가능한 카테고리 목록
-const categories = ['hair', 'face', 'body']
-const currentCategory = ref('hair')
+// ✅ 선택 요소 박스의 maxHeight 동적 계산
+const selectionBoxHeight = computed(() => `calc(70vh - 5rem - 40vw)`)
 
-// 선택된 캐릭터 정보 저장
-const selected = ref({
-  hair: null,
-  face: null,
-  body: null
-})
-
-// 선택한 아이템을 저장하는 함수 ([경로, 번호] 형태로 저장)
-const selectItem = (category, item) => {
-  selected.value[category] = selected.value[category] === item ? null : item
-}
-
-// 선택 요소 박스의 maxHeight 동적 계산
-const selectionBoxHeight = computed(() => {
-  return `calc(70vh - 5rem - 40vw)`
-})
 </script>
