@@ -136,7 +136,7 @@ public class AuthController {
 		User userInfo = userRepository.findByUserId(userId).orElseThrow(() -> new RuntimeException("User not found"));
 		UserCharacter userCharacter = userCharacterRepository.findByUser_UserId(userId).orElseThrow(() -> new RuntimeException("User character not found"));
 
-		// UserInfoRes로 변환하여 응답 준비
+		// AllCharacterInfoRes로 변환하여 응답 준비
 		AllCharacterInfoRes allCharacterInfoRes = AllCharacterInfoRes.of(userInfo, userCharacter);
 		UserStats userStats = userStatsRepository.findByUser(userInfo).orElseThrow(() -> new RuntimeException("UserStats not found"));
 
