@@ -9,7 +9,7 @@
 
       <!-- 중앙: 제목 -->
       <!-- 컴퓨터 이미지 -->
-      <img class="max-w-full h-auto absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="@/assets/furni_1.png" alt="" />
+      <img class="w-2/3 h-auto absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="@/assets/furni_1.png" alt="" />
 
       <!-- 하단 중앙: 종료 버튼 -->
       <ExitButton class="absolute bottom-4 left-1/2 transform -translate-x-1/2" />
