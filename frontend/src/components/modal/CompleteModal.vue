@@ -13,7 +13,7 @@
 <script setup>
 import { useRouter, useRoute } from "vue-router"
 import { useMainStore, TUTORIAL_IDS } from "@/stores/mainStore"
-import { onMounted } from "vue"
+import { onMounted,ref } from "vue"
 
 const router = useRouter()
 const route = useRoute()
