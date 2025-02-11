@@ -338,22 +338,24 @@ public class AuthController {
 		return new String(chars);
 	}
 
+	@PutMapping("/updateAvatar")
+	@ApiOperation(value = "회원 본인 아바타 수정", notes = "로그인한 회원 본인의 아바타 정보를 수정한다.")
+	private ResponseEntity<BaseResponseBody> updateAvatar(
+			@RequestParam String newAvatar, HttpServletRequest request) {
+		// 헤더에서 토큰 사용해 사용자 ID 추출
+		String authHeader = request.getHeader("Authorization");
+		String userId = JwtTokenUtil.extractUserIdFromToken(authHeader);
 
-//	public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request) {
-//		String token = request.getHeader("Authorization").replace("Bearer ", "");
-//
-//		// JWT의 만료 시간 가져오기
-//		Date expiration = JwtTokenUtil.getVerifier().verify(token).getExpiresAt();
-//		long expirationTime = expiration.getTime() - System.currentTimeMillis();
-//		System.out.println("JWT 만료시간 : "+ expirationTime);
-//
-//		// Redis에 토큰 저장 (만료 시간만큼 유효하게 설정)
-//		redisTemplate.opsForValue().set(token, "logout", expirationTime, TimeUnit.MILLISECONDS);
-//
-//		Map<String, Object> response = new HashMap<>();
-//		response.put("message", "Success");
-//		response.put("statusCode", 200);
-//		return ResponseEntity.ok(response);
-//	}
+		// 사용자 캐릭터 정보 조회
+		Optional<UserCharacter> userCharacterOpt = userCharacterRepository.findByUser_UserId(userId);
+
+		// 아바타 정보 업데이트 및 저장
+		UserCharacter userCharacter = userCharacterOpt.get();
+		userCharacter.setAvatar(newAvatar);
+		userCharacterRepository.save(userCharacter);
+
+		return ResponseEntity.ok(BaseResponseBody.of(200, "아바타 정보가 성공적으로 변경되었습니다."));
+	}
+
 
 }
