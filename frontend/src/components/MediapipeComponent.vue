@@ -1,4 +1,10 @@
 <template>
+  <!-- 로딩 스피너 -->
+  <!-- <div v-if="isLoading" class="flex items-center justify-center h-screen w-screen bg-black bg-opacity-50 z-50">
+    <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+    <p class="text-white text-lg mt-2">로딩중...</p>
+  </div> -->
+
   <div class="container flex flex-col items-center justify-between p-4 h-screen w-screen">
     <div class="flex justify-between w-full">
       <!-- <div class="counter text-white-common z-10">(갯수)</div> -->
@@ -37,6 +43,8 @@ const emit = defineEmits(["pose-detected", "open-modal"])
 const route = useRoute()
 const router = useRouter()
 
+// const isLoading = ref(true)
+
 // 버튼
 import ExitButton from "@/components/button/ExitButton.vue"
 import ReportIssueButton from "@/components/button/ReportIssueButton.vue"
@@ -56,6 +64,8 @@ function formatTime(time) {
 
 // 타이머 시작 함수
 function startTimer() {
+  // if (isLoading.value) return
+
   clearInterval(intervalId) // 기존 타이머 초기화
   timeLeft.value = selectedTime.value // 선택된 시간으로 초기화
   formattedTime.value = formatTime(timeLeft.value)
@@ -68,7 +78,7 @@ function startTimer() {
       clearInterval(intervalId) // 타이머 종료
       formattedTime.value = "00:00"
       camera.stop()
-      alert('시간 종료')
+      alert("시간 종료")
       emit("open-modal")
     }
   }, 1000)
@@ -87,6 +97,8 @@ const showStartText = ref(false)
 
 // 카운트다운 시작 함수
 function startCountdown() {
+  // if (isLoading.value) return
+
   countdown.value = 3 // 카운트다운 초기화
   showStartText.value = false // 'START' 숨김
 
@@ -143,8 +155,13 @@ const onResults = (results) => {
 }
 
 onMounted(async () => {
+  // setTimeout(() => {
+  //   isLoading.value = false
+  // }, 2000)
+
   if (!videoElement.value || !canvasElement.value) {
     console.error("Video or Canvas element is not initialized.")
+
     return
   }
 
@@ -178,12 +195,15 @@ onMounted(async () => {
   // Single Mode의 경우 시간을 URL BASE로 설정
   if (window.location.href.includes("single-mode")) {
     // 시작 시간 설정 by url prams
-    const pathSegments = route.path.split('/').filter(Boolean) // URL을 '/' 기준으로 분할하고, 빈 요소(마지막 `/`) 제거
+    const pathSegments = route.path.split("/").filter(Boolean) // URL을 '/' 기준으로 분할하고, 빈 요소(마지막 `/`) 제거
     const timeFromUrl = parseInt(pathSegments[pathSegments.length - 1]) // 마지막 값 가져오기
-    console.log(timeFromUrl, '인지된 시간')
+    console.log(timeFromUrl, "인지된 시간")
     if (!isNaN(timeFromUrl)) {
       selectedTime.value = timeFromUrl * 60 * 1000 // 초에서 밀리초 변환
     }
+  } else if (window.location.href.includes("tutorial")) {
+    // 튜토리얼 모드 기본값: 999분
+    selectedTime.value = 999 * 60 * 1000
   }
 
   try {
@@ -194,10 +214,24 @@ onMounted(async () => {
   }
 })
 
+// 로딩 상태가 변경되었을 때 동작 추가
+// watch(isLoading, async (newValue) => {
+//   if (!newValue) {
+//     try {
+//       await camera.start()
+//       startCountdown()
+//     } catch (error) {
+//       console.error("카메라 시작 오류:", error)
+//     }
+//   }
+// })
+
 // 종료 버튼 클릭 시
 function stopCameraAndNavigate() {
-  if (camera) { camera.stop() }
-  router.push({ name: 'Main' }) // /main으로 이동
+  if (camera) {
+    camera.stop()
+  }
+  router.push({ name: "Main" }) // /main으로 이동
 }
 
 onUnmounted(() => {
