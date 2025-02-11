@@ -5,11 +5,11 @@
       <div class="timer text-white-common z-20 absolute top-0 right-10">{{ formattedTime }}</div>
 
       <!-- fix: 시간 선택은 앞에서 넘어와야함 -->
-      <select class="absolute z-10" v-model="selectedTime" @change="resetTimer">
+      <!-- <select class="absolute z-10" v-model="selectedTime" @change="resetTimer">
         <option :value="1 * 60 * 1000">1분</option>
         <option :value="2 * 60 * 1000">2분</option>
         <option :value="5 * 60 * 1000">5분</option>
-      </select>
+      </select> -->
       <!-- <button class="text-white-common z-10" @click="startTimer">시작</button> -->
     </div>
     <!-- 중앙 영역 -->
@@ -42,7 +42,7 @@ import ReportIssueButton from "@/components/button/ReportIssueButton.vue"
 
 let intervalId = null // setInterval ID 저장 (타이머 초기화용)
 
-const selectedTime = ref(2 * 60 * 1000) // 기본값: 2분
+const selectedTime = ref(1 * 60 * 1000) // 기본값: 1분
 const timeLeft = ref(selectedTime.value) // 남은 시간 (ms)
 const formattedTime = ref(formatTime(timeLeft.value)) // 표시할 시간
 
@@ -72,11 +72,11 @@ function startTimer() {
 }
 
 // 타이머 리셋 함수 (시간 변경 시 호출)
-function resetTimer() {
-  clearInterval(intervalId) // 기존 타이머 초기화
-  timeLeft.value = selectedTime.value // 선택된 시간으로 초기화
-  formattedTime.value = formatTime(timeLeft.value)
-}
+// function resetTimer() {
+//   clearInterval(intervalId) // 기존 타이머 초기화
+//   timeLeft.value = selectedTime.value // 선택된 시간으로 초기화
+//   formattedTime.value = formatTime(timeLeft.value)
+// }
 
 // 카운트다운
 const countdown = ref(3)
