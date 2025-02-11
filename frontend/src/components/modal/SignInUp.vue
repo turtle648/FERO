@@ -123,8 +123,7 @@
 </template>
   
 <script setup>
-import { ref } from 'vue'
-import { defineEmits } from 'vue'
+import { ref, watchEffect, defineEmits } from 'vue'
 import { useRouter } from 'vue-router'
 import { login, checkEmailDuplicateAPI, sendEmail, signUp, verifyEmail, registerCharacter} from '@/api/accountAPI'
 import { useUserStore } from '@/stores/store'
@@ -145,6 +144,13 @@ const isEmailAvailable = ref(false)
 const emailConfirmCode = ref('')
 const gender = ref('')
 const userNickname = ref('')
+const avatar = ref('') 
+
+// watch()를 사용하여 gender 변경 감지
+watchEffect(() => {
+  if (gender.value === 'F') { avatar.value = '0-0-1' } 
+  else { avatar.value = '0-0-0' }
+})
 
 // 변수 초기화
 const resetFields = () => {
@@ -208,7 +214,7 @@ const handleSignUp2 = () => {
 }
 
 const handleSignUp3 = async () => {
-  const result = await registerCharacter(gender.value, userNickname.value, userStore.sessionId)
+  const result = await registerCharacter(gender.value, userNickname.value, avatar.value, userStore.sessionId)
   if (result) {
     alert('회원가입이 완료되었습니다.')
   }

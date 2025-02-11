@@ -62,18 +62,18 @@ import { useUserDataStore } from "@/stores/userDataStore"
 const userDataStore = useUserDataStore()
 const { userInfo } = storeToRefs(userDataStore)
 
-// ✅ 모달 닫기 이벤트
+// 모달 닫기 이벤트
 const emit = defineEmits(['close-modal'])
 const closeCharacterModal = () => emit('close-modal')
 
-// ✅ 선택 가능한 카테고리 목록
+// 선택 가능한 카테고리 목록
 const categories = ['hair', 'face', 'body']
 const currentCategory = ref('hair')
 
-// ✅ 선택된 캐릭터 정보 저장 (초기값: 현재 `userInfo.avatar`)
+// 선택된 캐릭터 정보 저장 (초기값: 현재 `userInfo.avatar`)
 const selected = ref({ hair: null, face: null, body: null })
 
-// ✅ `userInfo.avatar` 값이 변경될 때 자동으로 `selected` 업데이트
+// `userInfo.avatar` 값이 변경될 때 자동으로 `selected` 업데이트
 watchEffect(() => {
   if (userInfo.value?.avatar) {
     selected.value.hair = [null, userInfo.value.avatar[0]]
@@ -82,25 +82,25 @@ watchEffect(() => {
   }
 })
 
-// ✅ 아이템 선택 (이미 선택된 경우 선택 해제 가능)
+// 아이템 선택 (이미 선택된 경우 선택 해제 가능)
 const selectItem = (category, item) => {
   selected.value[category] = selected.value[category]?.[1] === item[1] ? null : item
 }
 
-// ✅ 완료 버튼 클릭 시 선택 데이터 처리
+// 완료 버튼 클릭 시 선택 데이터 처리
 const confirmSelection = async () => {
   const currentAvatar = userInfo.value?.avatar || [0, 0, 0]
 
-  // ✅ 선택된 값이 없으면 기존 `userInfo.avatar` 값 유지
+  // 선택된 값이 없으면 기존 `userInfo.avatar` 값 유지
   const hairIndex = selected.value.hair ? selected.value.hair[1] : currentAvatar[0]
   const faceIndex = selected.value.face ? selected.value.face[1] : currentAvatar[1]
   const bodyIndex = selected.value.body ? selected.value.body[1] : currentAvatar[2]
 
-  // ✅ `newAvatar` 문자열 생성 ("머리-얼굴-몸")
+  // `newAvatar` 문자열 생성 ("머리-얼굴-몸")
   const newAvatar = `${hairIndex}-${faceIndex}-${bodyIndex}`
   console.log("변환된 아바타 코드:", newAvatar)
 
-  // ✅ 아바타 업데이트 요청 (API 호출)
+  // 아바타 업데이트 요청 (API 호출)
   const success = await userDataStore.updateAvatar(newAvatar)
 
   if (success) {
@@ -112,7 +112,7 @@ const confirmSelection = async () => {
   closeCharacterModal()
 }
 
-// ✅ 선택 요소 박스의 maxHeight 동적 계산
+// 선택 요소 박스의 maxHeight 동적 계산
 const selectionBoxHeight = computed(() => `calc(70vh - 5rem - 40vw)`)
 
 </script>
