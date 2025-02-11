@@ -2,14 +2,27 @@ import { createRouter, createWebHistory } from "vue-router"
 import StartPage from "@/views/StartPage.vue"
 import MainPage from "@/views/MainPage.vue"
 import LoginPage from "@/views/LoginPage.vue"
-import TutorialPage from "@/views/tutorial/SquatTutorialPage.vue"
+import FitnessTutorialPage from "@/views/FitnessTutorialPage.vue"
 import VideoRoomPage from "@/views/VideoRoomPage.vue"
 import SingleModePage from "@/views/SingleModePage.vue"
 import MultiModePage from "@/views/MultiModePage.vue"
 import RankModePage from "@/views/RankModePage.vue"
-import mediapipeComponent from "@/components/mediapipeComponent.vue" // fix: 수정예정
-import SquartComponent from "@/components/SquartComponent.vue"
+// import MediapipeComponent from "@/components/MediapipeComponent.vue" // fix: 수정예정
 import QRComponent from "@/components/QRComponent.vue"
+import RankMatchPage from "@/views/RankMatchPage.vue"
+import UiTutorialPage from "@/views/UiTutorialPage.vue"
+
+// 랭크매치, 랭크모드에 인증 관련 메타데이터 고려해볼 것
+// meta: {
+//   requiresAuth: true,  // 인증 필요
+//   isMobile: true      // 모바일 전용
+
+// 에러페이지 라우팅 고려해볼 것것
+// {
+//   path: '/:pathMatch(.*)*',
+//   name: 'NotFound',
+//   component: NotFoundPage
+// }
 
 const routes = [
   {
@@ -31,9 +44,9 @@ const routes = [
     meta: { isMobile: true },
   },
   {
-    path: "/tutorial",
+    path: "/tutorial/:exercise",
     name: "Tutorial",
-    component: TutorialPage,
+    component: FitnessTutorialPage,
     meta: { isMobile: true },
   },
   {
@@ -42,12 +55,12 @@ const routes = [
     component: VideoRoomPage,
     meta: { isMobile: true },
   },
-  {
-    path: "/mediapipe",
-    name: "mediapipe",
-    component: mediapipeComponent,
-    meta: { isMobile: true },
-  },
+  // {
+  //   path: "/mediapipe",
+  //   name: "Mediapipe",
+  //   component: MediapipeComponent,
+  //   meta: { isMobile: true },
+  // },
   {
     path: "/single-mode/:exercise/:count",
     name: "SingleMode",
@@ -67,14 +80,21 @@ const routes = [
     props: true,
   },
   {
-    path: "/squart",
-    name: "squart",
-    component: SquartComponent,
-  },
-  {
     path: "/qr",
     name: "QR",
     component: QRComponent,
+  },
+  {
+    path: "/rank-match/:exercise",
+    name: "RankMatch",
+    component: RankMatchPage,
+    props: true,
+  },
+  {
+    path: '/ui-tutorial',
+    name: 'UiTutorial',
+    component: UiTutorialPage,
+    meta: { isMobile: true }
   },
 ]
 
@@ -84,22 +104,22 @@ const router = createRouter({
 })
 
 // 네비게이션 가드 설정
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("authToken")
-  const isMobile = "ontouchstart" in window || navigator.maxTouchPoints > 0 // 터치스크린 기기 감지
+// router.beforeEach((to, from, next) => {
+//   const token = localStorage.getItem("authToken")
+//   const isMobile = "ontouchstart" in window || navigator.maxTouchPoints > 0 // 터치스크린 기기 감지
 
-  if (to.path !== "/qr" && to.meta.isMobile && !isMobile) {
-    next("/qr")
-    console.log("모바일이 아닙니다 → /qr로 이동")
-    return
-  }
+//   if (to.path !== "/qr" && to.meta.isMobile && !isMobile) {
+//     next("/qr")
+//     console.log("모바일이 아닙니다 → /qr로 이동")
+//     return
+//   }
 
-  if (to.meta.requiresAuth && !token) {
-    next("/start")
-    console.log("토큰 없어서 /start로 이동")
-  } else {
-    next()
-  }
-})
+//   if (to.meta.requiresAuth && !token) {
+//     next("/start")
+//     console.log("토큰 없어서 /start로 이동")
+//   } else {
+//     next()
+//   }
+// })
 
 export default router

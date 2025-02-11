@@ -183,7 +183,7 @@ const checkEmailDuplicate = (email) => {
     })
 }
 
-// 인증 코드 확인 후 3페이지로 이동
+// 인증 코드 확인 후 2페이지로 이동
 const handleSignUp1 = async () => {
   const result = await verifyEmail(emailConfirmCode.value, email.value)
   if (result) { signUpPage.value = 2} 

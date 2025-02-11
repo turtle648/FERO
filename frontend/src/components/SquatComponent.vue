@@ -1,25 +1,28 @@
 <template>
-  <div class="counter-container">
-    <div class="count z-10 text-black">스쿼트 횟수: {{ count }}</div>
-    <div class="status">{{ feedback }}</div>
-    <div v-if="formFeedback" class="form-feedback">{{ formFeedback }}</div>
-    <div v-if="!isReady" class="form-feedback z-10">측면으로 서주세요!</div>
-    <mediapipeComponent @pose-detected="processPose" class="z-0" />
+  <div class="counter-container relative">
+    <div class="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 text-center">
+      <div class="count z-10 text-black">스쿼트 횟수: {{ count }}</div>
+      <div v-if="showGreat" class="great-message text-red text-3xl">Great!</div>
+    </div>
+    <MediapipeComponent @pose-detected="processPose" class="z-0" />
+    <CompleteModal v-if="showModal" />
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue"
-import mediapipeComponent from "./mediapipeComponent.vue"
-
-// const emit = defineEmits(["pose-detected"])
+import MediapipeComponent from "@/components/MediapipeComponent.vue"
+import CompleteModal from "@/components/modal/CompleteModal.vue"
 
 // 상태 변수 정의
 const count = ref(0)
 const isDown = ref(false)
 const feedback = ref("준비중...")
 const formFeedback = ref("")
-const isReady = ref(false)
+const showGreat = ref(false)
+const showModal = ref(false)
+
+const isTutorialMode = window.location.href.includes("tutorial")
 
 // 각도 계산 함수
 const calculateAngle = (a, b, c) => {
@@ -31,15 +34,12 @@ const calculateAngle = (a, b, c) => {
 
 // 자세 체크 함수
 const checkForm = (landmarks) => {
-  console.log(landmarks)
   const leftHip = landmarks[23]
   const rightHip = landmarks[24]
   const leftKnee = landmarks[25]
   const rightKnee = landmarks[26]
   const leftAnkle = landmarks[27]
   const rightAnkle = landmarks[28]
-
-  console.log(rightAnkle, leftAnkle, rightKnee, leftKnee)
 
   const leftKneeAngle = calculateAngle(leftHip, leftKnee, leftAnkle)
   const rightKneeAngle = calculateAngle(rightHip, rightKnee, rightAnkle)
@@ -61,12 +61,12 @@ const checkForm = (landmarks) => {
 // 포즈 처리 함수
 const processPose = (landmarks) => {
   if (!landmarks || landmarks.length === 0) {
-    isReady.value = false
+    // isReady.value = false
     feedback.value = "준비중..."
     return
   }
 
-  isReady.value = true
+  // isReady.value = true
   formFeedback.value = checkForm(landmarks)
 
   const leftHip = landmarks[23]
@@ -79,7 +79,6 @@ const processPose = (landmarks) => {
   const leftKneeAngle = calculateAngle(leftHip, leftKnee, leftAnkle)
   const rightKneeAngle = calculateAngle(rightHip, rightKnee, rightAnkle)
   const avgKneeAngle = (leftKneeAngle + rightKneeAngle) / 2
-  console.log(leftAnkle, rightAnkle, leftKnee, rightKnee)
 
   if (!isDown.value && avgKneeAngle < 100) {
     isDown.value = true
@@ -88,6 +87,15 @@ const processPose = (landmarks) => {
     isDown.value = false
     count.value++
     feedback.value = `Up! Count: ${count.value}`
+
+    showGreat.value = true
+    setTimeout(() => {
+      showGreat.value = false
+    }, 1000)
+
+    if (isTutorialMode && count.value === 3) {
+      showModal.value = true
+    }
   }
 }
 </script>

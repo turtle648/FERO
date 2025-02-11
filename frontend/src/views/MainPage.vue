@@ -1,8 +1,8 @@
 <template>
   <img class="background-image" src="@/assets/images/background_image2.png" alt="배경이미지" />
-  <div class="container" v-if="!isDesktop">
-    <div class="header absolute top-0 w-full h-[7vh] bg-[rgb(194,255,96)] text-white font-bold flex justify-between items-center">
-    <!-- 헤더 프로필 (40% 너비) -->
+  <div class="container absolute top-0 left-0 w-full h-full">
+    <div class="header absolute top-0 w-[100vw] h-[7vh] bg-[rgb(194,255,96)] text-white font-bold flex justify-between items-center">
+    <!-- 헤더 프로필 -->
     <div class="header-item header-profile w-1/2 h-[7vh] flex items-center" @click="openStatusModal">
       <!-- 프로필 이미지 (정사각형, 작은 사이즈로 동그랗게 만들기) -->
       <img src="@/assets/images/profile/default_profile.png" class="w-[7vh] h-[7vh] rounded-full object-cover">        
@@ -17,7 +17,7 @@
           <div class="absolute inset-0 flex items-center justify-center text-black text-[1.5vh] font-bold">
             Lv. {{ level }}
           </div>
-  
+          
           <!-- 경험치에 맞게 게이지 채우기 -->
           <div 
             class="gauge-bar bg-blue-500 h-full rounded-full" 
@@ -26,69 +26,86 @@
         </div>
       </div>
     </div>
-
+  
     <div class="flex justify-between items-center p-[1vh]">
       <!-- 설정 버튼 -->
       <img class="w-[5vh] h-[5vh] rounded-full object-cover" 
         @click="openSettingModal"
         src="@/assets/images/icon/setting.png" alt="" />
     </div>
-</div>
-
+  </div>
+  
   <!-- 알림 아이콘 -->
   <div class="absolute top-[10vh] right-[2vh] w-[4vh] h-[3vh] object-cover" @click="openAlarmModal">
     <img src="@/assets/images/icon/alarm2.png" alt="" />
   </div>
+  
+    <!-- 캐릭터 -->
+    <div class="absolute left-1/2 top-[calc(100vh/1.5)] transform -translate-x-1/2 -translate-y-1/2
+      w-[min(45vw,45vh)] h-[min(45vw,45vh)] flex items-center justify-center relative overflow-hidden"
+      @click="openCharacterModal">
 
+      <!-- 얼굴 이미지 -->
+      <img v-if="hair && face && body" :src="face" class="absolute w-[80%] top-0" />
+      <!-- 머리 이미지 -->
+      <img v-if="hair && face && body" :src="hair" class="absolute w-[80%] top-0" />
+      <!-- 몸 이미지 -->
+      <img v-if="hair && face && body" :src="body" class="absolute w-[80%] bottom-0" />
 
-
-
+      <!-- 이미지 없을 경우 -->
+      <div v-if="!face && !hair && !body" class="text-gray-500 text-center">
+        캐릭터 없음
+      </div>
+    </div>
+ 
+  
+  
     <!-- 상태창 -->
     <StatusModal v-if="showStatusModal" @closeStatus="closeStatusModal" />
-
+  
     <!-- 전적창 -->
     <MatchRecordModal v-if="showRecordModal" @closeRecord="closeRecordModal" />
-
+  
     <!-- 설정 -->
     <SettingModal v-if="showSettingModal" @closeSetting="closeSettingModal" @openSetting="openSettingModal" />
-
+  
     <!-- 알림 모달 -->
     <AlarmModal v-if="showAlarmModal" @closeAlarm="closeAlarmModal" @openAlarm="openAlarmModal" />
-
+  
     <!-- 운동 모드 선택 버튼들 -->
     <!-- <div class="exercise-options" v-show="showExerciseOptions"> -->
     <!-- <div class="option-item" @click="handleSoloExercise">혼자하기</div> -->
     <!-- <div class="option-item" @click="handleMultiExercise">같이하기</div> -->
     <!-- </div> -->
-
+  
     <!-- 새로운 모달 추가 -->
     <!-- <AloneModal v-if="showAloneModal" @closeAlone="closeAloneModal" /> -->
     <!-- <WithModal v-if="showWithModal" @closeWith="closeWithModal" /> -->
-
-    <div class="footer w-full h-[7vh]">
+  
+    <div class="footer w-[100vw] h-[7vh]">
       <!-- class명 추가해서 쓰기 -->
       <!-- <div class="grid-item" @click="toggleExerciseOptions">운동</div> -->
-
+  
       <div class="grid-item" @click="openFriendModal">친구</div>
       <div class="grid-item" @click="openCalendarModal">달력</div>
       <div class="grid-item" @click="openFitnessModal">운동</div>
       <div class="grid-item" @click="openRecordModal">전적</div>
       <div class="grid-item">퀘스트</div>
     </div>
-
-    <!-- 친구모달 -->
+  
+    <!-- 캐릭터 모달 -->
+    <CharacterModal v-if="showCharacterModal" @closeCharacter="closeCharacterModal" />
+  
+    <!-- 친구 모달 -->
     <FriendListModal v-if="showFriendModal" @closeFriend="closeFriendModal" @openFriend="openFriendModal" />
-
+  
     <!-- 달력 모달 -->
     <CalendarModal v-if="showCalendarModal" @closeCalendar="closeCalendarModal" @openCalendar="openCalendarModal" />
-
+  
     <!-- 운동 모달 -->
     <FitnessModal v-if="showFitnessModal" @closeFitness="closeFitnessModal" @openFitness="openFitnessModal" />
-
+  
     <!-- 퀘스트 모달 -->
-  </div>
-  <div v-else class="qr-code">
-    <h1>(나중에 큐알 들어갈 자리)</h1>
   </div>
 </template>
 
@@ -96,18 +113,23 @@
 import { ref, onMounted } from "vue"
 import { useUserStore } from "@/stores/store"
 import { useUserDataStore } from "@/stores/userDataStore"
+import { assets } from '@/assets.js'
+
 const userStore = useUserStore()
 const userDataStore = useUserDataStore()
 const nickName = ref('')
 const level = ref('')
 const exp = ref('')
+const hair = ref('')
+const face = ref('')
+const body = ref('')
 
 // 튜토리얼 여부 확인
 import { useMainStore } from "@/stores/mainStore"
 const mainStore = useMainStore()
 
 onMounted(async () => {
-  await mainStore.fetchData()
+  await mainStore.loadTutorial()
 })
 
 // 상태창 관련 변수 및 함수
@@ -199,22 +221,47 @@ const closeAlarmModal = () => {
   showAlarmModal.value = false
 }
 
+// 캐릭터 모달
+import CharacterModal from "@/components/modal/CharacterModal.vue"
+const showCharacterModal = ref(false)
+const openCharacterModal = () => {
+  if (!isAnyModalOpen()) {
+    showCharacterModal.value = true
+  }
+}
+const closeCharacterModal = () => {
+  showCharacterModal.value = false
+
+}
 // 현재 활성화된 모든 모달 상태를 확인하는 함수
 const isAnyModalOpen = () => {
   return showStatusModal.value || showRecordModal.value || showSettingModal.value || showAlarmModal.value || showFriendModal.value || showCalendarModal.value || showFitnessModal.value
 }
 
-onMounted(() => {
-  userStore
-  nickName.value = userDataStore.userNickname
-  level.value = userDataStore.userLevel
-  exp.value = userDataStore.userExperience
+onMounted(async () => {
+  try {
+    userStore
+    // userDataStore.userCharacter = [hairIndex, faceIndex, bodyIndex]
+    const [hairIndex, faceIndex, bodyIndex] = userDataStore.userCharacter    
+    // Base64 이미지 로드
+    hair.value = assets.hair[hairIndex]?.[0] || ""
+    face.value = assets.face[faceIndex]?.[0] || ""
+    body.value = assets.body[bodyIndex]?.[0] || ""
+
+    nickName.value = await userDataStore.checkUserNickname()
+    level.value = await userDataStore.checkUserLevel()
+    exp.value = await userDataStore.checkUserExperience()
+    
+    await mainStore.fetchData()
+  } catch (error) {
+    console.log("User Data 로드 중 오류 발생:", error)
+  }
 })
 </script>
 
 <style scoped>
 .background-image {
-  max-width: 100%;
+  max-width: 100vw;
   height: 100vh; /* 뷰포트 기준 100% */
   object-fit: cover;
   /* background-size: cover; */
