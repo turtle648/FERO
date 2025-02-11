@@ -69,7 +69,7 @@ export const useUserStore = defineStore('user', () => {
       if (response.data.statusCode === 200) {
         console.log('로그아웃 성공')
         clearSession()  // 세션 초기화
-        router.push('/start')  // 시작 페이지로 이동
+        router.push({ name: 'Start' })  // 시작 페이지로 이동
       } else {
         console.error('로그아웃 실패: 서버에서 응답 실패')
       }
