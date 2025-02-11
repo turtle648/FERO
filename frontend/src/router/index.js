@@ -10,6 +10,7 @@ import RankModePage from "@/views/RankModePage.vue"
 // import MediapipeComponent from "@/components/MediapipeComponent.vue" // fix: 수정예정
 import QRComponent from "@/components/QRComponent.vue"
 import RankMatchPage from "@/views/RankMatchPage.vue"
+import UiTutorialPage from "@/views/UiTutorialPage.vue"
 
 // 랭크매치, 랭크모드에 인증 관련 메타데이터 고려해볼 것
 // meta: {
@@ -88,6 +89,12 @@ const routes = [
     name: "RankMatch",
     component: RankMatchPage,
     props: true,
+  },
+  {
+    path: '/ui-tutorial',
+    name: 'UiTutorial',
+    component: UiTutorialPage,
+    meta: { isMobile: true }
   },
 ]
 

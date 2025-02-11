@@ -113,7 +113,7 @@ import { useMainStore } from "@/stores/mainStore"
 const mainStore = useMainStore()
 
 onMounted(async () => {
-  await mainStore.fetchData()
+  await mainStore.loadTutorial()
 })
 
 // 상태창 관련 변수 및 함수
@@ -228,6 +228,7 @@ onMounted(async () => {
     nickName.value = await userDataStore.checkUserNickname()
     level.value = await userDataStore.checkUserLevel()
     exp.value = await userDataStore.checkUserExperience()
+    await mainStore.fetchData()
   } catch (error) { console.log("User Data 로드 중 오류 발생:", error)}
 })
 </script>
