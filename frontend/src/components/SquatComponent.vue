@@ -42,7 +42,11 @@ const checkRequiredLandmarks = (landmarks) => {
   })
 }
 
-const openModal = () => { showModal.value = true }
+const openModal = () => { 
+  showModal.value = true 
+  alert('결과:', count)
+  alert('count등의 데이터어떻게 처리할지 결정 후 complete modal의 수정 필요.')
+}
 // 각도 계산 함수
 const calculateAngle = (a, b, c) => {
   const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x)
