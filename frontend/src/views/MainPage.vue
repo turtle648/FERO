@@ -105,9 +105,6 @@ onMounted(async () => {
   catch (error) { console.error("User Data 로드 중 오류 발생:", error) }
   await mainStore.loadTutorial()
 })
-
-
-
 </script>
 
 <style scoped>
