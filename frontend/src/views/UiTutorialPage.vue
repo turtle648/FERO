@@ -43,12 +43,13 @@
 
 <script setup>
 import { ref } from "vue"
-import { useRouter } from "vue-router"
+import { useRouter, useRoute } from "vue-router"
 import { useMainStore, TUTORIAL_IDS } from "@/stores/mainStore"
 import ExitButton from "@/components/button/ExitButton.vue"
 import ReportIssueButton from "@/components/button/ReportIssueButton.vue"
 
 const router = useRouter()
+const route = useRoute()
 const mainStore = useMainStore()
 
 // 현재 단계 상태 관리
@@ -66,7 +67,15 @@ const completeUiTutorial = async () => {
   try {
     const success = await mainStore.completeTutorial(TUTORIAL_IDS.UI)
     if (success) {
-      router.push("/main")
+      const nextExercise = route.params.exercise || TUTORIAL_IDS.SQUAT // 기본값 설정
+      if (!nextExercise) {
+        console.error("운동 정보가 누락되었습니다.")
+        return
+      }
+      router.push({
+        name: "Tutorial",
+        params: { exercise: nextExercise },
+      })
     } else {
       console.error("튜토리얼 완료 처리 실패")
     }
