@@ -92,16 +92,14 @@ const isSquatCompleted = computed(() => {
 // handleSquatClick 함수 수정 - computed 속성 활용
 const handleSquatClick = () => {
   if (!isUICompleted.value) {
-    router.push('/ui-tutorial')
-    return
-  }
-  
-  if (!isSquatCompleted.value) {
-    router.push(`/tutorial/${TUTORIAL_IDS.SQUAT}`)
-    return
-  }
-  
-  showModeModal.value = true
+    router.push({ name: 'UiTutorial' })
+    return showModeModal.value = false
+  } else if (!isSquatCompleted.value) {
+    router.push({ name: "Tutorial", params: { exercise: TUTORIAL_IDS.SQUAT } })
+    return showModeModal.value = false
+  } else {
+    return showModeModal.value = true
+  } 
 }
 
 
@@ -111,7 +109,7 @@ const selectNumber = (num) => {
 
 const selectMode = async (mode) => {
   const exerciseId = TUTORIAL_IDS.SQUAT // 스쿼트 ID(2) 사용
-
+  
   switch(mode) {
     case 'single':
       if (!selectedNumber.value) return

@@ -5,10 +5,10 @@
       <div v-if="showGreat" class="great-message text-red text-3xl">Great!</div>
     </div>
     <MediapipeComponent @pose-detected="processPose" class="z-0" />
-    <CompleteModal v-if="showModal" />
+    <CompleteModal v-if="showModal" @openModal="openModal"/>
 
     <div v-if="showErrorModal" class="landmark-error-modal">전신이 나오도록 카메라 위치를 수정해주세요</div>
-    <button @click="setCountToThree" class="fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded shadow-lg hover:bg-blue-600 z-50">Set Count to 3</button>
+    <button v-if="isTutorialMode" @click="setCountToThree" class="fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded shadow-lg hover:bg-blue-600 z-50">Set Count to 3</button>
   </div>
 </template>
 
@@ -28,6 +28,7 @@ const showErrorModal = ref(false) // 에러 모달 상태 변수
 
 const isTutorialMode = window.location.href.includes("tutorial")
 
+
 // 필수 랜드마크 정의
 const requiredLandmarks = [0, 1, 2, 3, 4, 5, 6, 27, 28, 29, 30, 31, 32]
 
@@ -41,6 +42,7 @@ const checkRequiredLandmarks = (landmarks) => {
   })
 }
 
+const openModal = () => { showModal.value = true }
 // 각도 계산 함수
 const calculateAngle = (a, b, c) => {
   const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x)
