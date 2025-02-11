@@ -30,10 +30,11 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue"
-import { useRouter } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 import { defineEmits } from "vue"
 
 const emit = defineEmits(["pose-detected", "openModal"])
+const route = useRoute()
 const router = useRouter()
 
 // 버튼
@@ -178,6 +179,15 @@ onMounted(async () => {
   } catch (error) {
     console.error("카메라 시작 오류:", error)
   }
+
+  // 시작 시간 설정 by url prams
+  const pathSegments = route.path.split('/').filter(Boolean) // URL을 '/' 기준으로 분할하고, 빈 요소(마지막 `/`) 제거
+  const timeFromUrl = parseInt(pathSegments[pathSegments.length - 1]) // 마지막 값 가져오기
+
+  if (!isNaN(timeFromUrl)) {
+    selectedTime.value = timeFromUrl * 1000 // 초에서 밀리초 변환
+  }
+
 })
 
 // 종료 버튼 클릭 시
