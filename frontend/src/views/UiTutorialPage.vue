@@ -1,22 +1,21 @@
 <template>
   <div class="ui-tutorial-page" @click="nextStep">
-    <div class="relative w-screen h-screen bg-gray-100">
+    <div class="relative w-screen h-screen bg-black">
       <!-- 좌측 상단: 카운트 -->
-      <div class="absolute top-4 left-4 text-lg font-bold p-2">카운트: 0</div>
+      <div class="absolute top-4 left-4 text-lg text-white font-bold p-2">1</div>
 
       <!-- 우측 상단: 타이머 -->
-      <div class="absolute top-4 right-4 text-lg font-bold p-2">타이머: 30초</div>
+      <div class="absolute top-4 right-4 text-lg text-white font-bold p-2">00:00</div>
 
       <!-- 중앙: 제목 -->
       <!-- 컴퓨터 이미지 -->
-      <!-- <img class="w-full h-fulll absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="@/assets/furni_1.png" alt="" /> -->
-      <img class="w-full h-full object-fill absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="@/assets/images/tmp-1.png" alt="" />
+      <img class="max-w-full h-auto absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="@/assets/furni_1.png" alt="" />
 
       <!-- 하단 중앙: 종료 버튼 -->
-      <button class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">종료</button>
+      <ExitButton class="absolute bottom-4 left-1/2 transform -translate-x-1/2" />
 
       <!-- 우측 하단: 신고 버튼 -->
-      <button class="absolute bottom-4 right-4 bg-yellow-500 text-white px-6 py-2 rounded hover:bg-yellow-600">신고</button>
+      <ReportIssueButton class="absolute bottom-4 right-4" />
 
       <!-- 설명 단계별로 표시 -->
       <div v-if="currentStep === 1" class="absolute top-[70px] right-[120px] flex items-center space-x-2">
@@ -46,6 +45,8 @@
 import { ref } from "vue"
 import { useRouter } from "vue-router"
 import { useMainStore, TUTORIAL_IDS } from "@/stores/mainStore"
+import ExitButton from "@/components/button/ExitButton.vue"
+import ReportIssueButton from "@/components/button/ReportIssueButton.vue"
 
 const router = useRouter()
 const mainStore = useMainStore()
