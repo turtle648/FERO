@@ -52,6 +52,7 @@
   position: relative;
   width: 100%;
   height: 100vh;
+  background: #000;
 }
 
 .my-video {
@@ -65,7 +66,7 @@
   top: 15%;
   right: 5%;
   width: 20%;
-  aspect-ratio: 16/9;
+  aspect-ratio: 9/16;
 }
 
 .peer-video {
@@ -77,16 +78,15 @@
 .controls {
   position: fixed;
   bottom: 20px;
-  width: 100%;
+  right: 20px;
   display: flex;
-  justify-content: center;
-  gap: 20px;
+  flex-direction: column-reverse;
+  gap: 10px;
 }
 
 .audio-controls {
-  position: absolute;
-  right: 20px;
   display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
@@ -94,9 +94,20 @@
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.8);
+  min-width: 180px;
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 </style>
-
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, defineProps } from 'vue'
