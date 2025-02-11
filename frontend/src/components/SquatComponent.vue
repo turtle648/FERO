@@ -6,6 +6,9 @@
     </div>
     <MediapipeComponent @pose-detected="processPose" class="z-0" />
     <CompleteModal v-if="showModal" />
+
+    <div v-if="showErrorModal" class="landmark-error-modal">전신이 나오도록 카메라 위치를 수정해주세요</div>
+    <button @click="setCountToThree" class="fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded shadow-lg hover:bg-blue-600 z-50">Set Count to 3</button>
   </div>
 </template>
 
@@ -21,6 +24,7 @@ const feedback = ref("준비중...")
 const formFeedback = ref("")
 const showGreat = ref(false)
 const showModal = ref(false)
+const showErrorModal = ref(false) // 에러 모달 상태 변수
 
 const isTutorialMode = window.location.href.includes("tutorial")
 
@@ -30,6 +34,17 @@ const calculateAngle = (a, b, c) => {
   let degrees = Math.abs((radians * 180.0) / Math.PI)
   if (degrees > 180.0) degrees = 360 - degrees
   return degrees
+}
+
+// 필수 랜드마크 체크
+const checkRequiredLandmarks = (landmarks) => {
+  const requiredIndices = [0, 1, 2, 3, 4, 5, 6, 27, 28]
+  for (let index of requiredIndices) {
+    if (!landmarks[index]) {
+      return false // 필수 랜드마크가 없음
+    }
+  }
+  return true // 모든 필수 랜드마크가 존재
 }
 
 // 자세 체크 함수
@@ -66,6 +81,14 @@ const processPose = (landmarks) => {
     return
   }
 
+  if (!checkRequiredLandmarks(landmarks)) {
+    showErrorModal.value = true // 에러 모달 표시
+    setTimeout(() => {
+      showErrorModal.value = false // 에러 모달 숨기기
+    }, 2000)
+    return
+  }
+
   // isReady.value = true
   formFeedback.value = checkForm(landmarks)
 
@@ -79,6 +102,10 @@ const processPose = (landmarks) => {
   const leftKneeAngle = calculateAngle(leftHip, leftKnee, leftAnkle)
   const rightKneeAngle = calculateAngle(rightHip, rightKnee, rightAnkle)
   const avgKneeAngle = (leftKneeAngle + rightKneeAngle) / 2
+
+  if (isTutorialMode && count.value >= 3) {
+    return
+  }
 
   if (!isDown.value && avgKneeAngle < 100) {
     isDown.value = true
@@ -96,6 +123,14 @@ const processPose = (landmarks) => {
     if (isTutorialMode && count.value === 3) {
       showModal.value = true
     }
+  }
+}
+
+// 임시 버튼 클릭 핸들러 함수
+const setCountToThree = () => {
+  count.value = 3
+  if (isTutorialMode) {
+    showModal.value = true // 튜토리얼 모드일 경우 완료 상태로 전환
   }
 }
 </script>
@@ -123,5 +158,26 @@ const processPose = (landmarks) => {
   font-size: 14px;
   color: #888;
   font-style: italic;
+}
+
+.landmark-error-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  z-index: 100;
+}
+.set-count-button {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 100;
 }
 </style>

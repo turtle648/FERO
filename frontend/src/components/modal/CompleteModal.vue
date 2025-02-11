@@ -15,9 +15,11 @@ const router = useRouter()
 const route = useRoute()
 const mainStore = useMainStore()
 
-const completeFitnessTutorial = () => {
+const completeFitnessTutorial = async () => {
   // URL에서 튜토리얼 ID 추출
+  await mainStore.loadTutorial()
   const tutorialId = route.params.exercise
+  console.log("Route params:", route.params)
 
   if (isNaN(tutorialId)) {
     console.error("Invalid tutorial ID:", route.params.id)
