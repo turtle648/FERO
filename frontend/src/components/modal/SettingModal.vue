@@ -11,6 +11,12 @@
         <li><button class="logout-button" @click="checkUserNickname">본인정보조회</button></li>
         <li><button class="logout-button" @click="checkUserLevel">본인레벨조회</button></li>
         <li><button class="logout-button" @click="checkUserExperience">본인경험치조회</button></li>
+        <li><button @click="routeRTC">테스트webRTC</button></li>
+        <section class="settings-credits">
+          <h2>Music Credits</h2>
+          <p>"Getting it Done" Kevin MacLeod (incompetech.com)
+          Licensed under Creative Commons: By Attribution 3.0</p>
+        </section>
       </ul>
     </div>
   </div>
@@ -20,6 +26,14 @@
 import { defineEmits } from "vue"
 import { useUserStore } from "@/stores/store"
 import { useUserDataStore } from "@/stores/userDataStore"
+
+// 테스트용 코드( 추후 삭제 )
+import { useRouter } from "vue-router"
+const router = useRouter()
+const routeRTC = () => {
+  router.push({ name: "VideoRoom" })
+}
+// 테스트용 코드 ( 여기까지 )
 
 const emit = defineEmits(["closeSetting"])
 const closeSettingModal = () => {

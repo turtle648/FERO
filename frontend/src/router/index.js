@@ -26,7 +26,7 @@ import UiTutorialPage from "@/views/UiTutorialPage.vue"
 
 const routes = [
   {
-    path: "/start",
+    path: "/",
     name: "Start",
     component: StartPage,
     meta: { isMobile: true },

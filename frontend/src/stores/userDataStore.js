@@ -12,7 +12,8 @@ export const useUserDataStore = defineStore('userData', () => {
   const userNickname = ref('')
   const userLevel = ref('1')
   const userExperience = ref('30')
-
+  const userCharacter = ref([1, 1, 2])
+  
   // 본인정보 확인 API 호출
   const checkUserNickname = async () => {
     try {
@@ -23,8 +24,8 @@ export const useUserDataStore = defineStore('userData', () => {
         'Authorization': token,  // Bearer 붙이지 않음 (확인 필요)
         'Content-Type': 'application/json'
       }
-
-      const response = await axios.get('https://i12e103.p.ssafy.io:8076/api/v1/auth/me', { headers })
+      
+      const response = await axios.get(`${BASE_URL}/auth/me`, { headers })
 
       if (response.status === 200) { 
         console.log('닉네임 조회 성공', response.data) 
@@ -91,7 +92,7 @@ export const useUserDataStore = defineStore('userData', () => {
   }
 
   return { 
-    userNickname, userLevel, userExperience,
+    userNickname, userLevel, userExperience, userCharacter,
     checkUserNickname, checkUserLevel, checkUserExperience,
          }
 })

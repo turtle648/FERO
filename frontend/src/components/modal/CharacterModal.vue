@@ -17,7 +17,7 @@
       </div>
 
       <!-- 카테고리 선택 -->
-      <div class="flex space-x-4 mb-4">
+      <div class="flex space-x-4">
         <button v-for="category in categories" :key="category"
           @click="currentCategory = category"
           class="w-[15vw] px-4 py-2 border rounded-md transition duration-200 ease-in-out"
@@ -30,18 +30,21 @@
 
       <!-- 선택 가능한 요소들 -->
       <div class="flex flex-col items-center w-full overflow-y-auto" :style="{ maxHeight: selectionBoxHeight }">
-        <div class="grid grid-cols-3 gap-2 p-3 rounded-md">
+        <div class="grid grid-cols-3 rounded-md">
           <img v-for="item in assets[currentCategory]" :key="item[1]"
             :src="item[0]" @click="selectItem(currentCategory, item)"
-            class="w-[15vw] aspect-square border-2 p-1 bg-white cursor-pointer rounded-md transition duration-200 ease-in-out"
-            :class="{ 'border-blue-500': selected[currentCategory] === item }"/>
+            class="w-[15vw] aspect-square border-2 p-1 bg-white cursor-pointer rounded-md transition-all duration-200 ease-in-out"
+            :class="{ 
+              'border-blue-600 bg-blue-100': selected[currentCategory]?.[1] === item[1], 
+              'border-gray-300': selected[currentCategory]?.[1] !== item[1] 
+            }"/>
         </div>
       </div>
 
       <!-- 완료 버튼 -->
       <div class="absolute bottom-0 left-0 w-full flex justify-center p-4 rounded-b-lg">
         <button @click="confirmSelection"
-                class="w-[15vw] mt-4 px-4 py-2 border rounded-md bg-blue-500 text-white hover:bg-green-600 transition duration-200 ease-in-out">
+                class="w-[15vw] h-[7.5vw] border rounded-md bg-blue-500 text-white hover:bg-green-600 transition duration-200 ease-in-out">
           완료
         </button>
       </div>

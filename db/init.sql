@@ -1,9 +1,4 @@
--- DROP DATABASE IF EXISTS E103_DB;
-
--- CREATE DATABASE E103_DB;
-
 USE E103_DB;
-
 
 -- 유저에 대한 정보
 CREATE TABLE user_info (
@@ -25,6 +20,7 @@ CREATE TABLE user_character (
                                 user_id VARCHAR(30) NOT NULL UNIQUE,
                                 user_nickname VARCHAR(15) NOT NULL UNIQUE,
                                 gender CHAR(1) NOT NULL CHECK (gender IN ('M', 'F')),
+                                avatar VARCHAR(30) NOT NULL,
 
                                 user_level SMALLINT UNSIGNED NOT NULL DEFAULT 1 CHECK (user_level <= 999),
                                 user_experience INT NOT NULL DEFAULT 0,
@@ -236,9 +232,192 @@ VALUES
 
 
 -- 기본 튜토리얼 데이터 삽입
-INSERT INTO tutorial_types (tutorial_name) VALUES
-                                               ('UI 기본'),
-                                               ('squat'),
-                                               ('pushup'),
-                                               ('lunge'),
-                                               ('plank');
+INSERT INTO tutorial_types (id, tutorial_name) VALUES
+                                               (1, 'pushup'),
+                                               (2, 'squat'),
+                                               (3, 'lunge'),
+                                               (4, 'plank'),
+                                               (99, 'UI');
+
+-- user_info 더미 데이터 (20명, 모든 비밀번호는 'moonym1')
+INSERT INTO user_info (user_id, user_password, user_name, user_email, phone_number) VALUES
+('ssafy123', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '홍길동', 'hong123@gmail.com', '010-1234-5678'),
+('kim456', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '김철수', 'kim456@naver.com', '010-2345-6789'),
+('lee789', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '이영희', 'lee789@daum.net', '010-3456-7890'),
+('park234', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '박지성', 'park234@gmail.com', '010-4567-8901'),
+('choi567', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '최민수', 'choi567@naver.com', '010-5678-9012'),
+('jung111', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '정소희', 'jung111@gmail.com', '010-6789-0123'),
+('kang222', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '강동원', 'kang222@naver.com', '010-7890-1234'),
+('yoon333', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '윤서준', 'yoon333@daum.net', '010-8901-2345'),
+('shin444', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '신민아', 'shin444@gmail.com', '010-9012-3456'),
+('song555', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '송혜교', 'song555@naver.com', '010-0123-4567'),
+('yang666', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '양현석', 'yang666@gmail.com', '010-1111-2222'),
+('han777', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '한지민', 'han777@naver.com', '010-2222-3333'),
+('oh888', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '오연서', 'oh888@daum.net', '010-3333-4444'),
+('seo999', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '서인국', 'seo999@gmail.com', '010-4444-5555'),
+('bae000', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '배수지', 'bae000@naver.com', '010-5555-6666'),
+('cha123', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '차은우', 'cha123@gmail.com', '010-6666-7777'),
+('moon234', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '문채원', 'moon234@naver.com', '010-7777-8888'),
+('joo345', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '주지훈', 'joo345@daum.net', '010-8888-9999'),
+('ryu456', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '류준열', 'ryu456@gmail.com', '010-9999-0000'),
+('kwon567', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', '권상우', 'kwon567@naver.com', '010-0000-1111');
+
+INSERT INTO user_character (user_id, user_nickname, gender, avatar, user_level, user_experience, points) VALUES
+('ssafy123', '길동이', 'M', '7-3-9', 5, 128, 1000),
+('kim456', '철수123', 'M', '2-6-4', 3, 57, 500),
+('lee789', '영희공주', 'F', '1-8-10', 7, 184, 1500),
+('park234', '지성축구', 'M', '5-9-2', 4, 76, 800),
+('choi567', '민수킹', 'M', '4-7-1', 2, 93, 300),
+('jung111', '소희쨩', 'F', '10-3-5', 8, 42, 2000),
+('kang222', '동원오빠', 'M', '6-2-8', 6, 177, 1200),
+('yoon333', '서준맨', 'M', '9-4-1', 9, 25, 2300),
+('shin444', '민아걸', 'F', '3-7-6', 3, 134, 600),
+('song555', '혜교님', 'F', '8-5-2', 5, 61, 1100),
+('yang666', '현석왕', 'M', '2-1-10', 4, 150, 900),
+('han777', '지민공듀', 'F', '5-9-7', 7, 92, 1700),
+('oh888', '연서비누', 'F', '7-4-3', 2, 189, 400),
+('seo999', '인국왕자', 'M', '10-6-1', 6, 78, 1400),
+('bae000', '수지짱', 'F', '3-2-9', 8, 46, 1900),
+('cha123', '은우꽃미남', 'M', '4-10-5', 5, 173, 1200),
+('moon234', '채원공주', 'F', '1-8-6', 3, 55, 700),
+('joo345', '지훈멋짐', 'M', '6-7-2', 9, 99, 2200),
+('ryu456', '준열검사', 'M', '9-5-8', 4, 37, 1000),
+('kwon567', '상우형님', 'M', '2-3-4', 7, 35, 1600);
+
+
+
+TRUNCATE TABLE user_rank_scores;
+
+INSERT INTO user_rank_scores (user_id, exercise_id, rank_score) VALUES
+('ssafy123', 1, 1148),
+('ssafy123', 2, 1238),
+('ssafy123', 3, 1080),
+('ssafy123', 4, 1228),
+('kim456', 1, 1706),
+('kim456', 2, 1109),
+('kim456', 3, 1347),
+('kim456', 4, 1403),
+('lee789', 1, 1020),
+('lee789', 2, 1237),
+('lee789', 3, 1789),
+('lee789', 4, 1587),
+('park234', 1, 866),
+('park234', 2, 1728),
+('park234', 3, 991),
+('park234', 4, 1349),
+('choi567', 1, 1177),
+('choi567', 2, 1575),
+('choi567', 3, 1633),
+('choi567', 4, 1360),
+('jung111', 1, 1782),
+('jung111', 2, 1631),
+('jung111', 3, 857),
+('jung111', 4, 1217),
+('kang222', 1, 1632),
+('kang222', 2, 1250),
+('kang222', 3, 940),
+('kang222', 4, 1608),
+('yoon333', 1, 1506),
+('yoon333', 2, 1678),
+('yoon333', 3, 1028),
+('yoon333', 4, 1698),
+('shin444', 1, 1301),
+('shin444', 2, 1460),
+('shin444', 3, 1399),
+('shin444', 4, 1328),
+('song555', 1, 912),
+('song555', 2, 905),
+('song555', 3, 938),
+('song555', 4, 1047),
+('yang666', 1, 869),
+('yang666', 2, 1553),
+('yang666', 3, 1699),
+('yang666', 4, 887),
+('han777', 1, 1132),
+('han777', 2, 1468),
+('han777', 3, 1470),
+('han777', 4, 1455),
+('oh888', 1, 862),
+('oh888', 2, 1679),
+('oh888', 3, 911),
+('oh888', 4, 1476),
+('seo999', 1, 1454),
+('seo999', 2, 1186),
+('seo999', 3, 892),
+('seo999', 4, 912),
+('bae000', 1, 954),
+('bae000', 2, 1364),
+('bae000', 3, 1355),
+('bae000', 4, 878),
+('cha123', 1, 1073),
+('cha123', 2, 1212),
+('cha123', 3, 1729),
+('cha123', 4, 930),
+('moon234', 1, 1068),
+('moon234', 2, 819),
+('moon234', 3, 1076),
+('moon234', 4, 1085),
+('joo345', 1, 1479),
+('joo345', 2, 993),
+('joo345', 3, 895),
+('joo345', 4, 1619),
+('ryu456', 1, 1590),
+('ryu456', 2, 886),
+('ryu456', 3, 1346),
+('ryu456', 4, 1492),
+('kwon567', 1, 1309),
+('kwon567', 2, 1480),
+('kwon567', 3, 1098),
+('kwon567', 4, 1303);
+
+UPDATE user_stats
+SET 
+    arms_stats = FLOOR(10 + (RAND() * (1000 - 10))),
+    legs_stats = FLOOR(10 + (RAND() * (1000 - 10))),
+    chest_stats = FLOOR(10 + (RAND() * (1000 - 10))),
+    abs_stats = FLOOR(10 + (RAND() * (1000 - 10))),
+    back_stats = FLOOR(10 + (RAND() * (1000 - 10))),
+    stamina_stats = FLOOR(10 + (RAND() * (1000 - 10))),
+    updated_at = DATE_ADD(NOW(), INTERVAL -FLOOR(RAND() * 365) DAY)
+WHERE id > 0;
+
+INSERT INTO exercise_log (user_id, exercise_duration, exercise_cnt, exercise_stats_ratio_id, exercise_date)
+SELECT 
+    user_id,
+    FLOOR(10 + (RAND() * (180 - 10))) AS exercise_duration,
+    FLOOR(1 + (RAND() * (5 - 1))) AS exercise_cnt,
+    FLOOR(1 + (RAND() * 4)) AS exercise_stats_ratio_id,
+    DATE_ADD(NOW(), INTERVAL -FLOOR(RAND() * 365) DAY) AS exercise_date
+FROM (
+    SELECT 'ssafy123' AS user_id UNION ALL
+    SELECT 'kim456' UNION ALL
+    SELECT 'lee789' UNION ALL
+    SELECT 'park234' UNION ALL
+    SELECT 'choi567' UNION ALL
+    SELECT 'jung111' UNION ALL
+    SELECT 'kang222' UNION ALL
+    SELECT 'yoon333' UNION ALL
+    SELECT 'shin444' UNION ALL
+    SELECT 'song555' UNION ALL
+    SELECT 'yang666' UNION ALL
+    SELECT 'han777' UNION ALL
+    SELECT 'oh888' UNION ALL
+    SELECT 'seo999' UNION ALL
+    SELECT 'bae000' UNION ALL
+    SELECT 'cha123' UNION ALL
+    SELECT 'moon234' UNION ALL
+    SELECT 'joo345' UNION ALL
+    SELECT 'ryu456' UNION ALL
+    SELECT 'kwon567'
+) AS users
+ORDER BY RAND()
+LIMIT 50;
+
+UPDATE user_tutorial_progress
+SET is_completed = 1, 
+    completed_at = NOW()
+WHERE id IN (
+    SELECT id FROM (
+        SELECT id FROM user_tutorial_progress ORDER BY RAND() LIMIT 30
+    ) AS subquery
+);
