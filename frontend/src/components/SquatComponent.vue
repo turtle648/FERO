@@ -27,14 +27,14 @@ const showModal = ref(false)
 const showErrorModal = ref(false) // 에러 모달 상태 변수
 
 const isTutorialMode = window.location.href.includes("tutorial")
-const isSingleMode = window.location.href.includes("single-mode")
+// const isSingleMode = window.location.href.includes("single-mode")
 
 // 모드 리턴
-const getMode = () => {
-  if (isTutorialMode) return "Tutorial Mode"
-  if (isSingleMode) return "Single Mode"
-  return "Unknown Mode"
-}
+// const getMode = () => {
+//   if (isTutorialMode) return "Tutorial Mode"
+//   if (isSingleMode) return "Single Mode"
+//   return "Unknown Mode"
+// }
 
 // 필수 랜드마크 정의
 const requiredLandmarks = [0, 1, 2, 3, 4, 5, 6, 27, 28, 29, 30, 31, 32]
