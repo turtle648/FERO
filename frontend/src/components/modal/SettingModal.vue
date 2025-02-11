@@ -2,6 +2,7 @@
   <div class="setting-modal">
     <div class="content">
       <button id="close-btn" @click="closeSettingModal">X</button>
+      <button @click="routeRTC">테스트webRTC</button>
       <ul class="menu-list">
         <li class="title">설정</li>
         <li>설정에 들어올 정보들</li>
@@ -20,6 +21,14 @@
 import { defineEmits } from "vue"
 import { useUserStore } from "@/stores/store"
 import { useUserDataStore } from "@/stores/userDataStore"
+
+// 테스트용 코드( 추후 삭제 )
+import { useRouter } from "vue-router"
+const router = useRouter()
+const routeRTC = () => {
+  router.push({ name: "VideoRoom" })
+}
+// 테스트용 코드 ( 여기까지 )
 
 const emit = defineEmits(["closeSetting"])
 const closeSettingModal = () => {
