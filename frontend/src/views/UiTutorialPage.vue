@@ -2,14 +2,15 @@
   <div class="ui-tutorial-page" @click="nextStep">
     <div class="relative w-screen h-screen bg-gray-100">
       <!-- 좌측 상단: 카운트 -->
-      <div class="absolute top-4 left-4 text-lg font-bold bg-white p-2 rounded shadow">카운트: 0</div>
+      <div class="absolute top-4 left-4 text-lg font-bold p-2">카운트: 0</div>
 
       <!-- 우측 상단: 타이머 -->
-      <div class="absolute top-4 right-4 text-lg font-bold bg-white p-2 rounded shadow">타이머: 30초</div>
+      <div class="absolute top-4 right-4 text-lg font-bold p-2">타이머: 30초</div>
 
       <!-- 중앙: 제목 -->
       <!-- 컴퓨터 이미지 -->
-      <img class="w-4/5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="@/assets/furni_1.png" alt="" />
+      <!-- <img class="w-full h-fulll absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="@/assets/furni_1.png" alt="" /> -->
+      <img class="w-full h-full object-fill absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="@/assets/images/tmp-1.png" alt="" />
 
       <!-- 하단 중앙: 종료 버튼 -->
       <button class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">종료</button>
