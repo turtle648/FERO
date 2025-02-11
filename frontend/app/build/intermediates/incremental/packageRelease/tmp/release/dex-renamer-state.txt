@@ -1,0 +1,4 @@
+#Tue Feb 11 01:16:23 UTC 2025
+base.0=/home/ubuntu/S12P11E103/frontend/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+renamed.0=classes.dex
+path.0=classes.dex
