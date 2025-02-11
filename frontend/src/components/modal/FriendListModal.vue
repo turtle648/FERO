@@ -21,9 +21,9 @@
 import { ref, defineEmits } from "vue"
 
 // 모달 닫기
-const emit = defineEmits(["closeFriend"])
+const emit = defineEmits(['close-modal'])
 const closeFriendModal = () => {
-  emit("closeFriend")
+  emit('close-modal')
 }
 
 // 친구목록, 채팅목록 상태 관리

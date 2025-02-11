@@ -28,9 +28,9 @@
 <script setup>
 import { ref, defineEmits, onMounted } from "vue"
 
-const emit = defineEmits(["closeCalendar"])
+const emit = defineEmits(['close-modal'])
 const closeCalendarModal = () => {
-  emit("closeCalendar")
+  emit('close-modal')
 }
 
 // 날짜 관련 상태 관리

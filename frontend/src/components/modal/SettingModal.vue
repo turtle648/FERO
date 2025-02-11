@@ -35,9 +35,9 @@ const routeRTC = () => {
 }
 // 테스트용 코드 ( 여기까지 )
 
-const emit = defineEmits(["closeSetting"])
+const emit = defineEmits(['close-modal'])
 const closeSettingModal = () => {
-  emit("closeSetting")
+  emit('close-modal')
 }
 
 const userStore = useUserStore()

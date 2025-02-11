@@ -72,7 +72,7 @@ import { useMainStore, TUTORIAL_IDS } from '@/stores/mainStore'
 
 const router = useRouter()
 const mainStore = useMainStore()
-const emit = defineEmits(['closeFitness'])
+const emit = defineEmits(['close-modal'])
 
 const showModeModal = ref(false)
 const selectedNumber = ref(null)
@@ -152,7 +152,7 @@ const toggleTutorialComplete = () => {
 }
 
 const closeFitnessModal = () => {
-  emit('closeFitness')
+  emit('close-modal')
 }
 </script>
 
