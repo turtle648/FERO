@@ -126,6 +126,7 @@ public class RegistrationService {
             character.setId(user.getId());
             character.setUserNickname(characterInfo.getUserNickname());
             character.setGender(characterInfo.getGender());
+            character.setAvatar(characterInfo.getAvatar());
             character.setPoints((short) 0);
 
             user.setUserCharacter(character); // 양방향 관계 설정
