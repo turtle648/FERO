@@ -33,6 +33,7 @@ import { ref, onMounted, onUnmounted } from "vue"
 import { useRouter } from "vue-router"
 import { defineEmits } from "vue"
 
+const emit = defineEmits(["pose-detected", "openModal"])
 const router = useRouter()
 
 // 버튼
@@ -65,6 +66,7 @@ function startTimer() {
     if (timeLeft.value <= 0) {
       clearInterval(intervalId) // 타이머 종료
       formattedTime.value = "00:00"
+      emit("openModal")
     }
   }, 1000)
 }
@@ -106,7 +108,6 @@ import { Camera } from "@mediapipe/camera_utils"
 import { Pose, POSE_CONNECTIONS } from "@mediapipe/pose"
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils"
 
-const emit = defineEmits(["pose-detected"])
 const videoElement = ref(null)
 const canvasElement = ref(null)
 let camera = null
@@ -180,11 +181,8 @@ onMounted(async () => {
 
 // 종료 버튼 클릭 시
 function stopCameraAndNavigate() {
-  if (camera) {
-    camera.stop() // 카메라 스트림 중지
-  }
-
-  router.push("/main") // /main으로 이동
+  if (camera) { camera.stop() }
+  router.push({ name: 'Main' }) // /main으로 이동
 }
 
 onUnmounted(() => {
