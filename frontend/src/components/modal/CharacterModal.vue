@@ -76,9 +76,9 @@ const selected = ref({ hair: null, face: null, body: null })
 // `userInfo.avatar` 값이 변경될 때 자동으로 `selected` 업데이트
 watchEffect(() => {
   if (userInfo.value?.avatar) {
-    selected.value.hair = [assets['hair'][userInfo.value.avatar[0]], userInfo.value.avatar[0]]
-    selected.value.face = [assets['face'][userInfo.value.avatar[1]], userInfo.value.avatar[1]]
-    selected.value.body = [assets['body'][userInfo.value.avatar[2]], userInfo.value.avatar[2]]
+    selected.value.hair = [assets['hair'][userInfo.value.avatar[0]][0], userInfo.value.avatar[0]]
+    selected.value.face = [assets['face'][userInfo.value.avatar[1]][0], userInfo.value.avatar[1]]
+    selected.value.body = [assets['body'][userInfo.value.avatar[2]][0], userInfo.value.avatar[2]]
   }
 })
 
