@@ -12,7 +12,7 @@ export const useUserDataStore = defineStore('userData', () => {
   const userNickname = ref('')
   const userLevel = ref('1')
   const userExperience = ref('30')
-  const userCharacter = ref([1, 1, 1])
+  const userCharacter = ref([1, 1, 2])
   
   // 본인정보 확인 API 호출
   const checkUserNickname = async () => {

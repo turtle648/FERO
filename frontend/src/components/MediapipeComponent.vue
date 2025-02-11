@@ -5,11 +5,11 @@
       <div class="timer text-white-common z-20 absolute top-0 right-10">{{ formattedTime }}</div>
 
       <!-- fix: 시간 선택은 앞에서 넘어와야함 -->
-      <select class="absolute z-10" v-model="selectedTime" @change="resetTimer">
+      <!-- <select class="absolute z-10" v-model="selectedTime" @change="resetTimer">
         <option :value="1 * 60 * 1000">1분</option>
         <option :value="2 * 60 * 1000">2분</option>
         <option :value="5 * 60 * 1000">5분</option>
-      </select>
+      </select> -->
       <!-- <button class="text-white-common z-10" @click="startTimer">시작</button> -->
     </div>
     <!-- 중앙 영역 -->
@@ -30,9 +30,11 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue"
-import { useRouter } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 import { defineEmits } from "vue"
 
+const emit = defineEmits(["pose-detected", "openModal"])
+const route = useRoute()
 const router = useRouter()
 
 // 버튼
@@ -41,7 +43,7 @@ import ReportIssueButton from "@/components/button/ReportIssueButton.vue"
 
 let intervalId = null // setInterval ID 저장 (타이머 초기화용)
 
-const selectedTime = ref(2 * 60 * 1000) // 기본값: 2분
+const selectedTime = ref(1 * 60 * 1000) // 기본값: 1분
 const timeLeft = ref(selectedTime.value) // 남은 시간 (ms)
 const formattedTime = ref(formatTime(timeLeft.value)) // 표시할 시간
 
@@ -65,16 +67,17 @@ function startTimer() {
     if (timeLeft.value <= 0) {
       clearInterval(intervalId) // 타이머 종료
       formattedTime.value = "00:00"
+      emit("openModal")
     }
   }, 1000)
 }
 
 // 타이머 리셋 함수 (시간 변경 시 호출)
-function resetTimer() {
-  clearInterval(intervalId) // 기존 타이머 초기화
-  timeLeft.value = selectedTime.value // 선택된 시간으로 초기화
-  formattedTime.value = formatTime(timeLeft.value)
-}
+// function resetTimer() {
+//   clearInterval(intervalId) // 기존 타이머 초기화
+//   timeLeft.value = selectedTime.value // 선택된 시간으로 초기화
+//   formattedTime.value = formatTime(timeLeft.value)
+// }
 
 // 카운트다운
 const countdown = ref(3)
@@ -103,10 +106,10 @@ function startCountdown() {
 
 // 미디어파이프 관련
 import { Camera } from "@mediapipe/camera_utils"
-import { Pose, POSE_CONNECTIONS } from "@mediapipe/pose"
-import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils"
+import { Pose } from "@mediapipe/pose"
+// import { Pose, POSE_CONNECTIONS } from "@mediapipe/pose"
+// import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils"
 
-const emit = defineEmits(["pose-detected"])
 const videoElement = ref(null)
 const canvasElement = ref(null)
 let camera = null
@@ -126,11 +129,11 @@ const onResults = (results) => {
   canvasCtx.drawImage(results.image, 0, 0, canvasElement.value.width, canvasElement.value.height)
 
   if (results.poseLandmarks) {
-    drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
-      color: "#00FF00",
-      lineWidth: 4,
-    })
-    drawLandmarks(canvasCtx, results.poseLandmarks, { color: "#FF0000", lineWidth: 2 })
+    // drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
+    //   color: "#00FF00",
+    //   lineWidth: 4,
+    // })
+    // drawLandmarks(canvasCtx, results.poseLandmarks, { color: "#FF0000", lineWidth: 2 })
     emit("pose-detected", results.poseLandmarks)
   }
 
@@ -176,15 +179,21 @@ onMounted(async () => {
   } catch (error) {
     console.error("카메라 시작 오류:", error)
   }
+
+  // 시작 시간 설정 by url prams
+  const pathSegments = route.path.split('/').filter(Boolean) // URL을 '/' 기준으로 분할하고, 빈 요소(마지막 `/`) 제거
+  const timeFromUrl = parseInt(pathSegments[pathSegments.length - 1]) // 마지막 값 가져오기
+
+  if (!isNaN(timeFromUrl)) {
+    selectedTime.value = timeFromUrl * 1000 // 초에서 밀리초 변환
+  }
+
 })
 
 // 종료 버튼 클릭 시
 function stopCameraAndNavigate() {
-  if (camera) {
-    camera.stop() // 카메라 스트림 중지
-  }
-
-  router.push("/main") // /main으로 이동
+  if (camera) { camera.stop() }
+  router.push({ name: 'Main' }) // /main으로 이동
 }
 
 onUnmounted(() => {

@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel("UserUpdateReq")
+@ApiModel("RankUpdateReq")
 public class RankUpdateReq {
 
     @ApiModelProperty(name = "승리한 유저의 Id")
