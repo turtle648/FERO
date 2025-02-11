@@ -100,15 +100,19 @@
 </style>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, defineProps } from 'vue'
+import { ref, onMounted, onBeforeUnmount, defineEmits, defineProps } from 'vue'
 
 // ver2
 import SquatComponent from '@/components/SquatComponent.vue'
+import axios from 'axios'
 
 // 초기 상태를 false로 설정
 const isMyVideoOn = ref(true)
 const isMyAudioOn = ref(false)  // 변경
 const isPeerAudioOn = ref(false)  // 변경
+
+const emit = defineEmits(['setIsMatched']);
+const props = defineProps(['exercise']);
 
 const toggleMyVideo = () => {
   isMyVideoOn.value = !isMyVideoOn.value
@@ -137,8 +141,6 @@ const togglePeerAudio = () => {
   }
 }
 
-
-const props = defineProps(['roomId'])
 const myFace = ref(null)
 const peerVideo = ref(null)
 let webSocket
@@ -166,9 +168,9 @@ const getMedia = async () => {
     })
     
     // 오디오 트랙 초기 상태를 비활성화
-    myStream.getAudioTracks().forEach(track => {
-      track.enabled = false
-    })
+    // myStream.getAudioTracks().forEach(track => {
+    //   track.enabled = false
+    // })
     
     if (myFace.value) {
       myFace.value.srcObject = myStream
@@ -195,7 +197,6 @@ const createOffer = async (receiverId) => {
     sendMessage({
       type: "offer",
       sdp: offer,
-      room: props.roomId,
       receiver: receiverId
     })
   } catch (error) {
@@ -220,7 +221,6 @@ const initRTCPeerConnection = () => {
       sendMessage({
         type: "candidate",
         candidate: event.candidate,
-        room: props.roomId,
         receiver: currentPeerId.value // 현재 연결된 Peer의 ID를 receiver로 전송
       })
     }
@@ -251,8 +251,9 @@ const handleWebSocketMessage = async (event) => {
     }
 
     case "offer": {
+      emit('setIsMatched', true);
       currentPeerId.value = message.sender // offer를 보낸 Peer의 ID 저장
-      
+
       if (!myPeerConnection) {
         await getMedia()
         initRTCPeerConnection()
@@ -266,7 +267,6 @@ const handleWebSocketMessage = async (event) => {
       sendMessage({
         type: "answer",
         sdp: answer,
-        room: props.roomId,
         receiver: message.sender
       })
       break
@@ -312,18 +312,32 @@ const handleWebSocketMessage = async (event) => {
   }
 }
 
+
+async function clickSubmitRoomId () {
+    const res = await axios.post("http://localhost:8076/api/v1/matching/enter", null, {
+        headers: {Authorization: `Bearer ${localStorage.getItem('authToken')}`},
+        params: {exerciseType : props.exercise}
+    })
+    
+    if(res.status === 200) {
+      console.log("📜 매칭시도");
+    }
+}
+
 // 컴포넌트 마운트 시 실행
-onMounted(async () => {
+onMounted(() => {
   // WebSocket 연결
-  webSocket = new WebSocket('wss://i12e103.p.ssafy.io:8076/api/v1/videorooms')
+  webSocket = new WebSocket('ws://localhost:8076/api/v1/videorooms')
   
-  webSocket.onopen = () => {
+  webSocket.onopen = async () => {
     console.log("WebSocket 연결됨")
     // 방 입장 메시지 전송
     sendMessage({
-      type: "join_room",
-      room: props.roomId
+      type: "auth",
+      auth: localStorage.getItem("authToken")
     })
+
+    await clickSubmitRoomId()
   }
 
   webSocket.onmessage = handleWebSocketMessage

@@ -1,16 +1,17 @@
 const { defineConfig } = require('@vue/cli-service');
-const fs = require('fs');
-const path = require('path');
+// const fs = require('fs');
+// const path = require('path');
 
 const devConfig = {
   transpileDependencies: true,
   devServer: process.env.NODE_ENV === 'development' ? {
     host: '0.0.0.0',
     allowedHosts: 'all',
-    https: {
-      key: fs.readFileSync(path.join(__dirname, 'certs/localhost.key')),
-      cert: fs.readFileSync(path.join(__dirname, 'certs/localhost.crt')),
-    },
+    // https: {
+    //   key: fs.readFileSync(path.join(__dirname, 'certs/localhost.key')),
+    //   cert: fs.readFileSync(path.join(__dirname, 'certs/localhost.crt')),
+    // },
+    https: false,
     port: 5173,
   } : {},
   pwa: {

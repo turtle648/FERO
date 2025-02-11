@@ -1,108 +1,28 @@
 <!-- views/RankMatchPage.vue -->
 <template>
-  <div class="rank-match-container">
+  <div v-if="!isMatched" class="rank-match-container">
       <!-- 매칭 진행 상태 표시 -->
-      <div v-if="matchStatus === 'searching'" class="matching-status">
+      <div class="matching-status">
           <div class="status-text">매칭을 찾는 중입니다...</div>
           <div class="loading-spinner"></div>
       </div>
-
-      <!-- 매칭 발견 시 수락/거절 UI -->
-      <div v-if="matchStatus === 'found'" class="match-found">
-          <h3>매치가 발견되었습니다!</h3>
-          <div class="button-group">
-              <button 
-                  @click="acceptMatch" 
-                  class="accept-button"
-                  :disabled="isLoading"
-              >
-                  {{ isLoading ? '처리중...' : '수락' }}
-              </button>
-              <button 
-                  @click="declineMatch" 
-                  class="decline-button"
-                  :disabled="isLoading"
-              >
-                  거절
-              </button>
-          </div>
-      </div>
-
-      <!-- 에러 상태 UI -->
-      <div v-if="matchStatus === 'error'" class="error-status">
-          <div class="error-text">매칭 중 오류가 발생했습니다</div>
-          <button @click="retryMatching" class="retry-button">
-              다시 시도
-          </button>
-      </div>
   </div>
+  <VideoComponent :class="{'hidden': !isMatched}" @set-is-matched="setIsMatched" :exercise="exercise"/>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, defineProps } from 'vue'
-import { useRouter } from 'vue-router'
-import { useMatchStore } from '@/stores/matchStore'
-import { storeToRefs } from 'pinia'
+import { ref } from 'vue'
+import VideoComponent from '@/components/videoroom/VideoComponent.vue';
+import { useRoute } from 'vue-router';
 
-// props 정의
-const props = defineProps({
-  exercise: {
-      type: String,
-      required: true
-  }
-})
 
-const router = useRouter()
-const matchStore = useMatchStore()
-const { matchStatus } = storeToRefs(matchStore)
-const isLoading = ref(false)
-
-// 매칭 수락 처리
-const acceptMatch = async () => {
-  isLoading.value = true
-  try {
-      await matchStore.acceptMatch()
-      router.push({
-          name: 'RankMode',
-          params: {
-              exercise: props.exercise
-          }
-      })
-  } catch (error) {
-      console.error('매칭 수락 실패:', error)
-      matchStore.matchStatus = 'error'
-  } finally {
-      isLoading.value = false
-  }
+const route = useRoute();
+const exercise = ref(route.params.exercise); // URL 파라미터를 ref로 저장
+const isMatched = ref(false);
+const setIsMatched = (value) => {
+  isMatched.value = value;
 }
 
-// 매칭 거절 처리
-const declineMatch = async () => {
-  isLoading.value = true
-  try {
-      await matchStore.declineMatch()
-  } catch (error) {
-      console.error('매칭 거절 실패:', error)
-      matchStore.matchStatus = 'error'
-  } finally {
-      isLoading.value = false
-  }
-}
-
-// 매칭 재시도
-const retryMatching = () => {
-  matchStore.initializeWebSocket()
-}
-
-onMounted(() => {
-  matchStore.initializeWebSocket()
-})
-
-onBeforeUnmount(() => {
-  if (matchStore.webSocket) {
-      matchStore.webSocket.close()
-  }
-})
 </script>
 
 <style scoped>
@@ -150,5 +70,9 @@ onBeforeUnmount(() => {
 
 .retry-button {
   @apply px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600;
+}
+
+.hidden {
+  visibility: hidden;
 }
 </style>

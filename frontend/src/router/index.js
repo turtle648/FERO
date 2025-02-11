@@ -3,10 +3,8 @@ import StartPage from "@/views/StartPage.vue"
 import MainPage from "@/views/MainPage.vue"
 import LoginPage from "@/views/LoginPage.vue"
 import FitnessTutorialPage from "@/views/FitnessTutorialPage.vue"
-import VideoRoomPage from "@/views/VideoRoomPage.vue"
 import SingleModePage from "@/views/SingleModePage.vue"
 import MultiModePage from "@/views/MultiModePage.vue"
-import RankModePage from "@/views/RankModePage.vue"
 // import MediapipeComponent from "@/components/MediapipeComponent.vue" // fix: 수정예정
 import QRComponent from "@/components/QRComponent.vue"
 import RankMatchPage from "@/views/RankMatchPage.vue"
@@ -49,12 +47,6 @@ const routes = [
     component: FitnessTutorialPage,
     meta: { isMobile: true },
   },
-  {
-    path: "/fitness",
-    name: "VideoRoom",
-    component: VideoRoomPage,
-    meta: { isMobile: true },
-  },
   // {
   //   path: "/mediapipe",
   //   name: "Mediapipe",
@@ -76,7 +68,7 @@ const routes = [
   {
     path: "/rank-mode/:exercise",
     name: "RankMode",
-    component: RankModePage,
+    component: RankMatchPage,
     props: true,
   },
   {
