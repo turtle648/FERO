@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import StartPage from "@/views/StartPage.vue"
 import MainPage from "@/views/MainPage.vue"
 import LoginPage from "@/views/LoginPage.vue"
-import TutorialPage from "@/views/TutorialPage.vue"
+import FitnessTutorialPage from "@/views/FitnessTutorialPage.vue"
 import VideoRoomPage from "@/views/VideoRoomPage.vue"
 import SingleModePage from "@/views/SingleModePage.vue"
 import MultiModePage from "@/views/MultiModePage.vue"
@@ -10,9 +10,10 @@ import RankModePage from "@/views/RankModePage.vue"
 // import MediapipeComponent from "@/components/MediapipeComponent.vue" // fix: 수정예정
 import QRComponent from "@/components/QRComponent.vue"
 import RankMatchPage from "@/views/RankMatchPage.vue"
+import UiTutorialPage from "@/views/UiTutorialPage.vue"
 
 // 랭크매치, 랭크모드에 인증 관련 메타데이터 고려해볼 것
-// meta: { 
+// meta: {
 //   requiresAuth: true,  // 인증 필요
 //   isMobile: true      // 모바일 전용
 
@@ -45,7 +46,7 @@ const routes = [
   {
     path: "/tutorial/:exercise",
     name: "Tutorial",
-    component: TutorialPage,
+    component: FitnessTutorialPage,
     meta: { isMobile: true },
   },
   {
@@ -84,10 +85,16 @@ const routes = [
     component: QRComponent,
   },
   {
-    path: '/rank-match/:exercise',
-    name: 'RankMatch',
+    path: "/rank-match/:exercise",
+    name: "RankMatch",
     component: RankMatchPage,
-    props: true
+    props: true,
+  },
+  {
+    path: '/ui-tutorial',
+    name: 'UiTutorial',
+    component: UiTutorialPage,
+    meta: { isMobile: true }
   },
 ]
 

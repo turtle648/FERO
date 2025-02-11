@@ -2,7 +2,7 @@
   <div class="container flex flex-col items-center justify-between p-4 h-screen w-screen">
     <div class="flex justify-between w-full">
       <!-- <div class="counter text-white-common z-10">(갯수)</div> -->
-      <div class="timer text-white-common z-20 absolute top-0 right-0">{{ formattedTime }}</div>
+      <div class="timer text-white-common z-20 absolute top-0 right-10">{{ formattedTime }}</div>
 
       <!-- fix: 시간 선택은 앞에서 넘어와야함 -->
       <select class="absolute z-10" v-model="selectedTime" @change="resetTimer">

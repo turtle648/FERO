@@ -9,7 +9,7 @@
           스쿼트
         </button>
         <button class="tutorial-button" @click="toggleTutorialComplete">
-          {{ isTutorialComplete ? '튜토리얼 완료됨' : '튜토리얼 완료하기' }}
+          {{ isSquatCompleted ? '튜토리얼 완료됨' : '튜토리얼 완료하기' }}
         </button>
       </div>
       
@@ -54,7 +54,7 @@
         <button 
           class="mode-button" 
           @click="selectMode('rank')"
-          :disabled="isLoading || !isTutorialComplete"
+          :disabled="isLoading || !isSquatCompleted"
         >
           <p class="mode-label">
             {{ isLoading ? '처리중...' : 'Rank Mode' }}
@@ -66,74 +66,79 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue'
+import { ref, computed, defineEmits } from 'vue'
 import { useRouter } from 'vue-router'
+import { useMainStore, TUTORIAL_IDS } from '@/stores/mainStore'
 
 const router = useRouter()
+const mainStore = useMainStore()
 const emit = defineEmits(['closeFitness'])
 
-const isTutorialComplete = ref(false)
 const showModeModal = ref(false)
 const selectedNumber = ref(null)
 const isLoading = ref(false)
 
-const toggleTutorialComplete = () => {
-  isTutorialComplete.value = !isTutorialComplete.value
+// computed 속성은 유지
+const isUICompleted = computed(() => {
+  const uiTutorial = mainStore.tutorial.find(t => t.tutorialId === TUTORIAL_IDS.UI)
+  return uiTutorial?.completed || false
+})
+
+const isSquatCompleted = computed(() => {
+  const squatTutorial = mainStore.tutorial.find(t => t.tutorialId === TUTORIAL_IDS.SQUAT)
+  return squatTutorial?.completed || false
+})
+
+// handleSquatClick 함수 수정 - computed 속성 활용
+const handleSquatClick = () => {
+  if (!isUICompleted.value) {
+    router.push('/ui-tutorial')
+    return
+  }
+  
+  if (!isSquatCompleted.value) {
+    router.push(`/tutorial/${TUTORIAL_IDS.SQUAT}`)
+    return
+  }
+  
+  showModeModal.value = true
 }
 
-const handleSquatClick = () => {
-  if (!isTutorialComplete.value) {
-    router.push('/tutorial')
-  } else {
-    showModeModal.value = true
-  }
-}
 
 const selectNumber = (num) => {
   selectedNumber.value = selectedNumber.value === num ? null : num
 }
 
 const selectMode = async (mode) => {
-  const exercise = 'squat' // 현재 선택된 운동
-  
+  const exerciseId = TUTORIAL_IDS.SQUAT // 스쿼트 ID(2) 사용
+
   switch(mode) {
     case 'single':
       if (!selectedNumber.value) return
       router.push({
         name: 'SingleMode',
-        params: {
-          exercise: exercise,
-          count: selectedNumber.value
-        }
+        params: { exercise: exerciseId, count: selectedNumber.value }
       })
       break
-      
+
     case 'multi':
-      router.push({
-        name: 'MultiMode',
-        params: {
-          exercise: exercise
-        }
+      router.push({ 
+        name: 'MultiMode', 
+        params: { exercise: exerciseId } 
       })
       break
-      
+
     case 'rank':
       try {
         isLoading.value = true
-        // 튜토리얼 완료 여부 확인
-        if (!isTutorialComplete.value) {
-          alert('먼저 튜토리얼을 완료해주세요.')
+        if (!isSquatCompleted.value) {
+          alert('스쿼트 튜토리얼을 먼저 완료해주세요.')
           return
         }
-        
-        router.push({
-          name: 'RankMatch',
-          params: {
-            exercise: exercise
-          }
+        router.push({ 
+          name: 'RankMatch', 
+          params: { exercise: exerciseId } 
         })
-      } catch (error) {
-        console.error('랭크 모드 진입 실패:', error)
       } finally {
         isLoading.value = false
         showModeModal.value = false
@@ -144,12 +149,17 @@ const selectMode = async (mode) => {
   showModeModal.value = false
 }
 
+const toggleTutorialComplete = () => {
+  // [옵션] 서버와 연동할 경우 mainStore.completeTutorial() 호출
+}
+
 const closeFitnessModal = () => {
   emit('closeFitness')
 }
 </script>
 
 <style scoped>
+/* 기존 스타일 유지 */
 .fitness-modal {
   @apply fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
          w-[40vh] h-[60vh] bg-white rounded-xl shadow-lg 
