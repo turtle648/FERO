@@ -14,7 +14,7 @@
           <div class="absolute inset-0 flex items-center justify-center text-black text-[1.5vh] font-bold">
             Lv. {{ level }}
           </div>
-          <div class="bg-blue-500 h-full rounded-full" :style="{ width: Math.min(exp, 100) + '%' }"></div>
+          <div class="bg-blue-500 h-full rounded-full" :style="{ width: Math.min(exp/2, 100) + '%' }"></div>
         </div>
       </div>
     </div>
