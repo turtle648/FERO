@@ -97,7 +97,7 @@ public class MatchingController {
         }
     }
 
-    // 3. 매칭 후 실행 될 API
+    /*// 3. 매칭 후 실행 될 API
     // Controller
     @PostMapping("/match-success")
     public ResponseEntity<?> handleMatchSuccess(@RequestBody MatchSuccessEvent matchEvent) {
@@ -117,6 +117,6 @@ public class MatchingController {
             return ResponseEntity.badRequest()
                     .body(BaseResponseBody.of(400, "매칭 처리 중 오류 발생: " + e.getMessage()));
         }
-    }
+    }*/
 
 }

@@ -219,7 +219,7 @@ public class MatchingService {
         removeFromRedis(exerciseId, userToken2);
 
         // eventPublisher 추가해야 함 -> WebSocket 으로
-//        eventPublisher.publishEvent(new MatchSuccessEvent(userToken1, userToken2, exerciseId));
+        eventPublisher.publishEvent(new MatchSuccessEvent(userToken1, userToken2, exerciseId));
 
 
 
