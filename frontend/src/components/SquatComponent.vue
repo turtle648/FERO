@@ -80,6 +80,10 @@ const processPose = (landmarks) => {
   const rightKneeAngle = calculateAngle(rightHip, rightKnee, rightAnkle)
   const avgKneeAngle = (leftKneeAngle + rightKneeAngle) / 2
 
+  if (isTutorialMode && count.value >= 3) {
+    return
+  }
+
   if (!isDown.value && avgKneeAngle < 100) {
     isDown.value = true
     feedback.value = "Down"
