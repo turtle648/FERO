@@ -52,6 +52,42 @@ export const useUserDataStore = defineStore('userData', () => {
     }
   }
   
+  // 아바타 수정 API
+  const updateAvatar = async (newAvatar) => {
+    try {
+      const token = userStore.accessToken
+      if (!token) {
+        console.error('아바타 수정 실패: 토큰이 없습니다.')
+        return false
+      }
+
+      const headers = {
+        Authorization: token,
+        'Content-Type': 'application/json'
+      }
+
+      const response = await axios.put(`${BASE_URL}/auth/updateAvatar`, null, { 
+        headers, 
+        params: { newAvatar }
+      })
+
+      if (response.status === 200) {
+        console.log('아바타 수정 성공', response.data)
+
+        // userInfo.avatar 업데이트
+        userInfo.value.avatar = newAvatar.split('-').map(Number)
+
+        return true
+      } else {
+        console.error('아바타 수정 실패: 서버에서 응답 실패')
+        return false
+      }
+    } catch (error) {
+      console.error('아바타 수정 요청 중 에러 발생:', error)
+      if (error.response) console.error('에러 응답:', error.response.data)
+      return false
+    }
+  }
 
   // 유저 레벨 조회
   const checkUserLevel = async () => {
@@ -105,7 +141,7 @@ export const useUserDataStore = defineStore('userData', () => {
 
   return { 
     userInfo,
-    checkUserInfo, 
+    checkUserInfo, updateAvatar,
     // 삭제 예정(테스트용 API)
     checkUserLevel, checkUserExperience,
          }
