@@ -35,8 +35,8 @@
             :src="item[0]" @click="selectItem(currentCategory, item)"
             class="w-[15vw] aspect-square border-2 p-1 bg-white cursor-pointer rounded-md transition-all duration-200 ease-in-out"
             :class="{ 
-              'border-blue-600 bg-blue-100': selected[currentCategory] === item,
-              'border-gray-300': selected[currentCategory] !== item
+              'border-blue-600 bg-blue-100': selected[currentCategory]?.[1] === item[1], 
+              'border-gray-300': selected[currentCategory]?.[1] !== item[1] 
             }"/>
         </div>
       </div>
