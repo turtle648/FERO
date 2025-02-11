@@ -105,8 +105,9 @@ function startCountdown() {
 
 // 미디어파이프 관련
 import { Camera } from "@mediapipe/camera_utils"
-import { Pose, POSE_CONNECTIONS } from "@mediapipe/pose"
-import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils"
+import { Pose } from "@mediapipe/pose"
+// import { Pose, POSE_CONNECTIONS } from "@mediapipe/pose"
+// import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils"
 
 const videoElement = ref(null)
 const canvasElement = ref(null)
@@ -127,11 +128,11 @@ const onResults = (results) => {
   canvasCtx.drawImage(results.image, 0, 0, canvasElement.value.width, canvasElement.value.height)
 
   if (results.poseLandmarks) {
-    drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
-      color: "#00FF00",
-      lineWidth: 4,
-    })
-    drawLandmarks(canvasCtx, results.poseLandmarks, { color: "#FF0000", lineWidth: 2 })
+    // drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
+    //   color: "#00FF00",
+    //   lineWidth: 4,
+    // })
+    // drawLandmarks(canvasCtx, results.poseLandmarks, { color: "#FF0000", lineWidth: 2 })
     emit("pose-detected", results.poseLandmarks)
   }
 
