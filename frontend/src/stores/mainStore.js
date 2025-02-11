@@ -51,28 +51,29 @@ export const useMainStore = defineStore("main", () => {
   async function completeTutorial(tutorialId) {
     try {
       console.time(`[⏱️] Tutorial #${tutorialId}`)
-      const { data } = await api.post(`/Tutorial/complete/${tutorialId}`)
-
+      const response = await api.post(`/Tutorial/complete/${tutorialId}`)
+      
       // 상태 업데이트
       if (tutorialId === TUTORIAL_IDS.UI) {
         uiTutorialCompleted.value = true
       } else {
-        const target = tutorial.value.find((t) => t.tutorialId === tutorialId)
-        console.log("운동데이터", target)
-        if (target) target.completed = data.completed
+        const target = tutorial.value.find(t => t.tutorialId === tutorialId)
+        if (target) target.completed = true
       }
-
-      return data.success
+  
+      // 응답의 상태 코드로 성공 여부 판단
+      return response.status === 200
     } catch (error) {
       console.error(`[🔥] Tutorial #${tutorialId} Error:`, {
         message: error.message,
-        config: error.config,
+        config: error.config
       })
       return false
     } finally {
       console.timeEnd(`[⏱️] Tutorial #${tutorialId}`)
     }
   }
+  
 
   // 튜토리얼 데이터 로드
   async function loadTutorial() {
