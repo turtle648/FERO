@@ -9,36 +9,50 @@ export const useUserDataStore = defineStore('userData', () => {
   const BASE_URL = 'https://i12e103.p.ssafy.io:8076/api/v1'
   const userStore = useUserStore()
 
-  const userNickname = ref('')
-  const userLevel = ref('1')
-  const userExperience = ref('30')
-  const userCharacter = ref([1, 1, 2])
+  const userInfo = ref({
+    userName: '', userNickname: '', userEmail: '',
+    phoneNumber: '', level: null, gender: '',
+    experience: null, avatar: [null, null, null], userStats: {},
+  })
   
   // 본인정보 확인 API 호출
-  const checkUserNickname = async () => {
+  const checkUserInfo = async () => {
     try {
       const token = userStore.accessToken
-      if (!token) { console.error('정보조회 실패: 토큰이 없습니다.'); return}
-
+      if (!token) return console.error('정보조회 실패: 토큰이 없습니다.')
+  
       const headers = {
-        'Authorization': token,  // Bearer 붙이지 않음 (확인 필요)
+        Authorization: token, // Bearer 붙이지 않음 (확인 필요)
         'Content-Type': 'application/json'
       }
-      
+  
       const response = await axios.get(`${BASE_URL}/auth/me`, { headers })
-
-      if (response.status === 200) { 
-        console.log('닉네임 조회 성공', response.data) 
-        userNickname.value = response.data['userNickname']
-        return response.data['userNickname']
-      } 
-      else { console.error('닉네임 조회 실패: 서버에서 응답 실패'); return 'Error' }
+      if (response.status !== 200) throw new Error('서버에서 응답 실패')
+ 
+      console.log('유저정보 조회 성공', response.data)
+  
+      // 구조 분해 할당 + 기본값 설정
+      const {
+        userName = '', userNickname = '', userEmail = '',
+        phoneNumber = '', level = null, gender = '',
+        experience = null, avatar = '0-0-0', userStats = {},
+      } = response.data
+  
+      // avatar 변환 (ex: "2-6-4" --> [2, 6, 4])
+      userInfo.value.avatar = avatar.split('-').map(Number)
+      
+      // userInfo 업데이트
+      Object.assign(userInfo.value, { userName, userNickname, userEmail, phoneNumber, level, gender, experience, userStats })
+  
+      return userInfo
     } catch (error) {
-      console.error('닉네임 조회 요청 중 에러 발생: ', error)
-      if (error.response) { console.error('에러 응답:', error.response.data) }
+      console.error('유저정보 조회 요청 중 에러 발생: ', error)
+      if (error.response) {console.error('에러 응답:', error.response.data)}
       return 'Error'
     }
   }
+  
+
   // 유저 레벨 조회
   const checkUserLevel = async () => {
     try {
@@ -53,8 +67,7 @@ export const useUserDataStore = defineStore('userData', () => {
         const response = await axios.get(`${BASE_URL}/userStats/level`, { headers })
   
         if (response.status === 200) { 
-            console.log('조회 성공', response.data) 
-            userLevel.value = response.data
+            console.log('레벨 조회 성공', response.data) 
             return response.data
         } 
         else { console.error('레벨 실패: 서버에서 응답 실패'); return 9999}
@@ -80,7 +93,6 @@ export const useUserDataStore = defineStore('userData', () => {
   
         if (response.status === 200) { 
             console.log('경험치 조회 성공', response.data) 
-            userExperience.value = response.data
             return response.data
         } 
         else { console.error('경험치 조회 실패: 서버에서 응답 실패'); return 0}
@@ -92,7 +104,9 @@ export const useUserDataStore = defineStore('userData', () => {
   }
 
   return { 
-    userNickname, userLevel, userExperience, userCharacter,
-    checkUserNickname, checkUserLevel, checkUserExperience,
+    userInfo,
+    checkUserInfo, 
+    // 삭제 예정(테스트용 API)
+    checkUserLevel, checkUserExperience,
          }
 })

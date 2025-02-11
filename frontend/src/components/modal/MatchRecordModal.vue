@@ -31,7 +31,7 @@ import { getMatchData } from '@/api/userAPI' // API import
 import { ref, defineEmits, onMounted } from 'vue'
 
 const matchData = ref() 
-const emit = defineEmits(['closeRecord'])
+const emit = defineEmits(['close-modal'])
 
 // 언제 매치 했는지 계산 해주는 함수
 const computeMatchTime = (date, time) => {
@@ -63,7 +63,7 @@ const computeMatchTime = (date, time) => {
 
 
 // 모달 외부 클릭 시 전적창 모달 종료
-const closeRecordModal = () => { emit('closeRecord') }
+const closeRecordModal = () => { emit('close-modal') }
 
 onMounted(() => {
     matchData.value = getMatchData()

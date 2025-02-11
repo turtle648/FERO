@@ -10,9 +10,9 @@
 import { defineEmits } from "vue"
 
 // 모달 닫기
-const emit = defineEmits(["closeAlarm"])
+const emit = defineEmits(['close-modal'])
 const closeAlarmModal = () => {
-  emit("closeAlarm")
+  emit('close-modal')
 }
 </script>
 

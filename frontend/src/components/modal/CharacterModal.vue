@@ -58,9 +58,9 @@ import { ref, computed, defineEmits } from 'vue'
 import { assets } from '@/assets.js'
 
 // 모달 닫기
-const emit = defineEmits(["closeCharacter"])
+const emit = defineEmits(['close-modal'])
 const closeCharacterModal = () => {
-  emit("closeCharacter")
+  emit('close-modal')
 }
 
 // 완료 버튼 클릭 시 선택 데이터 처리

@@ -8,9 +8,9 @@
   <script setup>
   import { defineEmits } from "vue"
   
-  const emit = defineEmits(["closeWith"])
+  const emit = defineEmits(['close-modal'])
   const closeWithModal = () => {
-    emit("closeWith")
+    emit('close-modal')
   }
   </script>
   

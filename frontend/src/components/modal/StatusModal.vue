@@ -99,10 +99,10 @@ onMounted(async () => {
 })
 
 
-const emit = defineEmits(['closeStatus', 'openRecord'])
+const emit = defineEmits(['close-modal'])
 
 // 모달 외부 클릭 시 상태창 모달 종료
-const closeStatusModal = () => { emit('closeStatus') }
+const closeStatusModal = () => { emit('close-modal') }
 
 </script>
 
@@ -216,7 +216,6 @@ h2 {
 }
 
 
-#record-btn,
 #close-btn {
     position: absolute;
     padding: 5px 10px;
@@ -226,11 +225,6 @@ h2 {
     border-radius: 5px;
     cursor: pointer;
     font-size:xx-small;
-}
-
-#record-btn {
-    bottom: 2%;
-    right: 2%;
 }
 
 #close-btn {
