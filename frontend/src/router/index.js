@@ -25,7 +25,7 @@ import RankMatchPage from "@/views/RankMatchPage.vue"
 
 const routes = [
   {
-    path: "/start",
+    path: "/",
     name: "Start",
     component: StartPage,
     meta: { isMobile: true },
