@@ -1,0 +1,42 @@
+{
+  "packageId": "io.ssafy.p.i12e103.twa",
+  "host": "i12e103.p.ssafy.io",
+  "name": "Hiki from Isekai",
+  "launcherName": "HI",
+  "display": "standalone",
+  "themeColor": "#FAC60E",
+  "themeColorDark": "#000000",
+  "navigationColor": "#000000",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#FFD700",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://i12e103.p.ssafy.io/img/icons/android-chrome-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "/home/ubuntu/S12P11E103/frontend/android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "1",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://i12e103.p.ssafy.io/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://i12e103.p.ssafy.io/",
+  "minSdkVersion": 21,
+  "orientation": "landscape",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "appVersion": "1"
+}

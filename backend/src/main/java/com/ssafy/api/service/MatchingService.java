@@ -3,13 +3,14 @@ package com.ssafy.api.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.api.request.EnterWaitingRoomEvent;
 import com.ssafy.api.request.WaitingUser;
+import com.ssafy.db.repository.ExerciseStatsRatioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -27,10 +29,11 @@ public class MatchingService {
     private final ApplicationEventPublisher eventPublisher;
 
     // Redis Key 상수
-    private static final String WAITING_QUEUE = "waiting:queue"; // 입장 순서
-    private static final String SCORE_SORTED_SET = "score:sorted:set"; // 점수 정렬
-    private static final String USER_INFO = "user:info"; // 유저 정보
+    private static final String WAITING_QUEUE = "waiting:queue:"; // 입장 순서
+    private static final String SCORE_SORTED_SET = "score:sorted:set:"; // 점수 정렬
+    private static final String USER_INFO = "user:info:"; // 유저 정보
     private static final String USER_JOIN_TIME = "waiting:expire:"; // 5분 타임아웃 체크 (주기적 실행)
+    private final ExerciseStatsRatioRepository exerciseStatsRatioRepository;
 
     // Redis Key 생성 유틸리티 메서드들
     private String getQueueKey(Long exerciseType) {
@@ -55,7 +58,6 @@ public class MatchingService {
         String sortedKey = getSortedSetKey(exerciseType);
         String userInfoKey = getUserInfoKey(exerciseType);
         String expireKey = getUserJoinTimeKey(exerciseType, userToken);
-//        System.out.printf("생성되는 운동 타입 키 : %s, %s, %s\n", queueKey, sortedKey, userInfoKey);
 
         // 유저 정보 저장
         redisTemplate.opsForHash().put(userInfoKey, userToken, waitingUser);
@@ -142,6 +144,47 @@ public class MatchingService {
 //        log.info("[REDIS REMOVE] Queue에서 제거된 아이템 수: {}", removedFromQueue); // 사실 얘는 삭제 안됨
         log.info("[REDIS REMOVE] 해시에서 제거된 아이템 수: {}", removedFromHash);
         log.info("[REDIS REMOVE] 정렬 세트에서 제거된 아이템 수: {}", removedFromSortedSet);
+    }
+
+    // 매칭 처리 로직 (스케줄러로 주기적으로 실행할 것)
+    @Scheduled(fixedRate = 300000) // 5분마다 실행
+    public void deleteUsers() {
+        List<Long> exerciseTypes = exerciseStatsRatioRepository.findAllExerciseStatsRatioId();
+
+        for (Long id : exerciseTypes) {
+            String queueKey = getQueueKey(id);
+            String sortedSetKey = getSortedSetKey(id);
+            String userInfoKey = getUserInfoKey(id);
+
+            List<Object> waitingUsers = redisTemplate.opsForList().range(queueKey, 0, -1);
+            if (waitingUsers == null || waitingUsers.isEmpty()) continue;
+
+            for(Object userToken : waitingUsers) {
+                String expireKeyString = getUserJoinTimeKey(id, userToken.toString());
+
+                Double score = redisTemplate.opsForZSet().score(sortedSetKey, userToken);
+                if(score == null){  // ZSet에는 없지만 Queue에는 존재하는 경우(매칭이 됐을 때)
+                    redisTemplate.opsForList().remove(queueKey, 1, userToken);
+                    redisTemplate.opsForHash().delete(userInfoKey, userToken);
+                    redisTemplate.delete(expireKeyString);
+                    log.info("[Matching] ZSet에 존재하지 않는 사용자 {} -> Queue에서도 삭제 (운동 타입: {})", userToken, id);
+                    continue;
+                }
+
+                Long ttl = redisTemplate.getExpire(expireKeyString, TimeUnit.SECONDS);
+                if (ttl == null || ttl == -2) { // 남은 기본 대기 시간이 만료 되었을 때 삭제
+                    log.info("[Matching] 키 만료됨: {}", expireKeyString);
+                } else if (ttl <= 0) {
+                    redisTemplate.opsForList().remove(queueKey, 1, userToken);
+                    redisTemplate.opsForZSet().remove(sortedSetKey, userToken);
+                    redisTemplate.opsForHash().delete(userInfoKey, userToken);
+                    redisTemplate.delete(expireKeyString);
+                    log.info("[Matching] 대기 시간이 초과된 사용자 {} 제거 완료 (운동 타입: {})", userToken, id);
+                } else {
+                    log.info("[Matching] 대기 시간이 남아있는 사용자 {} 발견 (남은 TTL: {}초, 운동 타입: {})", userToken, ttl, id);
+                }
+            }
+        }
     }
 
 
