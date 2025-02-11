@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button class="bg-white text-black px-4 py-2 rounded">신고</button>
+    <button class="bg-yellow-500 text-white px-4 py-2 rounded mx-auto">신고</button>
   </div>
 </template>
 
