@@ -9,7 +9,7 @@
     <div class="flex justify-between w-full">
       <div class="timer text-white-common z-20 absolute top-0 right-10">{{ formattedTime }}</div>
     </div>
-    
+
     <!-- 중앙 영역 -->
     <div v-if="countdown > 0" class="countdown text-4xl text-white z-10">{{ countdown }}</div>
     <div v-else-if="showStartText" class="start-text text-4xl text-white z-10">START</div>
@@ -84,14 +84,14 @@ function startTimer() {
 // }
 
 // 카운트다운
-const countdown = ref(3)
+const countdown = ref(4)
 const showStartText = ref(false)
 
 // 카운트다운 시작 함수
 function startCountdown() {
   // if (isLoading.value) return
 
-  countdown.value = 3 // 카운트다운 초기화
+  countdown.value = 4 // 카운트다운 초기화
   showStartText.value = false // 'START' 숨김
 
   const countdownInterval = setInterval(() => {
