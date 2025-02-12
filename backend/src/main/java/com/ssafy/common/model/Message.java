@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Message {
+    private String auth;
     private String sender;    // 보내는 유저 UUID
     private String type;      // 메시지 타입
     private String receiver;  // 받는 사람

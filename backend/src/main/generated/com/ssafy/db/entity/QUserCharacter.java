@@ -24,6 +24,8 @@ public class QUserCharacter extends EntityPathBase<UserCharacter> {
 
     public final QBaseEntity _super = new QBaseEntity(this);
 
+    public final StringPath avatar = createString("avatar");
+
     public final ListPath<ExerciseLog, QExerciseLog> exerciseLogs = this.<ExerciseLog, QExerciseLog>createList("exerciseLogs", ExerciseLog.class, QExerciseLog.class, PathInits.DIRECT2);
 
     public final ComparablePath<Character> gender = createComparable("gender", Character.class);

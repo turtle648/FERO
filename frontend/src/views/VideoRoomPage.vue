@@ -1,8 +1,7 @@
 <template>
     <div>
-        <input type="text" v-model=roomId placeholder="방 번호를 입력하세요">
-        <button v-on:click="clickSubmitRoomId">생성하기</button>
-        <VideoComponent v-if="submittedRoomId!=''" :room-id="submittedRoomId"/>
+        <button v-on:click="clickSubmitRoomId">매치시작</button>
+        <VideoComponent v-if="submittedRoomId"/>
     </div>
 </template>
   
@@ -10,14 +9,11 @@
 import VideoComponent from '@/components/videoroom/VideoComponent.vue';
 import { ref } from 'vue'
 
-const roomId = ref('');
-const submittedRoomId = ref('');
+const submittedRoomId = ref(false);
 
-function clickSubmitRoomId () {
-    submittedRoomId.value = roomId.value;
-    console.log("📜 방 번호 ID Video Component 전달11: " + submittedRoomId.value);
+const clickSubmitRoomId = (isClicked) => {
+    submittedRoomId.value = isClicked;
 }
-
 
 </script>
 
