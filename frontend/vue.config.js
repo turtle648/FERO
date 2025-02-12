@@ -14,21 +14,21 @@ const devConfig = {
     port: 5173,
   } : {},
   pwa: {
-    name: 'My App',
-    themeColor: '#4DBA87',
+    name: 'FERO',
+    themeColor: '#2D90A6',
     msTileColor: '#000000',
     manifestOptions: {
       start_url: '.',
       display: 'standalone',
       icons: [
         {
-          src: 'img/icons/android-chrome-192x192.png',
+          src: '/android-icon-192x192.png',
           sizes: '192x192',
           type: 'image/png',
         },
         {
-          src: 'img/icons/android-chrome-512x512.png',
-          sizes: '512x512',
+          src: '/android-icon-144x144.png',
+          sizes: '144x144',
           type: 'image/png',
         },
       ],
@@ -39,21 +39,21 @@ const devConfig = {
 const prodConfig = {
   transpileDependencies: true,
   pwa: {
-    name: 'My App',
-    themeColor: '#4DBA87',
+    name: 'FERO',
+    themeColor: '#2D90A6',
     msTileColor: '#000000',
     manifestOptions: {
       start_url: '.',
       display: 'standalone',
       icons: [
         {
-          src: 'img/icons/android-chrome-192x192.png',
+          src: '/android-icon-192x192.png',
           sizes: '192x192',
           type: 'image/png',
         },
         {
-          src: 'img/icons/android-chrome-512x512.png',
-          sizes: '512x512',
+          src: '/android-icon-144x144.png',
+          sizes: '144x144',
           type: 'image/png',
         },
       ],

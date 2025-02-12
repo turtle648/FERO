@@ -2,22 +2,20 @@
   <div class="fitness-modal">
     <button class="close-button" @click="closeFitnessModal">X</button>
     <h2 class="modal-title">운동 선택</h2>
-    
+
     <div class="button-container">
       <div class="exercise-group">
-        <button class="primary-button" @click="handleSquatClick">
-          스쿼트
-        </button>
+        <button class="primary-button" @click="handleSquatClick">스쿼트</button>
         <button class="tutorial-button" @click="toggleTutorialComplete">
-          {{ isSquatCompleted ? '튜토리얼 완료됨' : '튜토리얼 완료하기' }}
+          {{ isSquatCompleted ? "튜토리얼 완료됨" : "튜토리얼 완료하기" }}
         </button>
       </div>
-      
+
       <button class="disabled-button" disabled>
         런지
         <span class="locked-label">준비중</span>
       </button>
-      
+
       <button class="disabled-button" disabled>
         푸쉬업
         <span class="locked-label">준비중</span>
@@ -30,20 +28,10 @@
         <button class="close-button" @click="showModeModal = false">X</button>
       </div>
       <div class="mode-button-group">
-        <button 
-          class="mode-button"
-          :class="{ 'mode-button-disabled': !selectedNumber }"
-          @click="selectMode('single')"
-          :disabled="!selectedNumber"
-        >
+        <button class="mode-button" :class="{ 'mode-button-disabled': !selectedNumber }" @click="selectMode('single')" :disabled="!selectedNumber">
           <p class="mode-label">Single Mode</p>
           <div class="number-toggle">
-            <button 
-              v-for="num in [1, 2, 5]" 
-              :key="num"
-              :class="['number-button', { 'number-active': selectedNumber === num }]"
-              @click.stop="selectNumber(num)"
-            >
+            <button v-for="num in [1, 2, 5]" :key="num" :class="['number-button', { 'number-active': selectedNumber === num }]" @click.stop="selectNumber(num)">
               {{ num }}
             </button>
           </div>
@@ -51,13 +39,9 @@
         <button class="mode-button" @click="selectMode('multi')">
           <p class="mode-label">Multi Mode</p>
         </button>
-        <button 
-          class="mode-button" 
-          @click="selectMode('rank')"
-          :disabled="isLoading || !isSquatCompleted"
-        >
+        <button class="mode-button" @click="selectMode('rank')" :disabled="isLoading || !isSquatCompleted">
           <p class="mode-label">
-            {{ isLoading ? '처리중...' : 'Rank Mode' }}
+            {{ isLoading ? "처리중..." : "Rank Mode" }}
           </p>
         </button>
       </div>
@@ -66,13 +50,13 @@
 </template>
 
 <script setup>
-import { ref, computed, defineEmits } from 'vue'
-import { useRouter } from 'vue-router'
-import { useMainStore, TUTORIAL_IDS } from '@/stores/mainStore'
+import { ref, computed, defineEmits } from "vue"
+import { useRouter } from "vue-router"
+import { useMainStore, TUTORIAL_IDS } from "@/stores/mainStore"
 
 const router = useRouter()
 const mainStore = useMainStore()
-const emit = defineEmits(['closeFitness'])
+const emit = defineEmits(['close-modal'])
 
 const showModeModal = ref(false)
 const selectedNumber = ref(null)
@@ -80,28 +64,33 @@ const isLoading = ref(false)
 
 // computed 속성은 유지
 const isUICompleted = computed(() => {
-  const uiTutorial = mainStore.tutorial.find(t => t.tutorialId === TUTORIAL_IDS.UI)
+  const uiTutorial = mainStore.tutorial.find((t) => t.tutorialId === TUTORIAL_IDS.UI)
   return uiTutorial?.completed || false
 })
 
 const isSquatCompleted = computed(() => {
-  const squatTutorial = mainStore.tutorial.find(t => t.tutorialId === TUTORIAL_IDS.SQUAT)
+  const squatTutorial = mainStore.tutorial.find((t) => t.tutorialId === TUTORIAL_IDS.SQUAT)
   return squatTutorial?.completed || false
 })
 
 // handleSquatClick 함수 수정 - computed 속성 활용
 const handleSquatClick = () => {
   if (!isUICompleted.value) {
-    router.push({ name: 'UiTutorial' })
-    return showModeModal.value = false
+    router.push({
+      name: "UiTutorial",
+      params: { exercise: TUTORIAL_IDS.SQUAT }, // 선택한 운동 값 전달
+    })
+    return (showModeModal.value = false)
   } else if (!isSquatCompleted.value) {
-    router.push({ name: "Tutorial", params: { exercise: TUTORIAL_IDS.SQUAT } })
-    return showModeModal.value = false
+    router.push({
+      name: "Tutorial",
+      params: { exercise: TUTORIAL_IDS.SQUAT },
+    })
+    return (showModeModal.value = false)
   } else {
-    return showModeModal.value = true
-  } 
+    return (showModeModal.value = true)
+  }
 }
-
 
 const selectNumber = (num) => {
   selectedNumber.value = selectedNumber.value === num ? null : num
@@ -109,33 +98,33 @@ const selectNumber = (num) => {
 
 const selectMode = async (mode) => {
   const exerciseId = TUTORIAL_IDS.SQUAT // 스쿼트 ID(2) 사용
-  
-  switch(mode) {
-    case 'single':
+
+  switch (mode) {
+    case "single":
       if (!selectedNumber.value) return
       router.push({
-        name: 'SingleMode',
-        params: { exercise: exerciseId, count: selectedNumber.value }
+        name: "SingleMode",
+        params: { exercise: exerciseId, count: selectedNumber.value },
       })
       break
 
-    case 'multi':
-      router.push({ 
-        name: 'MultiMode', 
-        params: { exercise: exerciseId } 
+    case "multi":
+      router.push({
+        name: "MultiMode",
+        params: { exercise: exerciseId },
       })
       break
 
-    case 'rank':
+    case "rank":
       try {
         isLoading.value = true
         if (!isSquatCompleted.value) {
-          alert('스쿼트 튜토리얼을 먼저 완료해주세요.')
+          alert("스쿼트 튜토리얼을 먼저 완료해주세요.")
           return
         }
-        router.push({ 
-          name: 'RankMatch', 
-          params: { exercise: exerciseId } 
+        router.push({
+          name: "RankMatch",
+          params: { exercise: exerciseId },
         })
       } finally {
         isLoading.value = false
@@ -143,7 +132,7 @@ const selectMode = async (mode) => {
       }
       break
   }
-  
+
   showModeModal.value = false
 }
 
@@ -152,7 +141,7 @@ const toggleTutorialComplete = () => {
 }
 
 const closeFitnessModal = () => {
-  emit('closeFitness')
+  emit('close-modal')
 }
 </script>
 

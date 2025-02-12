@@ -1,19 +1,24 @@
 <template>
-  <div class="counter-container relative">
+  <div class="counter-container relative w-screen h-screen">
+    <!-- Loading Spinner -->
+    <div v-if="showSpinner" class="fixed inset-0 flex items-center justify-center bg-gray-100 z-300">
+      <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 z-300"></div>
+    </div>
+
     <div class="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 text-center">
       <div class="count z-10 text-black">스쿼트 횟수: {{ count }}</div>
       <div v-if="showGreat" class="great-message text-red text-3xl">Great!</div>
     </div>
-    <MediapipeComponent @pose-detected="processPose" class="z-0" />
-    <CompleteModal v-if="showModal" @openModal="openModal"/>
+    <MediapipeComponent @pose-detected="processPose" @open-modal="openModal" class="z-0" />
+    <CompleteModal v-if="showModal" :count="count" class="z-99" />
 
-    <div v-if="showErrorModal" class="landmark-error-modal">전신이 나오도록 카메라 위치를 수정해주세요</div>
+    <div v-if="showErrorModal" class="landmark-error-modal z-20">전신이 나오도록 카메라 위치를 수정해주세요</div>
     <button v-if="isTutorialMode" @click="setCountToThree" class="fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded shadow-lg hover:bg-blue-600 z-50">Set Count to 3</button>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue"
+import { ref, onMounted } from "vue"
 import MediapipeComponent from "@/components/MediapipeComponent.vue"
 import CompleteModal from "@/components/modal/CompleteModal.vue"
 
@@ -25,9 +30,17 @@ const formFeedback = ref("")
 const showGreat = ref(false)
 const showModal = ref(false)
 const showErrorModal = ref(false) // 에러 모달 상태 변수
+const showSpinner = ref(true) // 로딩 스피너 상태 변수
 
 const isTutorialMode = window.location.href.includes("tutorial")
+// const isSingleMode = window.location.href.includes("single-mode")
 
+// 모드 리턴
+// const getMode = () => {
+//   if (isTutorialMode) return "Tutorial Mode"
+//   if (isSingleMode) return "Single Mode"
+//   return "Unknown Mode"
+// }
 
 // 필수 랜드마크 정의
 const requiredLandmarks = [0, 1, 2, 3, 4, 5, 6, 27, 28, 29, 30, 31, 32]
@@ -42,11 +55,12 @@ const checkRequiredLandmarks = (landmarks) => {
   })
 }
 
-const openModal = () => { 
-  showModal.value = true 
-  alert('결과:', count)
-  alert('count등의 데이터어떻게 처리할지 결정 후 complete modal의 수정 필요.')
+// Complete Modal 열기
+const openModal = () => {
+  showErrorModal.value = false
+  showModal.value = true
 }
+
 // 각도 계산 함수
 const calculateAngle = (a, b, c) => {
   const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x)
@@ -142,6 +156,13 @@ const setCountToThree = () => {
     showModal.value = true // 튜토리얼 모드일 경우 완료 상태로 전환
   }
 }
+
+// 로딩 스피너 타이머 설정
+onMounted(() => {
+  setTimeout(() => {
+    showSpinner.value = false // 스피너 숨기기
+  }, 2000)
+})
 </script>
 
 <style scoped>

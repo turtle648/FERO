@@ -1,102 +1,153 @@
 <template>
-  <div class="start-container">
+  <div class="fixed inset-0 flex flex-col justify-center items-center overflow-hidden">
     <audio ref="audioPlayer" loop>
       <source :src="require('@/assets/background_music.mp3')" type="audio/mp3">
     </audio>
-    <video autoplay muted loop playsinline class="background-video">
-      <source src="@/assets/background.mp4" type="video/mp4">
-    </video>
-    <button class="start-button" @click="goToMain">Start</button>
-    <!-- 토큰이 없으면 모달 띄우기 -->
+    <!-- 배경 이미지 -->
+    <img 
+      src="@/assets/images/background_startpage.png" 
+      alt="배경이미지 로딩 에러" 
+      class="absolute inset-0 w-full h-full object-cover -z-10"
+    >
+    <!-- 로고 이미지 -->
+    <div class="absolute top-[35%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex justify-center">
+      <img 
+        src="@/assets/images/logo.png" 
+        alt="로고 이미지" 
+        class="w-[80%] max-w-4xl"
+      >
+    </div>
+    <!-- 시작 버튼 -->
+    <button 
+      @click="goToMain"
+      class="fixed bottom-[5%] left-1/2 -translate-x-1/2 
+        px-8 py-4 whitespace-nowrap
+        font-['Press_Start_2P'] text-2xl text-white
+        bg-transparent border-none cursor-pointer
+        tracking-wider leading-none
+        hover:scale-105 active:scale-95
+        transition-all duration-200 ease-in-out
+        text-shadow-pixel animate-blink
+        sm:text-xl sm:px-6 sm:py-3
+        xs:text-lg xs:px-4 xs:py-2"
+    >
+      press here to <span class="text-yellow-300">START</span>
+    </button>
     <SignInUp v-if="showModal" @close="closeModal" />
   </div>
 </template>
 
+
 <style scoped>
-.start-container {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+/* 전체 페이지 스크롤 방지 */
+:root {
   overflow: hidden;
-}
-
-.background-video {
-  position: absolute;
-  top: 0; 
-  left: 0;
-  width: 100%;
   height: 100%;
-  object-fit: cover;
-  z-index: -1;
 }
 
-.start-button {
-  position: relative;
-  padding: 1.5rem 4rem;
-  font-size: 1.5rem;
-  border-radius: 2rem;
-  border: none;
-  background-color: rgba(0, 123, 255, 0.8); /* 약간의 투명도 추가 */
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
+body {
+  overflow: hidden;
+  height: 100%;
+  position: fixed;
+  width: 100%;
 }
 
-/* 태블릿 크기 */
-@media (max-width: 768px) {
-  .start-button {
-    padding: 1.2rem 3rem;
-    font-size: 1.3rem;
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
   }
 }
 
-/* 모바일 크기 */
+.animate-blink {
+  animation: blink 1.5s infinite;
+}
+
+.text-shadow-pixel {
+  text-shadow: 
+    2px 2px 0 #000,
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+  .sm\:text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+  .sm\:px-6 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  .sm\:py-3 {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+}
+
 @media (max-width: 480px) {
-  .start-button {
-    padding: 1rem 2.5rem;
-    font-size: 1.1rem;
+  .xs\:text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+  .xs\:px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .xs\:py-2 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
   }
 }
 </style>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import '@fontsource/press-start-2p'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import SignInUp from '@/components/modal/SignInUp.vue'
 
 const router = useRouter()
 const showModal = ref(false)
+const audioPlayer = ref(null)
 
-// 토큰이 존재하는지 확인
-// Pinia 상태 관리 사용하여 토큰 유무 확인해도 괜찮음.
 const token = localStorage.getItem('authToken')
 
-const goToMain = () => {
+const goToMain = async () => {
   if (!token) {
-    // 토큰이 없으면 모달 띄우기
     showModal.value = true
   } else {
-    // 토큰이 있으면 메인 페이지로 이동
-    router.push('/main')
+    try {
+      await router.push('/main')
+    } catch (error) {
+      console.error('라우팅 에러:', error)
+    }
   }
 }
 
-// 모달 창 닫기
-const closeModal = () => { showModal.value = false }
+const closeModal = () => { 
+  showModal.value = false 
+}
 
-const audioPlayer = ref(null)
-
-// 사용자 상호작용 후 음악 재생
 const playMusic = () => {
   if (audioPlayer.value) {
     audioPlayer.value.play()
+      .catch(error => console.log('음악 재생 실패:', error))
   }
 }
 
 onMounted(() => {
-  // 페이지 로드 시 자동 재생을 위한 설정
   document.addEventListener('click', playMusic, { once: true })
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', playMusic)
+  if (audioPlayer.value) {
+    audioPlayer.value.pause()
+  }
 })
 </script>

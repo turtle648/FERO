@@ -2,13 +2,24 @@
 <template>
   <div class="video-container">
     <!-- 나의 화면 (전체 화면) -->
-    <video 
+
+    <!-- ver1: 그냥 카메라로 내 화면 띄우기기 -->
+    <!-- <video 
       ref="myFace" 
       v-show="isMyVideoOn"
       class="my-video" 
       playsinline 
       autoplay
-    ></video>
+    ></video> -->
+
+    <!-- ver2: 스쿼트 컴포넌트 갖고오기기 -->
+    <SquatComponent
+      v-show="isMyVideoOn"
+      class="my-video"
+      ref="myFace"
+    />
+
+    <!-- ver3: 운동모달에서 선택한 운동 컴포넌트 띄우기기 -->
 
     <!-- 상대방 화면 (우측 상단) -->
     <div class="peer-container">
@@ -49,73 +60,59 @@
 
 <style scoped>
 .video-container {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  background: #000;
+  @apply relative w-full h-screen bg-black;
 }
 
 .my-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  @apply w-full h-full object-cover relative z-10;
 }
 
 .peer-container {
-  position: absolute;
-  top: 15%;
-  right: 5%;
-  width: 20%;
-  aspect-ratio: 9/16;
+  @apply absolute top-[15%] right-[5%] w-1/5 aspect-[9/16] z-20;
 }
 
 .peer-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  @apply w-full h-full object-cover;
 }
 
 .controls {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  display: flex;
-  flex-direction: column-reverse;
-  gap: 10px;
+  @apply fixed bottom-5 left-5 flex flex-col-reverse gap-2.5 z-20;
 }
 
 .audio-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  @apply flex flex-col gap-2.5;
 }
 
 .control-btn {
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  font-weight: 600;
-  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.8);
-  min-width: 180px;
-  transition: all 0.3s ease;
+  @apply px-5 py-2.5 
+         rounded cursor-pointer 
+         bg-black/50 text-white 
+         border border-white/30 
+         font-semibold 
+         min-w-[180px]
+         transition-colors duration-300 ease-in-out
+         shadow-lg;
 }
 
 .control-btn:hover {
-  background: rgba(0, 0, 0, 0.7);
-  border-color: rgba(255, 255, 255, 0.5);
+  @apply bg-black/70 border-white/50;
 }
 </style>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, defineProps } from 'vue'
+import { ref, onMounted, onBeforeUnmount, defineEmits, defineProps } from 'vue'
 
-// 기존 script setup 내부에 추가
+// ver2
+import SquatComponent from '@/components/SquatComponent.vue'
+import axios from 'axios'
+
+// 초기 상태를 false로 설정
 const isMyVideoOn = ref(true)
-const isMyAudioOn = ref(true)
-const isPeerAudioOn = ref(true)
+const isMyAudioOn = ref(true)  // 변경
+const isPeerAudioOn = ref(true)  // 변경
+
+const emit = defineEmits(['setIsMatched']);
+const props = defineProps(['exercise']);
 
 const toggleMyVideo = () => {
   isMyVideoOn.value = !isMyVideoOn.value
@@ -144,8 +141,6 @@ const togglePeerAudio = () => {
   }
 }
 
-
-const props = defineProps(['roomId'])
 const myFace = ref(null)
 const peerVideo = ref(null)
 let webSocket
@@ -164,13 +159,18 @@ const iceServerConfig = {
 // RTCPeerConnection 설정
 let myPeerConnection = null
 
-// 미디어 스트림 가져오기
+// 미디어 스트림 가져오기 함수 수정
 const getMedia = async () => {
   try {
     myStream = await navigator.mediaDevices.getUserMedia({
       audio: true,
       video: true
     })
+    
+    // 오디오 트랙 초기 상태를 비활성화
+    // myStream.getAudioTracks().forEach(track => {
+    //   track.enabled = false
+    // })
     
     if (myFace.value) {
       myFace.value.srcObject = myStream
@@ -197,7 +197,6 @@ const createOffer = async (receiverId) => {
     sendMessage({
       type: "offer",
       sdp: offer,
-      room: props.roomId,
       receiver: receiverId
     })
   } catch (error) {
@@ -222,7 +221,6 @@ const initRTCPeerConnection = () => {
       sendMessage({
         type: "candidate",
         candidate: event.candidate,
-        room: props.roomId,
         receiver: currentPeerId.value // 현재 연결된 Peer의 ID를 receiver로 전송
       })
     }
@@ -253,8 +251,11 @@ const handleWebSocketMessage = async (event) => {
     }
 
     case "offer": {
-      currentPeerId.value = message.sender // offer를 보낸 Peer의 ID 저장
+      emit('setIsMatched', true);
+      console.log("offer: 매칭이 완료되었습니다");
       
+      currentPeerId.value = message.sender // offer를 보낸 Peer의 ID 저장
+
       if (!myPeerConnection) {
         await getMedia()
         initRTCPeerConnection()
@@ -268,13 +269,15 @@ const handleWebSocketMessage = async (event) => {
       sendMessage({
         type: "answer",
         sdp: answer,
-        room: props.roomId,
         receiver: message.sender
       })
       break
     }
 
     case "answer": {
+      emit('setIsMatched', true);
+      console.log("answer: 매칭이 완료되었습니다");
+
       await myPeerConnection.setRemoteDescription(new RTCSessionDescription(message.sdp))
       break
     }
@@ -314,18 +317,32 @@ const handleWebSocketMessage = async (event) => {
   }
 }
 
+
+async function clickSubmitRoomId () {
+    const res = await axios.post("https://i12e103.p.ssafy.io:8076/api/v1/matching/enter", null, {
+        headers: {Authorization: `Bearer ${localStorage.getItem('authToken')}`},
+        params: {exerciseType : props.exercise}
+    })
+    
+    if(res.status === 200) {
+      console.log("📜 매칭시도");
+    }
+}
+
 // 컴포넌트 마운트 시 실행
-onMounted(async () => {
+onMounted(() => {
   // WebSocket 연결
   webSocket = new WebSocket('wss://i12e103.p.ssafy.io:8076/api/v1/videorooms')
   
-  webSocket.onopen = () => {
+  webSocket.onopen = async () => {
     console.log("WebSocket 연결됨")
     // 방 입장 메시지 전송
     sendMessage({
-      type: "join_room",
-      room: props.roomId
+      type: "auth",
+      auth: localStorage.getItem("authToken")
     })
+
+    await clickSubmitRoomId()
   }
 
   webSocket.onmessage = handleWebSocketMessage

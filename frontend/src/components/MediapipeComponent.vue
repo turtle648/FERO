@@ -1,30 +1,32 @@
 <template>
   <div class="container flex flex-col items-center justify-between p-4 h-screen w-screen">
     <div class="flex justify-between w-full">
-      <!-- <div class="counter text-white-common z-10">(갯수)</div> -->
       <div class="timer text-white-common z-20 absolute top-0 right-10">{{ formattedTime }}</div>
-
-      <!-- fix: 시간 선택은 앞에서 넘어와야함 -->
-      <!-- <select class="absolute z-10" v-model="selectedTime" @change="resetTimer">
-        <option :value="1 * 60 * 1000">1분</option>
-        <option :value="2 * 60 * 1000">2분</option>
-        <option :value="5 * 60 * 1000">5분</option>
-      </select> -->
-      <!-- <button class="text-white-common z-10" @click="startTimer">시작</button> -->
     </div>
+
     <!-- 중앙 영역 -->
     <div v-if="countdown > 0" class="countdown text-4xl text-white z-10">{{ countdown }}</div>
     <div v-else-if="showStartText" class="start-text text-4xl text-white z-10">START</div>
 
     <!-- 본인 화면 -->
-    <video ref="videoElement" class="absolute inset-0 w-full h-full object-cover z-0"></video>
-    <canvas ref="canvasElement" class="absolute inset-0 w-full h-full z-0"></canvas>
+
+    <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
+      <canvas ref="canvasElement" class="w-full h-full object-fill">
+        <video ref="videoElement" class="w-full h-full object-fill"></video>
+      </canvas>
+    </div>
 
     <!-- 하단 버튼 -->
-    <div class="flex justify-between items-center w-full mt-4 z-10">
-      <ExitButton class="px-4 py-2 rounded mx-auto" @click="stopCameraAndNavigate" />
-      <ReportIssueButton />
+    <div class="button-container z-10">
+      <div class="flex justify-between items-center w-full mt-4 z-10">
+        <ExitButton class="px-4 py-2 rounded mx-auto" @click="stopCameraAndNavigate" />
+        <ReportIssueButton />
+      </div>
     </div>
+    <!-- <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-between items-center w-[90%] max-w-md z-10">
+      <ExitButton class="rounded bg-red-500 text-white" @click="stopCameraAndNavigate" />
+      <ReportIssueButton class="rounded bg-blue-500 text-white" />
+    </div> -->
   </div>
 </template>
 
@@ -33,9 +35,11 @@ import { ref, onMounted, onUnmounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { defineEmits } from "vue"
 
-const emit = defineEmits(["pose-detected", "openModal"])
+const emit = defineEmits(["pose-detected", "open-modal"])
 const route = useRoute()
 const router = useRouter()
+
+// const isLoading = ref(true)
 
 // 버튼
 import ExitButton from "@/components/button/ExitButton.vue"
@@ -56,6 +60,8 @@ function formatTime(time) {
 
 // 타이머 시작 함수
 function startTimer() {
+  // if (isLoading.value) return
+
   clearInterval(intervalId) // 기존 타이머 초기화
   timeLeft.value = selectedTime.value // 선택된 시간으로 초기화
   formattedTime.value = formatTime(timeLeft.value)
@@ -67,7 +73,8 @@ function startTimer() {
     if (timeLeft.value <= 0) {
       clearInterval(intervalId) // 타이머 종료
       formattedTime.value = "00:00"
-      emit("openModal")
+      camera.stop()
+      emit("open-modal")
     }
   }, 1000)
 }
@@ -80,12 +87,14 @@ function startTimer() {
 // }
 
 // 카운트다운
-const countdown = ref(3)
+const countdown = ref(4)
 const showStartText = ref(false)
 
 // 카운트다운 시작 함수
 function startCountdown() {
-  countdown.value = 3 // 카운트다운 초기화
+  // if (isLoading.value) return
+
+  countdown.value = 4 // 카운트다운 초기화
   showStartText.value = false // 'START' 숨김
 
   const countdownInterval = setInterval(() => {
@@ -141,8 +150,27 @@ const onResults = (results) => {
 }
 
 onMounted(async () => {
+  // setTimeout(() => {
+  //   isLoading.value = false
+  // }, 2000)
+
+  // Single Mode의 경우 시간을 URL BASE로 설정
+  if (window.location.href.includes("single-mode")) {
+    // 시작 시간 설정 by url prams
+    const pathSegments = route.path.split("/").filter(Boolean) // URL을 '/' 기준으로 분할하고, 빈 요소(마지막 `/`) 제거
+    const timeFromUrl = parseInt(pathSegments[pathSegments.length - 1]) // 마지막 값 가져오기
+    console.log(timeFromUrl, "인지된 시간")
+    if (!isNaN(timeFromUrl)) {
+      selectedTime.value = timeFromUrl * 60 * 1000 // 초에서 밀리초 변환
+    }
+  } else if (window.location.href.includes("tutorial")) {
+    // 튜토리얼 모드 기본값: 999분
+    selectedTime.value = 999 * 60 * 1000
+  }
+
   if (!videoElement.value || !canvasElement.value) {
     console.error("Video or Canvas element is not initialized.")
+
     return
   }
 
@@ -179,21 +207,26 @@ onMounted(async () => {
   } catch (error) {
     console.error("카메라 시작 오류:", error)
   }
-
-  // 시작 시간 설정 by url prams
-  const pathSegments = route.path.split('/').filter(Boolean) // URL을 '/' 기준으로 분할하고, 빈 요소(마지막 `/`) 제거
-  const timeFromUrl = parseInt(pathSegments[pathSegments.length - 1]) // 마지막 값 가져오기
-
-  if (!isNaN(timeFromUrl)) {
-    selectedTime.value = timeFromUrl * 1000 // 초에서 밀리초 변환
-  }
-
 })
+
+// 로딩 상태가 변경되었을 때 동작 추가
+// watch(isLoading, async (newValue) => {
+//   if (!newValue) {
+//     try {
+//       await camera.start()
+//       startCountdown()
+//     } catch (error) {
+//       console.error("카메라 시작 오류:", error)
+//     }
+//   }
+// })
 
 // 종료 버튼 클릭 시
 function stopCameraAndNavigate() {
-  if (camera) { camera.stop() }
-  router.push({ name: 'Main' }) // /main으로 이동
+  if (camera) {
+    camera.stop()
+  }
+  router.push({ name: "Main" }) // /main으로 이동
 }
 
 onUnmounted(() => {

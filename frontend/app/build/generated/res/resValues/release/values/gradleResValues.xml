@@ -8,9 +8,9 @@
     <!-- Value from default config. -->
     <bool name="enableSiteSettingsShortcut">true</bool>
     <!-- Value from default config. -->
-    <color name="backgroundColor">#FFD700</color>
+    <color name="backgroundColor">#FFFFFF</color>
     <!-- Value from default config. -->
-    <color name="colorPrimary">#FAC60E</color>
+    <color name="colorPrimary">#4ADE80</color>
     <!-- Value from default config. -->
     <color name="colorPrimaryDark">#000000</color>
     <!-- Value from default config. -->
@@ -24,7 +24,7 @@
     <!-- Value from default config. -->
     <integer name="splashScreenFadeOutDuration">300</integer>
     <!-- Value from default config. -->
-    <string name="appName" translatable="false">Hiki from Isekai</string>
+    <string name="appName" translatable="false">FERO</string>
     <!-- Value from default config. -->
     <string name="fallbackType" translatable="false">customtabs</string>
     <!-- Value from default config. -->
@@ -36,9 +36,9 @@
     <!-- Value from default config. -->
     <string name="launchUrl" translatable="false">https://i12e103.p.ssafy.io/</string>
     <!-- Value from default config. -->
-    <string name="launcherName" translatable="false">HI</string>
+    <string name="launcherName" translatable="false">FERO</string>
     <!-- Value from default config. -->
-    <string name="orientation" translatable="false">landscape</string>
+    <string name="orientation" translatable="false">default</string>
     <!-- Value from default config. -->
     <string name="providerAuthority" translatable="false">io.ssafy.p.i12e103.twa.fileprovider</string>
     <!-- Value from default config. -->
