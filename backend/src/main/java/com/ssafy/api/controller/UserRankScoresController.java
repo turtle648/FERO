@@ -59,15 +59,16 @@ public class UserRankScoresController {
     }
 
     @PostMapping("/update")
-    @ApiOperation(value = "랭크 점수 업데이트", notes = "Elo 시스템을 적용하여 승패에 따라 점수를 조정한다.")
+    @ApiOperation(value = "랭크 점수 업데이트", notes = "Elo 시스템을 적용하여 승패에 따라 점수를 조정한다. \n (result: user1이 이겼을 때 1, 졌을 때 2, 비겼을 때 0)")
     public ResponseEntity<RankUpdateRes> updateRank(@RequestBody RankUpdateReq rankUpdateReq) {
 
-        String winnerId = rankUpdateReq.getWinnerId();
-        String loserId = rankUpdateReq.getLoserId();
+        String user1Id = rankUpdateReq.getUser1Id();
+        String user2Id = rankUpdateReq.getUser2Id();
         Long exerciseId = rankUpdateReq.getExerciseId();
+        int result =rankUpdateReq.getResult();
 
         try {
-            RankUpdateRes response = userRankScoresService.updateRankScore(winnerId, loserId, exerciseId);
+            RankUpdateRes response = userRankScoresService.updateRankScore(user1Id, user2Id, exerciseId, result);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

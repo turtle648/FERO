@@ -6,10 +6,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class RankUpdateRes {
-    private String winnerId;
-    private short winnerPreviousScore;
-    private short winnerNewScore;
-    private String loserId;
-    private short loserPreviousScore;
-    private short loserNewScore;
+    private String user1Id;
+    private short user1PreviousScore;
+    private short user1NewScore;
+    private String user2Id;
+    private short user2PreviousScore;
+    private short user2NewScore;
 }
