@@ -252,6 +252,8 @@ const handleWebSocketMessage = async (event) => {
 
     case "offer": {
       emit('setIsMatched', true);
+      console.log("offer: 매칭이 완료되었습니다");
+      
       currentPeerId.value = message.sender // offer를 보낸 Peer의 ID 저장
 
       if (!myPeerConnection) {
@@ -274,6 +276,8 @@ const handleWebSocketMessage = async (event) => {
 
     case "answer": {
       emit('setIsMatched', true);
+      console.log("answer: 매칭이 완료되었습니다");
+
       await myPeerConnection.setRemoteDescription(new RTCSessionDescription(message.sdp))
       break
     }
