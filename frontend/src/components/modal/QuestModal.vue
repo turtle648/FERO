@@ -7,16 +7,15 @@
             <div v-if="isLoading">데이터 불러오는 중</div>
 
             <!-- 퀘스트 데이터 -->
+            <!-- 이후에 퀘스트 데이터에 ccs 넣을거면 -->
+            <!-- :class="{ 'completed': quest.is_completed }" 써서 동적 바인딩-->
             <div v-else>
-                <div v-for="quest in questData"
-                :key="quest.exercise_id"
-                class="quest-item"
-                :class="{ 'completed': quest.is_completed }">
-                    <p>시간: {{ quest.quest_time }}</p>
-                    <p>운동 횟수: {{ quest.real_cnt }}</p>
-                    <p>목표 갯수: {{ quest.exercise_cnt }}</p>
-                    <p>상태: {{ quest.is_completed ? '완료' : '미완료' }}</p>
-                    <p>메세지: {{ quest.message }}</p>
+                <div class="quest-item">
+                    <p>시간: {{ questData.quest_time }}</p>
+                    <p>운동 횟수: {{ questData.real_cnt }}</p>
+                    <p>목표 갯수: {{ questData.exercise_cnt }}</p>
+                    <p>상태: {{ questData.is_completed ? '완료' : '미완료' }}</p>
+                    <p>메세지: {{ questData.message }}</p>
                 </div>
             </div>
         </div>
@@ -50,7 +49,7 @@ const getQuestData = async () => {
         const token = localStorage.getItem('authToken')
 
         // 추후에 API 나오면 변경
-        const response = await axios.get('@/assets/dummy_data/getQuestData.json', {
+        const response = await axios.get('/dummy_data/getQuestData.json', {
             headers: {
                 Authorization: `Bearer ${token}`
             },
