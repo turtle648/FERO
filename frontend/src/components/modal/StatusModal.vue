@@ -1,41 +1,32 @@
-<!-- 
-    추가로 진행해야 하는 것.
-        1 Status Background Image(도트)
-        2 내부에서 사용할 숫자 밑 글씨 만들어야함. (다른 component에서 사용해도 됨)
-        3 어떤 정보를 정확히 표기해서 줄건지, 결정해야 함.
-
-    현재 더미데이터 사용중
--->
 <template>
     <div class="modal" @click="closeStatusModal">
       <div class="modal-content" @click.stop>
         <!-- 모달 종료 버튼 -->
         <button id="close-btn" @click="closeStatusModal">X</button>
-        
         <!-- 요소 1: 닉네임, 레벨, 랭크-->
         <div class="status-element status-1">
           <!-- 차후, png로 대체할 것 -->
           <h2>Status</h2>
-          <div style="margin-top: 2%;">닉네임: {{ userStatus.nickName }}</div>
+          <div style="margin-top: 2%;">닉네임: {{ userInfo.userNickname }}</div>
           <div style="margin-top: 2%;">
-            Lv. {{ userStatus.level }} | Rank: {{ userStatus.rank }}
+            Lv. {{ userInfo.level }} | Rank: !!api수정을 통해 받기!!
           </div>
         </div>
         <!-- 요소 2 -->
         <div class="status-element status-2">
             <div>
-                전체 승: {{ userStatus.totalWinRate }} | 총 플레이 수: {{ userStatus.totalGames }} | myBest: {{ userStatus.myBestGame }}
+                전체 승: !!api수정을 통해 받기!! | 총 플레이 수: !!api수정을 통해 받기!! | myBest: !!api수정을 통해 받기!!
             </div>
             <div>
-                월간 승: {{ userStatus.monthlyWinRate }} | 월간 게임 수: {{ userStatus.monthlyGames }} | myBest: {{ userStatus.myBestMonthlyGame }}
+                월간 승: !!전척api완성후추가!! | 월간 게임 수: !!전척api완성후추가!! | myBest: !!전척api완성후추가!!
             </div>
         </div>
   
         <!-- 요소 3: 퀘스트 달성률, 게이지바 -->
         <div class="status-element status-3">
         <div style="margin-bottom: 2%;">
-            <span style="margin-right: 10%;">미션 클리어 수: {{ userStatus.questCompletes }}</span>
-            <span>월간 클리어 수: {{ userStatus.monthlyQuestCompletes }}</span>
+            <span style="margin-right: 10%;">미션 클리어 수: !!퀘스트api완성후추가!!</span>
+            <span>월간 클리어 수: !!퀘스트api완성후추가!!</span>
         </div>
         <div class="progress-box">
             일일 달성률:
@@ -44,21 +35,25 @@
             v-for="n in 5" 
             :key="n" 
             :class="{
-                'filled': (userStatus.todayQuestProgress % 100) / 20 >= n,
-                'empty': (userStatus.todayQuestProgress % 100) / 20 < n
+                'filled': (85 % 100) / 20 >= n,
+                'empty': (85 % 100) / 20 < n
             }" 
             class="progress-box-cell">
             </span>
-            ({{ userStatus.todayQuestProgress }}%)
+            <!-- (!!퀘스트api완성후추가!!%) -->
+            85% <!-- ({{ userStatus.todayQuestProgress }}%) -->
         </div>
         </div>
   
         <!-- 요소 4: 그래프 이미지 박스 -->
         <div class="status-element status-4">
           <div class="status-graph">
-            <!-- 지울예정 -->
-            <div style="color:hsl(0, 0%, 0%, 0.4);"><div>owmoc,20x2 ajdiwankn dwmomalm ;mwa mnxinsp</div><span> kd0wm</span><div>a b   c d    e f   g h   i j k l m n o p q r s t u </div><span> kd0wm</span><div>a    b c d  e   f g h    i j k    l m    n o p q r s </div><span> kd0wm</span><div>owmoc,20x2 ajdiwankn   dwmomalm   ;mwa mnxinsp</div><div>owmoc,20x2 ajdiwankn     dwmomalm ;    mwa   mnxinsp</div><span> kd0wm</span><span> kd0wm</span><div>a  b c  d  e f g  h i  j k l    m    n o  p q r s</div><span> kd0wm</span><div>owmoc,20x2 ajdiwankn   dwmomalm ;    mwa    mnxinsp</div><span> kd0wm</span><div>owmoc,20x2 ajdiwankn   dwmomalm ; mwa  mnxinsp</div><span> kd0wm</span></div>
-            .
+           <p>absStats: {{ userInfo.userStats.absStats }}</p>
+           <p>armsStats: {{ userInfo.userStats.armsStats }}</p>
+           <p>backStats: {{ userInfo.userStats.backStats }}</p>
+           <p>chestStats: {{ userInfo.userStats.chestStats }}</p>
+           <p>legsStats: {{ userInfo.userStats.legsStats }}</p>
+           <p>staminaStats: {{ userInfo.userStats.staminaStats }}</p>
           </div>
         </div>
       </div>
@@ -66,41 +61,11 @@
   </template>
   
 <script setup>
-import { defineEmits, onMounted, ref } from 'vue'
-import { getStatus } from '@/api/userAPI'; // API import
-
-const userStatus = ref({
-    // 기본정보
-    'nickName': '', 'level': '', 'rank': '',
-    'totalWinRate': '', 'totalGames': '', 'myBestGame': '',
-    'monthlyWinRate': '', 'monthlyGames': '', 'myBestMonthlyGame': '',
-    'questCompletes': '', 'monthlyQuestCompletes': '', 'todayQuestProgress': '', 
-    // 육각으로 표시할 정보
-    'stamina': '', 'endurance': '', 'cardio': '', 
-    'agility': '', 'strength': '', 'flexibility': '',
-})
-
-// 유저 상태 변수에 추가
-const getUserStatus = async () => {
-    // getStatus()에서 사용자 상태를 가져오는 비동기 작업 수행
-    await getStatus()
-
-    for (const key in userStatus.value) {
-        if (localStorage.getItem(key)) { userStatus.value[key] = localStorage.getItem(key) }
-    }
-}
-
-
-// 모달이 열릴 때 onMounted 훅 사용
-onMounted(async () => {
-    await getUserStatus()
-    console.log('유저 상태창 ==========')
-    console.log(userStatus.value)
-})
-
-
+import { defineEmits, ref } from 'vue'
+import { useUserDataStore } from "@/stores/userDataStore"
+const userDataStore = useUserDataStore()
+const userInfo = ref(userDataStore.userInfo)
 const emit = defineEmits(['close-modal'])
-
 // 모달 외부 클릭 시 상태창 모달 종료
 const closeStatusModal = () => { emit('close-modal') }
 
@@ -172,9 +137,6 @@ h2 {
     position: relative;
     width: 100%; /* 부모 요소의 너비에 맞추기 */
     height: 100%; /* 부모 요소의 높이에 맞추기 */
-    display: flex; /* Flexbox로 콘텐츠 중앙 정렬 */
-    justify-content: center; /* 가로 중앙 정렬 */
-    align-items: center; /* 세로 중앙 정렬 */
 }
 
 .status-graph::after {
