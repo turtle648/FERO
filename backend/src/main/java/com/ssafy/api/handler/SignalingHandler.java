@@ -1,12 +1,14 @@
 package com.ssafy.api.handler;
 
+import com.ssafy.api.request.ExerciseResultEvent;
 import com.ssafy.api.request.MatchSuccessEvent;
 import com.ssafy.api.service.MatchingService;
 import com.ssafy.common.model.Message;
 import com.ssafy.common.util.RTCUtil;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -16,10 +18,10 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 
 
 @Slf4j
+@AllArgsConstructor
 public class SignalingHandler extends TextWebSocketHandler {
     // 어떤 방에 어떤 유저가 들어있는지 저장 -> { 방번호 : [ { id : userUUID1 }, { id: userUUID2 }, …], ... }
     private final Map<String, List<Map<String, String>>> roomInfo = new HashMap<>();
@@ -30,6 +32,7 @@ public class SignalingHandler extends TextWebSocketHandler {
     // 세션 정보 저장 -> { userUUID1 : 세션객체, userUUID2 : 세션객체, ... }
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final Map<String, String> tokenWithUid = new HashMap<>();
+    private final Map<String, String> uidWithToken= new HashMap<>();
 
     // 방의 최대 인원수
     private static final int MAXIMUM = 2;
@@ -43,15 +46,14 @@ public class SignalingHandler extends TextWebSocketHandler {
     private static final String MSG_TYPE_CANDIDATE = "candidate";
     // 방 입장 메시지
     private static final String MSG_TYPE_AUTH = "auth";
+    private static final String MSG_TYPE_CNT = "count";
+    private static final String MSG_TYPE_FINAL = "final";
 
+    private final ApplicationEventPublisher eventPublisher;
     // 레디스 삭제할 때 쓸 leaveWaitingRoom
     private final MatchingService matchingService;
     private final ApplicationContext eventHandler;
-    // 직접 생성자 작성
-    public SignalingHandler(MatchingService matchingService, ApplicationContext eventHandler) {
-        this.matchingService = matchingService;
-        this.eventHandler = eventHandler;
-    }
+
 
     // 웹소켓 연결 시
     @Override
@@ -66,6 +68,30 @@ public class SignalingHandler extends TextWebSocketHandler {
 //        log.info("Token: {}", tokenWithUid);
 //        log.info("=====================");
 //    }
+
+    public void sendEventScore(String userUUID1, Message message) {
+        String userUUID2 = message.getReceiver();
+        String userToken1 = uidWithToken.get(userUUID1);
+        String userToken2 = uidWithToken.get(userUUID2);
+
+        int userScore1 = Integer.parseInt(message.getMyCount());
+        int userScore2 = Integer.parseInt(message.getPeerCount());
+
+        Long exerciseType = Long.parseLong(message.getExerciseType());
+
+        int result = 0;
+
+        if(userScore1 > userScore2) {
+            result = 1;
+        } else if(userScore2 > userScore1) {
+            result = 2;
+        }
+
+        log.info("⚠️ publish :: {}", new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
+        uidWithToken.keySet().removeIf(entry -> entry.equals(userUUID1));
+        uidWithToken.keySet().removeIf(entry -> entry.equals(userUUID2));
+        eventPublisher.publishEvent(new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
+    }
 
     @EventListener
     public void matchResult(MatchSuccessEvent event) {
@@ -146,8 +172,8 @@ public class SignalingHandler extends TextWebSocketHandler {
         session.sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
                 .type("all_users")
                 .allUsers(originRoomUser)
+                .room(roomId)
                 .sender(userUUID).build())));
-
     }
 
 
@@ -166,7 +192,24 @@ public class SignalingHandler extends TextWebSocketHandler {
 
             // 메시지 타입에 따라서 서버에서 하는 역할이 달라진다
             switch (message.getType()) {
+                case MSG_TYPE_FINAL:
+                    sendEventScore(userUUID, message);
+                    break;
 
+                case MSG_TYPE_CNT:
+                    String receiverId = message.getReceiver();
+                    String myCount = message.getMyCount();
+                    log.info(">>> 💯 [ws] {} -> {} 점수 전송: {}", userUUID, receiverId, myCount);
+                    WebSocketSession receiverSession = sessions.get(receiverId);
+                    if (receiverSession != null && receiverSession.isOpen()) {
+                        receiverSession.sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
+                                .type(MSG_TYPE_CNT)
+                                .sender(userUUID)
+                                .receiver(receiverId)
+                                .peerCount(myCount)
+                                .build())));
+                    }
+                    break;
                 // 클라이언트에게서 받은 메시지 타입에 따른 signal 프로세스
                 case MSG_TYPE_OFFER:
                 case MSG_TYPE_ANSWER:
@@ -201,6 +244,9 @@ public class SignalingHandler extends TextWebSocketHandler {
                     session.getAttributes().put("exerciseType", message.getExerciseType());
                     log.info("📜 사용자 세션 등록 - session: {}, exerciseType: {}, token: {}",
                             session, message.getExerciseType(), message.getAuth());
+                    uidWithToken.put(session.getId(), message.getAuth());
+                    log.info("📜 사용자 세션 등록 - session: {}, token: {}", session, message.getAuth());
+                    log.info("uidWithToken: {}", uidWithToken.get(session.getId()));
                     break;
                 // 메시지 타입이 잘못되었을 경우
                 default:

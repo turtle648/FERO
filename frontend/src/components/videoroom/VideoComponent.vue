@@ -17,6 +17,7 @@
       v-show="isMyVideoOn"
       class="my-video"
       ref="myFace"
+      @set-count="setCount"
     />
 
     <!-- ver3: 운동모달에서 선택한 운동 컴포넌트 띄우기기 -->
@@ -100,7 +101,7 @@
 </style>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, defineEmits, defineProps } from 'vue'
+import { ref, onMounted, onBeforeUnmount, defineEmits, defineProps, watch } from 'vue'
 
 // ver2
 import SquatComponent from '@/components/SquatComponent.vue'
@@ -113,6 +114,12 @@ const isPeerAudioOn = ref(true)  // 변경
 
 const emit = defineEmits(['setIsMatched']);
 const props = defineProps(['exercise']);
+const count = ref(0);
+const peerCount = ref(0);
+
+const setCount = (value) => {
+  count.value = value;
+}
 
 const toggleMyVideo = () => {
   isMyVideoOn.value = !isMyVideoOn.value
@@ -146,6 +153,16 @@ const peerVideo = ref(null)
 let webSocket
 let myStream
 let currentPeerId = ref(null) // 현재 연결된 Peer의 ID를 저장
+
+watch(count, (newCount) => {
+  console.log("👟 운동 개수 증가: " + newCount);
+
+  sendMessage({
+      type: "count",
+      myCount: count.value,
+      receiver: currentPeerId.value
+  })
+})
 
 // ICE 서버 설정 - TURN 서버 포함
 const iceServerConfig = {
@@ -193,7 +210,6 @@ const createOffer = async (receiverId) => {
     currentPeerId.value = receiverId // 현재 연결하려는 Peer의 ID 저장
     const offer = await myPeerConnection.createOffer()
     await myPeerConnection.setLocalDescription(offer)
-    
     sendMessage({
       type: "offer",
       sdp: offer,
@@ -248,6 +264,12 @@ const handleWebSocketMessage = async (event) => {
         createOffer(user.id)
       })
       break
+    }
+
+    case "count": {
+      peerCount.value = message.peerCount
+      console.log("🏋️‍♀️ 상대방의 점수: " + peerCount.value);
+      break;
     }
 
     case "offer": {
@@ -306,6 +328,16 @@ const handleWebSocketMessage = async (event) => {
         myPeerConnection.close()
         myPeerConnection = null
       }
+
+      sendMessage({
+        type:"final",
+        auth: localStorage.getItem("authToken"),
+        receiver: currentPeerId.value,
+        myCount: count.value,
+        peerCount: peerCount.value,
+        exerciseType: props.exercise
+      })
+
       currentPeerId.value = null // Peer ID 초기화
       break
     }
@@ -319,7 +351,7 @@ const handleWebSocketMessage = async (event) => {
 
 
 async function clickSubmitRoomId () {
-    const res = await axios.post("https://i12e103.p.ssafy.io:8076/api/v1/matching/enter", null, {
+    const res = await axios.post("http://localhost:8076/api/v1/matching/enter", null, {
         headers: {Authorization: `Bearer ${localStorage.getItem('authToken')}`},
         params: {exerciseType : props.exercise}
     })
@@ -332,7 +364,7 @@ async function clickSubmitRoomId () {
 // 컴포넌트 마운트 시 실행
 onMounted(() => {
   // WebSocket 연결
-  webSocket = new WebSocket('wss://i12e103.p.ssafy.io:8076/api/v1/videorooms')
+  webSocket = new WebSocket('ws://localhost:8076/api/v1/videorooms')
   
   webSocket.onopen = async () => {
     console.log("WebSocket 연결됨")
