@@ -70,7 +70,6 @@ function startTimer() {
       clearInterval(intervalId) // 타이머 종료
       formattedTime.value = "00:00"
       camera.stop()
-      alert("시간 종료")
       emit("open-modal")
     }
   }, 1000)
