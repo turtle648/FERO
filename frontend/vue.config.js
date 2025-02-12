@@ -11,6 +11,7 @@ const devConfig = {
       key: fs.readFileSync(path.join(__dirname, 'certs/localhost.key')),
       cert: fs.readFileSync(path.join(__dirname, 'certs/localhost.crt')),
     },
+    // https: false,
     port: 5173,
   } : {},
   pwa: {

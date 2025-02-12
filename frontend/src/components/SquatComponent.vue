@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, defineEmits } from "vue"
 import MediapipeComponent from "@/components/MediapipeComponent.vue"
 import CompleteModal from "@/components/modal/CompleteModal.vue"
 
@@ -34,6 +34,8 @@ const showSpinner = ref(true) // 로딩 스피너 상태 변수
 
 const isTutorialMode = window.location.href.includes("tutorial")
 // const isSingleMode = window.location.href.includes("single-mode")
+
+const emit = defineEmits(['setCount']);
 
 // 모드 리턴
 // const getMode = () => {
@@ -135,6 +137,7 @@ const processPose = (landmarks) => {
     } else if (isDown.value && avgKneeAngle > 160) {
       isDown.value = false
       count.value++
+      emit('setCount', count.value);
       feedback.value = `Up! Count: ${count.value}`
 
       showGreat.value = true

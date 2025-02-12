@@ -1,19 +1,15 @@
 package com.ssafy.api.service;
 
-import com.ssafy.api.request.RankUpdateReq;
+import com.ssafy.api.request.ExerciseResultEvent;
 import com.ssafy.api.response.RankUpdateRes;
-import com.ssafy.db.entity.User;
-import com.ssafy.db.entity.UserCharacter;
+import com.ssafy.common.util.JwtTokenUtil;
 import com.ssafy.db.entity.UserRankScores;
-import com.ssafy.db.entity.UserStats;
 import com.ssafy.db.repository.UserRankScoresRepository;
-import com.ssafy.db.repository.UserRepository;
-import com.ssafy.db.repository.UserStatsRepository;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 @Slf4j
@@ -41,8 +37,16 @@ public class UserRankScoresServiceImpl implements UserRankScoresService {
     }
 
     @Override
+    @EventListener
     @Transactional
-    public RankUpdateRes updateRankScore(String user1Id, String user2Id, Long exerciseId, int result) {
+    public RankUpdateRes updateRankScore(ExerciseResultEvent event) {
+        String user1Id = JwtTokenUtil.getUserIdFromJWT(event.getUserToken1());
+        String user2Id = JwtTokenUtil.getUserIdFromJWT(event.getUserToken2());
+        Long exerciseId = event.getExerciseType();
+        double result = event.getResult();
+
+        log.info(">>> eventListener : {}", event);
+
         // 유저1 & 유저2의 특정 운동 랭크 점수 조회
         UserRankScores user1Rank = userRankScoresRepository
                 .findByUser_UserIdAndExerciseStatsRatio_Id(user1Id, exerciseId)

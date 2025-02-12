@@ -3,6 +3,7 @@ package com.ssafy.config;
 import com.ssafy.api.handler.ChatWebSocketHandler;
 import com.ssafy.api.handler.MatchingWebSocketHandler;
 import com.ssafy.api.handler.SignalingHandler;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -13,7 +14,12 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 @Configuration
 @EnableWebSocket
 @EnableScheduling
-public class WebSocketConfig implements WebSocketConfigurer, WebSocketMessageBrokerConfigurer {
+public class WebSocketConfig implements WebSocketConfigurer {
+    private final ApplicationEventPublisher eventPublisher;
+
+    public WebSocketConfig(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -26,7 +32,7 @@ public class WebSocketConfig implements WebSocketConfigurer, WebSocketMessageBro
 
     @Bean
     public WebSocketHandler signalingSocketHandler() {
-        return new SignalingHandler();
+        return new SignalingHandler(eventPublisher);
     }
 
     @Bean
