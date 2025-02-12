@@ -15,8 +15,8 @@
     <div v-else-if="showStartText" class="start-text text-4xl text-white z-10">START</div>
 
     <!-- 본인 화면 -->
-    <video ref="videoElement" class="absolute inset-0 w-full h-full object-cover z-0"></video>
-    <canvas ref="canvasElement" class="absolute inset-0 w-full h-full z-0"></canvas>
+    <video ref="videoElement" class="absolute inset-0 aspect-[9/16] z-0"></video>
+    <canvas ref="canvasElement" class="absolute inset-0 aspect-[9/16] z-0"></canvas>
 
     <!-- 하단 버튼 -->
     <div class="flex justify-between items-center w-full mt-4 z-10">
