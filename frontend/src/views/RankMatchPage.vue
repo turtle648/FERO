@@ -21,6 +21,8 @@ const exercise = ref(route.params.exercise); // URL 파라미터를 ref로 저�
 const isMatched = ref(false);
 const setIsMatched = (value) => {
   isMatched.value = value;
+  console.log("❤️ setIsMatched::" + isMatched.value);
+  
 }
 
 </script>

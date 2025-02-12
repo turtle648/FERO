@@ -252,6 +252,8 @@ const handleWebSocketMessage = async (event) => {
 
     case "offer": {
       emit('setIsMatched', true);
+      console.log("offer: 매칭이 완료되었습니다");
+      
       currentPeerId.value = message.sender // offer를 보낸 Peer의 ID 저장
 
       if (!myPeerConnection) {
@@ -274,6 +276,8 @@ const handleWebSocketMessage = async (event) => {
 
     case "answer": {
       emit('setIsMatched', true);
+      console.log("answer: 매칭이 완료되었습니다");
+
       await myPeerConnection.setRemoteDescription(new RTCSessionDescription(message.sdp))
       break
     }
@@ -315,7 +319,7 @@ const handleWebSocketMessage = async (event) => {
 
 
 async function clickSubmitRoomId () {
-    const res = await axios.post("https://i12e103.p.ssafy.io:8076/api/v1/matching/enter", null, {
+    const res = await axios.post("http://localhost:8076/api/v1/matching/enter", null, {
         headers: {Authorization: `Bearer ${localStorage.getItem('authToken')}`},
         params: {exerciseType : props.exercise}
     })
@@ -328,7 +332,7 @@ async function clickSubmitRoomId () {
 // 컴포넌트 마운트 시 실행
 onMounted(() => {
   // WebSocket 연결
-  webSocket = new WebSocket('wss://i12e103.p.ssafy.io:8076/api/v1/videorooms')
+  webSocket = new WebSocket('ws://localhost:8076/api/v1/videorooms')
   
   webSocket.onopen = async () => {
     console.log("WebSocket 연결됨")
