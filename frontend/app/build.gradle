@@ -24,15 +24,15 @@ def twaManifest = [
     applicationId: 'io.ssafy.p.i12e103.twa',
     hostName: 'i12e103.p.ssafy.io', // The domain being opened in the TWA.
     launchUrl: '/', // The start path for the TWA. Must be relative to the domain.
-    name: 'Hiki from Isekai', // The application name.
-    launcherName: 'HI', // The name shown on the Android Launcher.
-    themeColor: '#FAC60E', // The color used for the status bar.
+    name: 'FERO', // The application name.
+    launcherName: 'FERO', // The name shown on the Android Launcher.
+    themeColor: '#4ADE80', // The color used for the status bar.
     themeColorDark: '#000000', // The color used for the dark status bar.
     navigationColor: '#000000', // The color used for the navigation bar.
     navigationColorDark: '#000000', // The color used for the dark navbar.
     navigationDividerColor: '#000000', // The navbar divider color.
     navigationDividerColorDark: '#000000', // The dark navbar divider color.
-    backgroundColor: '#FFD700', // The color used for the splash screen background.
+    backgroundColor: '#FFFFFF', // The color used for the splash screen background.
     enableNotifications: true, // Set to true to enable notification delegation.
     // Every shortcut must include the following fields:
     // - name: String that will show up in the shortcut.
@@ -47,7 +47,7 @@ def twaManifest = [
     // 'customtabs' and 'webview'.
     fallbackType: 'customtabs',
     enableSiteSettingsShortcut: 'true',
-    orientation: 'landscape',
+    orientation: 'default',
 ]
 
 android {
@@ -57,8 +57,8 @@ android {
         applicationId "io.ssafy.p.i12e103.twa"
         minSdkVersion 21
         targetSdkVersion 35
-        versionCode 1
-        versionName "1"
+        versionCode 2
+        versionName "2"
 
         // The name for the application
         resValue "string", "appName", twaManifest.name

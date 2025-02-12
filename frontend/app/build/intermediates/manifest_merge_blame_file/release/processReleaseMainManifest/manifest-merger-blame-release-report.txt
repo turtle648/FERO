@@ -23,8 +23,8 @@
 23-->
 24<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 25    package="io.ssafy.p.i12e103.twa"
-26    android:versionCode="1"
-27    android:versionName="1" >
+26    android:versionCode="2"
+27    android:versionName="2" >
 28
 29    <uses-sdk
 30        android:minSdkVersion="21"
@@ -35,9 +35,9 @@
 33-->/home/ubuntu/S12P11E103/frontend/app/src/main/AndroidManifest.xml:26:26-78
 34
 35    <queries>
-35-->[com.google.androidbrowserhelper:androidbrowserhelper:2.5.0] /home/ubuntu/.gradle/caches/8.8/transforms/d3335fbdff4200978ad121d7b141def7/transformed/androidbrowserhelper-2.5.0/AndroidManifest.xml:26:5-34:15
+35-->[com.google.androidbrowserhelper:androidbrowserhelper:2.5.0] /root/.gradle/caches/8.8/transforms/d3335fbdff4200978ad121d7b141def7/transformed/androidbrowserhelper-2.5.0/AndroidManifest.xml:26:5-34:15
 36        <intent>
-36-->[com.google.androidbrowserhelper:androidbrowserhelper:2.5.0] /home/ubuntu/.gradle/caches/8.8/transforms/d3335fbdff4200978ad121d7b141def7/transformed/androidbrowserhelper-2.5.0/AndroidManifest.xml:27:9-33:18
+36-->[com.google.androidbrowserhelper:androidbrowserhelper:2.5.0] /root/.gradle/caches/8.8/transforms/d3335fbdff4200978ad121d7b141def7/transformed/androidbrowserhelper-2.5.0/AndroidManifest.xml:27:9-33:18
 37            <action android:name="android.intent.action.VIEW" />
 37-->/home/ubuntu/S12P11E103/frontend/app/src/main/AndroidManifest.xml:137:17-68
 37-->/home/ubuntu/S12P11E103/frontend/app/src/main/AndroidManifest.xml:137:25-66
@@ -59,7 +59,7 @@
 47        android:allowBackup="true"
 47-->/home/ubuntu/S12P11E103/frontend/app/src/main/AndroidManifest.xml:37:9-35
 48        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-48-->[androidx.core:core:1.1.0] /home/ubuntu/.gradle/caches/8.8/transforms/2144911bb09dce3a07f407e3b390637e/transformed/core-1.1.0/AndroidManifest.xml:24:18-86
+48-->[androidx.core:core:1.1.0] /root/.gradle/caches/8.8/transforms/2144911bb09dce3a07f407e3b390637e/transformed/core-1.1.0/AndroidManifest.xml:24:18-86
 49        android:extractNativeLibs="true"
 50        android:icon="@mipmap/ic_launcher"
 50-->/home/ubuntu/S12P11E103/frontend/app/src/main/AndroidManifest.xml:38:9-43

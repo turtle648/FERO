@@ -118,6 +118,7 @@ io.ssafy.p.i12e103.twa:id/accessibility_custom_action_31 = 0x7f06001a
 io.ssafy.p.i12e103.twa:drawable/notification_bg = 0x7f050004
 io.ssafy.p.i12e103.twa:dimen/compat_button_padding_vertical_material = 0x7f040005
 io.ssafy.p.i12e103.twa:dimen/notification_large_icon_height = 0x7f04000d
+io.ssafy.p.i12e103.twa:mipmap/ic_maskable = 0x7f090001
 io.ssafy.p.i12e103.twa:attr/fontVariationSettings = 0x7f010009
 io.ssafy.p.i12e103.twa:integer/status_bar_notification_info_maxnum = 0x7f070001
 io.ssafy.p.i12e103.twa:integer/splashScreenFadeOutDuration = 0x7f070000
