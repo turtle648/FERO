@@ -5,6 +5,7 @@ import com.ssafy.api.request.ExerciseLogSearchReq;
 import com.ssafy.api.response.ExerciseLogRes;
 import com.ssafy.api.response.ExerciseStatsRatioRes;
 import com.ssafy.api.response.MonthlyQuestsStatusRes;
+import com.ssafy.api.response.QuestsRes;
 import com.ssafy.api.service.ExerciseLogService;
 import com.ssafy.api.service.ExerciseLogServiceImpl;
 import com.ssafy.api.service.QuestsService;
@@ -100,8 +101,19 @@ public class ExerciseController {
             @ApiParam(value = "조회할 월", required = true) @RequestParam int month
     ) {
         String userId = JwtTokenUtil.extractUserIdFromToken(request.getHeader("Authorization"));
-        List<MonthlyQuestsStatusRes> response = questService.getMonthlyQuestStatus(userId, year, month);
-        return ResponseEntity.ok(response);
+        return questService.getMonthlyQuestStatus(userId, year, month)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
+
+    @GetMapping("/today")
+    @ApiOperation(value = "오늘의 퀘스트 조회", notes = "현재 로그인한 사용자의 오늘 퀘스트 정보를 조회")
+    public ResponseEntity<List<QuestsRes>> getTodayQuests(HttpServletRequest request) {
+        String userId = JwtTokenUtil.extractUserIdFromToken(request.getHeader("Authorization"));
+
+        return questService.getTodayQuest(userId, LocalDate.now())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
     }
 
 
