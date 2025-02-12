@@ -351,7 +351,7 @@ const handleWebSocketMessage = async (event) => {
 
 
 async function clickSubmitRoomId () {
-    const res = await axios.post("http://localhost:8076/api/v1/matching/enter", null, {
+    const res = await axios.post("https://i12e103.p.ssafy.io:8076/api/v1/matching/enter", null, {
         headers: {Authorization: `Bearer ${localStorage.getItem('authToken')}`},
         params: {exerciseType : props.exercise}
     })
@@ -364,7 +364,7 @@ async function clickSubmitRoomId () {
 // 컴포넌트 마운트 시 실행
 onMounted(() => {
   // WebSocket 연결
-  webSocket = new WebSocket('ws://localhost:8076/api/v1/videorooms')
+  webSocket = new WebSocket('wss://i12e103.p.ssafy.io:8076/api/v1/videorooms')
   
   webSocket.onopen = async () => {
     console.log("WebSocket 연결됨")
