@@ -27,23 +27,26 @@
 
 <script setup>
 import { ref, defineEmits, onMounted } from "vue"
+// import { useMainStore } from "@/stores/mainStore"
 
-const emit = defineEmits(['close-modal'])
+// const mainStore = useMainStore()
+
+const emit = defineEmits(["close-modal"])
 const closeCalendarModal = () => {
-  emit('close-modal')
+  emit("close-modal")
 }
 
 // 날짜 관련 상태 관리
 const currentDate = new Date()
 const currentYear = ref(currentDate.getFullYear())
 const currentMonth = ref(currentDate.getMonth())
-const daysContainer = ref(null)
+const daysContainer = ref(null) // 달력의 날짜를 렌더링할 요소
 
 // 월별 날짜 렌더링 함수
 const renderCalendar = () => {
-  const firstDayOfMonth = new Date(currentYear.value, currentMonth.value, 1).getDay()
-  const lastDateOfMonth = new Date(currentYear.value, currentMonth.value + 1, 0).getDate()
-  const lastDayOfPrevMonth = new Date(currentYear.value, currentMonth.value, 0).getDate()
+  const firstDayOfMonth = new Date(currentYear.value, currentMonth.value, 1).getDay() // 해당 월의 첫 번째 날의 요일
+  const lastDateOfMonth = new Date(currentYear.value, currentMonth.value + 1, 0).getDate() // 해당 월의 마지막 날짜
+  const lastDayOfPrevMonth = new Date(currentYear.value, currentMonth.value, 0).getDate() // 이전 월의 마지막 날짜
 
   let daysHTML = ""
 
@@ -59,41 +62,55 @@ const renderCalendar = () => {
   }
 
   // 다음 달 날짜
-  const nextDays = 42 - (firstDayOfMonth + lastDateOfMonth)
+  const nextDays = 42 - (firstDayOfMonth + lastDateOfMonth) // 총 셀 개수를 맞추기 위해 필요한 다음 달의 날짜 수 계산
   for (let i = 1; i <= nextDays; i++) {
     daysHTML += `<span class="inactive">${i}</span>`
   }
 
   if (daysContainer.value) {
-    daysContainer.value.innerHTML = daysHTML
+    daysContainer.value.innerHTML = daysHTML // 계산된 HTML을 DOM에 삽입
   }
 }
 
 // 이전/다음 달 이동 함수
-const prevMonth = () => {
+const prevMonth = async () => {
   if (currentMonth.value === 0) {
-    currentMonth.value = 11
+    currentMonth.value = 11 // 현재 월이 1월이면 이전 달은 작년의 12월
     currentYear.value--
   } else {
-    currentMonth.value--
+    currentMonth.value-- // 이전 달로 이동
   }
-  renderCalendar()
+  renderCalendar() // 변경된 월에 맞게 달력 다시 렌더링
+
+  // try {
+  //   const response = await mainStore.isQuestCompleted(currentYear.value, currentMonth.value + 1) // 해당 월의 퀘스트 데이터 가져오기
+  //   console.log("✅ Prev Month Quest Data:", response)
+  // } catch (error) {
+  //   console.error("🚨 Error fetching quest data for prev month:", error)
+  // }
 }
 
-const nextMonth = () => {
+const nextMonth = async () => {
   if (currentMonth.value === 11) {
-    currentMonth.value = 0
+    currentMonth.value = 0 // 현재 월이 12월이면 다음 달은 내년의 1월
     currentYear.value++
   } else {
     currentMonth.value++
   }
   renderCalendar()
+
+  // try {
+  //   const response = await mainStore.isQuestCompleted(currentYear.value, currentMonth.value + 1)
+  //   console.log(response)
+  // } catch (error) {
+  //   console.error(error)
+  // }
 }
 
 // 초기 렌더링
 onMounted(() => {
   daysContainer.value = document.querySelector(".days")
-  renderCalendar()
+  renderCalendar() // 초기 달력 렌더링 실행
 })
 </script>
 
@@ -161,7 +178,7 @@ onMounted(() => {
 
 #close-btn {
   position: absolute;
-  top: 2%;
-  right: 2%;
+  top: 1%;
+  right: 1%;
 }
 </style>

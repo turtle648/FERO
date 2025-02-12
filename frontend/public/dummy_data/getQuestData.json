@@ -1,0 +1,11 @@
+{
+    "id": 1,
+    "user_character_id": 101,
+    "quest_date": "2025-02-13",
+    "quest_time": "14:30:00",
+    "exercise_id": 2,
+    "exercise_cnt": 20,
+    "real_cnt": 15,
+    "is_completed": false,
+    "message": "200"
+}
