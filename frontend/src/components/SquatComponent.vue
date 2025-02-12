@@ -1,8 +1,8 @@
 <template>
   <div class="counter-container relative">
     <!-- Loading Spinner -->
-    <div v-if="showSpinner" class="fixed inset-0 flex items-center justify-center bg-gray-100 z-50">
-      <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+    <div v-if="showSpinner" class="fixed inset-0 flex items-center justify-center bg-gray-100 z-300">
+      <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 z-300"></div>
     </div>
 
     <div class="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 text-center">
@@ -12,7 +12,7 @@
     <MediapipeComponent @pose-detected="processPose" @open-modal="openModal" class="z-0" />
     <CompleteModal v-if="showModal" :count="count" class="z-99" />
 
-    <div v-if="showErrorModal" class="landmark-error-modal">전신이 나오도록 카메라 위치를 수정해주세요</div>
+    <div v-if="showErrorModal" class="landmark-error-modal z-20">전신이 나오도록 카메라 위치를 수정해주세요</div>
     <button v-if="isTutorialMode" @click="setCountToThree" class="fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded shadow-lg hover:bg-blue-600 z-50">Set Count to 3</button>
   </div>
 </template>
