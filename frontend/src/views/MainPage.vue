@@ -40,7 +40,7 @@
     <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('calendar')">달력</div>
     <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('fitness')">운동</div>
     <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('record')">전적</div>
-    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer">퀘스트</div>
+    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('quest')">퀘스트</div>
   </div>
 
   <!-- 모달 컴포넌트 -->
@@ -52,6 +52,9 @@
   <CalendarModal v-if="modals.calendar" @close-modal="closeModal('calendar')" @open-modal="openModal('calendar')" />
   <FitnessModal v-if="modals.fitness" @close-modal="closeModal('fitness')" @open-modal="openModal('fitness')" />
   <MatchRecordModal v-if="modals.record" @close-modal="closeModal('record')" @open-modal="openModal('record')" />
+  <QuestModal v-if="modals.quest" @close-modal="closeModal('quest')" @open-modal="openModal('quest')" />
+  <!-- 백그라운드 음성인식 -->
+  <SpeechRecognitionHandler @voice-control="modalControl" />
 </template>
 
 <script setup>
@@ -70,7 +73,8 @@ import FriendListModal from "@/components/modal/FriendListModal.vue"
 import CalendarModal from "@/components/modal/CalendarModal.vue"
 import FitnessModal from "@/components/modal/FitnessModal.vue"
 import MatchRecordModal from "@/components/modal/MatchRecordModal.vue"
-
+import QuestModal from "@/components/modal/QuestModal.vue"
+import SpeechRecognitionHandler from "@/components/voice/SpeechRecognitionHandler.vue"
 
 // 스토어 가져오기 ==================================================
 const userDataStore = useUserDataStore()
@@ -93,11 +97,19 @@ watchEffect(() => {
 
 
 // 모달 상태 및 관리 메서드 ========================================
-const modals = ref({ status: false, record: false, setting: false, friend: false, calendar: false, fitness: false, alarm: false, character: false })
+const modals = ref({ status: false, record: false, setting: false, friend: false, calendar: false, fitness: false, alarm: false, character: false, quest: false, })
 const isAnyModalOpen = computed(() => Object.values(modals.value).some(v => v))
 const openModal = (type) => { if (!isAnyModalOpen.value) modals.value[type] = true }
 const closeModal = (type) => { modals.value[type] = false }
-
+const modalControl = (type) => {
+  if (type === "close" || isAnyModalOpen.value) {
+    // 모든 모달 종료
+    modals.value = { status: false, record: false, setting: false, friend: false, calendar: false, fitness: false, alarm: false, character: false, quest: false, }    
+  } else { 
+    // 모달창 열기
+    modals.value[type] = true
+  }
+}
 
 // 유저정보/ 튜토리얼정보 불러오기 ==================================================
 onMounted(async () => {
