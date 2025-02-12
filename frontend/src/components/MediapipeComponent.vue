@@ -1,25 +1,27 @@
 <template>
+  <!-- 로딩 스피너 -->
+  <!-- <div v-if="isLoading" class="flex items-center justify-center h-screen w-screen bg-black bg-opacity-50 z-50">
+    <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+    <p class="text-white text-lg mt-2">로딩중...</p>
+  </div> -->
+
   <div class="container flex flex-col items-center justify-between p-4 h-screen w-screen">
     <div class="flex justify-between w-full">
-      <div class="timer text-white-common z-20 absolute top-20 right-10">{{ formattedTime }}</div>
+      <div class="timer text-white-common z-20 absolute top-0 right-10">{{ formattedTime }}</div>
     </div>
 
     <!-- 중앙 영역 -->
-    <div class="absolute inset-0 flex items-center justify-center z-100">
-      <div v-if="countdown > 0" class="countdown text-5xl text-black">{{ countdown }}</div>
-      <div v-else-if="showStartText" class="start-text text-5xl text-black">START</div>
-    </div>
+    <div v-if="countdown > 0" class="countdown text-4xl text-white z-10">{{ countdown }}</div>
+    <div v-else-if="showStartText" class="start-text text-4xl text-white z-10">START</div>
 
     <!-- 본인 화면 -->
-    <div class="relative w-full aspect-[9/16] bg-black">
-      <video ref="videoElement" class="absolute inset-0 aspect-[9/16] object-cover z-0"></video>
-      <canvas ref="canvasElement" class="absolute inset-0 w-full h-full z-0"></canvas>
-    </div>
+    <video ref="videoElement" class="absolute inset-0 aspect-[9/16] z-0"></video>
+    <canvas ref="canvasElement" class="absolute inset-0 aspect-[9/16] z-0"></canvas>
 
-    <div class="z-10 relative">
-      <!-- 하단 버튼 -->
-      <ExitButton class="absolute bottom-0 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded z-30" @click="stopCameraAndNavigate" />
-      <ReportIssueButton class="absolute bottom-0 right-8 px-4 py-2 rounded z-30" />
+    <!-- 하단 버튼 -->
+    <div class="flex justify-between items-center w-full mt-4 z-10">
+      <ExitButton class="px-4 py-2 rounded mx-auto" @click="stopCameraAndNavigate" />
+      <ReportIssueButton />
     </div>
   </div>
 </template>
