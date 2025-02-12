@@ -42,11 +42,11 @@ onMounted(() => {
   }
 });
 
-// 🔹 "헤이 파소콩" 감지 → 5초간 명령어 대기
+// 🔹hey 감지 → 5초간 명령어 대기
 const processSpeech = (text) => {
   if (isWaitingCommand.value) return; // 이미 대기 중이면 무시
 
-  if (text.includes("헤이 파소콩")) {
+  if (text.includes("hey") || text.includes("Hey") || text.includes("헤이") || text.includes("해이")) {
     startCommandListening();
   }
 };
