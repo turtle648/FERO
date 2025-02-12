@@ -45,11 +45,11 @@ const userDataStore = useUserDataStore()
 
 // 로그아웃 함수
 const goToStart = async () => {
-  await userStore.logOut() // Pinia store에서 제공하는 goToStart 호출
+  await userStore.logOut()
 }
 
 // 본인정보조회
-const checkUserNickname = () => { userDataStore.checkUserNickname() }
+const checkUserNickname = () => { userDataStore.checkUserInfo() }
 // 본인레벨조회
 const checkUserLevel = () => { userDataStore.checkUserLevel() }
 // 본인경험치조회

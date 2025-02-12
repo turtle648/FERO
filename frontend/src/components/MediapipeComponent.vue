@@ -151,6 +151,20 @@ onMounted(async () => {
   //   isLoading.value = false
   // }, 2000)
 
+    // Single Mode의 경우 시간을 URL BASE로 설정
+    if (window.location.href.includes("single-mode")) {
+    // 시작 시간 설정 by url prams
+    const pathSegments = route.path.split("/").filter(Boolean) // URL을 '/' 기준으로 분할하고, 빈 요소(마지막 `/`) 제거
+    const timeFromUrl = parseInt(pathSegments[pathSegments.length - 1]) // 마지막 값 가져오기
+    console.log(timeFromUrl, "인지된 시간")
+    if (!isNaN(timeFromUrl)) {
+      selectedTime.value = timeFromUrl * 60 * 1000 // 초에서 밀리초 변환
+    }
+  } else if (window.location.href.includes("tutorial")) {
+    // 튜토리얼 모드 기본값: 999분
+    selectedTime.value = 999 * 60 * 1000
+  }
+
   if (!videoElement.value || !canvasElement.value) {
     console.error("Video or Canvas element is not initialized.")
 
@@ -183,20 +197,6 @@ onMounted(async () => {
     width: window.innerWidth,
     height: window.innerHeight,
   })
-
-  // Single Mode의 경우 시간을 URL BASE로 설정
-  if (window.location.href.includes("single-mode")) {
-    // 시작 시간 설정 by url prams
-    const pathSegments = route.path.split("/").filter(Boolean) // URL을 '/' 기준으로 분할하고, 빈 요소(마지막 `/`) 제거
-    const timeFromUrl = parseInt(pathSegments[pathSegments.length - 1]) // 마지막 값 가져오기
-    console.log(timeFromUrl, "인지된 시간")
-    if (!isNaN(timeFromUrl)) {
-      selectedTime.value = timeFromUrl * 60 * 1000 // 초에서 밀리초 변환
-    }
-  } else if (window.location.href.includes("tutorial")) {
-    // 튜토리얼 모드 기본값: 999분
-    selectedTime.value = 999 * 60 * 1000
-  }
 
   try {
     await camera.start()
