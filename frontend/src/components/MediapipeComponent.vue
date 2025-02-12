@@ -10,9 +10,11 @@
 
     <!-- 본인 화면 -->
 
-    <canvas ref="canvasElement" class="absolute inset-0 aspect-[9/16] z-0">
-      <video ref="videoElement" class="absolute inset-0 aspect-[9/16] z-0"></video>
-    </canvas>
+    <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
+      <canvas ref="canvasElement" class="w-full h-full object-fill">
+        <video ref="videoElement" class="w-full h-full object-fill"></video>
+      </canvas>
+    </div>
 
     <!-- 하단 버튼 -->
     <div class="button-container z-10">
@@ -152,8 +154,8 @@ onMounted(async () => {
   //   isLoading.value = false
   // }, 2000)
 
-    // Single Mode의 경우 시간을 URL BASE로 설정
-    if (window.location.href.includes("single-mode")) {
+  // Single Mode의 경우 시간을 URL BASE로 설정
+  if (window.location.href.includes("single-mode")) {
     // 시작 시간 설정 by url prams
     const pathSegments = route.path.split("/").filter(Boolean) // URL을 '/' 기준으로 분할하고, 빈 요소(마지막 `/`) 제거
     const timeFromUrl = parseInt(pathSegments[pathSegments.length - 1]) // 마지막 값 가져오기
