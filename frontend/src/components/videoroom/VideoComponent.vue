@@ -273,6 +273,7 @@ const handleWebSocketMessage = async (event) => {
     }
 
     case "answer": {
+      emit('setIsMatched', true);
       await myPeerConnection.setRemoteDescription(new RTCSessionDescription(message.sdp))
       break
     }
