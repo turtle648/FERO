@@ -10,13 +10,16 @@ import lombok.Setter;
 @ApiModel("RankUpdateReq")
 public class RankUpdateReq {
 
-    @ApiModelProperty(name = "승리한 유저의 Id")
-    private String winnerId;
+    @ApiModelProperty(name = "User1의 Id")
+    private String user1Id;
 
-    @ApiModelProperty(name = "패배한 유저의 Id")
-    private String loserId;
+    @ApiModelProperty(name = "User2의 Id")
+    private String user2Id;
 
     @ApiModelProperty(name = "운동에 대한 Id")
     private Long exerciseId;
+
+    @ApiModelProperty(name = "user1 에 대한 승, 패, 무")
+    private int result;
 }
 
