@@ -52,8 +52,15 @@ const playMusic = async () => {
     console.log('배경 음악 자동 재생 성공')
   } catch (error) {
     console.log('자동 재생 실패, 브라우저 정책으로 차단됨:', error)
-    setTimeout(playMusic, 2000) // 2초 후 재시도
+    document.addEventListener('click', handleUserInteraction, { once: true })
   }
+}
+
+// 첫 사용자 액션 후 자동 재생 가능하도록 설정
+const handleUserInteraction = () => {
+  console.log('사용자 상호작용 감지됨! 음악 재생 시작')
+  playMusic()
+  document.removeEventListener('click', handleUserInteraction)
 }
 
 // PWA 실행 시 자동 재생 시도
@@ -63,6 +70,7 @@ onMounted(() => {
 
 // PWA 종료 시 음악 정지
 onUnmounted(() => {
+  document.removeEventListener('click', handleUserInteraction)
   if (audioPlayer.value) {
     audioPlayer.value.pause()
   }
@@ -112,6 +120,7 @@ onUnmounted(() => {
     <SignInUp v-if="showModal" @close="closeModal" />
   </div>
 </template>
+
 
 
 <style scoped>
@@ -179,4 +188,4 @@ body {
     padding-bottom: 0.5rem;
   }
 }
-</style>
+</style>`
