@@ -9,7 +9,7 @@ import MultiModePage from "@/views/MultiModePage.vue"
 import QRComponent from "@/components/QRComponent.vue"
 import RankMatchPage from "@/views/RankMatchPage.vue"
 import UiTutorialPage from "@/views/UiTutorialPage.vue"
-
+import TestVoice from "@/components/testVoice.vue"
 // 랭크매치, 랭크모드에 인증 관련 메타데이터 고려해볼 것
 // meta: {
 //   requiresAuth: true,  // 인증 필요
@@ -87,6 +87,12 @@ const routes = [
     name: 'UiTutorial',
     component: UiTutorialPage,
     meta: { isMobile: true }
+  },
+  {
+    path: "/testVoice",
+    name: "testVoice",
+    component: TestVoice,
+    meta: { isMobile: true },
   },
 ]
 
