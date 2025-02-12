@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 public class QuestsService {
     private final QuestsRepository questsRepository;
 
-    public List<MonthlyQuestsStatusRes> getMonthlyQuestStatus(String userId, int year, int month) {
+    public Optional<List<MonthlyQuestsStatusRes>> getMonthlyQuestStatus(String userId, int year, int month) {
         // 해당 월의 시작일과 마지막일 계산
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDate endDate = startDate.plusMonths(1).minusDays(1);
@@ -27,23 +28,33 @@ public class QuestsService {
                 userId, startDate, endDate
         );
 
-        // 응답 데이터 생성
-        List<MonthlyQuestsStatusRes> response = new ArrayList<>();
-        monthlyQuests.forEach(quest -> {
-            MonthlyQuestsStatusRes status = new MonthlyQuestsStatusRes();
-            status.setDay(quest.getQuestDate().getDayOfMonth());
-            status.setIsCompleted(quest.getIsCompleted());
-            response.add(status);
-        });
+        if (monthlyQuests.isEmpty()) {
+            return Optional.empty();
+        }
 
-        return response;
+        // 응답 데이터 생성
+        List<MonthlyQuestsStatusRes> response = monthlyQuests.stream()
+                .map(quest -> MonthlyQuestsStatusRes.builder()
+                        .day(quest.getQuestDate().getDayOfMonth())
+                        .isCompleted(quest.getIsCompleted())
+                        .build())
+                .collect(Collectors.toList());
+
+        return Optional.of(response);
     }
 
-    public List<QuestsRes> getTodayQuest(String userId, LocalDate date) {
+    public Optional<List<QuestsRes>> getTodayQuest(String userId, LocalDate date) {
         List<QuestsEntity> todayQuests = questsRepository.findByUserCharacter_User_UserIdAndQuestDate(userId, date);
-        return todayQuests.stream()
+        if (todayQuests.isEmpty()) {
+            return Optional.empty();
+        }
+
+        List<QuestsRes> responses = todayQuests.stream()
                 .map(QuestsRes::from)
                 .collect(Collectors.toList());
+
+        return Optional.of(responses);
     }
+
 
 }
