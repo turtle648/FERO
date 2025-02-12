@@ -145,15 +145,16 @@ CREATE TABLE chat_message (
 
 CREATE TABLE quests (
                         id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                        user_id VARCHAR(30) NOT NULL,
+                        user_character_id BIGINT NOT NULL,
                         quest_date DATE NOT NULL,          -- 날짜만 저장 (YYYY-MM-DD)
-                        quest_time TIME NOT NULL,          -- 시간만 저장 (HH:MM:SS)
+                        quest_time TIME,          -- 시간만 저장 (HH:MM:SS)
                         exercise_id BIGINT NOT NULL,       -- exercise_stats_ratio의 id 참조
                         exercise_cnt INT UNSIGNED NOT NULL, -- 목표 운동 횟수
+                        real_cnt int unsigned default 0, -- 진짜 운동 횟수
                         is_completed BOOLEAN DEFAULT FALSE, -- 달성 여부
                         message VARCHAR(200),              -- 퀘스트 메시지
 
-                        FOREIGN KEY (user_id) REFERENCES user_character(user_id) ON DELETE CASCADE,
+                        FOREIGN KEY (user_character_id) REFERENCES user_character(id) ON DELETE CASCADE,
                         FOREIGN KEY (exercise_id) REFERENCES exercise_stats_ratio(id) ON DELETE RESTRICT
 );
 
@@ -231,6 +232,87 @@ BEGIN
 END //
 
 DELIMITER ;
+
+--- FUNCTION
+
+-- 레벨별 운동 횟수를 계산하는 함수
+DELIMITER //
+CREATE FUNCTION calculate_exercise_count(user_level INT)
+    RETURNS INT
+    DETERMINISTIC
+BEGIN
+    -- 기본 횟수 5회, 5레벨 단위로 2회씩 증가
+RETURN 5 + (2 * FLOOR(user_level / 5));
+END //
+DELIMITER ;
+
+
+-- EVENT SCHEDULER
+
+-- 전날 퀘스트 성공 여부를 체크하는 이벤트 스케줄러
+DELIMITER //
+CREATE EVENT quest_completion_check
+ON SCHEDULE EVERY 1 DAY
+STARTS CURRENT_DATE + INTERVAL 1 DAY
+DO
+BEGIN
+    -- 전날 퀘스트의 달성 여부 업데이트
+UPDATE quests
+SET is_completed = CASE
+                       WHEN real_cnt >= exercise_cnt THEN TRUE
+                       ELSE FALSE
+    END
+WHERE quest_date = DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY);
+END //
+DELIMITER ;
+
+-- -- 매일 자정에 새로운 퀘스트를 생성하는 이벤트 스케줄러
+-- DELIMITER //
+-- CREATE EVENT daily_quest_creation
+-- ON SCHEDULE EVERY 1 DAY
+-- STARTS CURRENT_DATE + INTERVAL 1 DAY
+-- DO
+-- BEGIN
+--     -- 모든 사용자에 대해 모든 운동 종류의 퀘스트 생성
+-- INSERT INTO quests (user_id, quest_date, exercise_id, exercise_cnt, real_cnt, message)
+-- SELECT
+--     uc.user_id,
+--     CURRENT_DATE,
+--     esr.id,
+--     calculate_exercise_count(uc.user_level),
+--     0,  -- real_cnt 초기값
+--     CONCAT(esr.exercise_type, '을(를) ',
+--            calculate_exercise_count(uc.user_level),
+--            '번 해주세요!')
+-- FROM user_character uc
+--          CROSS JOIN exercise_stats_ratio esr;
+-- END //
+-- DELIMITER ;
+
+-- 스쿼트 퀘스트만 생성하는 이벤트 스케줄러
+DELIMITER //
+CREATE EVENT daily_quest_creation
+ON SCHEDULE EVERY 1 DAY
+STARTS CURRENT_DATE + INTERVAL 1 DAY
+DO
+BEGIN
+    -- 모든 사용자에 대해 스쿼트 퀘스트만 생성
+INSERT INTO quests (user_id, quest_date, exercise_id, exercise_cnt, real_cnt, message)
+SELECT
+    uc.user_id,
+    CURRENT_DATE,
+    2,  -- 스쿼트의 exercise_id
+    calculate_exercise_count(uc.user_level),
+    0,  -- real_cnt 초기값
+    CONCAT('스쿼트를 ',
+           calculate_exercise_count(uc.user_level),
+           '번 해주세요!')
+FROM user_character uc;
+END //
+DELIMITER ;
+
+-- 이벤트 스케줄러 활성화
+SET GLOBAL event_scheduler = ON;
 
 
 -- -- -- -- -- 데이터 삽입 -- -- -- -- --
@@ -385,7 +467,7 @@ INSERT INTO user_rank_scores (user_id, exercise_id, rank_score) VALUES
 ('kwon567', 4, 1303);
 
 UPDATE user_stats
-SET 
+SET
     arms_stats = FLOOR(10 + (RAND() * (1000 - 10))),
     legs_stats = FLOOR(10 + (RAND() * (1000 - 10))),
     chest_stats = FLOOR(10 + (RAND() * (1000 - 10))),
@@ -396,7 +478,7 @@ SET
 WHERE id > 0;
 
 INSERT INTO exercise_log (user_id, exercise_duration, exercise_cnt, exercise_stats_ratio_id, exercise_date)
-SELECT 
+SELECT
     user_id,
     FLOOR(10 + (RAND() * (180 - 10))) AS exercise_duration,
     FLOOR(1 + (RAND() * (5 - 1))) AS exercise_cnt,
@@ -426,12 +508,3 @@ FROM (
 ) AS users
 ORDER BY RAND()
 LIMIT 50;
-
-UPDATE user_tutorial_progress
-SET is_completed = 1, 
-    completed_at = NOW()
-WHERE id IN (
-    SELECT id FROM (
-        SELECT id FROM user_tutorial_progress ORDER BY RAND() LIMIT 30
-    ) AS subquery
-);
