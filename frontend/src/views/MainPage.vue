@@ -102,8 +102,13 @@ const isAnyModalOpen = computed(() => Object.values(modals.value).some(v => v))
 const openModal = (type) => { if (!isAnyModalOpen.value) modals.value[type] = true }
 const closeModal = (type) => { modals.value[type] = false }
 const modalControl = (type) => {
-  if (isAnyModalOpen.value) {modals.value[type] = false}
-  else {modals.value[type] = true}
+  if (type === "close" || isAnyModalOpen.value) {
+    // 모든 모달 종료
+    modals.value = { status: false, record: false, setting: false, friend: false, calendar: false, fitness: false, alarm: false, character: false, quest: false, }    
+  } else { 
+    // 모달창 열기
+    modals.value[type] = true
+  }
 }
 
 // 유저정보/ 튜토리얼정보 불러오기 ==================================================

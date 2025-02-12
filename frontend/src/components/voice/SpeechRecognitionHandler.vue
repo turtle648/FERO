@@ -25,6 +25,7 @@
     "알림": () => emit("voice-control", "alarm"),
     "캐릭터": () => emit("voice-control", "character"),
     "퀘스트": () => emit("voice-control", "quest"),    
+    "종료": () => emit("voice-control", "close"),
   }
   
   // 🔹 음성 인식 초기화
