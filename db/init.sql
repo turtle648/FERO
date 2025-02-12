@@ -239,7 +239,7 @@ INSERT INTO tutorial_types (id, tutorial_name) VALUES
                                                (4, 'plank'),
                                                (99, 'UI');
 
--- user_info 더미 데이터 (20명, 모든 비밀번호는 'moonym1')
+-- user_info 더미 데이터 (20명, 모든 비밀번호는 '1234')
 INSERT INTO user_info (user_id, user_password, user_name, user_email, phone_number) VALUES
 ('ssafy123', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Hong Gil-dong', 'hong123@gmail.com', '010-1234-5678'),
 ('kim456', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Kim Chul-soo', 'kim456@naver.com', '010-2345-6789'),
@@ -265,7 +265,7 @@ INSERT INTO user_info (user_id, user_password, user_name, user_email, phone_numb
 INSERT INTO user_character (user_id, user_nickname, gender, avatar, user_level, user_experience, points) VALUES
 ('ssafy123', 'GilDong', 'M', '7-3-9', 5, 128, 1000),
 ('kim456', 'ChulSoo123', 'M', '2-6-4', 3, 57, 500),
-('lee789', 'YoungHeePrincess', 'F', '1-8-10', 7, 184, 1500),
+('lee789', 'YoungHee', 'F', '1-8-10', 7, 184, 1500),
 ('park234', 'JiSungSoccer', 'M', '5-9-2', 4, 76, 800),
 ('choi567', 'MinSooKing', 'M', '4-7-1', 2, 93, 300),
 ('jung111', 'SoHeeJjang', 'F', '10-3-5', 8, 42, 2000),
