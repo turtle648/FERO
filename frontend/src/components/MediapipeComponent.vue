@@ -15,14 +15,20 @@
     <div v-else-if="showStartText" class="start-text text-4xl text-white z-10">START</div>
 
     <!-- 본인 화면 -->
-    <video ref="videoElement" class="absolute inset-0 aspect-[9/16] z-0"></video>
-    <canvas ref="canvasElement" class="absolute inset-0 aspect-[9/16] z-0"></canvas>
+
+    <canvas ref="canvasElement" class="absolute inset-0 aspect-[9/16] z-0">
+      <video ref="videoElement" class="absolute inset-0 aspect-[9/16] z-0"></video>
+    </canvas>
 
     <!-- 하단 버튼 -->
     <div class="flex justify-between items-center w-full mt-4 z-10">
       <ExitButton class="px-4 py-2 rounded mx-auto" @click="stopCameraAndNavigate" />
       <ReportIssueButton />
     </div>
+    <!-- <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-between items-center w-[90%] max-w-md z-10">
+      <ExitButton class="rounded bg-red-500 text-white" @click="stopCameraAndNavigate" />
+      <ReportIssueButton class="rounded bg-blue-500 text-white" />
+    </div> -->
   </div>
 </template>
 
