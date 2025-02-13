@@ -1,9 +1,12 @@
 package com.ssafy.api.handler;
 
 import com.ssafy.api.request.MatchSuccessEvent;
+import com.ssafy.api.service.MatchingService;
 import com.ssafy.common.model.Message;
 import com.ssafy.common.util.RTCUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -13,6 +16,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
 
 @Slf4j
@@ -39,6 +43,15 @@ public class SignalingHandler extends TextWebSocketHandler {
     private static final String MSG_TYPE_CANDIDATE = "candidate";
     // 방 입장 메시지
     private static final String MSG_TYPE_AUTH = "auth";
+
+    // 레디스 삭제할 때 쓸 leaveWaitingRoom
+    private final MatchingService matchingService;
+    private final ApplicationContext eventHandler;
+    // 직접 생성자 작성
+    public SignalingHandler(MatchingService matchingService, ApplicationContext eventHandler) {
+        this.matchingService = matchingService;
+        this.eventHandler = eventHandler;
+    }
 
     // 웹소켓 연결 시
     @Override
@@ -185,7 +198,9 @@ public class SignalingHandler extends TextWebSocketHandler {
                 case MSG_TYPE_AUTH:
                     sessions.put(session.getId(), session);
                     tokenWithUid.put(message.getAuth(), session.getId());
-                    log.info("📜 사용자 세션 등록 - session: {}, token: {}", session, message.getAuth());
+                    session.getAttributes().put("exerciseType", message.getExerciseType());
+                    log.info("📜 사용자 세션 등록 - session: {}, exerciseType: {}, token: {}",
+                            session, message.getExerciseType(), message.getAuth());
                     break;
                 // 메시지 타입이 잘못되었을 경우
                 default:
@@ -201,52 +216,74 @@ public class SignalingHandler extends TextWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         log.info(">>> [ws] 클라이언트 접속 해제 : 세션 - {}, 상태 - {}", session, status);
 
-        // 유저 uuid 와 roomID 를 저장
-        String userUUID = session.getId(); // 유저 uuid
-        String roomId = userInfo.get(userUUID); // roomId
+        try {
+            // 유저 uuid 와 roomID 를 저장
+            String userUUID = session.getId(); // 유저 uuid
 
-        if (roomId != null && userUUID != null) {
-            // 1. Remove user from sessions
-            sessions.remove(userUUID);
-
-            // 2. Remove user from userInfo
-            userInfo.remove(userUUID);
-
-            // 3. Remove user from roomInfo
-            if (roomInfo.containsKey(roomId)) {
-                // Remove the user from the room
-                roomInfo.get(roomId).removeIf(userMap -> userMap.get("id").equals(userUUID));
-
-                // If the room is empty after removing the user, remove the room entirely
-                if (roomInfo.get(roomId).isEmpty()) {
-                    roomInfo.remove(roomId);
-                    log.info(">>> [ws] 빈 방이어서 #{}번 방 삭제 완료", roomId);
+            // 유저 토큰과 exerciseType 가져오기
+            String token = null;
+            for(Map.Entry<String, String> entry : tokenWithUid.entrySet()) {
+                if (entry.getValue().equals(userUUID)) {
+                    token = entry.getKey();
+                    break;
                 }
             }
+            Long exerciseType = (Long) session.getAttributes().get("exerciseType");
 
-            // 4. Remove user from tokenWithUid
-            tokenWithUid.entrySet().removeIf(entry -> entry.getValue().equals(userUUID));
+            // Redis cleanup 수행
+            if (token != null && exerciseType != null) {
+                matchingService.leaveWaitingRoom(token, exerciseType);
+                log.info("🧹 Redis cleanup completed for token: {}, exerciseType: {}", token, exerciseType);
+            }
 
-            // 5. Notify other users in the room about the exit
-            sessions.values().forEach(s -> {
-                try {
-                    if (!s.getId().equals(userUUID)) {
-                        s.sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
-                                .type("user_exit")
-                                .sender(userUUID)
-                                .build())));
+
+            String roomId = userInfo.get(userUUID); // roomId
+
+            if (roomId != null && userUUID != null) {
+                // 1. Remove user from sessions
+                sessions.remove(userUUID);
+
+                // 2. Remove user from userInfo
+                userInfo.remove(userUUID);
+
+                // 3. Remove user from roomInfo
+                if (roomInfo.containsKey(roomId)) {
+                    // Remove the user from the room
+                    roomInfo.get(roomId).removeIf(userMap -> userMap.get("id").equals(userUUID));
+
+                    // If the room is empty after removing the user, remove the room entirely
+                    if (roomInfo.get(roomId).isEmpty()) {
+                        roomInfo.remove(roomId);
+                        log.info(">>> [ws] 빈 방이어서 #{}번 방 삭제 완료", roomId);
                     }
-                } catch (Exception e) {
-                    log.error(">>> 에러 발생 : user_exit 메시지 전달 실패 {}", e.getMessage());
                 }
-            });
 
-            log.info(">>> [ws] #{}번 방에서 {} 삭제 완료", roomId, userUUID);
-            if (roomInfo.containsKey(roomId)) {
-                log.info(">>> [ws] #{}번 방에 남은 유저 {}", roomId, roomInfo.get(roomId));
+                // 4. Remove user from tokenWithUid
+                tokenWithUid.entrySet().removeIf(entry -> entry.getValue().equals(userUUID));
+
+                // 5. Notify other users in the room about the exit
+                sessions.values().forEach(s -> {
+                    try {
+                        if (!s.getId().equals(userUUID)) {
+                            s.sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
+                                    .type("user_exit")
+                                    .sender(userUUID)
+                                    .build())));
+                        }
+                    } catch (Exception e) {
+                        log.error(">>> 에러 발생 : user_exit 메시지 전달 실패 {}", e.getMessage());
+                    }
+                });
+
+                log.info(">>> [ws] #{}번 방에서 {} 삭제 완료", roomId, userUUID);
+                if (roomInfo.containsKey(roomId)) {
+                    log.info(">>> [ws] #{}번 방에 남은 유저 {}", roomId, roomInfo.get(roomId));
+                }
+            } else {
+                log.warn(">>> [ws] 유저 정보를 찾을 수 없음 : {}", userUUID);
             }
-        } else {
-            log.warn(">>> [ws] 유저 정보를 찾을 수 없음 : {}", userUUID);
+        } catch (Exception e) {
+            log.error("[ws Error] during cleanup: ", e);
         }
     }
 

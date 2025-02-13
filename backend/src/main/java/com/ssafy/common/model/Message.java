@@ -20,4 +20,5 @@ public class Message {
     private Object candidate; // 상태
     private Object sdp;       // sdp 정보
     private Object allUsers;  // 해당 방에 본인을 제외한 전체 유저
+    private Long exerciseType; // 운동 종류
 }
