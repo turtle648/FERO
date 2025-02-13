@@ -127,6 +127,7 @@ public class SignalingHandler extends TextWebSocketHandler {
             log.error("Error sending info messages: ", e);
         }
 
+
         uidWithToken.keySet().removeIf(entry -> entry.equals(userUUID1));
         uidWithToken.keySet().removeIf(entry -> entry.equals(userUUID2));
         tokenWithUid.entrySet().removeIf(entry -> entry.getValue().equals(userUUID1));

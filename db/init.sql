@@ -475,7 +475,6 @@ INSERT INTO user_character (user_id, user_nickname, gender, avatar, user_level, 
 
 
 
-
 TRUNCATE TABLE user_rank_scores;
 
 INSERT INTO user_rank_scores (user_id, exercise_id, rank_score) VALUES

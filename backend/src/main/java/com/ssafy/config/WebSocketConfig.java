@@ -6,7 +6,6 @@ import com.ssafy.api.handler.SignalingHandler;
 import com.ssafy.api.service.MatchingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
-import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

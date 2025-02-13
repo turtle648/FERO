@@ -1,6 +1,5 @@
 package com.ssafy.api.request;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
