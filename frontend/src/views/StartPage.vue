@@ -107,7 +107,7 @@ body {
 
 <script setup>
 import '@fontsource/press-start-2p'
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import SignInUp from '@/components/modal/SignInUp.vue'
 
@@ -120,6 +120,7 @@ const token = localStorage.getItem('authToken')
 const goToMain = async () => {
   if (!token) {
     showModal.value = true
+    await nextTick()
   } else {
     try {
       await router.push('/main')
@@ -133,7 +134,8 @@ const closeModal = () => {
   showModal.value = false 
 }
 
-const playMusic = () => {
+const playMusic = async () => {
+  await nextTick()
   if (audioPlayer.value) {
     audioPlayer.value.play()
       .catch(error => console.log('음악 재생 실패:', error))
