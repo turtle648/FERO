@@ -407,7 +407,8 @@ onMounted(() => {
     console.log("WebSocket 연결됨")
     sendMessage({
       type: "auth",
-      auth: localStorage.getItem("authToken")
+      auth: localStorage.getItem("authToken"),
+      exerciseType: props.exercise
     })
     await clickSubmitRoomId()
   }

@@ -3,8 +3,10 @@ package com.ssafy.api.handler;
 import com.ssafy.api.request.ExerciseResultEvent;
 import com.ssafy.api.request.GameResultReq;
 import com.ssafy.api.request.MatchSuccessEvent;
+import com.ssafy.api.request.UserIdGameResultReq;
 import com.ssafy.api.service.MatchingService;
 import com.ssafy.common.model.Message;
+import com.ssafy.common.util.JwtTokenUtil;
 import com.ssafy.common.util.RTCUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +52,6 @@ public class SignalingHandler extends TextWebSocketHandler {
     private static final String MSG_TYPE_AUTH = "auth";
     private static final String MSG_TYPE_CNT = "count";
     private static final String MSG_TYPE_FINAL = "final";
-
     private final ApplicationEventPublisher eventPublisher;
     // 레디스 삭제할 때 쓸 leaveWaitingRoom
     private final MatchingService matchingService;
@@ -102,14 +103,29 @@ public class SignalingHandler extends TextWebSocketHandler {
         log.info("⚠️ exercise result publish :: {}", new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
         log.info("⚠️ game result publish :: {}", new GameResultReq(exerciseType, roomId, 1, userToken1, userToken2, userScore1, userScore2));
 
-        sessions.get(userUUID1).sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
-                .type("info")
-                .room(roomId)
-                .peerToken(userToken2).build())));
-        sessions.get(userUUID2).sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
-                .type("info")
-                .room(roomId)
-                .peerToken(userToken1).build())));
+        // 세션 상태 체크 후 메시지 전송
+        WebSocketSession session1 = sessions.get(userUUID1);
+        WebSocketSession session2 = sessions.get(userUUID2);
+
+        try {
+            if (session1 != null && session1.isOpen()) {
+                session1.sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
+                        .type("info")
+                        .room(roomId)
+                        .peerToken(userToken2)
+                        .build())));
+            }
+
+            if (session2 != null && session2.isOpen()) {
+                session2.sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
+                        .type("info")
+                        .room(roomId)
+                        .peerToken(userToken1)
+                        .build())));
+            }
+        } catch (Exception e) {
+            log.error("Error sending info messages: ", e);
+        }
 
         uidWithToken.keySet().removeIf(entry -> entry.equals(userUUID1));
         uidWithToken.keySet().removeIf(entry -> entry.equals(userUUID2));
@@ -118,7 +134,7 @@ public class SignalingHandler extends TextWebSocketHandler {
 
 
         eventPublisher.publishEvent(new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
-        eventPublisher.publishEvent(new GameResultReq(exerciseType, roomId, 60, userToken1, userToken2, userScore1, userScore2));
+        eventPublisher.publishEvent(new UserIdGameResultReq(exerciseType, roomId, 60, JwtTokenUtil.getUserIdFromJWT(userToken1), JwtTokenUtil.getUserIdFromJWT(userToken2), userScore1, userScore2));
     }
 
     @EventListener
@@ -322,7 +338,7 @@ public class SignalingHandler extends TextWebSocketHandler {
                     break;
                 }
             }
-            Long exerciseType = (Long) session.getAttributes().get("exerciseType");
+            Long exerciseType = Long.parseLong(session.getAttributes().get("exerciseType").toString());
 
             // Redis cleanup 수행
             if (token != null && exerciseType != null) {
@@ -334,9 +350,6 @@ public class SignalingHandler extends TextWebSocketHandler {
             String roomId = userInfo.get(userUUID); // roomId
 
             if (roomId != null && userUUID != null) {
-                // 1. Remove user from sessions
-                sessions.remove(userUUID);
-
                 // 2. Remove user from userInfo
                 userInfo.remove(userUUID);
 
@@ -351,9 +364,6 @@ public class SignalingHandler extends TextWebSocketHandler {
                         log.info(">>> [ws] 빈 방이어서 #{}번 방 삭제 완료", roomId);
                     }
                 }
-
-                // 4. Remove user from tokenWithUid
-                tokenWithUid.entrySet().removeIf(entry -> entry.getValue().equals(userUUID));
 
                 // 5. Notify other users in the room about the exit
                 sessions.values().forEach(s -> {

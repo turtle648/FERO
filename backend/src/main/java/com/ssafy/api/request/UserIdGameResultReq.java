@@ -1,16 +1,18 @@
 package com.ssafy.api.request;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
-@Setter
+@RequiredArgsConstructor
 public class UserIdGameResultReq {
-    private Long exerciseId;
-    private String gameId;
-    private int duration;
-    private String user1Id;
-    private String user2Id;
-    private Integer user1Score;
-    private Integer user2Score;
+    private final Long exerciseId;
+    private final String gameId;
+    private final int duration;
+    private final String user1Id;
+    private final String user2Id;
+    private final Integer user1Score;
+    private final Integer user2Score;
 }
