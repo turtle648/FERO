@@ -9,14 +9,14 @@
     <div v-else-if="showStartText" class="start-text text-4xl text-white z-10">START</div>
 
     <!-- 본인 화면 -->
-    <div class="video-container relative w-full aspect-[9/16] overflow-hidden">
-      <canvas ref="canvasElement" class="absolute w-full h-full">
-        <video ref="videoElement" autoplay playsinline muted class="absolute w-full h-full object-cover"></video>
+    <div class="video-container relative h-full">
+      <canvas ref="canvasElement" class="h-screen">
+        <video ref="videoElement" autoplay playsinline muted class="h-full object-cover overflow-hidden aspect-[9/16]"></video>
       </canvas>
     </div>
 
     <!-- 하단 버튼 -->
-    <div class="button-container z-10">
+    <div class="absolute bottom-[2vh] button-container z-10">
       <div class="flex justify-between items-center w-full mt-4 z-10">
         <ExitButton class="px-4 py-2 rounded mx-auto" @click="stopCameraAndNavigate" />
         <ReportIssueButton />
