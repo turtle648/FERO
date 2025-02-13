@@ -24,6 +24,7 @@
     "bootstrap-vue-3": "^0.5.1",
     "core-js": "^3.8.3",
     "easytimer.js": "^4.6.0",
+    "gsap": "^3.12.7",
     "livekit-client": "^2.8.1",
     "pinia": "^2.3.1",
     "register-service-worker": "^1.7.2",

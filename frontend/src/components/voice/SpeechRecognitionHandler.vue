@@ -1,111 +1,143 @@
-<!-- 음성인식 모델 설명
-Hey (수정예정)를 외치면 명령을 입력받을 수 있음.(콘솔창을 통해서 확인가능)
-이후 commands에 있는 명령어 목록을 말하면 해당 기능이 수행됨. 
-
-ex. 
-    1. "Hey"를 외쳐 봅니다.
-    2. 콘솔창에 "명령어 입력 대기 시작 (5초)" 로그가 생성된걸 확인
-    3. 명령어를 외쳐봅니다.(ex. 상태창 )
--->
-
 <template>
-    <div class="hidden"></div> <!-- UI 요소 없음 -->
-  </template>
-  
-  <script setup>
-  import { ref, onMounted, onUnmounted, defineEmits } from "vue"
-  
-  const emit = defineEmits(["voice-control"])
-  
-  const transcript = ref("") // 현재 인식된 텍스트
-  const isListening = ref(false) // 음성 인식 상태
-  const isWaitingCommand = ref(false) // 명령어 대기 상태
-  const timer = ref(0) // 5초 카운트다운
-  let recognition = null
-  let wakeUpTimer = null
-  
-  // 🔹 실행할 명령어 목록 
-  const commands = {
-    "종료": () => emit("voice-control", "close"),
-    "상태": () => emit("voice-control", "status"),
-    "설정": () => emit("voice-control", "setting"),
-    "전적": () => emit("voice-control", "record"),
-    "친구": () => emit("voice-control", "friend"),
-    "달력": () => emit("voice-control", "calendar"),
-    "운동": () => emit("voice-control", "fitness"),
-    "알림": () => emit("voice-control", "alarm"),
-    "캐릭터": () => emit("voice-control", "character"),
-    "퀘스트": () => emit("voice-control", "quest"),    
+    <div class="hidden"></div>
+</template>
+
+<script setup>
+import { ref, onMounted, onUnmounted, defineEmits } from "vue";
+
+const emit = defineEmits(["voice-control"]);
+const transcript = ref("");
+const isListening = ref(false);
+const isWaitingCommand = ref(false);
+const collectedSpeech = ref(""); // 5초 동안 말한 내용 저장
+const timer = ref(0);
+let recognition = null;
+let wakeUpTimer = null;
+
+const commands = {
+  "종료": () => emit("voice-control", "close"),
+  "상태": () => emit("voice-control", "status"),
+  "설정": () => emit("voice-control", "setting"),
+  "전적": () => emit("voice-control", "record"),
+  "친구": () => emit("voice-control", "friend"),
+  "달력": () => emit("voice-control", "calendar"),
+  "운동": () => emit("voice-control", "fitness"),
+  "알림": () => emit("voice-control", "alarm"),
+  "캐릭터": () => emit("voice-control", "character"),
+  "퀘스트": () => emit("voice-control", "quest"),
+};
+
+const wakeWords = [
+  "파소콩", "파소꽁", "파소컹", "파소콤", "파소꼼", "파소컴",
+  "파서콩", "파서꽁", "파서컹", "파서콤", "파서꼼", "파서컴",
+  "빠소콩", "빠소꽁", "빠소컹", "빠소콤", "빠소꼼", "빠소컴",
+  "빠서콩", "빠서꽁", "빠서컹", "빠서콤", "빠서꼼", "빠서컴",
+  "하소꽁", "하소콩", "하소컹", "하소콤", "하소꼼", "하소컴",
+  "하서콩", "하서꽁", "하서컹", "하서콤", "하서꼼", "하서컴"
+];
+
+const startRecognition = () => {
+  if (isListening.value) return;
+  isListening.value = true;
+  recognition.start();
+};
+
+const stopRecognition = () => {
+  if (!isListening.value) return;
+  isListening.value = false;
+  recognition.stop();
+};
+
+onMounted(async () => {
+  if (!("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
+    console.warn("⚠️ 음성 인식을 지원하지 않는 브라우저입니다.");
+    return;
   }
-  
-  // 🔹 음성 인식 초기화
-  onMounted(() => {
-    if (!("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
-      console.warn("⚠️ 음성 인식을 지원하지 않는 브라우저입니다.")
-      return
+
+  recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = "ko-KR";
+  recognition.maxAlternatives = 5;
+
+  recognition.onstart = () => (isListening.value = true);
+
+  recognition.onend = () => {
+    isListening.value = false;
+    setTimeout(startRecognition, 500);
+  };
+
+  recognition.onerror = (event) => {
+    console.warn("음성 인식 오류:", event);
+    setTimeout(startRecognition, 1000);
+  };
+
+  recognition.onresult = (event) => {
+    let interimTranscript = "";
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      interimTranscript += event.results[i][0].transcript.trim() + " ";
     }
-  
-    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)()
-    recognition.continuous = true
-    recognition.interimResults = false
-    recognition.lang = "ko-KR"
-  
-    recognition.onstart = () => isListening.value = true
-    recognition.onend = () => isListening.value = false
-    recognition.onerror = (event) => console.error("음성 인식 오류:", event)
-  
-    recognition.onresult = (event) => {
-      const finalTranscript = event.results[event.results.length - 1][0].transcript.trim()
-      transcript.value = finalTranscript
-      processSpeech(finalTranscript)
-    }
-  
-    recognition.start() // 🔹 백그라운드에서 계속 듣기
-  })
-  
-  // 🔹 "헤이" 또는 "hey" 감지 → 5초간 명령어 대기
-  const processSpeech = (text) => {
-    if (isWaitingCommand.value) return // 이미 대기 중이면 무시
-  
-    if (/(헤이|해이|hey|hay|Hey|Hay)/.test(text)) {
-      startCommandListening()
-    }
+    transcript.value = normalizeText(interimTranscript);
+    processSpeech(transcript.value);
+  };
+
+  try {
+    await navigator.mediaDevices.getUserMedia({
+      audio: { noiseSuppression: false, echoCancellation: false },
+    });
+    console.log("🎧 노이즈 감소 적용 완료");
+  } catch (error) {
+    console.warn("🎧 노이즈 감소 적용 실패:", error);
   }
-  
-  // 🔹 5초간 명령어 입력 대기
-  const startCommandListening = () => {
-    console.log("🔔 명령어 입력 대기 시작 (5초)")
-    transcript.value = "" // 기존 텍스트 초기화
-    isWaitingCommand.value = true
-    timer.value = 5 // 5초 타이머 시작
-  
-    const countdown = setInterval(() => {
-      timer.value--
-      if (timer.value <= 0) clearInterval(countdown)
-    }, 1000)
-  
-    clearTimeout(wakeUpTimer)
-    wakeUpTimer = setTimeout(() => {
-      executeCommand(transcript.value)
-      isWaitingCommand.value = false
-    }, 5000)
+
+  startRecognition();
+});
+
+const processSpeech = (text) => {
+  if (isWaitingCommand.value) {
+    collectedSpeech.value += " " + text;
+    return;
   }
-  
-  // 🔹 명령어 실행
-  const executeCommand = (text) => {
-    for (const key in commands) {
-      if (text.includes(key)) {
-        commands[key]() // 
-        return
-      }
-    }
-    console.log("⚠️ 인식된 명령어가 없습니다")
+  if (detectWakeWord(text)) {
+    console.log("🟢 웨이크워드 감지!");
+    startCommandListening();
   }
-  
-  // 🔹 컴포넌트 제거 시 음성 인식 중지
-  onUnmounted(() => {
-    recognition?.abort()
-    clearTimeout(wakeUpTimer)
-  })
-  </script>
-  
+};
+
+const detectWakeWord = (text) => wakeWords.some((word) => text.includes(word));
+
+const startCommandListening = () => {
+  console.log("🔔 명령어 입력 대기 시작 (5초)");
+  collectedSpeech.value = "";
+  isWaitingCommand.value = true;
+  timer.value = 5;
+
+  const countdown = setInterval(() => {
+    timer.value--;
+    if (timer.value <= 0) clearInterval(countdown);
+  }, 1000);
+
+  clearTimeout(wakeUpTimer);
+  wakeUpTimer = setTimeout(() => {
+    executeCommand(collectedSpeech.value);
+    isWaitingCommand.value = false;
+  }, 5000);
+};
+
+const executeCommand = (text) => {
+  let matchedCommand = Object.keys(commands).find((key) => text.includes(key));
+  if (matchedCommand) {
+    console.log(`✅ 명령어 실행: ${matchedCommand}`);
+    commands[matchedCommand]();
+  } else {
+    console.log("⚠️ 인식된 명령어가 없습니다.");
+  }
+};
+
+const normalizeText = (text) => text.replace(/\s+/g, " ").trim();
+
+onUnmounted(() => {
+  stopRecognition();
+  clearTimeout(wakeUpTimer);
+});
+</script>
