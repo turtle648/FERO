@@ -263,7 +263,7 @@ INSERT INTO user_info (user_id, user_password, user_name, user_email, phone_numb
 ('kwon567', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Kwon Sang-woo', 'kwon567@naver.com', '010-0000-1111');
 
 INSERT INTO user_character (user_id, user_nickname, gender, avatar, user_level, user_experience, points) VALUES
-('ssafy123', 'GilDong', 'M', '7-3-9', 5, 128, 1000),
+('ssafy123', '길동', 'M', '7-3-9', 5, 128, 1000),
 ('kim456', 'ChulSoo123', 'M', '2-6-4', 3, 57, 500),
 ('lee789', 'YoungHee', 'F', '1-8-10', 7, 184, 1500),
 ('park234', 'JiSungSoccer', 'M', '5-9-2', 4, 76, 800),
