@@ -582,3 +582,8 @@ FROM (
      ) AS users
 ORDER BY RAND()
     LIMIT 50;
+
+INSERT INTO quests (user_character_id, quest_date, quest_time, exercise_id, exercise_cnt, real_cnt, is_completed, message)
+VALUES
+    ('1', '2025-02-12', NULL, '2', '7', '7', '1', '스쿼트를 7번 해주세요!'),
+    ('1', '2025-02-13', '00:40:53', '2', '7', '2', '0', '스쿼트를 7번 해주세요!');
