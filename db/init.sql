@@ -324,19 +324,18 @@ BEGIN
 END IF;
 END //
 
-DELIMITER ;
-
---- FUNCTION
+-- 함수 정의
+DELIMITER //
 
 -- 레벨별 운동 횟수를 계산하는 함수
-DELIMITER //
 CREATE FUNCTION calculate_exercise_count(user_level INT)
     RETURNS INT
     DETERMINISTIC
 BEGIN
     -- 기본 횟수 5회, 5레벨 단위로 2회씩 증가
-RETURN 5 + (2 * FLOOR(user_level / 5));
+    RETURN 5 + (2 * FLOOR(user_level / 5));
 END //
+
 DELIMITER ;
 
 
