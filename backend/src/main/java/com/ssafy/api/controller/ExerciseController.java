@@ -4,12 +4,16 @@ import com.ssafy.api.request.ExerciseLogReq;
 import com.ssafy.api.request.ExerciseLogSearchReq;
 import com.ssafy.api.response.ExerciseLogRes;
 import com.ssafy.api.response.ExerciseStatsRatioRes;
+import com.ssafy.api.response.MonthlyQuestsStatusRes;
+import com.ssafy.api.response.QuestsRes;
 import com.ssafy.api.service.ExerciseLogService;
 import com.ssafy.api.service.ExerciseLogServiceImpl;
+import com.ssafy.api.service.QuestsService;
 import com.ssafy.common.util.JwtTokenUtil;
 import com.ssafy.db.entity.ExerciseLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -32,6 +36,7 @@ public class ExerciseController {
     private final ExerciseLogServiceImpl exerciseService;
     private final ExerciseLogServiceImpl exerciseLogServiceImpl;
     private final ExerciseLogService exerciseLogService;
+    private final QuestsService questService;
 
     @GetMapping("/stats_ratio/{exerciseStatsRatioId}")
     @ApiOperation(value = "운동 종목 별 스탯 조회", notes = "운동 종목의 id로 스탯 비율 조회")
@@ -87,5 +92,29 @@ public class ExerciseController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyList());
         }
     }
+
+    @GetMapping("/monthly")
+    @ApiOperation(value = "월별 퀘스트 달성 현황", notes = "특정 연월의 퀘스트 달성 현황을 조회")
+    public ResponseEntity<List<MonthlyQuestsStatusRes>> getMonthlyQuests(
+            HttpServletRequest request,
+            @ApiParam(value = "조회할 연도", required = true) @RequestParam int year,
+            @ApiParam(value = "조회할 월", required = true) @RequestParam int month
+    ) {
+        String userId = JwtTokenUtil.extractUserIdFromToken(request.getHeader("Authorization"));
+        return questService.getMonthlyQuestStatus(userId, year, month)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
+
+    @GetMapping("/today")
+    @ApiOperation(value = "오늘의 퀘스트 조회", notes = "현재 로그인한 사용자의 오늘 퀘스트 정보를 조회")
+    public ResponseEntity<List<QuestsRes>> getTodayQuests(HttpServletRequest request) {
+        String userId = JwtTokenUtil.extractUserIdFromToken(request.getHeader("Authorization"));
+
+        return questService.getTodayQuest(userId, LocalDate.now())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
+
 
 }

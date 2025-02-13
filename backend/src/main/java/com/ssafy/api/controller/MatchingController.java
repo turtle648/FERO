@@ -1,5 +1,6 @@
 package com.ssafy.api.controller;
 
+import com.ssafy.api.request.MatchSuccessEvent;
 import com.ssafy.api.response.WaitingRoomStatusRes;
 import com.ssafy.api.service.MatchingService;
 import com.ssafy.common.model.response.BaseResponseBody;
@@ -13,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -92,4 +96,27 @@ public class MatchingController {
             return ResponseEntity.badRequest().body("대기방 퇴장 실패: " + e.getMessage());
         }
     }
+
+    /*// 3. 매칭 후 실행 될 API
+    // Controller
+    @PostMapping("/match-success")
+    public ResponseEntity<?> handleMatchSuccess(@RequestBody MatchSuccessEvent matchEvent) {
+        try {
+            // 토큰에서 실제 userId 추출
+            String player1Id = JwtTokenUtil.getUserIdFromJWT(matchEvent.getUserToken1());
+            String player2Id = JwtTokenUtil.getUserIdFromJWT(matchEvent.getUserToken2());
+
+            String matchResult = player1Id + player2Id;
+
+            log.info("Match success processed for players {} and {} for exercise {}",
+                    player1Id, player2Id, matchEvent.getExerciseId());
+
+            return ResponseEntity.ok(matchResult);
+        } catch (Exception e) {
+            log.error("Error processing match success", e);
+            return ResponseEntity.badRequest()
+                    .body(BaseResponseBody.of(400, "매칭 처리 중 오류 발생: " + e.getMessage()));
+        }
+    }*/
+
 }

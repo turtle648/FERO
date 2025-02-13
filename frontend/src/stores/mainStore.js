@@ -52,28 +52,27 @@ export const useMainStore = defineStore("main", () => {
     try {
       console.time(`[⏱️] Tutorial #${tutorialId}`)
       const response = await api.post(`/Tutorial/complete/${tutorialId}`)
-      
+
       // 상태 업데이트
       if (tutorialId === TUTORIAL_IDS.UI) {
         uiTutorialCompleted.value = true
       } else {
-        const target = tutorial.value.find(t => t.tutorialId === tutorialId)
+        const target = tutorial.value.find((t) => t.tutorialId === tutorialId)
         if (target) target.completed = true
       }
-  
+
       // 응답의 상태 코드로 성공 여부 판단
       return response.status === 200
     } catch (error) {
       console.error(`[🔥] Tutorial #${tutorialId} Error:`, {
         message: error.message,
-        config: error.config
+        config: error.config,
       })
       return false
     } finally {
       console.timeEnd(`[⏱️] Tutorial #${tutorialId}`)
     }
   }
-  
 
   // 튜토리얼 데이터 로드
   async function loadTutorial() {
@@ -87,6 +86,28 @@ export const useMainStore = defineStore("main", () => {
     }
   }
 
+  // 퀘스트 한달치
+  async function isQuestCompleted(year, month) {
+    try {
+      console.time(`[⏱️] Sending Date Year: ${year}, Month: ${month}`)
+
+      // API 호출
+      const data = { year, month }
+      const response = await api.get("/exercise/monthly", data)
+
+      console.log("✅ Date Sent Successfully:", response.data)
+      return response.data // 성공 시 응답 데이터 반환
+    } catch (error) {
+      console.error(`[🔥] Error Sending Date Year: ${year}, Month: ${month}`, {
+        message: error.message,
+        config: error.config,
+      })
+      throw error // 호출한 컴포넌트에서 에러를 처리할 수 있도록 던짐
+    } finally {
+      console.timeEnd(`[⏱️] Sending Date Year: ${year}, Month: ${month}`)
+    }
+  }
+
   return {
     tutorial,
     authToken,
@@ -94,5 +115,6 @@ export const useMainStore = defineStore("main", () => {
     TUTORIAL_IDS, // 상수 노출
     loadTutorial,
     completeTutorial,
+    isQuestCompleted,
   }
 })

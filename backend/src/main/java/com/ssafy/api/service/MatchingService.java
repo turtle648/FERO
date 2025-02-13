@@ -278,6 +278,8 @@ public class MatchingService {
         // eventPublisher 추가해야 함 -> WebSocket 으로
         eventPublisher.publishEvent(new MatchSuccessEvent(userToken1, userToken2, exerciseId));
 
+
+
         log.info("🎊 매칭 성공! User1: {}, User2: {}, Exercise: {}", userToken1, userToken2, exerciseId);
     }
 
