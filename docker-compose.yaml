@@ -53,6 +53,7 @@ services:
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+      - --init-connect='SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;'
     volumes:
       - my-sql-volume:/var/lib/mysql
       - /home/ubuntu/S12P11E103/db:/docker-entrypoint-initdb.d
