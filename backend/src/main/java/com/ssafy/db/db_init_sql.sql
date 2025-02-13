@@ -1,3 +1,7 @@
+-- DROP DATABASE IF EXISTS E103_DB;
+
+-- CREATE DATABASE E103_DB;
+
 USE E103_DB;
 
 -- 유저에 대한 정보
@@ -106,10 +110,10 @@ GROUP BY
 -- 게임 결과에 대한 테이블(한 게임당 user1, user2 각각 기준으로 하나씩 생성)
 CREATE TABLE game_results (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    game_id BIGINT NOT NULL DEFAULT 1,         -- 동일한 경기 기록을 식별하는 gameId
+    game_id VARCHAR(200) NOT NULL,         -- 동일한 경기 기록을 식별하는 gameId
     exercise_id BIGINT NOT NULL,          -- 운동 종류 ID
     user_id VARCHAR(30) NOT NULL,              -- 유저 ID
-    opponent_id VARCHAR(30) NOT NULL,          -- 상대방 ID
+    opponent_id VARCHAR(100) NOT NULL,          -- 상대방 ID
     user_score SMALLINT NOT NULL,              -- 유저의 점수
     opponent_score SMALLINT NOT NULL,          -- 상대방 점수
     result ENUM('WIN', 'LOSE', 'DRAW') NOT NULL, -- 유저 기준 결과
@@ -400,7 +404,7 @@ FROM user_character uc;
 END //
 DELIMITER ;
 
--- 이벤트 스케줄러 활성화
+-- 이벤트 스케줄러 활성화 
 SET GLOBAL event_scheduler = ON;
 
 

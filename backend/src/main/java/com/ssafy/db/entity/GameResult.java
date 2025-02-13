@@ -18,7 +18,10 @@ import java.time.LocalDateTime;
 public class GameResult extends BaseEntity {
 
     @Column(nullable = false)
-    private Long gameId; // 경기 ID (UUID 추천)
+    private String gameId; // 경기 ID (UUID 추천)
+
+    @Column(nullable = false)
+    private Integer duration; // 경기 시간
 
     @Column(nullable = false)
     private Long exerciseId; // 운동 종류

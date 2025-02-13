@@ -8,8 +8,8 @@ import lombok.ToString;
 @ToString
 @RequiredArgsConstructor
 public class ExerciseResultEvent {
-    private final String userToken1;
-    private final String userToken2;
+    private final String user1Id;
+    private final String user2Id;
     private final int userScore1;
     private final int userScore2;
     private final int result;

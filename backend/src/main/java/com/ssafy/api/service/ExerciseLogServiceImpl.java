@@ -33,6 +33,7 @@ public class ExerciseLogServiceImpl implements ExerciseLogService {
     }
 
     @Override
+    @Transactional
     public ExerciseLog addExerciseLogAndUpdateStats(String userId, ExerciseLogReq req) {
         // 1. 사용자 캐릭터 조회
         UserCharacter userCharacter = userCharacterRepository.findByUser_UserId(userId)

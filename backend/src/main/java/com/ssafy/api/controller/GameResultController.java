@@ -1,6 +1,7 @@
 package com.ssafy.api.controller;
 
 import com.ssafy.api.request.GameResultReq;
+import com.ssafy.api.request.UserIdGameResultReq;
 import com.ssafy.api.service.GameResultServiceImpl;
 import com.ssafy.common.util.JwtTokenUtil;
 import com.ssafy.db.entity.GameResult;
@@ -21,7 +22,7 @@ public class GameResultController {
 
     @PostMapping("/save")
     @ApiOperation(value = "게임 결과 저장", notes = "두 유저의 경기 결과를 저장한다.")
-    public ResponseEntity<String> saveGameResult(@RequestBody GameResultReq request) {
+    public ResponseEntity<String> saveGameResult(@RequestBody UserIdGameResultReq request) {
         gameResultService.saveGameResult(request);
         return ResponseEntity.ok("Game result saved successfully");
     }
