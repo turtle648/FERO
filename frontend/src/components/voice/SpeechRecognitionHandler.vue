@@ -1,3 +1,13 @@
+<!-- 음성인식 모델 설명
+Hey (수정예정)를 외치면 명령을 입력받을 수 있음.(콘솔창을 통해서 확인가능)
+이후 commands에 있는 명령어 목록을 말하면 해당 기능이 수행됨. 
+
+ex. 
+    1. "Hey"를 외쳐 봅니다.
+    2. 콘솔창에 "명령어 입력 대기 시작 (5초)" 로그가 생성된걸 확인
+    3. 명령어를 외쳐봅니다.(ex. 상태창 )
+-->
+
 <template>
     <div class="hidden"></div> <!-- UI 요소 없음 -->
   </template>
@@ -16,6 +26,7 @@
   
   // 🔹 실행할 명령어 목록 
   const commands = {
+    "종료": () => emit("voice-control", "close"),
     "상태": () => emit("voice-control", "status"),
     "설정": () => emit("voice-control", "setting"),
     "전적": () => emit("voice-control", "record"),
@@ -25,7 +36,6 @@
     "알림": () => emit("voice-control", "alarm"),
     "캐릭터": () => emit("voice-control", "character"),
     "퀘스트": () => emit("voice-control", "quest"),    
-    "종료": () => emit("voice-control", "close"),
   }
   
   // 🔹 음성 인식 초기화
