@@ -9,9 +9,17 @@
     <div v-else-if="showStartText" class="start-text text-4xl text-white z-10">START</div>
 
     <!-- 본인 화면 -->
-    <div class="video-container relative h-full">
+    <!-- 기존 코드 -->
+    <!-- <div class="video-container relative h-full">
       <canvas ref="canvasElement" class="h-screen">
         <video ref="videoElement" autoplay playsinline muted class="h-full object-cover overflow-hidden aspect-[9/16]"></video>
+      </canvas>
+    </div> -->
+
+    <!-- 수정 코드 -->
+    <div class="video-container relative h-full overflow-hidden w-full max-w-[800px] max-h-full">
+      <canvas ref="canvasElement" class="h-full w-full">
+        <video ref="videoElement" autoplay playsinline muted class="h-full w-full object-cover"></video>
       </canvas>
     </div>
 
@@ -139,19 +147,19 @@ const onResults = (results) => {
 
   if (results.poseLandmarks) {
     emit("pose-detected", results.poseLandmarks)
-    
-    const landmarks = results.poseLandmarks;
-    const nose = landmarks[0]; // 코
-    const leftEye = landmarks[2]; // 왼쪽 눈
-    const rightEye = landmarks[5]; // 오른쪽 눈
+
+    const landmarks = results.poseLandmarks
+    const nose = landmarks[0] // 코
+    const leftEye = landmarks[2] // 왼쪽 눈
+    const rightEye = landmarks[5] // 오른쪽 눈
     // drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
     //   color: "#00FF00",
     //   lineWidth: 4,
     // })
     // drawLandmarks(canvasCtx, results.poseLandmarks, { color: "#FF0000", lineWidth: 2 })
     if (nose && leftEye && rightEye) {
-      const faceX = (nose.x + leftEye.x + rightEye.x) / 3 * canvasElement.value.width
-      const faceY = (nose.y + leftEye.y + rightEye.y) / 3 * canvasElement.value.height
+      const faceX = ((nose.x + leftEye.x + rightEye.x) / 3) * canvasElement.value.width
+      const faceY = ((nose.y + leftEye.y + rightEye.y) / 3) * canvasElement.value.height
       const faceWidth = Math.abs(leftEye.x - rightEye.x) * 2 * canvasElement.value.width
       const faceHeight = faceWidth * 1.2 // 비율상 얼굴 높이 설정
 
@@ -172,7 +180,7 @@ const onResults = (results) => {
     }
   }
 
-  canvasCtx.restore() 
+  canvasCtx.restore()
 }
 
 onMounted(async () => {
