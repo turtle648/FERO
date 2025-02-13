@@ -24,9 +24,9 @@
     </div> -->
 
     <!-- 수정 코드2 -->
-    <div class="video-container relative h-[400px] w-[300px] overflow-hidden mx-auto">
-      <canvas ref="canvasElement" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-        <video ref="videoElement" autoplay playsinline muted class="h-auto w-auto object-cover"></video>
+    <div class="video-container relative h-full overflow-hidden mx-auto">
+      <canvas ref="canvasElement" class="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <video ref="videoElement" autoplay playsinline muted class="h-full w-full overflow-hidden"></video>
       </canvas>
     </div>
 
