@@ -115,15 +115,15 @@ public class MatchingController {
     @PostMapping("/endGame")
     public ResponseEntity<?> endGmae(@RequestBody EndGameReq endGameReq){
 
-        GameResultReq gameResultReq = new GameResultReq();
-
-        gameResultReq.setGameId(endGameReq.getGameId());
-        gameResultReq.setUserToken1(endGameReq.getUserToken());
-        gameResultReq.setUserToken2(endGameReq.getOpponentToken());
-        gameResultReq.setUser1Score((int) gameResultRepository.findByGameId(endGameReq.getGameId()).get(0).getUserScore());
-        gameResultReq.setUser2Score((int) gameResultRepository.findByGameId(endGameReq.getGameId()).get(0).getOpponentScore());
-        gameResultReq.setExerciseId(gameResultRepository.findByGameId(endGameReq.getGameId()).get(0).getExerciseId());
-        gameResultReq.setDuration(gameResultRepository.findByGameId(endGameReq.getGameId()).get(0).getDuration());
+        GameResultReq gameResultReq = new GameResultReq(
+                gameResultRepository.findByGameId(endGameReq.getGameId()).get(0).getExerciseId(),
+                endGameReq.getGameId(),
+                gameResultRepository.findByGameId(endGameReq.getGameId()).get(0).getDuration(),
+                endGameReq.getUserToken(),
+                endGameReq.getOpponentToken(),
+                (int) gameResultRepository.findByGameId(endGameReq.getGameId()).get(0).getUserScore(),
+                (int) gameResultRepository.findByGameId(endGameReq.getGameId()).get(0).getOpponentScore()
+        );
 
         GameResultInfoRes gameResultInfoRes = matchingService.saveGameResult(gameResultReq);
 
