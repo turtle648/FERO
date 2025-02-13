@@ -125,6 +125,7 @@ const canvasElement = ref(null)
 let camera = null
 let pose = null
 
+// 얼굴 블러처리 기본 코드 가이드라인만 추가함함
 const onResults = (results) => {
   if (!canvasElement.value) return
 
@@ -139,15 +140,41 @@ const onResults = (results) => {
   canvasCtx.drawImage(results.image, 0, 0, canvasElement.value.width, canvasElement.value.height)
 
   if (results.poseLandmarks) {
+    emit("pose-detected", results.poseLandmarks)
+    
+    const landmarks = results.poseLandmarks;
+    const nose = landmarks[0]; // 코
+    const leftEye = landmarks[2]; // 왼쪽 눈
+    const rightEye = landmarks[5]; // 오른쪽 눈
     // drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
     //   color: "#00FF00",
     //   lineWidth: 4,
     // })
     // drawLandmarks(canvasCtx, results.poseLandmarks, { color: "#FF0000", lineWidth: 2 })
-    emit("pose-detected", results.poseLandmarks)
+    if (nose && leftEye && rightEye) {
+      const faceX = (nose.x + leftEye.x + rightEye.x) / 3 * canvasElement.value.width
+      const faceY = (nose.y + leftEye.y + rightEye.y) / 3 * canvasElement.value.height
+      const faceWidth = Math.abs(leftEye.x - rightEye.x) * 2 * canvasElement.value.width
+      const faceHeight = faceWidth * 1.2 // 비율상 얼굴 높이 설정
+
+      // 얼굴 영역을 따로 복사
+      const faceImage = canvasCtx.getImageData(faceX - faceWidth / 2, faceY - faceHeight / 2, faceWidth, faceHeight)
+      const offscreenCanvas = document.createElement("canvas")
+      offscreenCanvas.width = faceWidth
+      offscreenCanvas.height = faceHeight
+      const offscreenCtx = offscreenCanvas.getContext("2d")
+      offscreenCtx.putImageData(faceImage, 0, 0)
+
+      // 블러 필터 적용
+      offscreenCtx.filter = "blur(10px)"
+      offscreenCtx.drawImage(offscreenCanvas, 0, 0)
+
+      // 다시 원래 위치에 그리기
+      canvasCtx.drawImage(offscreenCanvas, faceX - faceWidth / 2, faceY - faceHeight / 2, faceWidth, faceHeight)
+    }
   }
 
-  canvasCtx.restore()
+  canvasCtx.restore() 
 }
 
 onMounted(async () => {
