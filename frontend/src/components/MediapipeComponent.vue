@@ -140,55 +140,70 @@ let pose = null
 
 // 얼굴 블러처리 기본 코드 가이드라인만 추가함함
 const onResults = (results) => {
-  if (!canvasElement.value) return
+  if (!canvasElement.value) return;
 
-  const canvasCtx = canvasElement.value.getContext("2d")
-  canvasCtx.save()
-  canvasCtx.clearRect(0, 0, canvasElement.value.width, canvasElement.value.height)
+  const canvasCtx = canvasElement.value.getContext("2d");
+  canvasCtx.save();
+  canvasCtx.clearRect(0, 0, canvasElement.value.width, canvasElement.value.height);
 
-  // 좌우 반전 적용
-  canvasCtx.translate(canvasElement.value.width, 0)
-  canvasCtx.scale(-1, 1)
+  // 좌우 반전 적용 (웹캠 미러 효과)
+  canvasCtx.translate(canvasElement.value.width, 0);
+  canvasCtx.scale(-1, 1);
 
-  canvasCtx.drawImage(results.image, 0, 0, canvasElement.value.width, canvasElement.value.height)
+  // 원본 이미지 그리기
+  canvasCtx.drawImage(results.image, 0, 0, canvasElement.value.width, canvasElement.value.height);
 
   if (results.poseLandmarks) {
-    emit("pose-detected", results.poseLandmarks)
+    emit("pose-detected", results.poseLandmarks);
 
-    const landmarks = results.poseLandmarks
-    const nose = landmarks[0] // 코
-    const leftEye = landmarks[2] // 왼쪽 눈
-    const rightEye = landmarks[5] // 오른쪽 눈
-    // drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
-    //   color: "#00FF00",
-    //   lineWidth: 4,
-    // })
-    // drawLandmarks(canvasCtx, results.poseLandmarks, { color: "#FF0000", lineWidth: 2 })
-    if (nose && leftEye && rightEye) {
-      const faceX = ((nose.x + leftEye.x + rightEye.x) / 3) * canvasElement.value.width
-      const faceY = ((nose.y + leftEye.y + rightEye.y) / 3) * canvasElement.value.height
-      const faceWidth = Math.abs(leftEye.x - rightEye.x) * 2 * canvasElement.value.width
-      const faceHeight = faceWidth * 1.2 // 비율상 얼굴 높이 설정
+    const landmarks = results.poseLandmarks;
+    const nose = landmarks[0];
+    const leftEar = landmarks[7];
+    const rightEar = landmarks[8];
+    const leftShoulder = landmarks[11];
+    const rightShoulder = landmarks[12];
+    const emoji = "😎"; // 사용할 이모지
 
-      // 얼굴 영역을 따로 복사
-      const faceImage = canvasCtx.getImageData(faceX - faceWidth / 2, faceY - faceHeight / 2, faceWidth, faceHeight)
-      const offscreenCanvas = document.createElement("canvas")
-      offscreenCanvas.width = faceWidth
-      offscreenCanvas.height = faceHeight
-      const offscreenCtx = offscreenCanvas.getContext("2d")
-      offscreenCtx.putImageData(faceImage, 0, 0)
+    if (nose && leftEar && rightEar && leftShoulder && rightShoulder) {
+      const faceX = (nose.x + leftEar.x + rightEar.x) / 3 * canvasElement.value.width;
+      const faceY = (nose.y + leftEar.y + rightEar.y) / 3 * canvasElement.value.height;
+      const faceWidth = Math.abs(leftEar.x - rightEar.x) * 2.5 * canvasElement.value.width;
+      const faceHeight = Math.abs(nose.y - (leftShoulder.y + rightShoulder.y) / 2) * 2.5 * canvasElement.value.height;
+
+      // ✅ **1. 블러 처리 먼저 수행**
+      const offscreenCanvas = document.createElement("canvas");
+      offscreenCanvas.width = faceWidth;
+      offscreenCanvas.height = faceHeight;
+      const offscreenCtx = offscreenCanvas.getContext("2d");
+
+      // 블러 적용할 영역 복사
+      offscreenCtx.drawImage(
+          results.image,
+          faceX - faceWidth / 2, faceY - faceHeight / 2, faceWidth, faceHeight,
+          0, 0, faceWidth, faceHeight
+      );
 
       // 블러 필터 적용
-      offscreenCtx.filter = "blur(10px)"
-      offscreenCtx.drawImage(offscreenCanvas, 0, 0)
+      offscreenCtx.filter = "blur(40px)";
+      offscreenCtx.drawImage(offscreenCanvas, 0, 0);
 
-      // 다시 원래 위치에 그리기
-      canvasCtx.drawImage(offscreenCanvas, faceX - faceWidth / 2, faceY - faceHeight / 2, faceWidth, faceHeight)
+      // 블러된 이미지 캔버스에 그리기
+      canvasCtx.drawImage(offscreenCanvas, faceX - faceWidth / 2, faceY - faceHeight / 2, faceWidth, faceHeight);
+
+      // ✅ **2. 블러 처리 후 이모지 그리기**
+      const earDistance = Math.abs(leftEar.x - rightEar.x) * canvasElement.value.width; // 귀 간 거리 계산
+      const emojiSize = earDistance * 2; // 이모지 크기를 얼굴 크기에 맞게 조절
+
+      canvasCtx.font = `${emojiSize}px sans-serif`; // 동적으로 크기 설정
+      canvasCtx.textAlign = "center";
+      canvasCtx.textBaseline = "middle"; // 중앙 정렬
+      canvasCtx.fillText(emoji, faceX, faceY);
+
     }
   }
 
-  canvasCtx.restore()
-}
+  canvasCtx.restore();
+};
 
 onMounted(async () => {
   // setTimeout(() => {
