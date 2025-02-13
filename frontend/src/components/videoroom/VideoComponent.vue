@@ -339,7 +339,8 @@ onMounted(() => {
     // 방 입장 메시지 전송
     sendMessage({
       type: "auth",
-      auth: localStorage.getItem("authToken")
+      auth: localStorage.getItem("authToken"),
+      exerciseType: props.exercise // 운동 타입 추가
     })
 
     await clickSubmitRoomId()

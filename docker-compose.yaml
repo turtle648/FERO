@@ -52,6 +52,7 @@ services:
       - 3307:3306
     volumes:
       - my-sql-volume:/var/lib/mysql
+      - /home/ubuntu/S12P11E103/db/config/my.cnf:/etc/mysql/conf.d/my.cnf
       - /home/ubuntu/S12P11E103/db:/docker-entrypoint-initdb.d
     networks:
       - my-sql-network

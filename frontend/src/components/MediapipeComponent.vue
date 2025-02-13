@@ -1,5 +1,5 @@
 <template>
-  <div class="container flex flex-col items-center justify-between p-4 h-screen w-screen">
+  <div class="container flex flex-col items-center justify-between p-4 h-fulll w-full">
     <div class="flex justify-between w-full">
       <div class="timer text-white-common z-20 absolute top-0 right-10">{{ formattedTime }}</div>
     </div>
@@ -9,16 +9,14 @@
     <div v-else-if="showStartText" class="start-text text-4xl text-white z-10">START</div>
 
     <!-- 본인 화면 -->
-    <div class="relative w-full h-full flex justify-center items-center overflow-hidden">
-      <canvas ref="canvasElement" class="">
-        <video ref="videoElement" class="aspect-[9/16] w-auto h-full"></video>
-        <!-- fix: 비디오에만 태그 달기기, 화면에 표시될 크기 지정 -->
-        <!-- 미디어파이프 표시되는 화면이 가로로 긴 화면인데 세로를 풀 중심점을 화면 표시되는 중심으로 잡아서 중심에서 9: 16 맞추기 (나머지 부분 잘리고 스크롤 없이) -->
+    <div class="video-container relative h-full">
+      <canvas ref="canvasElement" class="h-screen">
+        <video ref="videoElement" autoplay playsinline muted class="h-full object-cover overflow-hidden aspect-[9/16]"></video>
       </canvas>
     </div>
 
     <!-- 하단 버튼 -->
-    <div class="button-container z-10">
+    <div class="absolute bottom-[2vh] button-container z-10">
       <div class="flex justify-between items-center w-full mt-4 z-10">
         <ExitButton class="px-4 py-2 rounded mx-auto" @click="stopCameraAndNavigate" />
         <ReportIssueButton />

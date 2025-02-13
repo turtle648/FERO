@@ -1,5 +1,5 @@
 <template>
-  <div class="counter-container relative w-screen h-screen">
+  <div class="counter-container relative w-screen h-screen overflow-hidden">
     <!-- Loading Spinner -->
     <div v-if="showSpinner" class="fixed inset-0 flex items-center justify-center bg-gray-100 z-300">
       <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 z-300"></div>

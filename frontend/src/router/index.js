@@ -83,13 +83,13 @@ const routes = [
     props: true,
   },
   {
-    path: '/ui-tutorial',
-    name: 'UiTutorial',
+    path: "/ui-tutorial",
+    name: "UiTutorial",
     component: UiTutorialPage,
-    meta: { isMobile: true }
+    meta: { isMobile: true },
   },
   // 백그라운드 음성인식 반응속도 테스트용
-  { 
+  {
     path: "/testVoice",
     name: "testVoice",
     component: TestVoice,
