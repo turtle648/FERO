@@ -49,7 +49,7 @@ import { ref, onMounted, onUnmounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { defineEmits } from "vue"
 
-const emit = defineEmits(["pose-detected", "open-modal"])
+const emit = defineEmits(["pose-detected", "open-modal", "getTime"])
 const route = useRoute()
 const router = useRouter()
 
@@ -83,6 +83,7 @@ function startTimer() {
   intervalId = setInterval(() => {
     timeLeft.value -= 1000 // 매초마다 시간 감소
     formattedTime.value = formatTime(timeLeft.value)
+    emit('getTime', timeLeft.value);
 
     if (timeLeft.value <= 0) {
       clearInterval(intervalId) // 타이머 종료

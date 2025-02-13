@@ -53,6 +53,7 @@ const completeFitnessTutorial = async () => {
 const completeFitnessSingle = () => {router.push({ name: 'Main' })}
 
 onMounted(() => {
+  console.log(mode.value);
   if (window.location.href.includes("tutorial")) { mode.value = 'tutorial'}
   else if (window.location.href.includes("single-mode")) {mode.value = 'single'}
   else if (window.location.href.includes("rank-mode")) {mode.value = 'rank'}

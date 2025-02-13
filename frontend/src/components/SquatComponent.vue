@@ -9,7 +9,7 @@
       <div class="count z-10 text-black">스쿼트 횟수: {{ count }}</div>
       <div v-if="showGreat" class="great-message text-red text-3xl">Great!</div>
     </div>
-    <MediapipeComponent @pose-detected="processPose" @open-modal="openModal" class="z-0" />
+    <MediapipeComponent @get-Time="getTime" @pose-detected="processPose" @open-modal="openModal" class="z-0" />
     <CompleteModal v-if="showModal" :count="count" class="z-99" />
 
     <div v-if="showErrorModal" class="landmark-error-modal z-20">전신이 나오도록 카메라 위치를 수정해주세요</div>
@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, defineEmits } from "vue"
 import MediapipeComponent from "@/components/MediapipeComponent.vue"
 import CompleteModal from "@/components/modal/CompleteModal.vue"
 
@@ -31,16 +31,21 @@ const showGreat = ref(false)
 const showModal = ref(false)
 const showErrorModal = ref(false) // 에러 모달 상태 변수
 const showSpinner = ref(true) // 로딩 스피너 상태 변수
-
 const isTutorialMode = window.location.href.includes("tutorial")
 // const isSingleMode = window.location.href.includes("single-mode")
 
+const emit = defineEmits(['setCount', 'getTimeLeft']);
 // 모드 리턴
 // const getMode = () => {
 //   if (isTutorialMode) return "Tutorial Mode"
 //   if (isSingleMode) return "Single Mode"
 //   return "Unknown Mode"
 // }
+
+const getTime = (value) => {
+  console.log();
+  emit('getTimeLeft', value)
+}
 
 // 필수 랜드마크 정의
 const requiredLandmarks = [0, 1, 2, 3, 4, 5, 6, 27, 28, 29, 30, 31, 32]
@@ -135,6 +140,7 @@ const processPose = (landmarks) => {
     } else if (isDown.value && avgKneeAngle > 160) {
       isDown.value = false
       count.value++
+      emit('setCount', count.value);
       feedback.value = `Up! Count: ${count.value}`
 
       showGreat.value = true

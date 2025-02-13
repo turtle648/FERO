@@ -1,10 +1,15 @@
 package com.ssafy.api.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssafy.api.request.EnterWaitingRoomEvent;
-import com.ssafy.api.request.MatchSuccessEvent;
-import com.ssafy.api.request.WaitingUser;
-import com.ssafy.db.repository.ExerciseStatsRatioRepository;
+import com.ssafy.api.request.*;
+import com.ssafy.api.response.GameResultInfoRes;
+import com.ssafy.api.response.RankUpdateRes;
+import com.ssafy.common.util.JwtTokenUtil;
+import com.ssafy.db.entity.ExerciseLog;
+import com.ssafy.db.entity.User;
+import com.ssafy.db.entity.UserCharacter;
+import com.ssafy.db.entity.UserStats;
+import com.ssafy.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -15,6 +20,15 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -28,7 +42,18 @@ public class MatchingService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final StringRedisTemplate stringRedisTemplate;
     private final ApplicationEventPublisher eventPublisher;
+    private final UserStatsRepository userStatsRepository;
+    private final UserRepository userRepository;
+    private final GameResultServiceImpl gameResultService;
+    private final UserCharacterRepository userCharacterRepository;
+    private final ExerciseLogRepository exerciseLogRepository;
+    private final UserRankScoresRepository userRankScoresRepository;
+    private final UserRankScoresServiceImpl userRankScoresServiceImpl;
+    private final ExerciseLogService exerciseLogService;
     private boolean matchFound = false;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     // Redis Key 상수
     private static final String WAITING_QUEUE = "waiting:queue:"; // 입장 순서
@@ -244,7 +269,7 @@ public class MatchingService {
             // 점수 차이가 100 이내인지 확인
             System.out.println("들어올 애 점수 : "+rankScore);
             System.out.println("큐에 있는 후보자 점수 : "+currentUserScore);
-            if (Math.abs(currentUserScore - rankScore) <= 100) {
+            if (Math.abs(currentUserScore - rankScore) <= 1000) {
                 // 매칭 성공
                 handleMatchSuccess(currentUserToken, userToken, exerciseId);
                 matchFound = true;
@@ -283,4 +308,118 @@ public class MatchingService {
         log.info("🎊 매칭 성공! User1: {}, User2: {}, Exercise: {}", userToken1, userToken2, exerciseId);
     }
 
+
+    // 매칭된 게임에 대한 id 만들기
+    public String makeGameId(String userToken, String date) {
+        try {
+        // **해시 입력값 생성**
+        String input = userToken + "_" + date;
+
+        // **SHA-256 해시 생성**
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hashBytes = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+
+        // **Base64 인코딩 (DB 저장을 위해 문자열 변환)**
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(hashBytes);
+
+    } catch (NoSuchAlgorithmException e) {
+        throw new RuntimeException("SHA-256 알고리즘을 사용할 수 없음", e);
+    }
+    }
+
+    @Transactional
+    public GameResultInfoRes saveGameResult(GameResultReq gameResultReq) {
+        GameResultInfoRes gameResultInfoRes = new GameResultInfoRes();
+
+        String userId = JwtTokenUtil.getUserIdFromJWT(gameResultReq.getUserToken1());
+        String opponentId = JwtTokenUtil.getUserIdFromJWT(gameResultReq.getUserToken2());
+        User user = userRepository.findById(userId).orElse(null);
+
+        // Stats 깊은 복사
+        UserStats currentStats = userStatsRepository.findByUser(user).orElse(null);
+        UserStats beforeStats = null;
+        if(currentStats != null) {
+            beforeStats = new UserStats();
+            beforeStats.setId(currentStats.getId());
+            beforeStats.setAbsStats(currentStats.getAbsStats());
+            beforeStats.setArmsStats(currentStats.getArmsStats());
+            beforeStats.setBackStats(currentStats.getBackStats());
+            beforeStats.setChestStats(currentStats.getChestStats());
+            beforeStats.setLegsStats(currentStats.getLegsStats());
+            beforeStats.setStaminaStats(currentStats.getStaminaStats());
+            beforeStats.setUpdatedAt(currentStats.getUpdatedAt());
+        }
+
+        // Character 깊은 복사
+        UserCharacter currentCharacter = userCharacterRepository.findByUser_UserId(userId).orElse(null);
+        Short beforeLevel = null;
+        Integer beforeExperience = null;
+        if(currentCharacter != null) {
+            beforeLevel = currentCharacter.getUserLevel();
+            beforeExperience = currentCharacter.getUserExperience();
+        }
+
+        // 기본 정보 설정
+        gameResultInfoRes.setUserId(userId);
+        gameResultInfoRes.setOpponentId(opponentId);
+        gameResultInfoRes.setUserScore(gameResultReq.getUser1Score());
+        gameResultInfoRes.setOpponentScore(gameResultReq.getUser2Score());
+        gameResultInfoRes.setExerciseId(gameResultReq.getExerciseId());
+
+        // 복사해둔 before 상태 설정
+        gameResultInfoRes.setBeforeStats(beforeStats);
+        gameResultInfoRes.setBeforeUserLevel(beforeLevel);
+        gameResultInfoRes.setBeforeUserExperience(beforeExperience);
+
+        // DB 반영 - before 상태 완전히 저장
+        entityManager.flush();
+        entityManager.clear();
+
+        // 운동 전적을 DB에 저장 및 스탯/경험치 업데이트
+        ExerciseLogReq exerciseLogReq = new ExerciseLogReq();
+        exerciseLogReq.setExerciseCnt(gameResultReq.getUser1Score());
+        exerciseLogReq.setExerciseStatsRatioId(gameResultReq.getExerciseId());
+        exerciseLogReq.setExerciseDuration(gameResultReq.getDuration());
+        exerciseLogService.addExerciseLogAndUpdateStats(userId, exerciseLogReq);
+
+        // DB 반영 - 업데이트된 상태 저장
+        entityManager.flush();
+        entityManager.clear();
+
+        Integer result;
+        if (gameResultReq.getUser1Score() > gameResultReq.getUser2Score()) {
+            result = 1;  // user1 승리
+        } else if (gameResultReq.getUser1Score() < gameResultReq.getUser2Score()) {
+            result = 2;  // user1 패배 (user2 승리)
+        } else {
+            result = 0;  // 무승부 (승자 없음)
+        }
+
+        ExerciseResultEvent exerciseResultEvent = new ExerciseResultEvent(
+                gameResultReq.getUserToken1(),
+                gameResultReq.getUserToken2(),
+                gameResultReq.getUser1Score(),
+                gameResultReq.getUser2Score(),
+                result,
+                gameResultReq.getExerciseId()
+        );
+
+        RankUpdateRes rankUpdateRes = userRankScoresServiceImpl.updateRankScore(exerciseResultEvent);
+        gameResultInfoRes.setBeforeRankScore(rankUpdateRes.getUser1PreviousScore());
+        gameResultInfoRes.setAfterRankScore(rankUpdateRes.getUser1NewScore());
+
+        // 새로운 트랜잭션에서 after 상태 조회를 위해 clear
+        entityManager.clear();
+
+        // 업데이트된 after 상태 조회
+        UserStats afterStats = userStatsRepository.findByUser(user).orElse(null);
+        gameResultInfoRes.setAfterStats(afterStats);
+
+        // Character 정보도 새로 조회
+        UserCharacter updatedCharacter = userCharacterRepository.findByUser_UserId(userId).get();
+        gameResultInfoRes.setAfterUserLevel(updatedCharacter.getUserLevel());
+        gameResultInfoRes.setAfterUserExperience(updatedCharacter.getUserExperience());
+
+        return gameResultInfoRes;
+    }
 }

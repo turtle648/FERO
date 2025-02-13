@@ -1,12 +1,16 @@
 package com.ssafy.api.controller;
 
-import com.ssafy.api.request.MatchSuccessEvent;
-import com.ssafy.api.response.WaitingRoomStatusRes;
+import com.ssafy.api.request.EndGameReq;
+import com.ssafy.api.request.GameResultReq;
+import com.ssafy.api.request.MakeGameIdReq;
+import com.ssafy.api.response.GameResultInfoRes;
 import com.ssafy.api.service.MatchingService;
 import com.ssafy.common.model.response.BaseResponseBody;
 import com.ssafy.common.util.JwtTokenUtil;
 import com.ssafy.db.entity.UserRankScores;
+import com.ssafy.db.repository.GameResultRepository;
 import com.ssafy.db.repository.UserRankScoresRepository;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -14,9 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -26,6 +27,7 @@ import java.util.Optional;
 public class MatchingController {
     private final MatchingService matchingService;
     private final UserRankScoresRepository userRankScoresRepository;
+    private final GameResultRepository gameResultRepository;
 
     // 1. 대기방 입장
     @PostMapping("/enter")
@@ -95,6 +97,37 @@ public class MatchingController {
             log.error("대기방 퇴장 실패", e);
             return ResponseEntity.badRequest().body("대기방 퇴장 실패: " + e.getMessage());
         }
+    }
+
+    // 매칭된 게임 방에 대한 아이디 만들기
+    @PostMapping("/getMatchingId")
+    public ResponseEntity<?> getMatchingId(@RequestBody MakeGameIdReq makeGameIdReq){
+
+        String userId = makeGameIdReq.getUserId();
+        String date = makeGameIdReq.getDate();
+
+        matchingService.makeGameId(userId, date);
+
+        return ResponseEntity.ok(matchingService.makeGameId(userId, date));
+    }
+
+    // 게임 끝낼때
+    @PostMapping("/endGame")
+    public ResponseEntity<?> endGmae(@RequestBody EndGameReq endGameReq){
+
+        GameResultReq gameResultReq = new GameResultReq(
+                gameResultRepository.findByGameId(endGameReq.getGameId()).get(0).getExerciseId(),
+                endGameReq.getGameId(),
+                gameResultRepository.findByGameId(endGameReq.getGameId()).get(0).getDuration(),
+                endGameReq.getUserToken(),
+                endGameReq.getOpponentToken(),
+                (int) gameResultRepository.findByGameId(endGameReq.getGameId()).get(0).getUserScore(),
+                (int) gameResultRepository.findByGameId(endGameReq.getGameId()).get(0).getOpponentScore()
+        );
+
+        GameResultInfoRes gameResultInfoRes = matchingService.saveGameResult(gameResultReq);
+
+        return ResponseEntity.ok(ResponseEntity.ok(gameResultInfoRes));
     }
 
     /*// 3. 매칭 후 실행 될 API
