@@ -40,8 +40,8 @@ public class UserRankScoresServiceImpl implements UserRankScoresService {
     @EventListener
     @Transactional
     public RankUpdateRes updateRankScore(ExerciseResultEvent event) {
-        String user1Id = JwtTokenUtil.getUserIdFromJWT(event.getUserToken1());
-        String user2Id = JwtTokenUtil.getUserIdFromJWT(event.getUserToken2());
+        String user1Id = JwtTokenUtil.getUserIdFromJWT(event.getUser1Id());
+        String user2Id = JwtTokenUtil.getUserIdFromJWT(event.getUser2Id());
         Long exerciseId = event.getExerciseType();
         double result = event.getResult();
 

@@ -8,9 +8,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-@ApiModel("EdnGameReq")
-public class EndGameReq {
-    private String userToken;
-    private String opponentToken;
-    private String gameId;
+@ApiModel("MakeGameIdReq")
+public class MakeGameIdReq {
+    private String userId;
+    private String date;
 }

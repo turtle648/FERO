@@ -5,12 +5,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class GameResultReq {
+public class UserIdGameResultReq {
     private Long exerciseId;
     private String gameId;
     private int duration;
-    private String userToken1;
-    private String userToken2;
+    private String user1Id;
+    private String user2Id;
     private Integer user1Score;
     private Integer user2Score;
 }
