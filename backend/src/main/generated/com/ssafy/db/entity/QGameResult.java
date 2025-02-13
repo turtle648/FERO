@@ -23,9 +23,11 @@ public class QGameResult extends EntityPathBase<GameResult> {
 
     public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
 
+    public final NumberPath<Integer> duration = createNumber("duration", Integer.class);
+
     public final NumberPath<Long> exerciseId = createNumber("exerciseId", Long.class);
 
-    public final NumberPath<Long> gameId = createNumber("gameId", Long.class);
+    public final StringPath gameId = createString("gameId");
 
     //inherited
     public final NumberPath<Long> id = _super.id;

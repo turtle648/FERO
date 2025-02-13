@@ -10,6 +10,7 @@ import QRComponent from "@/components/QRComponent.vue"
 import RankMatchPage from "@/views/RankMatchPage.vue"
 import UiTutorialPage from "@/views/UiTutorialPage.vue"
 import TestVoice from "@/components/voice/testVoice.vue"
+import RankMatchResultPage from "@/views/RankMatchResultPage.vue"
 // 랭크매치, 랭크모드에 인증 관련 메타데이터 고려해볼 것
 // meta: {
 //   requiresAuth: true,  // 인증 필요
@@ -70,6 +71,11 @@ const routes = [
     name: "RankMode",
     component: RankMatchPage,
     props: true,
+  },
+  {
+    path: "/rank-result",
+    name: "RankResult",
+    component: RankMatchResultPage,
   },
   {
     path: "/qr",

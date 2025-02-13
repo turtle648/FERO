@@ -6,6 +6,7 @@ import com.ssafy.api.handler.SignalingHandler;
 import com.ssafy.api.service.MatchingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
+import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,11 +21,8 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketConfigurer {
     private final ApplicationEventPublisher eventPublisher;
-
     private final MatchingService matchingService;
-
     private final ApplicationContext eventHandler;
-
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {

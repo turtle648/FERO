@@ -1,6 +1,7 @@
 package com.ssafy.api.handler;
 
 import com.ssafy.api.request.ExerciseResultEvent;
+import com.ssafy.api.request.GameResultReq;
 import com.ssafy.api.request.MatchSuccessEvent;
 import com.ssafy.api.service.MatchingService;
 import com.ssafy.common.model.Message;
@@ -16,6 +17,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -69,8 +71,12 @@ public class SignalingHandler extends TextWebSocketHandler {
 //        log.info("=====================");
 //    }
 
-    public void sendEventScore(String userUUID1, Message message) {
+    public void sendEventScore(String userUUID1, Message message) throws Exception {
+        log.info("🤡 sendEventScore: {}", message);
+        int remainTime = Integer.parseInt(message.getRemainTime());
+
         String userUUID2 = message.getReceiver();
+        String roomId = userInfo.get(userUUID1);
         String userToken1 = uidWithToken.get(userUUID1);
         String userToken2 = uidWithToken.get(userUUID2);
 
@@ -80,17 +86,39 @@ public class SignalingHandler extends TextWebSocketHandler {
         Long exerciseType = Long.parseLong(message.getExerciseType());
 
         int result = 0;
-
-        if(userScore1 > userScore2) {
+        if(remainTime != 0) {
             result = 1;
-        } else if(userScore2 > userScore1) {
-            result = 2;
+        }
+        if(remainTime == 0) {
+            if(userScore1 > userScore2) {
+                result = 1;
+            }
+            if(userScore2 > userScore1) {
+                result = 2;
+            }
         }
 
-        log.info("⚠️ publish :: {}", new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
+
+        log.info("⚠️ exercise result publish :: {}", new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
+        log.info("⚠️ game result publish :: {}", new GameResultReq(exerciseType, roomId, 1, userToken1, userToken2, userScore1, userScore2));
+
+        sessions.get(userUUID1).sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
+                .type("info")
+                .room(roomId)
+                .peerToken(userToken2).build())));
+        sessions.get(userUUID2).sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
+                .type("info")
+                .room(roomId)
+                .peerToken(userToken1).build())));
+
         uidWithToken.keySet().removeIf(entry -> entry.equals(userUUID1));
         uidWithToken.keySet().removeIf(entry -> entry.equals(userUUID2));
+        tokenWithUid.entrySet().removeIf(entry -> entry.getValue().equals(userUUID1));
+        tokenWithUid.entrySet().removeIf(entry -> entry.getValue().equals(userUUID2));
+
+
         eventPublisher.publishEvent(new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
+        eventPublisher.publishEvent(new GameResultReq(exerciseType, roomId, 60, userToken1, userToken2, userScore1, userScore2));
     }
 
     @EventListener
@@ -98,7 +126,10 @@ public class SignalingHandler extends TextWebSocketHandler {
         log.info(">>> ❤️ [ws] 이벤트 리스너 동작!: {}", event);
         String user1 = event.getUserToken1();
         String user2 = event.getUserToken2();
-        String roomId = user1 + user2;
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String now = format.format(date);
+        String roomId = matchingService.makeGameId(user1, now);
 
         try {
             joinRoom(user1, roomId);
@@ -188,19 +219,36 @@ public class SignalingHandler extends TextWebSocketHandler {
             // 유저 uuid 와 roomID 를 저장
             String userUUID = session.getId(); // 유저 uuid
             String roomId = message.getRoom(); // roomId
+            String receiverId;
+            WebSocketSession receiverSession;
             log.info(">>> [ws] 메시지 타입 {}, 보낸 사람 {}", message.getType(), userUUID);
+
 
             // 메시지 타입에 따라서 서버에서 하는 역할이 달라진다
             switch (message.getType()) {
+                case "exercise_complete":
+                    receiverId = message.getReceiver();
+                    receiverSession = sessions.get(receiverId);
+                    if (receiverSession != null && receiverSession.isOpen()) {
+                        receiverSession.sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
+                                .type("exercise_complete")
+                                .sender(message.getSender())
+                                .myCount(message.getMyCount())
+                                .receiver(message.getReceiver())
+                                .build())));
+                    }
+
+                    break;
+
                 case MSG_TYPE_FINAL:
                     sendEventScore(userUUID, message);
                     break;
 
                 case MSG_TYPE_CNT:
-                    String receiverId = message.getReceiver();
+                    receiverId = message.getReceiver();
                     String myCount = message.getMyCount();
                     log.info(">>> 💯 [ws] {} -> {} 점수 전송: {}", userUUID, receiverId, myCount);
-                    WebSocketSession receiverSession = sessions.get(receiverId);
+                    receiverSession = sessions.get(receiverId);
                     if (receiverSession != null && receiverSession.isOpen()) {
                         receiverSession.sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
                                 .type(MSG_TYPE_CNT)

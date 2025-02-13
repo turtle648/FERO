@@ -15,14 +15,13 @@ import { ref } from 'vue'
 import VideoComponent from '@/components/videoroom/VideoComponent.vue';
 import { useRoute } from 'vue-router';
 
-
 const route = useRoute();
 const exercise = ref(route.params.exercise); // URL 파라미터를 ref로 저장
 const isMatched = ref(false);
+
 const setIsMatched = (value) => {
   isMatched.value = value;
   console.log("❤️ setIsMatched::" + isMatched.value);
-  
 }
 
 </script>

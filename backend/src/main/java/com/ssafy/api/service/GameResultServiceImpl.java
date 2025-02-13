@@ -5,6 +5,7 @@ import com.ssafy.api.request.UserIdGameResultReq;
 import com.ssafy.db.entity.GameResult;
 import com.ssafy.db.repository.GameResultRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -17,6 +18,7 @@ public class GameResultServiceImpl implements GameResultService{
     private final GameResultRepository gameResultRepository;
 
     // 경기 결과 저장 (두 개의 레코드 생성)
+    @EventListener
     @Transactional
     public void saveGameResult(UserIdGameResultReq request) {
 

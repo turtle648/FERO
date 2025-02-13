@@ -97,6 +97,7 @@ public class UserRankScoresServiceImpl implements UserRankScoresService {
 
         double actualScore;
         if (isWinner == null) { // 무승부 처리
+            log.info("무승부!");
             actualScore = 0.5;
         } else if (isWinner) {
             actualScore = 1.0;
