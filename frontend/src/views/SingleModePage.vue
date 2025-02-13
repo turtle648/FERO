@@ -1,10 +1,10 @@
 <template>
   <div class="tutorial-page w-screen h-screen flex flex-col items-center relative">
-    <div class="w-screen h-screen bg-black bg-opacity-60 z-5"></div>
+    <!-- <div class="w-screen h-screen bg-black bg-opacity-60 z-5"></div> -->
     <component :is="currentExerciseComponent" class="z-0" />
   </div>
 </template>
-  
+
 <script setup>
 import { useRoute } from "vue-router"
 import SquatComponent from "@/components/SquatComponent.vue"
@@ -21,9 +21,8 @@ const exerciseComponents = {
 const currentExerciseComponent = exerciseComponents[exerciseType] || null
 
 onMounted(() => {
-    console.log(exerciseType)
+  console.log(exerciseType)
 })
 </script>
 
 <style scoped></style>
-  
