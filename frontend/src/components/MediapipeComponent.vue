@@ -9,9 +9,24 @@
     <div v-else-if="showStartText" class="start-text text-4xl text-white z-10">START</div>
 
     <!-- 본인 화면 -->
-    <div class="video-container relative h-full">
+    <!-- 기존 코드 -->
+    <!-- <div class="video-container relative h-full">
       <canvas ref="canvasElement" class="h-screen">
         <video ref="videoElement" autoplay playsinline muted class="h-full object-cover overflow-hidden aspect-[9/16]"></video>
+      </canvas>
+    </div> -->
+
+    <!-- 수정 코드 -->
+    <!-- <div class="video-container relative h-full max-w-[800px] max-h-full">
+      <canvas ref="canvasElement" class="h-screen">
+        <video ref="videoElement" autoplay playsinline muted class="h-full w-full overflow-hidden"></video>
+      </canvas>
+    </div> -->
+
+    <!-- 수정 코드2 -->
+    <div class="video-container relative h-full overflow-hidden mx-auto">
+      <canvas ref="canvasElement" class="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <video ref="videoElement" autoplay playsinline muted class="h-full w-full overflow-hidden"></video>
       </canvas>
     </div>
 
