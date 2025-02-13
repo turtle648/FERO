@@ -24,9 +24,16 @@
     </div> -->
 
     <!-- 수정 코드2 -->
-    <div class="video-container relative h-full overflow-hidden mx-auto">
-      <canvas ref="canvasElement" class="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-        <video ref="videoElement" autoplay playsinline muted class="h-full w-full overflow-hidden"></video>
+<!--    <div class="video-container relative h-full overflow-hidden mx-auto">-->
+<!--      <canvas ref="canvasElement" class="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">-->
+<!--        <video ref="videoElement" autoplay playsinline muted class="h-full w-full overflow-hidden"></video>-->
+<!--      </canvas>-->
+<!--    </div>-->
+
+    <!-- 본인 화면 -->
+    <div class="relative w-full h-full flex justify-center items-center overflow-hidden">
+      <canvas ref="canvasElement" class="">
+        <video ref="videoElement" class="aspect-[9/16] w-full h-auto object-cover"></video>
       </canvas>
     </div>
 
