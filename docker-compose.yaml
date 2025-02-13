@@ -50,6 +50,9 @@ services:
       MYSQL_DATABASE: "E103_DB"
     ports:
       - 3307:3306
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
     volumes:
       - my-sql-volume:/var/lib/mysql
       - /home/ubuntu/S12P11E103/db:/docker-entrypoint-initdb.d
