@@ -9,12 +9,12 @@
     <div v-else-if="showStartText" class="start-text text-4xl text-white z-10">START</div>
 
     <!-- 본인 화면 -->
-
-    <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
-      <canvas ref="canvasElement" class="w-full h-full object-fill">
-        <video ref="videoElement" class="w-full h-full object-fill"></video>
+    <div class="relative w-full h-full flex justify-center items-center overflow-hidden">
+      <canvas ref="canvasElement" class="">
+        <video ref="videoElement" class="aspect-[9/16] w-full h-auto object-cover"></video>
         <!-- fix: 비디오에만 태그 달기기, 화면에 표시될 크기 지정 -->
-         <!-- 미디어파이프 표시되는 화면이 가로로 긴 화면인데 세로를 풀 중심점을 화면 표시되는 중심으로 잡아서 중심에서 9: 16 맞추기 (나머지 부분 잘리고 스크롤 없이이) -->
+        <!-- 여기 수정 -->
+        <!-- 미디어파이프 표시되는 화면이 가로로 긴 화면인데 세로를 풀 중심점을 화면 표시되는 중심으로 잡아서 중심에서 9: 16 맞추기 (나머지 부분 잘리고 스크롤 없이) -->
       </canvas>
     </div>
 

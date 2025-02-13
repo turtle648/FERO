@@ -87,26 +87,26 @@ export const useMainStore = defineStore("main", () => {
   }
 
   // 퀘스트 한달치
-  // async function isQuestCompleted(year, month) {
-  //   try {
-  //     console.time(`[⏱️] Sending Date Year: ${year}, Month: ${month}`)
+  async function isQuestCompleted(year, month) {
+    try {
+      console.time(`[⏱️] Sending Date Year: ${year}, Month: ${month}`)
 
-  //     // API 호출
-  //     const data = { year, month }
-  //     const response = await api.post("/quest/complete", data)
+      // API 호출
+      const data = { year, month }
+      const response = await api.get("/exercise/monthly", data)
 
-  //     console.log("✅ Date Sent Successfully:", response.data)
-  //     return response.data // 성공 시 응답 데이터 반환
-  //   } catch (error) {
-  //     console.error(`[🔥] Error Sending Date Year: ${year}, Month: ${month}`, {
-  //       message: error.message,
-  //       config: error.config,
-  //     })
-  //     throw error // 호출한 컴포넌트에서 에러를 처리할 수 있도록 던짐
-  //   } finally {
-  //     console.timeEnd(`[⏱️] Sending Date Year: ${year}, Month: ${month}`)
-  //   }
-  // }
+      console.log("✅ Date Sent Successfully:", response.data)
+      return response.data // 성공 시 응답 데이터 반환
+    } catch (error) {
+      console.error(`[🔥] Error Sending Date Year: ${year}, Month: ${month}`, {
+        message: error.message,
+        config: error.config,
+      })
+      throw error // 호출한 컴포넌트에서 에러를 처리할 수 있도록 던짐
+    } finally {
+      console.timeEnd(`[⏱️] Sending Date Year: ${year}, Month: ${month}`)
+    }
+  }
 
   return {
     tutorial,
@@ -115,6 +115,6 @@ export const useMainStore = defineStore("main", () => {
     TUTORIAL_IDS, // 상수 노출
     loadTutorial,
     completeTutorial,
-    // isQuestCompleted,
+    isQuestCompleted,
   }
 })
