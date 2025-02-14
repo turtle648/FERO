@@ -241,6 +241,7 @@ const handleWebSocketMessage = async (event) => {
 
     case "exercise_complete": {
       isPeerExerciseComplete.value = true
+      console.log("exercise_complete에서 받은 peerToken:", message.peerToken);
       console.log("exercise_complete에서 받은 count:", message.myCount);
       peerCount.value = message.myCount
       console.log("exercise_complete 후 peerCount:", peerCount.value);
