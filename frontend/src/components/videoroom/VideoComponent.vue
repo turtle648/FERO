@@ -6,6 +6,7 @@
       ref="myFace"
       @set-count="setCount"
       @get-time-left="setTime"
+      :command="command"
     />
 
     <div class="peer-container">
@@ -47,8 +48,8 @@
 import { ref, onMounted, onBeforeUnmount, defineEmits, defineProps, watch } from 'vue'
 import SquatComponent from '@/components/SquatComponent.vue'
 import axios from 'axios'
-import router from '@/router'
-import { setRouteData } from '@/router/routeData'
+// import router from '@/router'
+// import { setRouteData } from '@/router/routeData'
 
 // 기본 상태 관리
 const isMyVideoOn = ref(true)
@@ -68,6 +69,7 @@ const peerVideo = ref(null)
 const roomId = ref(null)
 const currentPeerId = ref(null)
 const peerToken = ref(null)
+const command = ref('')
 
 let webSocket
 let myStream
@@ -135,12 +137,17 @@ const cleanupAndNavigate = (finalRoomId, finalPeerToken) => {
     webSocket.close();
   }
 
-  setRouteData({
-    roomId: finalRoomId,
-    peerToken: finalPeerToken
-  })
+  // setRouteData({
+  //   roomId: finalRoomId,
+  //   peerToken: finalPeerToken
+  // })
 
-  router.push('/rank-result')
+  // router.push('/rank-result')
+  // (스쿼트)컴포넌트로 데이터를 보냄
+  command.value = {
+    roomId: finalRoomId,
+    peerToken: finalPeerToken,
+  }
 }
 
 // 비디오/오디오 토글 함수들
