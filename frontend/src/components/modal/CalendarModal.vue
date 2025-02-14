@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fixed inset-0 flex items-center justify-center bg-white h-[70vh] w-[40vh]"
+    class="fixed inset-x-20 inset-y-32 flex items-center justify-center bg-white h-[70vh] w-[40vh]"
   >
     <div class="flex flex-col bg-white relative w-full h-full pt-5 px-3">
       <button
