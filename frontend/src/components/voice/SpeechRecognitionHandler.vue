@@ -1,4 +1,31 @@
 <template>
+     <div v-if="isWakeWordDetected" class="fixed top-[10vh] right-5 flex items-center space-x-2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-md">
+      <MicIcon class="w-6 h-6 text-red-400" />
+      <span>명령어 듣는 중...</span>
+      <div class="relative w-8 h-8">
+        <svg class="absolute top-0 left-0 w-full h-full">
+          <circle
+            class="text-gray-700"
+            stroke="currentColor"
+            stroke-width="4"
+            fill="transparent"
+            r="12"
+            cx="16"
+            cy="16"
+          />
+          <circle
+            class="text-blue-400 transition-all"
+            :style="{ strokeDasharray: '75.4', strokeDashoffset: `${(timer / 5) * 75.4}` }"
+            stroke="currentColor"
+            stroke-width="4"
+            fill="transparent"
+            r="12"
+            cx="16"
+            cy="16"
+          />
+        </svg>
+      </div>
+    </div>
     <div class="hidden"></div>
 </template>
 
@@ -71,6 +98,7 @@ const checkCommand = (text) => {
       if (levenshteinDistance(word, command) <= 1) {
         console.log(`✅ 명령어 "${word}" 감지됨!`);
         executeCommand(command);
+        isWakeWordDetected.value = false
         return;
       }
     }
