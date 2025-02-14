@@ -14,13 +14,11 @@ import java.time.LocalDateTime;
 @Builder
 public class Friend extends BaseEntity{
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;  // 요청을 보낸 유저
+    @Column(name = "user_id")
+    private String userId;  // 요청을 보낸 유저
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "friend_id", nullable = false)
-    private User friend;  // 친구가 될 유저
+    @Column(name = "friend_id", nullable = false)
+    private String friendId;  // 친구가 될 유저
 
     @Column(name = "friend_nickname")
     private String friendNickname; // 친구의 닉네임 (user_nickname과 연결)
@@ -28,6 +26,7 @@ public class Friend extends BaseEntity{
     @Column(name = "friend_level", nullable = false)
     private int friendLevel;  // 기본 레벨 1
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private FriendStatus status;
 

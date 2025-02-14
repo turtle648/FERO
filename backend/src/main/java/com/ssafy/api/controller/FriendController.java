@@ -20,18 +20,20 @@ public class FriendController {
 
 //    // 친구 요청 보내기
     @PostMapping("/request")
+    @ApiOperation(value = "친구 요청", notes = "특정 유저에게 친구 신청")
     public ResponseEntity<String> sendFriendRequest(@RequestBody FriendReq request) {
         friendService.sendFriendRequest(request.getUserId(), request.getFriendId());
         return ResponseEntity.ok("친구 요청을 보냈습니다.");
     }
 
 //    // 친구 요청 수락
-//    @PostMapping("/accept")
-//    public ResponseEntity<String> acceptFriendRequest(@RequestBody FriendRequest request) {
-//        friendService.acceptFriendRequest(request.getUserId(), request.getFriendId());
-//        return ResponseEntity.ok("친구 요청을 수락했습니다.");
-//    }
-//
+    @PostMapping("/accept")
+    @ApiOperation(value = "친구 요청 승인", notes = "특정 유저의 친구 요청을 승인.")
+    public ResponseEntity<String> acceptFriendRequest(@RequestBody FriendReq request) {
+        friendService.acceptFriendRequest(request.getUserId(), request.getFriendId());
+        return ResponseEntity.ok("친구 요청을 수락했습니다.");
+    }
+
 //    // 친구 삭제
 //    @DeleteMapping("/remove")
 //    public ResponseEntity<String> removeFriend(@RequestBody FriendRequest request) {
