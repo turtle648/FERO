@@ -1,41 +1,14 @@
-export const assets = {
-    hair: [
-      [ require('@/assets/character/hair/hair0.png'), 0 ],  
-      [ require('@/assets/character/hair/hair1.png'), 1 ],  
-      [ require('@/assets/character/hair/hair2.png'), 2 ], 
-      [ require('@/assets/character/hair/hair3.png'), 3 ],       
-      [ require('@/assets/character/hair/hair4.png'), 4 ],       
-      [ require('@/assets/character/hair/hair5.png'), 5 ],       
-      [ require('@/assets/character/hair/hair6.png'), 6 ],       
-      [ require('@/assets/character/hair/hair7.png'), 7 ],       
-      [ require('@/assets/character/hair/hair8.png'), 8 ],       
-      [ require('@/assets/character/hair/hair9.png'), 9 ],         
-    ],
-    face: [
-      [ require('@/assets/character/face/face0.png'), 0 ],
-      [ require('@/assets/character/face/face1.png'), 1 ],
-      [ require('@/assets/character/face/face2.png'), 2 ],
-      [ require('@/assets/character/face/face3.png'), 3 ],
-      [ require('@/assets/character/face/face4.png'), 4 ],
-      [ require('@/assets/character/face/face5.png'), 5 ],
-      [ require('@/assets/character/face/face6.png'), 6 ],
-      [ require('@/assets/character/face/face7.png'), 7 ],
-      [ require('@/assets/character/face/face8.png'), 8 ],
-      [ require('@/assets/character/face/face9.png'), 9 ],
-      [ require('@/assets/character/face/face10.png'), 10 ],
-      [ require('@/assets/character/face/face11.png'), 11 ],
-      [ require('@/assets/character/face/face12.png'), 12 ],
-      [ require('@/assets/character/face/face13.png'), 13 ],
-      [ require('@/assets/character/face/face14.png'), 14 ],
-    ],
-    body: [
-      [ require('@/assets/character/body/body0.png'), 0 ],
-      [ require('@/assets/character/body/body1.png'), 1 ],
-      [ require('@/assets/character/body/body2.png'), 2 ],
-      [ require('@/assets/character/body/body3.png'), 3 ],
-      [ require('@/assets/character/body/body4.png'), 4 ],
-      [ require('@/assets/character/body/body5.png'), 5 ],
-      [ require('@/assets/character/body/body6.png'), 6 ],
-      [ require('@/assets/character/body/body7.png'), 7 ],
-    ],
-  };
+export const assets = ['hair', 'face', 'body'].reduce((acc, category) => {
+  const count = {
+    hair: 10,
+    face: 15,
+    body: 8,
+  }[category];
+
+  acc[category] = Array.from({ length: count }, (_, i) => [
+    require(`@/assets/character/${category}/${category}${i}.png`),
+    i,
+  ]);
+
+  return acc;
+}, {});
