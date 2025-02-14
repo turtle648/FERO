@@ -162,6 +162,21 @@ CREATE TABLE chat_message (
                               FOREIGN KEY (sender_id) REFERENCES user_info(user_id) ON DELETE CASCADE
 );
 
+-- 유저간의 친구정보에 대한 테이블
+CREATE TABLE friends (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id VARCHAR(30) NOT NULL,
+    friend_id VARCHAR(30) NOT NULL,
+    friend_nickname VARCHAR(15),
+    friend_level INT NOT NULL,
+    status VARCHAR(10) CHECK (status IN ('pending', 'accepted', 'blocked')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    -- updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES user_info(user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_friend FOREIGN KEY (friend_id) REFERENCES user_info(user_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_friendship (user_id, friend_id)
+);
+
 CREATE TABLE quests (
                         id BIGINT PRIMARY KEY AUTO_INCREMENT,
                         user_character_id BIGINT NOT NULL,
@@ -340,7 +355,7 @@ BEGIN
       AND quest_date = DATE(NEW.exercise_date);
 END IF;
 END //
-DELIMITER;
+DELIMITER ;
 
 -- 스탯 히스토리 업데이트 이후 히스토리 갱신
 DELIMITER //

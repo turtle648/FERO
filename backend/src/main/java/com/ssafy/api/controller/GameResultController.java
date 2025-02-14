@@ -1,6 +1,5 @@
 package com.ssafy.api.controller;
 
-import com.ssafy.api.request.GameResultReq;
 import com.ssafy.api.request.UserIdGameResultReq;
 import com.ssafy.api.service.GameResultServiceImpl;
 import com.ssafy.common.util.JwtTokenUtil;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/gameResults")
