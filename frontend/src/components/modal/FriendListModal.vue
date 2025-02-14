@@ -1,24 +1,36 @@
 <template>
-  <div class="friend-list-modal w-[40vh] h-[60vh] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white flex">
-    <div class="content w-full realtive">
-      <div class="button-container z-20">
+  <div class="friend-list-modal w-[40vh] h-[60vh] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex">
+    <div class="content w-full relative">
+      <div class="button-container">
         <button class="absolute right-3 top-2 z-20" id="close-btn" @click="closeFriendModal">X</button>
       </div>
 
-      <div class="menu">
-        <div class="friend" @click="showList('friend')">친구목록</div>
-        <div class="chatting" @click="showList('chatting')">채팅목록</div>
+      <div class="menu flex justify-around h-[7vh] bg-white">
+        <div class="content menu-size" @click="showList('friend')">친구목록</div>
+        <div class="content menu-size" @click="showList('chatting')">채팅목록</div>
       </div>
 
       <!-- 친구목록 -->
-      <div class="friend-list-container" v-if="activeList === 'friend'">
-        <div>
-          <li v-for="friend in friendList" :key="friend.id">{{ friend.nickname }} (Level: {{ friend.level }})</li>
-        </div>
+      <div class="friend-list list-container" v-if="activeList === 'friend'">
+        <ul>
+          <!-- <li v-for="friend in friendList" :key="friend.id">{{ friend.nickname }} (Level: {{ friend.level }})</li> -->
+          <li class="content">Lv.2 닉네임 (thscodl04)</li>
+          <li class="content">Lv.2 닉네임 (thscodl04)</li>
+          <li class="content">Lv.2 닉네임 (thscodl04)</li>
+          <li class="content">Lv.2 닉네임 (thscodl04)</li>
+          <li class="content">Lv.2 닉네임 (thscodl04)</li>
+        </ul>
       </div>
 
       <!-- 채팅목록 -->
-      <div class="chatting-list-container" v-if="activeList === 'chatting'"></div>
+      <div class="chatting-list list-container" v-if="activeList === 'chatting'">
+        <ul>
+          <li class="content">채팅</li>
+          <li class="content">채팅</li>
+          <li class="content">채팅</li>
+          <li class="content">채팅</li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -67,37 +79,14 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.menu {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 10px; /* 아래 콘텐츠와 간격 추가 */
+.content {
+  @apply h-[6vh];
 }
 
-.friend {
-  position: relative;
-  z-index: 10;
+.menu-size {
+  @apply relative z-10 w-full h-[5vh];
 }
-
-.chatting {
-  position: relative;
-  z-index: 10;
-}
-
-.friend-list-container {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-color: paleturquoise;
-}
-
-.chatting-list-container {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-color: pink;
+.list-container {
+  @apply w-full h-[53vh] overflow-y-auto bg-blue-500;
 }
 </style>
