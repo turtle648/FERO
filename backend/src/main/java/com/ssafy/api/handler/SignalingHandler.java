@@ -1,9 +1,6 @@
 package com.ssafy.api.handler;
 
-import com.ssafy.api.request.ExerciseResultEvent;
-import com.ssafy.api.request.GameResultReq;
-import com.ssafy.api.request.MatchSuccessEvent;
-import com.ssafy.api.request.UserIdGameResultReq;
+import com.ssafy.api.request.*;
 import com.ssafy.api.service.MatchingService;
 import com.ssafy.common.model.Message;
 import com.ssafy.common.util.JwtTokenUtil;
@@ -128,6 +125,19 @@ public class SignalingHandler extends TextWebSocketHandler {
         }
 
 
+        ExerciseLogReq user1LogReq = new ExerciseLogReq();
+        user1LogReq.setExerciseCnt(userScore1);
+        user1LogReq.setExerciseDuration(60);
+        user1LogReq.setExerciseStatsRatioId(exerciseType);
+
+        ExerciseLogReq user2LogReq = new ExerciseLogReq();
+        user2LogReq.setExerciseCnt(userScore2);
+        user2LogReq.setExerciseDuration(60);
+        user2LogReq.setExerciseStatsRatioId(exerciseType);
+
+        log.info("⚠️ user1 log publish :: {} -> {}", JwtTokenUtil.getUserIdFromJWT(userToken1), user1LogReq);
+        log.info("⚠️ user2 log publish :: {} -> {}", JwtTokenUtil.getUserIdFromJWT(userToken2), user2LogReq);
+
         uidWithToken.keySet().removeIf(entry -> entry.equals(userUUID1));
         uidWithToken.keySet().removeIf(entry -> entry.equals(userUUID2));
         tokenWithUid.entrySet().removeIf(entry -> entry.getValue().equals(userUUID1));
@@ -136,6 +146,8 @@ public class SignalingHandler extends TextWebSocketHandler {
 
         eventPublisher.publishEvent(new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
         eventPublisher.publishEvent(new UserIdGameResultReq(exerciseType, roomId, 60, JwtTokenUtil.getUserIdFromJWT(userToken1), JwtTokenUtil.getUserIdFromJWT(userToken2), userScore1, userScore2));
+        eventPublisher.publishEvent(new EventExerciseLog(JwtTokenUtil.getUserIdFromJWT(userToken1), user1LogReq));
+        eventPublisher.publishEvent(new EventExerciseLog(JwtTokenUtil.getUserIdFromJWT(userToken2), user2LogReq));
     }
 
     @EventListener

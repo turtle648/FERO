@@ -1,5 +1,6 @@
 package com.ssafy.api.controller;
 
+import com.ssafy.api.request.EventExerciseLog;
 import com.ssafy.api.request.ExerciseLogReq;
 import com.ssafy.api.request.ExerciseLogSearchReq;
 import com.ssafy.api.response.ExerciseLogRes;
@@ -55,7 +56,7 @@ public class ExerciseController {
         String userId = JwtTokenUtil.extractUserIdFromToken(authHeader);
 
         ExerciseLog savedExerciseLog = exerciseLogService.addExerciseLogAndUpdateStats(
-                userId, exerciseLogReq
+                new EventExerciseLog(userId, exerciseLogReq)
         );
 
         return ResponseEntity.ok(ExerciseLogRes.from(savedExerciseLog));

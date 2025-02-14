@@ -380,7 +380,7 @@ public class MatchingService {
         exerciseLogReq.setExerciseCnt(gameResultReq.getUser1Score());
         exerciseLogReq.setExerciseStatsRatioId(gameResultReq.getExerciseId());
         exerciseLogReq.setExerciseDuration(gameResultReq.getDuration());
-        exerciseLogService.addExerciseLogAndUpdateStats(userId, exerciseLogReq);
+        exerciseLogService.addExerciseLogAndUpdateStats(new EventExerciseLog(userId, exerciseLogReq));
 
         // DB 반영 - 업데이트된 상태 저장
         entityManager.flush();
