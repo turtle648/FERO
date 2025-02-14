@@ -1,7 +1,9 @@
 <template>
-  <div class="friend-list-modal">
-    <div class="content">
-      <button id="close-btn" @click="closeFriendModal">X</button>
+  <div class="friend-list-modal w-[40vh] h-[60vh] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white flex">
+    <div class="content w-full realtive">
+      <div class="button-container z-20">
+        <button class="absolute right-3 top-2 z-20" id="close-btn" @click="closeFriendModal">X</button>
+      </div>
 
       <div class="menu">
         <div class="friend" @click="showList('friend')">친구목록</div>
@@ -9,21 +11,31 @@
       </div>
 
       <!-- 친구목록 -->
-      <div class="friend-list" v-if="activeList === 'friend'"></div>
+      <div class="friend-list-container" v-if="activeList === 'friend'">
+        <div>
+          <li v-for="friend in friendList" :key="friend.id">{{ friend.nickname }} (Level: {{ friend.level }})</li>
+        </div>
+      </div>
 
       <!-- 채팅목록 -->
-      <div class="chatting-list" v-if="activeList === 'chatting'"></div>
+      <div class="chatting-list-container" v-if="activeList === 'chatting'"></div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, defineEmits } from "vue"
+import { ref, defineEmits, onMounted } from "vue"
+import { useFriendStore } from "@/stores/friendStore"
+
+const friendStore = useFriendStore()
+
+// 친구목록 데이터
+const friendList = ref([])
 
 // 모달 닫기
-const emit = defineEmits(['close-modal'])
+const emit = defineEmits(["close-modal"])
 const closeFriendModal = () => {
-  emit('close-modal')
+  emit("close-modal")
 }
 
 // 친구목록, 채팅목록 상태 관리
@@ -31,33 +43,30 @@ const activeList = ref("friend") // 기본값으로 친구목록
 const showList = (list) => {
   activeList.value = list
 }
+
+// 친구목록 데이터 가져오기
+const fetchFriendList = async () => {
+  try {
+    const response = await friendStore.getFriendList()
+
+    if (response && response.length > 0) {
+      // 데이터가 존재하면 저장
+      friendList.value = response
+    } else {
+      // 데이터가 없으면 빈 배열로 초기화
+      friendList.value = []
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+onMounted(() => {
+  fetchFriendList()
+})
 </script>
 
 <style scoped>
-.friend-list-modal {
-  width: 40vh;
-  height: 60vh;
-  position: fixed;
-  top: 50%; /* 화면의 세로 중앙 */
-  left: 50%; /* 화면의 가로 중앙 */
-  transform: translate(-50%, -50%); /* 자신의 크기만큼 반으로 이동 */
-  background: rgba(255, 255, 255);
-  display: flex;
-}
-
-.content {
-  width: 100%;
-  position: relative;
-  text-align: center;
-}
-
-#close-btn {
-  position: absolute;
-  right: 3%;
-  top: 2%;
-  z-index: 11;
-}
-
 .menu {
   display: flex;
   justify-content: space-around;
@@ -74,7 +83,7 @@ const showList = (list) => {
   z-index: 10;
 }
 
-.friend-list {
+.friend-list-container {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -83,7 +92,7 @@ const showList = (list) => {
   background-color: paleturquoise;
 }
 
-.chatting-list {
+.chatting-list-container {
   position: absolute;
   width: 100%;
   height: 100%;

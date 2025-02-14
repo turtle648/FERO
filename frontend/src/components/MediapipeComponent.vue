@@ -24,11 +24,11 @@
     </div> -->
 
     <!-- 수정 코드2 -->
-<!--    <div class="video-container relative h-full overflow-hidden mx-auto">-->
-<!--      <canvas ref="canvasElement" class="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">-->
-<!--        <video ref="videoElement" autoplay playsinline muted class="h-full w-full overflow-hidden"></video>-->
-<!--      </canvas>-->
-<!--    </div>-->
+    <!--    <div class="video-container relative h-full overflow-hidden mx-auto">-->
+    <!--      <canvas ref="canvasElement" class="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">-->
+    <!--        <video ref="videoElement" autoplay playsinline muted class="h-full w-full overflow-hidden"></video>-->
+    <!--      </canvas>-->
+    <!--    </div>-->
 
     <!-- 본인 화면 -->
     <div class="relative w-full h-full flex justify-center items-center overflow-hidden">
@@ -90,7 +90,7 @@ function startTimer() {
   intervalId = setInterval(() => {
     timeLeft.value -= 1000 // 매초마다 시간 감소
     formattedTime.value = formatTime(timeLeft.value)
-    emit('getTime', timeLeft.value);
+    emit("getTime", timeLeft.value)
 
     if (timeLeft.value <= 0) {
       clearInterval(intervalId) // 타이머 종료
@@ -148,70 +148,65 @@ let pose = null
 
 // 얼굴 블러처리 기본 코드 가이드라인만 추가함함
 const onResults = (results) => {
-  if (!canvasElement.value) return;
+  if (!canvasElement.value) return
 
-  const canvasCtx = canvasElement.value.getContext("2d");
-  canvasCtx.save();
-  canvasCtx.clearRect(0, 0, canvasElement.value.width, canvasElement.value.height);
+  const canvasCtx = canvasElement.value.getContext("2d")
+  canvasCtx.save()
+  canvasCtx.clearRect(0, 0, canvasElement.value.width, canvasElement.value.height)
 
   // 좌우 반전 적용 (웹캠 미러 효과)
-  canvasCtx.translate(canvasElement.value.width, 0);
-  canvasCtx.scale(-1, 1);
+  canvasCtx.translate(canvasElement.value.width, 0)
+  canvasCtx.scale(-1, 1)
 
   // 원본 이미지 그리기
-  canvasCtx.drawImage(results.image, 0, 0, canvasElement.value.width, canvasElement.value.height);
+  canvasCtx.drawImage(results.image, 0, 0, canvasElement.value.width, canvasElement.value.height)
 
   if (results.poseLandmarks) {
-    emit("pose-detected", results.poseLandmarks);
+    emit("pose-detected", results.poseLandmarks)
 
-    const landmarks = results.poseLandmarks;
-    const nose = landmarks[0];
-    const leftEar = landmarks[7];
-    const rightEar = landmarks[8];
-    const leftShoulder = landmarks[11];
-    const rightShoulder = landmarks[12];
-    const emoji = "😎"; // 사용할 이모지
+    const landmarks = results.poseLandmarks
+    const nose = landmarks[0]
+    const leftEar = landmarks[7]
+    const rightEar = landmarks[8]
+    const leftShoulder = landmarks[11]
+    const rightShoulder = landmarks[12]
+    const emoji = "😎" // 사용할 이모지
 
     if (nose && leftEar && rightEar && leftShoulder && rightShoulder) {
-      const faceX = (nose.x + leftEar.x + rightEar.x) / 3 * canvasElement.value.width;
-      const faceY = (nose.y + leftEar.y + rightEar.y) / 3 * canvasElement.value.height;
-      const faceWidth = Math.abs(leftEar.x - rightEar.x) * 2.5 * canvasElement.value.width;
-      const faceHeight = Math.abs(nose.y - (leftShoulder.y + rightShoulder.y) / 2) * 2.5 * canvasElement.value.height;
+      const faceX = ((nose.x + leftEar.x + rightEar.x) / 3) * canvasElement.value.width
+      const faceY = ((nose.y + leftEar.y + rightEar.y) / 3) * canvasElement.value.height
+      const faceWidth = Math.abs(leftEar.x - rightEar.x) * 2.5 * canvasElement.value.width
+      const faceHeight = Math.abs(nose.y - (leftShoulder.y + rightShoulder.y) / 2) * 2.5 * canvasElement.value.height
 
       // ✅ **1. 블러 처리 먼저 수행**
-      const offscreenCanvas = document.createElement("canvas");
-      offscreenCanvas.width = faceWidth;
-      offscreenCanvas.height = faceHeight;
-      const offscreenCtx = offscreenCanvas.getContext("2d");
+      const offscreenCanvas = document.createElement("canvas")
+      offscreenCanvas.width = faceWidth
+      offscreenCanvas.height = faceHeight
+      const offscreenCtx = offscreenCanvas.getContext("2d")
 
       // 블러 적용할 영역 복사
-      offscreenCtx.drawImage(
-          results.image,
-          faceX - faceWidth / 2, faceY - faceHeight / 2, faceWidth, faceHeight,
-          0, 0, faceWidth, faceHeight
-      );
+      offscreenCtx.drawImage(results.image, faceX - faceWidth / 2, faceY - faceHeight / 2, faceWidth, faceHeight, 0, 0, faceWidth, faceHeight)
 
       // 블러 필터 적용
-      offscreenCtx.filter = "blur(40px)";
-      offscreenCtx.drawImage(offscreenCanvas, 0, 0);
+      offscreenCtx.filter = "blur(40px)"
+      offscreenCtx.drawImage(offscreenCanvas, 0, 0)
 
       // 블러된 이미지 캔버스에 그리기
-      canvasCtx.drawImage(offscreenCanvas, faceX - faceWidth / 2, faceY - faceHeight / 2, faceWidth, faceHeight);
+      canvasCtx.drawImage(offscreenCanvas, faceX - faceWidth / 2, faceY - faceHeight / 2, faceWidth, faceHeight)
 
       // ✅ **2. 블러 처리 후 이모지 그리기**
-      const earDistance = Math.abs(leftEar.x - rightEar.x) * canvasElement.value.width; // 귀 간 거리 계산
-      const emojiSize = earDistance * 2; // 이모지 크기를 얼굴 크기에 맞게 조절
+      const earDistance = Math.abs(leftEar.x - rightEar.x) * canvasElement.value.width // 귀 간 거리 계산
+      const emojiSize = earDistance * 2 // 이모지 크기를 얼굴 크기에 맞게 조절
 
-      canvasCtx.font = `${emojiSize}px sans-serif`; // 동적으로 크기 설정
-      canvasCtx.textAlign = "center";
-      canvasCtx.textBaseline = "middle"; // 중앙 정렬
-      canvasCtx.fillText(emoji, faceX, faceY);
-
+      canvasCtx.font = `${emojiSize}px sans-serif` // 동적으로 크기 설정
+      canvasCtx.textAlign = "center"
+      canvasCtx.textBaseline = "middle" // 중앙 정렬
+      canvasCtx.fillText(emoji, faceX, faceY)
     }
   }
 
-  canvasCtx.restore();
-};
+  canvasCtx.restore()
+}
 
 onMounted(async () => {
   // setTimeout(() => {
