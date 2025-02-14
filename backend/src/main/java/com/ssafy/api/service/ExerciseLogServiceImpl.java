@@ -1,5 +1,6 @@
 package com.ssafy.api.service;
 
+import com.ssafy.api.request.EventExerciseLog;
 import com.ssafy.api.request.ExerciseLogReq;
 import com.ssafy.api.request.ExerciseLogSearchReq;
 import com.ssafy.api.response.ExerciseLogRes;
@@ -7,6 +8,7 @@ import com.ssafy.api.response.ExerciseStatsRatioRes;
 import com.ssafy.db.entity.*;
 import com.ssafy.db.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -34,7 +36,10 @@ public class ExerciseLogServiceImpl implements ExerciseLogService {
 
     @Override
     @Transactional
-    public ExerciseLog addExerciseLogAndUpdateStats(String userId, ExerciseLogReq req) {
+    @EventListener
+    public ExerciseLog addExerciseLogAndUpdateStats(EventExerciseLog event) {
+        String userId = event.getUserId();
+        ExerciseLogReq req = event.getReq();
         // 1. 사용자 캐릭터 조회
         UserCharacter userCharacter = userCharacterRepository.findByUser_UserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자 캐릭터를 찾을 수 없습니다."));

@@ -1,5 +1,6 @@
 package com.ssafy.api.service;
 
+import com.ssafy.api.request.EventExerciseLog;
 import com.ssafy.api.request.ExerciseLogReq;
 import com.ssafy.api.request.ExerciseLogSearchReq;
 import com.ssafy.api.response.ExerciseLogRes;
@@ -12,7 +13,7 @@ public interface ExerciseLogService {
     // 운동 종목의 스탯 조회
     ExerciseStatsRatioRes getStatsByExerciseLog(Long exerciseStatsRatioId);
     // 운동 기록 추가 및 스탯 업데이트
-    ExerciseLog addExerciseLogAndUpdateStats(String userId, ExerciseLogReq request);
+    ExerciseLog addExerciseLogAndUpdateStats(EventExerciseLog event);
     // 운동 기록 조회 옵션
     List<ExerciseLogRes> searchExerciseLog(
             String userId,
