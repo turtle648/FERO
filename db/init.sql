@@ -177,6 +177,23 @@ CREATE TABLE quests (
                         FOREIGN KEY (exercise_id) REFERENCES exercise_stats_ratio(id) ON DELETE RESTRICT
 );
 
+-- 사용자의 스탯 히스토리
+CREATE TABLE user_stats_history (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_character_id BIGINT NOT NULL,
+    arms_stats SMALLINT UNSIGNED NOT NULL,
+    legs_stats SMALLINT UNSIGNED NOT NULL,
+    chest_stats SMALLINT UNSIGNED NOT NULL,
+    abs_stats SMALLINT UNSIGNED NOT NULL,
+    back_stats SMALLINT UNSIGNED NOT NULL,
+    stamina_stats SMALLINT UNSIGNED NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    stats_date DATE NOT NULL,
+    FOREIGN KEY (user_character_id) REFERENCES user_character(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_date_user (user_character_id, stats_date)
+);
+
+
 -- -- -- -- -- 트리거 작업 -- -- -- -- --
 
 
@@ -323,10 +340,71 @@ BEGIN
       AND quest_date = DATE(NEW.exercise_date);
 END IF;
 END //
+DELIMITER;
 
--- 함수 정의
+-- 스탯 히스토리 업데이트 이후 히스토리 갱신
 DELIMITER //
+CREATE TRIGGER after_user_stats_update
+    AFTER UPDATE ON user_stats
+    FOR EACH ROW
+BEGIN
+    DECLARE stats_history_exists INT;
+    DECLARE user_char_id BIGINT;
 
+    -- user_character id 가져오기
+    SELECT id INTO user_char_id
+    FROM user_character
+    WHERE user_id = NEW.user_id;
+
+    -- 오늘 날짜의 히스토리 존재 여부 확인
+    SELECT COUNT(*) INTO stats_history_exists
+    FROM user_stats_history
+    WHERE user_character_id = user_char_id 
+    AND stats_date = CURRENT_DATE;
+
+    IF stats_history_exists = 0 THEN
+        -- 해당 날짜의 기록이 없으면 새로 INSERT
+        INSERT INTO user_stats_history (
+            user_character_id,
+            chest_stats,
+            back_stats,
+            stamina_stats,
+            arms_stats,
+            legs_stats,
+            abs_stats,
+            stats_date
+        ) VALUES (
+            user_char_id,
+            NEW.chest_stats,
+            NEW.back_stats,
+            NEW.stamina_stats,
+            NEW.arms_stats,
+            NEW.legs_stats,
+            NEW.abs_stats,
+            CURRENT_DATE
+        );
+    ELSE
+        -- 해당 날짜의 기록이 있으면 UPDATE
+        UPDATE user_stats_history
+        SET
+            chest_stats = NEW.chest_stats,
+            back_stats = NEW.back_stats,
+            stamina_stats = NEW.stamina_stats,
+            arms_stats = NEW.arms_stats,
+            legs_stats = NEW.legs_stats,
+            abs_stats = NEW.abs_stats,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE 
+            user_character_id = user_char_id
+            AND stats_date = CURRENT_DATE;
+    END IF;
+END //
+DELIMITER ;
+
+
+-- FUNCTION 
+
+DELIMITER //
 -- 레벨별 운동 횟수를 계산하는 함수
 CREATE FUNCTION calculate_exercise_count(user_level INT)
     RETURNS INT
@@ -389,9 +467,9 @@ STARTS CURRENT_DATE + INTERVAL 1 DAY
 DO
 BEGIN
     -- 모든 사용자에 대해 스쿼트 퀘스트만 생성
-INSERT INTO quests (user_id, quest_date, exercise_id, exercise_cnt, real_cnt, message)
+INSERT INTO quests (user_character_id, quest_date, exercise_id, exercise_cnt, real_cnt, message)
 SELECT
-    uc.user_id,
+    uc.id,
     CURRENT_DATE,
     2,  -- 스쿼트의 exercise_id
     calculate_exercise_count(uc.user_level),
@@ -405,7 +483,6 @@ DELIMITER ;
 
 -- 이벤트 스케줄러 활성화 
 SET GLOBAL event_scheduler = ON;
-
 
 -- -- -- -- -- 데이터 삽입 -- -- -- -- --
 
@@ -600,3 +677,8 @@ FROM (
      ) AS users
 ORDER BY RAND()
     LIMIT 50;
+
+INSERT INTO quests (user_character_id, quest_date, quest_time, exercise_id, exercise_cnt, real_cnt, is_completed, message) 
+VALUES 
+('1', '2025-02-12', NULL, '2', '7', '7', '1', '스쿼트를 7번 해주세요!'),
+('1', '2025-02-13', '00:40:53', '2', '7', '2', '0', '스쿼트를 7번 해주세요!');
