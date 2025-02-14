@@ -4,7 +4,6 @@ import MainPage from "@/views/MainPage.vue"
 import LoginPage from "@/views/LoginPage.vue"
 import FitnessTutorialPage from "@/views/FitnessTutorialPage.vue"
 import SingleModePage from "@/views/SingleModePage.vue"
-import MultiModePage from "@/views/MultiModePage.vue"
 // import MediapipeComponent from "@/components/MediapipeComponent.vue" // fix: 수정예정
 import QRComponent from "@/components/QRComponent.vue"
 import RankMatchPage from "@/views/RankMatchPage.vue"
@@ -58,12 +57,6 @@ const routes = [
     path: "/single-mode/:exercise/:count",
     name: "SingleMode",
     component: SingleModePage,
-    props: true,
-  },
-  {
-    path: "/multi-mode/:exercise",
-    name: "MultiMode",
-    component: MultiModePage,
     props: true,
   },
   {

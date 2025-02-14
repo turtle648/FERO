@@ -46,9 +46,7 @@
   <!-- 모달 컴포넌트 -->
   <StatusModal v-if="modals.status" @close-modal="closeModal('status')" @open-modal="openModal('status')"/>
   <SettingModal v-if="modals.setting" @close-modal="closeModal('setting')" @open-modal="openModal('setting')" />
-  <AlarmModal v-if="modals.alarm" @close-modal="closeModal('alarm')" @open-modal="openModal('alarm')" />
   <CharacterModal v-if="modals.character" @close-modal="closeModal('character')" @open-modal="openModal('character')" />
-  <FriendListModal v-if="modals.friend" @close-modal="closeModal('friend')" @open-modal="openModal('friend')" />
   <CalendarModal v-if="modals.calendar" @close-modal="closeModal('calendar')" @open-modal="openModal('calendar')" />
   <FitnessModal v-if="modals.fitness" @close-modal="closeModal('fitness')" @open-modal="openModal('fitness')" />
   <MatchRecordModal v-if="modals.record" @close-modal="closeModal('record')" @open-modal="openModal('record')" />
@@ -67,9 +65,7 @@ import { assets } from '@/assets.js'
 
 import StatusModal from "@/components/modal/StatusModal.vue"
 import SettingModal from "@/components/modal/SettingModal.vue"
-import AlarmModal from "@/components/modal/AlarmModal.vue"
 import CharacterModal from "@/components/modal/CharacterModal.vue"
-import FriendListModal from "@/components/modal/FriendListModal.vue"
 import CalendarModal from "@/components/modal/CalendarModal.vue"
 import FitnessModal from "@/components/modal/FitnessModal.vue"
 import MatchRecordModal from "@/components/modal/MatchRecordModal.vue"
@@ -97,7 +93,7 @@ watchEffect(() => {
 
 
 // 모달 상태 및 관리 메서드 ========================================
-const modals = ref({ status: false, record: false, setting: false, friend: false, calendar: false, fitness: false, alarm: false, character: false, quest: false, })
+const modals = ref({ status: false, record: false, setting: false, calendar: false, fitness: false, character: false, quest: false, })
 const isAnyModalOpen = computed(() => Object.values(modals.value).some(v => v))
 const openModal = (type) => { if (!isAnyModalOpen.value) modals.value[type] = true }
 const closeModal = (type) => { modals.value[type] = false }
