@@ -1,6 +1,6 @@
--- DROP DATABASE IF EXISTS E103_DB;
+DROP DATABASE IF EXISTS E103_DB;
 
--- CREATE DATABASE E103_DB;
+CREATE DATABASE E103_DB;
 
 USE E103_DB;
 
@@ -138,6 +138,22 @@ CREATE TABLE user_tutorial_progress (
                                         completed_at TIMESTAMP,
                                         FOREIGN KEY (user_id) REFERENCES user_info(user_id) ON DELETE CASCADE,
                                         FOREIGN KEY (tutorial_id) REFERENCES tutorial_types(id)
+);
+
+
+-- 유저간의 친구정보에 대한 테이블
+CREATE TABLE friends (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id VARCHAR(30) NOT NULL,
+    friend_id VARCHAR(30) NOT NULL,
+    friend_nickname VARCHAR(15),
+    friend_level INT NOT NULL,
+    status VARCHAR(10) CHECK (status IN ('pending', 'accepted', 'blocked')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    -- updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES user_info(user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_friend FOREIGN KEY (friend_id) REFERENCES user_info(user_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_friendship (user_id, friend_id)
 );
 
 
@@ -386,13 +402,13 @@ DELIMITER ;
 DELIMITER //
 CREATE EVENT daily_quest_creation
 ON SCHEDULE EVERY 1 DAY
-STARTS CURRENT_DATE + INTERVAL 1 DAY
+STARTS TIMESTAMP(CURRENT_DATE + INTERVAL 1 DAY, '09:50:00')
 DO
 BEGIN
     -- 모든 사용자에 대해 스쿼트 퀘스트만 생성
-INSERT INTO quests (user_id, quest_date, exercise_id, exercise_cnt, real_cnt, message)
+INSERT INTO quests (user_character_id, quest_date, exercise_id, exercise_cnt, real_cnt, message)
 SELECT
-    uc.user_id,
+    uc.id,
     CURRENT_DATE,
     2,  -- 스쿼트의 exercise_id
     calculate_exercise_count(uc.user_level),
@@ -471,8 +487,6 @@ INSERT INTO user_character (user_id, user_nickname, gender, avatar, user_level, 
     ('joo345', 'JiHoonJjang', 'M', '3-9-2', 7, 150, 1800),
     ('ryu456', 'JunYeolBest', 'M', '8-2-4', 4, 101, 900),
     ('kwon567', 'SangWooPower', 'M', '7-6-1', 5, 139, 1400);
-
-
 
 
 TRUNCATE TABLE user_rank_scores;
@@ -601,6 +615,7 @@ FROM (
      ) AS users
 ORDER BY RAND()
     LIMIT 50;
+
 
 INSERT INTO quests (user_character_id, quest_date, quest_time, exercise_id, exercise_cnt, real_cnt, is_completed, message)
 VALUES
