@@ -30,6 +30,8 @@ import io.swagger.annotations.ApiResponses;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -101,6 +103,28 @@ public class UserStatsController {
         }
 
         return ResponseEntity.ok(userCharacter.getUserExperience().intValue());
+    }
+
+    @GetMapping("/history")
+    @ApiOperation(value = "캐릭터 월별 스탯 히스토리 조회", notes = "특정 연도와 월의 캐릭터 스탯 히스토리를 일자별로 조회할 수 있다.")
+    public ResponseEntity<?> getMonthlyHistory(
+            HttpServletRequest request,
+            @RequestParam @ApiParam(value = "조회할 연도", example = "2024") int year,
+            @RequestParam @ApiParam(value = "조회할 월(1-12)", example = "2") int month) {
+
+        String token = request.getHeader("Authorization");
+        String userId = JwtTokenUtil.getUserIdFromJWT(token);
+
+        // user_character_id 조회
+        UserCharacter userCharacter = userCharacterService.getUserCharacterByUserId(userId);
+        if (userCharacter == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        // 스탯 히스토리 조회 결과를 담을 응답 객체
+        List<Map<String, Object>> response = userStatsService.getMonthlyStatsHistory(userCharacter.getId(), year, month);
+
+        return ResponseEntity.ok(response);
     }
 
 
