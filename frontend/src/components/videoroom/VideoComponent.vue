@@ -203,15 +203,16 @@ const handleWebSocketMessage = async (event) => {
   switch (message.type) {
     case "info": {
       console.log("info 도착:: " + message.room + "," + message.peerToken);
-
+      console.log('기존의 피어토큰', peerToken.value)
+      console.log('info 도착:: 받은 피어토큰', message.peerToken)
       // 첫 번째 info 메시지인 경우
       roomId.value = message.room;
-      peerToken.value = message.peerToken;
+      peerToken.value = message.peerToken || peerToken.value
 
       // final 메시지 전송 후의 info 메시지인 경우
       if (needToSendFinal.value === false && roomId.value) {
         console.log("최종 info 메시지 수신, 정리 작업 시작");
-        cleanupAndNavigate(message.room, message.peerToken);
+        cleanupAndNavigate(message.room, peerToken.value);
         return;
       }
 
