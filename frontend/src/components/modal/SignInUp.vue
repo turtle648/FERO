@@ -29,7 +29,7 @@
         <hr>
         
         <div class="social-login">
-          <img class="social-login-icon" src="@/assets/images/icon/kakao-talk-icon.png" alt="카카오톡" @click="handleSocialLogin('kakao')">
+          <img class="social-login-icon" src="@/assets/images/icon/kakao-talk-icon.png" alt="카카오톡" @click="handleSocialLogIn('kakao')">
           <img class="social-login-icon" src="@/assets/images/icon/google-icon.png">
           <img class="social-login-icon" src="@/assets/images/icon/facebook-icon.png">
           <img class="social-login-icon" src="@/assets/images/icon/instagram-icon.png">
@@ -125,7 +125,6 @@
 <script setup>
 import { ref, watchEffect, defineEmits } from 'vue'
 import { useRouter } from 'vue-router'
-import { login, checkEmailDuplicateAPI, sendEmail, signUp, verifyEmail, registerCharacter} from '@/api/accountAPI'
 import { useUserStore } from '@/stores/store'
 
 const emit = defineEmits(['close'])
@@ -169,7 +168,7 @@ const resetFields = () => {
 // 로그인 API 호출
 const handleSubmit = async () => {
   try {
-    const result = await login(id.value, password.value)
+    const result = await userStore.logIn(id.value, password.value)
     if (result) { 
       userStore.setAccessToken(result)
       router.push('/main') 
@@ -179,19 +178,19 @@ const handleSubmit = async () => {
 
 // 이메일 중복확인 API
 const checkEmailDuplicate = (email) => {
-  checkEmailDuplicateAPI(email)
+  userStore.checkEmailDuplicateAPI(email)
     .then((result) => {
       if (result) {
         isEmailAvailable.value = true
         alert('이메일 중복확인이 완료되었습니다. 인증코드를 입력해주세요.')
-        sendEmail(email)
+        userStore.sendEmail(email)
       }
     })
 }
 
 // 인증 코드 확인 후 2페이지로 이동
 const handleSignUp1 = async () => {
-  const result = await verifyEmail(emailConfirmCode.value, email.value)
+  const result = await userStore.verifyEmail(emailConfirmCode.value, email.value)
   if (result) { signUpPage.value = 2} 
   else { alert('인증 코드가 유효하지 않습니다. 다시 시도해주세요.')}
 }
@@ -205,7 +204,7 @@ const handleSignUp2 = () => {
     alert('이메일 중복체크를 진행해 주세요.')
     return
   } else {
-    signUp(id.value, password.value, name.value, phone.value, email.value)
+    userStore.signUp(id.value, password.value, name.value, phone.value, email.value)
       .then((result) => {
         userStore.setSessionId(result.message) // Pinia에서 sessionId 설정
         signUpPage.value = 3
@@ -214,7 +213,7 @@ const handleSignUp2 = () => {
 }
 
 const handleSignUp3 = async () => {
-  const result = await registerCharacter(gender.value, userNickname.value, avatar.value, userStore.sessionId)
+  const result = await userStore.registerCharacter(gender.value, userNickname.value, avatar.value, userStore.sessionId)
   if (result) {
     alert('회원가입이 완료되었습니다.')
   }
@@ -224,7 +223,7 @@ const handleSignUp3 = async () => {
 const selectCharacter = (gen) => { gender.value = gen}
 
 
-const handleSocialLogin = (platform) => { alert(`${platform} 소셜 로그인! 미구현`) }
+const handleSocialLogIn = (platform) => { alert(`${platform} 소셜 로그인! 미구현`) }
 
 const openSignUp = () => { isSignUpMode.value = true; resetFields(); }
 
