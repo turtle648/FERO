@@ -501,6 +501,8 @@ INSERT INTO tutorial_types (id, tutorial_name) VALUES
     (2, 'squat'),
     (3, 'lunge'),
     (4, 'plank'),
+    (97, 'Start'),
+    (98, 'MainPage'),
     (99, 'UI');
 
 -- user_info 더미 데이터 (20명, 모든 비밀번호는 '1234')
