@@ -45,6 +45,7 @@ const emit = defineEmits(['setCount', 'getTimeLeft'])
 const props = defineProps(['command'])
 const result = ref('')
 watch(() => props.command, (newCommand) => {
+  console.log(newCommand, '명령받음')
   if (newCommand) {
     showModal.value = true
     result.value = newCommand
