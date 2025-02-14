@@ -13,6 +13,7 @@
       <button @click="completeFitnessSingle" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">확인</button>
     </div>
     <div v-if="mode === 'rank'">랭크모드 결과!</div>
+    {{ Result }}
   </div>
 </template>
 
@@ -29,6 +30,7 @@ const mode = ref('')
 // 부모로부터 count를 props로 받음
 defineProps({
   count: Number,
+  result: Object,
 })
 
 const completeFitnessTutorial = async () => {

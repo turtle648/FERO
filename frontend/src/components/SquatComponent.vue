@@ -10,7 +10,7 @@
       <div v-if="showGreat" class="great-message text-red text-3xl">Great!</div>
     </div>
     <MediapipeComponent @get-Time="getTime" @pose-detected="processPose" @open-modal="openModal" class="z-0" />
-    <CompleteModal v-if="showModal" :count="count" class="z-99" />
+    <CompleteModal v-if="showModal" :result="result" :count="count" class="z-50" />
 
     <div v-if="showErrorModal" class="landmark-error-modal z-20">전신이 나오도록 카메라 위치를 수정해주세요</div>
     <button v-if="isTutorialMode" @click="setCountToThree" class="fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded shadow-lg hover:bg-blue-600 z-50">Set Count to 3</button>
@@ -18,11 +18,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineEmits } from "vue"
+import { ref, watch, onMounted, defineEmits, defineProps } from "vue"
 import MediapipeComponent from "@/components/MediapipeComponent.vue"
 import CompleteModal from "@/components/modal/CompleteModal.vue"
 
-// 상태 변수 정의
+// 상태 변수 e
 const count = ref(0)
 const isDown = ref(false)
 const feedback = ref("준비중...")
@@ -34,7 +34,7 @@ const showSpinner = ref(true) // 로딩 스피너 상태 변수
 const isTutorialMode = window.location.href.includes("tutorial")
 // const isSingleMode = window.location.href.includes("single-mode")
 
-const emit = defineEmits(['setCount', 'getTimeLeft']);
+const emit = defineEmits(['setCount', 'getTimeLeft'])
 // 모드 리턴
 // const getMode = () => {
 //   if (isTutorialMode) return "Tutorial Mode"
@@ -42,10 +42,20 @@ const emit = defineEmits(['setCount', 'getTimeLeft']);
 //   return "Unknown Mode"
 // }
 
+const props = defineProps(['command'])
+const result = ref('')
+watch(() => props.command, (newCommand) => {
+  if (newCommand) {
+    showModal.value = true
+    result.value = newCommand
+  }
+})
+
 const getTime = (value) => {
   console.log();
   emit('getTimeLeft', value)
 }
+
 
 // 필수 랜드마크 정의
 const requiredLandmarks = [0, 1, 2, 3, 4, 5, 6, 27, 28, 29, 30, 31, 32]
