@@ -22,8 +22,6 @@
     <!-- 랭크모드 결과 -->
     <div v-if="mode === 'rank'" class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center">
       <p class="text-lg font-bold mb-4">랭크모드 결과!</p>
-      <p>{{ userStore.accessToken }}</p>
-      
       <div v-if="isLoading" class="flex justify-center items-center">
         <svg class="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -31,7 +29,32 @@
         </svg>
       </div>
 
-      <p v-else-if="rankResult">{{ rankResult }}</p>
+      <div v-else-if="rankResult">
+        <p>{{ rankResult.body }}</p>
+        <hr>
+        <p class="text-lg font-bold">
+          {{
+            rankResult.body.userScore > rankResult.body.opponentScore ? "승리" :
+            rankResult.body.userScore < rankResult.body.opponentScore ? "패배" :
+            "무승부"
+          }}
+        </p>
+        <p>{{ rankResult.body.userId }} vs {{ rankResult.body.opponentId }}</p>
+        <p>운동 종류: {{ rankResult.body.exerciseId }}</p>
+        <p>운동 개수: {{ props.count }}</p>
+        <p>랭크 점수 변화: {{ rankResult.body.beforeRankScore }} → {{ rankResult.body.afterRankScore }} ({{ rankResult.body.afterRankScore - rankResult.body.beforeRankScore }})</p>
+        <p>레벨 변화: {{ rankResult.body.beforeUserLevel }} → {{ rankResult.body.afterUserLevel }}</p>
+        <p>경험치 변화: {{ rankResult.body.beforeUserExperience }} → {{ rankResult.body.afterUserExperience }} ({{ rankResult.body.afterUserExperience - rankResult.body.beforeUserExperience }})</p>
+        <p>근력 변화 ==========</p>
+        <ul>
+          <li>팔: {{ rankResult.body.beforeStats.armsStats }} → {{ rankResult.body.afterStats.armsStats }} ({{ rankResult.body.beforeStats.armsStats - rankResult.body.afterStats.armsStats }})</li>
+          <li>다리: {{ rankResult.body.beforeStats.legsStats }} → {{ rankResult.body.afterStats.legsStats }} ({{ rankResult.body.beforeStats.legsStats - rankResult.body.afterStats.legsStats }})</li>
+          <li>가슴: {{ rankResult.body.beforeStats.chestStats }} → {{ rankResult.body.afterStats.chestStats }} ({{ rankResult.body.beforeStats.chestStats - rankResult.body.afterStats.chestStats }})</li>
+          <li>복부: {{ rankResult.body.beforeStats.absStats }} → {{ rankResult.body.afterStats.absStats }} ({{ rankResult.body.beforeStats.absStats - rankResult.body.afterStats.absStats }})</li>
+          <li>등: {{ rankResult.body.beforeStats.backStats }} → {{ rankResult.body.afterStats.backStats }} ({{ rankResult.body.beforeStats.backStats - rankResult.body.afterStats.backStats }})</li>
+          <li>지구력: {{ rankResult.body.beforeStats.staminaStats }} → {{ rankResult.body.afterStats.staminaStats }} ({{ rankResult.body.beforeStats.staminaStats - rankResult.body.afterStats.staminaStats }})</li>
+        </ul>
+      </div>
       
       <p v-else class="text-red-500">랭크 결과를 불러오지 못했습니다.</p>
       
