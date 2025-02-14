@@ -30,15 +30,13 @@
       </div>
 
       <div v-else-if="rankResult">
-        <p>{{ rankResult.body }}</p>
-        <hr>
-        <p class="text-lg font-bold">
+        <h2 class="text-lg font-bold">
           {{
             rankResult.body.userScore > rankResult.body.opponentScore ? "승리" :
             rankResult.body.userScore < rankResult.body.opponentScore ? "패배" :
             "무승부"
           }}
-        </p>
+        </h2>
         <p>{{ rankResult.body.userId }} vs {{ rankResult.body.opponentId }}</p>
         <p>운동 종류: {{ rankResult.body.exerciseId }}</p>
         <p>운동 개수: {{ props.count }}</p>
