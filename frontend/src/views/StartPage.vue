@@ -1,42 +1,22 @@
 <template>
   <div class="fixed inset-0 flex flex-col justify-center items-center overflow-hidden">
-    <audio ref="audioPlayer" loop>
-      <source :src="require('@/assets/background_music.mp3')" type="audio/mp3">
-    </audio>
     <!-- 배경 이미지 -->
-    <img 
-      src="@/assets/images/background_startpage.png" 
-      alt="배경이미지 로딩 에러" 
-      class="absolute inset-0 w-full h-full object-cover -z-10"
-    >
+    <img src="@/assets/images/background_startpage.png" alt="배경이미지 로딩 에러" class="absolute inset-0 w-full h-full object-cover -z-10" />
     <!-- 로고 이미지 -->
     <div class="absolute top-[35%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex justify-center">
-      <img 
-        src="@/assets/images/logo.png" 
-        alt="로고 이미지" 
-        class="w-[80%] max-w-4xl"
-      >
+      <img src="@/assets/images/logo.png" alt="로고 이미지" class="w-[80%] max-w-4xl" />
     </div>
     <!-- 시작 버튼 -->
-    <button 
+    <button
       @click="goToMain"
-      class="fixed bottom-[5%] left-1/2 -translate-x-1/2 
-        px-8 py-4 whitespace-nowrap
-        font-['Press_Start_2P'] text-2xl text-white
-        bg-transparent border-none cursor-pointer
-        tracking-wider leading-none
-        hover:scale-105 active:scale-95
-        transition-all duration-200 ease-in-out
-        text-shadow-pixel animate-blink
-        sm:text-xl sm:px-6 sm:py-3
-        xs:text-lg xs:px-4 xs:py-2"
+      class="fixed bottom-[5%] left-1/2 -translate-x-1/2 px-8 py-4 whitespace-nowrap font-['Press_Start_2P'] text-2xl text-white bg-transparent border-none cursor-pointer tracking-wider leading-none hover:scale-105 active:scale-95 transition-all duration-200 ease-in-out text-shadow-pixel animate-blink sm:text-xl sm:px-6 sm:py-3 xs:text-lg xs:px-4 xs:py-2"
     >
-      press here to <span class="text-yellow-300">START</span>
+      press here to
+      <span class="text-yellow-300">START</span>
     </button>
     <SignInUp v-if="showModal" @close="closeModal" />
   </div>
 </template>
-
 
 <style scoped>
 /* 전체 페이지 스크롤 방지 */
@@ -53,7 +33,8 @@ body {
 }
 
 @keyframes blink {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -66,11 +47,7 @@ body {
 }
 
 .text-shadow-pixel {
-  text-shadow: 
-    2px 2px 0 #000,
-    -2px -2px 0 #000,
-    2px -2px 0 #000,
-    -2px 2px 0 #000;
+  text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
 }
 
 /* 반응형 스타일 */
@@ -106,16 +83,16 @@ body {
 </style>
 
 <script setup>
-import '@fontsource/press-start-2p'
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
-import SignInUp from '@/components/modal/SignInUp.vue'
+import "@fontsource/press-start-2p"
+import { ref, onMounted, onUnmounted, nextTick } from "vue"
+import { useRouter } from "vue-router"
+import SignInUp from "@/components/modal/SignInUpModal.vue"
 
 const router = useRouter()
 const showModal = ref(false)
 const audioPlayer = ref(null)
 
-const token = localStorage.getItem('authToken')
+const token = localStorage.getItem("authToken")
 
 const goToMain = async () => {
   if (!token) {
@@ -123,31 +100,30 @@ const goToMain = async () => {
     await nextTick()
   } else {
     try {
-      await router.push('/main')
+      await router.push("/main")
     } catch (error) {
-      console.error('라우팅 에러:', error)
+      console.error("라우팅 에러:", error)
     }
   }
 }
 
-const closeModal = () => { 
-  showModal.value = false 
+const closeModal = () => {
+  showModal.value = false
 }
 
 const playMusic = async () => {
   await nextTick()
   if (audioPlayer.value) {
-    audioPlayer.value.play()
-      .catch(error => console.log('음악 재생 실패:', error))
+    audioPlayer.value.play().catch((error) => console.log("음악 재생 실패:", error))
   }
 }
 
 onMounted(() => {
-  document.addEventListener('click', playMusic, { once: true })
+  document.addEventListener("click", playMusic, { once: true })
 })
 
 onUnmounted(() => {
-  document.removeEventListener('click', playMusic)
+  document.removeEventListener("click", playMusic)
   if (audioPlayer.value) {
     audioPlayer.value.pause()
   }

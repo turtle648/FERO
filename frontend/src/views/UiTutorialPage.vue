@@ -7,10 +7,6 @@
       <!-- 우측 상단: 타이머 -->
       <div class="absolute top-4 right-4 text-lg text-white font-bold p-2">00:00</div>
 
-      <!-- 중앙: 제목 -->
-      <!-- 컴퓨터 이미지 -->
-      <img class="w-2/3 h-auto absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" src="@/assets/furni_1.png" alt="" />
-
       <!-- 하단 중앙: 종료 버튼 -->
       <ExitButton class="absolute bottom-4 left-1/2 transform -translate-x-1/2" />
 

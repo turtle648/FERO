@@ -1,15 +1,14 @@
 import { createRouter, createWebHistory } from "vue-router"
 import StartPage from "@/views/StartPage.vue"
 import MainPage from "@/views/MainPage.vue"
-import LoginPage from "@/views/LoginPage.vue"
 import FitnessTutorialPage from "@/views/FitnessTutorialPage.vue"
 import SingleModePage from "@/views/SingleModePage.vue"
-// import MediapipeComponent from "@/components/MediapipeComponent.vue" // fix: 수정예정
 import QRComponent from "@/components/QRComponent.vue"
 import RankMatchPage from "@/views/RankMatchPage.vue"
 import UiTutorialPage from "@/views/UiTutorialPage.vue"
 import TestVoice from "@/components/voice/testVoice.vue"
 import RankMatchResultPage from "@/views/RankMatchResultPage.vue"
+
 // 랭크매치, 랭크모드에 인증 관련 메타데이터 고려해볼 것
 // meta: {
 //   requiresAuth: true,  // 인증 필요
@@ -36,23 +35,11 @@ const routes = [
     meta: { isMobile: true },
   },
   {
-    path: "/login",
-    name: "Login",
-    component: LoginPage,
-    meta: { isMobile: true },
-  },
-  {
     path: "/tutorial/:exercise",
     name: "Tutorial",
     component: FitnessTutorialPage,
     meta: { isMobile: true },
   },
-  // {
-  //   path: "/mediapipe",
-  //   name: "Mediapipe",
-  //   component: MediapipeComponent,
-  //   meta: { isMobile: true },
-  // },
   {
     path: "/single-mode/:exercise/:count",
     name: "SingleMode",
