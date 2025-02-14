@@ -23,8 +23,18 @@
     <div v-if="mode === 'rank'" class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center">
       <p class="text-lg font-bold mb-4">랭크모드 결과!</p>
       <p>{{ userStore.accessToken }}</p>
-      <p v-if="rankResult">{{ rankResult }}</p>
+      
+      <div v-if="isLoading" class="flex justify-center items-center">
+        <svg class="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+      </div>
+
+      <p v-else-if="rankResult">{{ rankResult }}</p>
+      
       <p v-else class="text-red-500">랭크 결과를 불러오지 못했습니다.</p>
+      
       <button @click="completeFitnessRank" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
         확인
       </button>
@@ -45,19 +55,20 @@ const mainStore = useMainStore()
 const userStore = useUserStore()
 const mode = ref('')
 const rankResult = ref('')
+const isLoading = ref(false)  // 로딩 상태
 
 const props = defineProps({
   count: Number,
   result: Object,
 })
 
-// result가 변경될 때 로그 출력
+// result가 변경될 때 API 호출
 watch(() => props.result, (newResult) => {
   if (newResult) {
     console.log("Updated result:", newResult)
     fetchRankResult()
   }
-}, { immediate: false })  // 처음 마운트될 때 실행되지 않도록 설정
+}, { immediate: false })
 
 const completeFitnessTutorial = async () => {
   await mainStore.loadTutorial()
@@ -78,28 +89,35 @@ const completeFitnessTutorial = async () => {
 const completeFitnessSingle = () => { router.push({ name: 'Main' }) }
 const completeFitnessRank = () => { router.push({ name: 'Main' }) }
 
+// 랭크 결과 API 호출 (최대 3번 재시도)
 const fetchRankResult = async () => {
-  console.log('프롭데이터:', props)
-  console.log('props.result: ', props.result)
-  console.log('props.result.roomId: ', props.result.roomId)
-  console.log('props.result.peerToken: ', props.result.peerToken)
-  console.log('userStore.accessToken: ', userStore.accessToken)
+  let attempts = 0
+  isLoading.value = true  // 로딩 시작
 
-  try {
-    const payload = {
-      gameId: props.result.roomId,
-      opponentToken: props.result.peerToken,
-      userToken: userStore.accessToken,
+  while (attempts < 3) {
+    try {
+      const payload = {
+        gameId: props.result.roomId,
+        opponentToken: props.result.peerToken,
+        userToken: userStore.accessToken,
+      }
+      console.log(`Rank Match API Request (Attempt ${attempts + 1}):`, payload)
+
+      const response = await axios.post('https://i12e103.p.ssafy.io:8076/api/v1/matching/endGame', payload)
+      console.log("Rank Match Response:", response.data)
+
+      rankResult.value = response.data ?? "결과를 불러올 수 없습니다."
+      isLoading.value = false  // 로딩 종료
+      return
+    } catch (error) {
+      attempts++
+      console.error(`Error fetching rank match result (Attempt ${attempts}):`, error.response?.data || error)
+
+      if (attempts >= 3) {
+        rankResult.value = "API 호출 중 오류 발생."
+        isLoading.value = false  // 로딩 종료
+      }
     }
-    console.log("Sending Rank Match API Request:", payload)
-
-    const response = await axios.post('https://i12e103.p.ssafy.io:8076/api/v1/matching/endGame', payload)
-    
-    console.log("Rank Match Response:", response.data)
-    rankResult.value = response.data ?? "결과를 불러올 수 없습니다."
-  } catch (error) {
-    console.error("Error fetching rank match result:", error.response?.data || error)
-    rankResult.value = "API 호출 중 오류 발생."
   }
 }
 
