@@ -54,7 +54,7 @@
   <MatchRecordModal v-if="modals.record" @close-modal="closeModal('record')" @open-modal="openModal('record')" />
   <QuestModal v-if="modals.quest" @close-modal="closeModal('quest')" @open-modal="openModal('quest')" />
   <!-- 백그라운드 음성인식 -->
-  <SpeechRecognitionHandler @voice-control="modalControl" />
+  <!-- <SpeechRecognitionHandler @voice-control="modalControl" /> -->
 </template>
 
 <script setup>
@@ -74,7 +74,7 @@ import CalendarModal from "@/components/modal/CalendarModal.vue"
 import FitnessModal from "@/components/modal/FitnessModal.vue"
 import MatchRecordModal from "@/components/modal/MatchRecordModal.vue"
 import QuestModal from "@/components/modal/QuestModal.vue"
-import SpeechRecognitionHandler from "@/components/voice/SpeechRecognitionHandler.vue"
+// import SpeechRecognitionHandler from "@/components/voice/SpeechRecognitionHandler.vue"
 
 // 스토어 가져오기 ==================================================
 const userDataStore = useUserDataStore()
@@ -101,22 +101,22 @@ const modals = ref({ status: false, record: false, setting: false, friend: false
 const isAnyModalOpen = computed(() => Object.values(modals.value).some(v => v))
 const openModal = (type) => { if (!isAnyModalOpen.value) modals.value[type] = true }
 const closeModal = (type) => { modals.value[type] = false }
-const modalControl = (type) => {
-  if (type === "close") {
-    // 모든 모달 종료
-    modals.value = { status: false, record: false, setting: false, friend: false, calendar: false, fitness: false, alarm: false, character: false, quest: false, }    
-  } else if (isAnyModalOpen.value) {
-    const activeModal = Object.keys(modals.value).find(key => modals.value[key]) || null
-    if (activeModal === type) { 
-      modals.value[type] = false 
-    } else { 
-      modals.value[activeModal] = false
-      modals.value[type] = true
-     }
-  } else { 
-    modals.value[type] = true
-  }
-}
+// const modalControl = (type) => {
+//   if (type === "close") {
+//     // 모든 모달 종료
+//     modals.value = { status: false, record: false, setting: false, friend: false, calendar: false, fitness: false, alarm: false, character: false, quest: false, }    
+//   } else if (isAnyModalOpen.value) {
+//     const activeModal = Object.keys(modals.value).find(key => modals.value[key]) || null
+//     if (activeModal === type) { 
+//       modals.value[type] = false 
+//     } else { 
+//       modals.value[activeModal] = false
+//       modals.value[type] = true
+//      }
+//   } else { 
+//     modals.value[type] = true
+//   }
+// }
 
 // 유저정보/ 튜토리얼정보 불러오기 ==================================================
 onMounted(async () => {
