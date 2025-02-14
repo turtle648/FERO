@@ -127,29 +127,77 @@ let camera = null
 let pose = null
 
 const onResults = (results) => {
-  if (!canvasElement.value) return
+  if (!canvasElement.value) return;
 
-  const canvasCtx = canvasElement.value.getContext("2d")
-  canvasCtx.save()
-  canvasCtx.clearRect(0, 0, canvasElement.value.width, canvasElement.value.height)
+  const canvasCtx = canvasElement.value.getContext("2d");
+  canvasCtx.save();
+  canvasCtx.clearRect(0, 0, canvasElement.value.width, canvasElement.value.height);
 
-  // 좌우 반전 적용
-  canvasCtx.translate(canvasElement.value.width, 0)
-  canvasCtx.scale(-1, 1)
+  // 좌우 반전 적용 (기본 영상도 반전됨)
+  canvasCtx.translate(canvasElement.value.width, 0);
+  canvasCtx.scale(-1, 1);
 
-  canvasCtx.drawImage(results.image, 0, 0, canvasElement.value.width, canvasElement.value.height)
+  canvasCtx.drawImage(results.image, 0, 0, canvasElement.value.width, canvasElement.value.height);
 
   if (results.poseLandmarks) {
-    // drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
-    //   color: "#00FF00",
-    //   lineWidth: 4,
-    // })
-    // drawLandmarks(canvasCtx, results.poseLandmarks, { color: "#FF0000", lineWidth: 2 })
-    emit("pose-detected", results.poseLandmarks)
+    emit("pose-detected", results.poseLandmarks);
+
+    const landmarks = results.poseLandmarks;
+    const nose = landmarks[0];
+    const leftEar = landmarks[7];
+    const rightEar = landmarks[8];
+    const leftShoulder = landmarks[11];
+    const rightShoulder = landmarks[12];
+    const emoji = "😎";
+
+    if (nose && leftEar && rightEar && leftShoulder && rightShoulder) {
+      const faceX = (nose.x + leftEar.x + rightEar.x) / 3 * canvasElement.value.width;
+      const faceY = (nose.y + leftEar.y + rightEar.y) / 3 * canvasElement.value.height;
+
+      const faceWidth = Math.abs(leftEar.x - rightEar.x) * 2 * canvasElement.value.width;
+      const faceHeight = Math.abs(nose.y - (leftShoulder.y + rightShoulder.y) / 2) * 2 * canvasElement.value.height;
+
+      // ✅ **1. 블러 적용할 영역 설정**
+      canvasCtx.save();
+      canvasCtx.beginPath();
+      canvasCtx.rect(faceX - faceWidth / 2, faceY - faceHeight / 2, faceWidth, faceHeight);
+      canvasCtx.clip();
+
+      // 블러 처리용 오프스크린 캔버스 생성
+      const offscreenCanvas = document.createElement("canvas");
+      offscreenCanvas.width = faceWidth;
+      offscreenCanvas.height = faceHeight;
+      const offscreenCtx = offscreenCanvas.getContext("2d");
+
+      // 블러 영역 복사
+      offscreenCtx.drawImage(
+          results.image,
+          faceX - faceWidth / 2, faceY - faceHeight / 2, faceWidth, faceHeight,
+          0, 0, faceWidth, faceHeight
+      );
+
+      // 블러 필터 적용
+      offscreenCtx.filter = "blur(40px)";
+      offscreenCtx.drawImage(offscreenCanvas, 0, 0);
+
+      // 클립 적용된 부분에 블러 처리된 이미지 그리기
+      canvasCtx.drawImage(offscreenCanvas, faceX - faceWidth / 2, faceY - faceHeight / 2, faceWidth, faceHeight);
+      canvasCtx.restore(); // 클립 영역 해제
+
+      // ✅ **2. 블러 처리 후 이모지 그리기**
+      const earDistance = Math.abs(leftEar.x - rightEar.x) * canvasElement.value.width;
+      const emojiSize = earDistance * 2; // 이모지 크기 자동 조정
+
+      canvasCtx.font = `${emojiSize}px sans-serif`; // 동적 크기 설정
+      canvasCtx.textAlign = "center";
+      canvasCtx.textBaseline = "middle";
+      canvasCtx.fillText(emoji, faceX, faceY);
+    }
   }
 
-  canvasCtx.restore()
-}
+  canvasCtx.restore();
+};
+
 
 onMounted(async () => {
   // setTimeout(() => {
