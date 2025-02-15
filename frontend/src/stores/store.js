@@ -60,6 +60,8 @@ export const useUserStore = defineStore('user', () => {
         { id, password }
       )
       console.log(response.data)
+      localStorage.setItem('authToken', response.data['accessToken'])
+      localStorage.setItem('userId', id)
       return response.data['accessToken']
     } catch (error) {
       console.error(`로그인 요청 중 에러 발생: `, error)
