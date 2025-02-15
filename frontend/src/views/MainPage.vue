@@ -1,7 +1,7 @@
 <template>
   <!-- 배경 이미지 -->
   <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
-    <img src="@/assets/images/background_image3.png" class="w-full h-full object-fill" />
+    <img src="@/assets/images/new_bg4.png" class="w-full h-full object-fill" />
   </div>
 
   <!-- 헤더 -->
@@ -20,10 +20,10 @@
   </header>
 
   <!-- 캐릭터 -->
-  <div class="absolute left-1/2 bottom-[6vh] transform -translate-x-1/2 w-[40vh] h-[50vh] flex items-center justify-center overflow-hidden cursor-pointer" @click="openModal('character')">
-    <img v-if="hair && face && body" :src="face" class="absolute w-[40vh] h-[40vh] top-0" />
-    <img v-if="hair && face && body" :src="hair" class="absolute w-[40vh] h-[40vh] top-0" />
-    <img v-if="hair && face && body" :src="body" class="absolute w-[40vh] h-[40vh] bottom-0" />
+  <div class="absolute left-1/2 bottom-[19vh] transform -translate-x-1/2 w-[30vh] h-[37.5vh] flex items-center justify-center overflow-hidden cursor-pointer" @click="openModal('character')">
+    <img v-if="hair && face && body" :src="face" class="absolute w-[30vh] h-[30vh] top-0" />
+    <img v-if="hair && face && body" :src="hair" class="absolute w-[30vh] h-[30vh] top-0" />
+    <img v-if="hair && face && body" :src="body" class="absolute w-[30vh] h-[30vh] bottom-0" />
     <div v-if="!face && !hair && !body" class="text-gray-500 text-center">캐릭터 없음</div>
   </div>
 

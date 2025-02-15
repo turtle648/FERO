@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div v-if="isWakeWordDetected" class="fixed top-[10vh] right-5 flex items-center space-x-2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-md">
    <MicIcon class="w-6 h-6 text-red-400" />
    <span>명령어 듣는 중...</span>
@@ -160,4 +160,17 @@ if (recognition) {
  recognition.stop();
 }
 })
+</script> -->
+<template>
+  <div>
+
+  </div>
+</template>
+
+<script setup>
+
 </script>
+
+<style lang="scss" scoped>
+
+</style>
