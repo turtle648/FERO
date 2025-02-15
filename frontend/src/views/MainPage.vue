@@ -1,7 +1,7 @@
 <template>
   <!-- 배경 이미지 -->
   <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
-    <img src="@/assets/images/new_bg4.png" class="w-full h-full object-fill" />
+    <img src="@/assets/images/main_background.png" class="w-full h-full object-fill" />
   </div>
 
   <!-- 헤더 -->
@@ -16,25 +16,26 @@
         </div>
       </div>
     </div>
-    <img class="w-[5vh] h-[5vh] object-cover cursor-pointer" @click="openModal('setting')" src="@/assets/images/icon/setting.png" alt="설정" />
+    <!-- <img class="w-[5vh] h-[5vh] object-cover cursor-pointer" @click="openModal('setting')" src="@/assets/images/icon/setting.png" alt="설정" /> -->
   </header>
 
   <!-- 캐릭터 -->
-  <div class="absolute left-1/2 bottom-[19vh] transform -translate-x-1/2 w-[30vh] h-[37.5vh] flex items-center justify-center overflow-hidden cursor-pointer" @click="openModal('character')">
-    <img v-if="hair && face && body" :src="face" class="absolute w-[30vh] h-[30vh] top-0" />
-    <img v-if="hair && face && body" :src="hair" class="absolute w-[30vh] h-[30vh] top-0" />
-    <img v-if="hair && face && body" :src="body" class="absolute w-[30vh] h-[30vh] bottom-0" />
+  <div class="absolute left-1/2 bottom-[8vh] transform -translate-x-1/2 w-[40vh] h-[50vh] flex items-center justify-center overflow-hidden cursor-pointer" @click="openModal('character')">
+    <img v-if="hair && face && body" :src="face" class="absolute w-[40vh] h-[40vh] top-0" />
+    <img v-if="hair && face && body" :src="hair" class="absolute w-[40vh] h-[40vh] top-0" />
+    <img v-if="hair && face && body" :src="body" class="absolute w-[40vh] h-[40vh] bottom-0" />
     <div v-if="!face && !hair && !body" class="text-gray-500 text-center">캐릭터 없음</div>
   </div>
 
   <!-- 하단 메뉴 -->
-  <div class="footer absolute bottom-0 w-full h-[7vh] grid grid-cols-4 bg-white text-center">
+  <div class="footer absolute bottom-0 w-full h-[7vh] grid grid-cols-5 bg-white text-center">
     <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('calendar')">달력</div>
     <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('record')">전적</div>
     <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('fitness')">운동</div>
     <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('quest')">퀘스트</div>
+    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('setting')">설정</div>
   </div>
-
+  
   <!-- 모달 컴포넌트 -->
   <StatusModal v-if="modals.status" @close-modal="closeModal('status')" @open-modal="openModal('status')" />
   <SettingModal v-if="modals.setting" @close-modal="closeModal('setting')" @open-modal="openModal('setting')" />
