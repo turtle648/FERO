@@ -1,131 +1,161 @@
+<!-- StartPage.vue (Page)
+├── API
+│   ├── accountAPI.js
+│   └── userAPI.js
+│
+├── Components
+│   ├── layouts/
+│   │   └── StartPageLayout.vue
+│   │       ├── organisms/
+│   │       │   ├── BackgroundOrganism.vue
+│   │       │   │   ├── molecules/
+│   │       │   │   │   ├── BackgroundImageMolecule.vue
+│   │       │   │   │   │   └── atoms/BaseImageAtom.vue
+│   │       │   │   │   └── BackgroundMusicMolecule.vue
+│   │       │   │   │       └── atoms/AudioAtom.vue
+│   │       │   │   └── assets/musics/background_music.mp3
+│   │       │   │
+│   │       │   ├── LogoOrganism.vue
+│   │       │   │   └── molecules/LogoImageMolecule.vue
+│   │       │   │       ├── atoms/BaseImageAtom.vue
+│   │       │   │       └── assets/images/logo.png
+│   │       │   │
+│   │       │   ├── StartButtonOrganism.vue
+│   │       │   │   ├── molecules/
+│   │       │   │   │   ├── BaseButtonMolecule.vue
+│   │       │   │   │   │   └── atoms/ButtonAtom.vue
+│   │       │   │   │   └── ButtonTextMolecule.vue
+│   │       │   │   │       ├── atoms/TextAtom.vue
+│   │       │   │   │       └── atoms/HighlightedTextAtom.vue
+│   │       │   │   └── assets/fonts/press-start-2p.css
+│   │       │   │
+│   │       │   └── SignInUpModalOrganism.vue
+│   │       │       ├── molecules/
+│   │       │       │   ├── ModalHeaderMolecule.vue
+│   │       │       │   ├── LoginFormMolecule.vue
+│   │       │       │   ├── SocialLoginMolecule.vue
+│   │       │       │   └── SignUpStepFormMolecule.vue
+│   │       │       └── atoms/
+│   │       │           ├── BaseImageAtom.vue
+│   │       │           ├── ButtonAtom.vue
+│   │       │           ├── InputAtom.vue
+│   │       │           ├── LabelAtom.vue
+│   │       │           └── TextAtom.vue
+│   │       │
+│   │       └── assets/images/background_startpage.png
+│   │
+│   └── assets/
+│       ├── images/
+│       │   ├── background_startpage.png
+│       │   ├── logo.png
+│       │   └── icon/
+│       │       ├── kakao-talk-icon.png
+│       │       ├── google-icon.png
+│       │       ├── facebook-icon.png
+│       │       └── sign-up-{1,2,3}.png
+│       │
+│       └── musics/
+│           └── background_music.mp3
+│
+└── Router/
+    └── index.js -->
 <template>
-  <div class="fixed inset-0 flex flex-col justify-center items-center overflow-hidden">
-    <!-- 배경 이미지 -->
-    <img src="@/assets/images/background_startpage.png" alt="배경이미지 로딩 에러" class="absolute inset-0 w-full h-full object-cover -z-10" />
-    <!-- 로고 이미지 -->
-    <div class="absolute top-[35%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex justify-center">
-      <img src="@/assets/images/logo.png" alt="로고 이미지" class="w-[80%] max-w-4xl" />
-    </div>
-    <!-- 시작 버튼 -->
-    <button
-      @click="goToMain"
-      class="fixed bottom-[5%] left-1/2 -translate-x-1/2 px-8 py-4 whitespace-nowrap font-['Press_Start_2P'] text-2xl text-white bg-transparent border-none cursor-pointer tracking-wider leading-none hover:scale-105 active:scale-95 transition-all duration-200 ease-in-out text-shadow-pixel animate-blink sm:text-xl sm:px-6 sm:py-3 xs:text-lg xs:px-4 xs:py-2"
-    >
-      press here to
-      <span class="text-yellow-300">START</span>
-    </button>
-    <SignInUp v-if="showModal" @close="closeModal" />
-  </div>
+  <StartPageLayout
+    :showModal="showModal"
+    @goToMain="goToMain"
+    @closeModal="closeModal"
+    @login="handleLogin"
+    @socialLogin="handleSocialLogin"
+    @signUp="handleSignUp"
+    @verifyEmail="handleEmailVerification"
+    ref="audioPlayerRef"
+  />
 </template>
 
-<style scoped>
-/* 전체 페이지 스크롤 방지 */
-:root {
-  overflow: hidden;
-  height: 100%;
-}
-
-body {
-  overflow: hidden;
-  height: 100%;
-  position: fixed;
-  width: 100%;
-}
-
-@keyframes blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-
-.animate-blink {
-  animation: blink 1.5s infinite;
-}
-
-.text-shadow-pixel {
-  text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
-}
-
-/* 반응형 스타일 */
-@media (max-width: 768px) {
-  .sm\:text-xl {
-    font-size: 1.25rem;
-    line-height: 1.75rem;
-  }
-  .sm\:px-6 {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-  .sm\:py-3 {
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .xs\:text-lg {
-    font-size: 1.125rem;
-    line-height: 1.75rem;
-  }
-  .xs\:px-4 {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-  .xs\:py-2 {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-  }
-}
-</style>
-
 <script setup>
-import "@fontsource/press-start-2p"
-import { ref, onMounted, onUnmounted, nextTick } from "vue"
-import { useRouter } from "vue-router"
-import SignInUp from "@/components/modal/SignInUpModal.vue"
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
+import StartPageLayout from '@/components/layouts/StartPageLayout.vue'
+import { login, signUp, verifyEmail } from '@/api/accountAPI'
 
 const router = useRouter()
 const showModal = ref(false)
-const audioPlayer = ref(null)
+const audioPlayerRef = ref(null)
+const token = localStorage.getItem('authToken')
 
-const token = localStorage.getItem("authToken")
-
+// Methods
 const goToMain = async () => {
   if (!token) {
     showModal.value = true
     await nextTick()
   } else {
     try {
-      await router.push("/main")
+      await router.push('/main')
     } catch (error) {
-      console.error("라우팅 에러:", error)
+      console.error('라우팅 에러:', error)
     }
   }
 }
 
-const closeModal = () => {
-  showModal.value = false
+const closeModal = () => { 
+  showModal.value = false 
 }
 
+const handleLogin = async (formData) => {
+  try {
+    const response = await login(formData.id, formData.password)
+    if (response === 200) {
+      await router.push('/main')
+    }
+  } catch (error) {
+    console.error('로그인 에러:', error)
+  }
+}
+
+const handleSocialLogin = async (platform) => {
+  console.log(`${platform} 로그인 시도`)
+  // 소셜 로그인 로직 구현
+}
+
+const handleSignUp = async (formData) => {
+  try {
+    const response = await signUp(formData)
+    if (response.success) {
+      showModal.value = false
+      // 회원가입 성공 처리
+    }
+  } catch (error) {
+    console.error('회원가입 에러:', error)
+  }
+}
+
+const handleEmailVerification = async (email) => {
+  try {
+    const response = await verifyEmail(email)
+    if (response.success) {
+      // 이메일 인증 성공 처리
+    }
+  } catch (error) {
+    console.error('이메일 인증 에러:', error)
+  }
+}
+
+// Audio handling
 const playMusic = async () => {
   await nextTick()
-  if (audioPlayer.value) {
-    audioPlayer.value.play().catch((error) => console.log("음악 재생 실패:", error))
+  if (audioPlayerRef.value) {
+    audioPlayerRef.value.playAudio()
   }
 }
 
 onMounted(() => {
-  document.addEventListener("click", playMusic, { once: true })
+  document.addEventListener('click', playMusic, { once: true })
 })
 
 onUnmounted(() => {
-  document.removeEventListener("click", playMusic)
-  if (audioPlayer.value) {
-    audioPlayer.value.pause()
+  document.removeEventListener('click', playMusic)
+  if (audioPlayerRef.value) {
+    audioPlayerRef.value.pauseAudio()
   }
 })
 </script>
