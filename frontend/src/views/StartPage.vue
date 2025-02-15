@@ -103,9 +103,8 @@ const closeModal = () => {
 
 const handleLogin = async (formData) => {
   try {
-    const response = await login(formData)
-    if (response.success) {
-      localStorage.setItem('authToken', response.token)
+    const response = await login(formData.id, formData.password)
+    if (response === 200) {
       await router.push('/main')
     }
   } catch (error) {

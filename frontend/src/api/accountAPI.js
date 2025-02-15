@@ -10,8 +10,10 @@ export const login = async (id, password) => {
     const response = await axios.post(`${BASE_URL}/auth/login`, 
       { id, password }
     )
+    localStorage.setItem('authToken', response.data['accessToken'])
+    localStorage.setItem('userId', id)
     console.log(response.data)
-    return response.data['accessToken']
+    return response.data['statusCode']
   } catch (error) {
     console.error(`로그인 요청 중 에러 발생: `, error)
     return false
