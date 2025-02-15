@@ -21,10 +21,12 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function clearSession() {
-    accessToken.value = null
-    sessionId.value = null
     localStorage.removeItem('authToken')
     localStorage.removeItem('sessionId')
+    localStorage.removeItem('userId')
+    accessToken.value = null
+    sessionId.value = null
+    userId.value = null
   }
 
   function setUserId(userIdValue) {
@@ -71,7 +73,7 @@ export const useUserStore = defineStore('user', () => {
       const token = accessToken.value;
       if (!token) {
         console.error('로그아웃 실패: 토큰이 없습니다.')
-        return
+        return false
       }
 
       const headers = {

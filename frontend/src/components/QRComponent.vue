@@ -1,6 +1,6 @@
 <template>
   <div class="qr-container">
-    <h2>(나중에 큐알 들어갈 자리)</h2>
+    <img src="@/assets/Fitness_Hero_QR_Code.png" alt="QR Code for Fitness Hero">
   </div>
   <div class="title-container">
     <h1 class="text-title">Hello Tailwind!</h1>
@@ -11,7 +11,7 @@
 
 <style>
 /* Tailwind CSS 클래스 적용 */
-.qr-container {
+/* .qr-container {
   @apply border border-black bg-green-200;
 }
 
@@ -21,5 +21,5 @@
 
 .text-title {
   @apply font-bold underline text-3xl;
-}
+} */
 </style>

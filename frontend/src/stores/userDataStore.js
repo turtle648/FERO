@@ -19,7 +19,10 @@ export const useUserDataStore = defineStore('userData', () => {
   const checkUserInfo = async () => {
     try {
       const token = userStore.accessToken
-      if (!token) return console.error('정보조회 실패: 토큰이 없습니다.')
+      if (!token) {
+        console.log('정보조회 실패: 토큰이 없습니다.')
+        return false
+      }
   
       const headers = {
         Authorization: token, // Bearer 붙이지 않음 (확인 필요)
@@ -48,7 +51,7 @@ export const useUserDataStore = defineStore('userData', () => {
     } catch (error) {
       console.error('유저정보 조회 요청 중 에러 발생: ', error)
       if (error.response) {console.error('에러 응답:', error.response.data)}
-      return 'Error'
+      return false
     }
   }
   
