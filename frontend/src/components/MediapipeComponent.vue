@@ -64,7 +64,7 @@ const router = useRouter()
 
 // 버튼
 import ExitButton from "@/components/button/ExitButton.vue"
-import ReportIssueButton from "@/components/button/ReportIssueButton.vue"
+import ReportIssueButton from "@/components/button/ReportButton.vue"
 
 let intervalId = null // setInterval ID 저장 (타이머 초기화용)
 
