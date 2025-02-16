@@ -3,11 +3,11 @@
     <!-- 중앙 영역 -->
     <div class="start-container flex absolute inset-0 items-center justify-center h-screen z-10">
       <div v-if="countdown > 0" class="countdown text-5xl z-10">{{ countdown }}</div>
-      <div v-else-if="showStartText" class="start-text text-5xl z-10">START</div>
+      <div v-else-if="showStartText" class="start-text text-5xl z-10">START!</div>
     </div>
 
     <!-- 상단 영역 -->
-    <div class="timer-container text-4xl absolute top-4 left-4 z-0">{{ formattedTime }}</div>
+    <div class="timer-container text-4xl absolute top-4 left-4 z-0 nes-btn">{{ formattedTime }}</div>
 
     <!-- 본인 화면 -->
     <!-- <div class="relative w-full h-full flex justify-center items-center overflow-hidden">
@@ -23,7 +23,7 @@
     </div>
 
     <!-- 버튼 영역 -->
-    <div class="button-container flex absolute inset-0 items-end pb-4">
+    <div class="button-container flex absolute inset-0 items-end pb-4 z-30">
       <!-- ExitButton을 하단 중앙에 배치 -->
       <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2">
         <ExitButton @click="stopCameraAndNavigate" />
