@@ -1,12 +1,14 @@
 package com.ssafy.api.handler;
 
-import com.ssafy.api.request.MatchSuccessEvent;
+import com.ssafy.api.request.*;
 import com.ssafy.api.service.MatchingService;
 import com.ssafy.common.model.Message;
+import com.ssafy.common.util.JwtTokenUtil;
 import com.ssafy.common.util.RTCUtil;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -14,12 +16,13 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 
 
 @Slf4j
+@AllArgsConstructor
 public class SignalingHandler extends TextWebSocketHandler {
     // 어떤 방에 어떤 유저가 들어있는지 저장 -> { 방번호 : [ { id : userUUID1 }, { id: userUUID2 }, …], ... }
     private final Map<String, List<Map<String, String>>> roomInfo = new HashMap<>();
@@ -30,6 +33,7 @@ public class SignalingHandler extends TextWebSocketHandler {
     // 세션 정보 저장 -> { userUUID1 : 세션객체, userUUID2 : 세션객체, ... }
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final Map<String, String> tokenWithUid = new HashMap<>();
+    private final Map<String, String> uidWithToken= new HashMap<>();
 
     // 방의 최대 인원수
     private static final int MAXIMUM = 2;
@@ -43,15 +47,13 @@ public class SignalingHandler extends TextWebSocketHandler {
     private static final String MSG_TYPE_CANDIDATE = "candidate";
     // 방 입장 메시지
     private static final String MSG_TYPE_AUTH = "auth";
-
+    private static final String MSG_TYPE_CNT = "count";
+    private static final String MSG_TYPE_FINAL = "final";
+    private final ApplicationEventPublisher eventPublisher;
     // 레디스 삭제할 때 쓸 leaveWaitingRoom
     private final MatchingService matchingService;
     private final ApplicationContext eventHandler;
-    // 직접 생성자 작성
-    public SignalingHandler(MatchingService matchingService, ApplicationContext eventHandler) {
-        this.matchingService = matchingService;
-        this.eventHandler = eventHandler;
-    }
+
 
     // 웹소켓 연결 시
     @Override
@@ -67,12 +69,96 @@ public class SignalingHandler extends TextWebSocketHandler {
 //        log.info("=====================");
 //    }
 
+    public void sendEventScore(String userUUID1, Message message) throws Exception {
+        log.info("🤡 sendEventScore: {}", message);
+        int remainTime = Integer.parseInt(message.getRemainTime());
+
+        String userUUID2 = message.getReceiver();
+        String roomId = userInfo.get(userUUID1);
+        String userToken1 = uidWithToken.get(userUUID1);
+        String userToken2 = uidWithToken.get(userUUID2);
+
+        int userScore1 = Integer.parseInt(message.getMyCount());
+        int userScore2 = Integer.parseInt(message.getPeerCount());
+
+        Long exerciseType = Long.parseLong(message.getExerciseType());
+
+        int result = 0;
+        if(remainTime != 0) {
+            result = 1;
+        }
+        if(remainTime == 0) {
+            if(userScore1 > userScore2) {
+                result = 1;
+            }
+            if(userScore2 > userScore1) {
+                result = 2;
+            }
+        }
+
+
+        log.info("⚠️ exercise result publish :: {}", new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
+        log.info("⚠️ game result publish :: {}", new GameResultReq(exerciseType, roomId, 1, userToken1, userToken2, userScore1, userScore2));
+
+        // 세션 상태 체크 후 메시지 전송
+        WebSocketSession session1 = sessions.get(userUUID1);
+        WebSocketSession session2 = sessions.get(userUUID2);
+
+        try {
+            if (session1 != null && session1.isOpen()) {
+                session1.sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
+                        .type("info")
+                        .room(roomId)
+                        .peerToken(userToken2)
+                        .build())));
+            }
+
+            if (session2 != null && session2.isOpen()) {
+                session2.sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
+                        .type("info")
+                        .room(roomId)
+                        .peerToken(userToken1)
+                        .build())));
+            }
+        } catch (Exception e) {
+            log.error("Error sending info messages: ", e);
+        }
+
+
+        ExerciseLogReq user1LogReq = new ExerciseLogReq();
+        user1LogReq.setExerciseCnt(userScore1);
+        user1LogReq.setExerciseDuration(60);
+        user1LogReq.setExerciseStatsRatioId(exerciseType);
+
+        ExerciseLogReq user2LogReq = new ExerciseLogReq();
+        user2LogReq.setExerciseCnt(userScore2);
+        user2LogReq.setExerciseDuration(60);
+        user2LogReq.setExerciseStatsRatioId(exerciseType);
+
+        log.info("⚠️ user1 log publish :: {} -> {}", JwtTokenUtil.getUserIdFromJWT(userToken1), user1LogReq);
+        log.info("⚠️ user2 log publish :: {} -> {}", JwtTokenUtil.getUserIdFromJWT(userToken2), user2LogReq);
+
+        uidWithToken.keySet().removeIf(entry -> entry.equals(userUUID1));
+        uidWithToken.keySet().removeIf(entry -> entry.equals(userUUID2));
+        tokenWithUid.entrySet().removeIf(entry -> entry.getValue().equals(userUUID1));
+        tokenWithUid.entrySet().removeIf(entry -> entry.getValue().equals(userUUID2));
+
+
+        eventPublisher.publishEvent(new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
+        eventPublisher.publishEvent(new UserIdGameResultReq(exerciseType, roomId, 60, JwtTokenUtil.getUserIdFromJWT(userToken1), JwtTokenUtil.getUserIdFromJWT(userToken2), userScore1, userScore2));
+        eventPublisher.publishEvent(new EventExerciseLog(JwtTokenUtil.getUserIdFromJWT(userToken1), user1LogReq));
+        eventPublisher.publishEvent(new EventExerciseLog(JwtTokenUtil.getUserIdFromJWT(userToken2), user2LogReq));
+    }
+
     @EventListener
     public void matchResult(MatchSuccessEvent event) {
         log.info(">>> ❤️ [ws] 이벤트 리스너 동작!: {}", event);
         String user1 = event.getUserToken1();
         String user2 = event.getUserToken2();
-        String roomId = user1 + user2;
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String now = format.format(date);
+        String roomId = matchingService.makeGameId(user1, now);
 
         try {
             joinRoom(user1, roomId);
@@ -146,8 +232,8 @@ public class SignalingHandler extends TextWebSocketHandler {
         session.sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
                 .type("all_users")
                 .allUsers(originRoomUser)
+                .room(roomId)
                 .sender(userUUID).build())));
-
     }
 
 
@@ -162,11 +248,45 @@ public class SignalingHandler extends TextWebSocketHandler {
             // 유저 uuid 와 roomID 를 저장
             String userUUID = session.getId(); // 유저 uuid
             String roomId = message.getRoom(); // roomId
+            String receiverId;
+            WebSocketSession receiverSession;
             log.info(">>> [ws] 메시지 타입 {}, 보낸 사람 {}", message.getType(), userUUID);
+
 
             // 메시지 타입에 따라서 서버에서 하는 역할이 달라진다
             switch (message.getType()) {
+                case "exercise_complete":
+                    receiverId = message.getReceiver();
+                    receiverSession = sessions.get(receiverId);
+                    if (receiverSession != null && receiverSession.isOpen()) {
+                        receiverSession.sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
+                                .type("exercise_complete")
+                                .sender(message.getSender())
+                                .myCount(message.getMyCount())
+                                .receiver(message.getReceiver())
+                                .build())));
+                    }
 
+                    break;
+
+                case MSG_TYPE_FINAL:
+                    sendEventScore(userUUID, message);
+                    break;
+
+                case MSG_TYPE_CNT:
+                    receiverId = message.getReceiver();
+                    String myCount = message.getMyCount();
+                    log.info(">>> 💯 [ws] {} -> {} 점수 전송: {}", userUUID, receiverId, myCount);
+                    receiverSession = sessions.get(receiverId);
+                    if (receiverSession != null && receiverSession.isOpen()) {
+                        receiverSession.sendMessage(new TextMessage(RTCUtil.getString(Message.builder()
+                                .type(MSG_TYPE_CNT)
+                                .sender(userUUID)
+                                .receiver(receiverId)
+                                .peerCount(myCount)
+                                .build())));
+                    }
+                    break;
                 // 클라이언트에게서 받은 메시지 타입에 따른 signal 프로세스
                 case MSG_TYPE_OFFER:
                 case MSG_TYPE_ANSWER:
@@ -201,6 +321,9 @@ public class SignalingHandler extends TextWebSocketHandler {
                     session.getAttributes().put("exerciseType", message.getExerciseType());
                     log.info("📜 사용자 세션 등록 - session: {}, exerciseType: {}, token: {}",
                             session, message.getExerciseType(), message.getAuth());
+                    uidWithToken.put(session.getId(), message.getAuth());
+                    log.info("📜 사용자 세션 등록 - session: {}, token: {}", session, message.getAuth());
+                    log.info("uidWithToken: {}", uidWithToken.get(session.getId()));
                     break;
                 // 메시지 타입이 잘못되었을 경우
                 default:
@@ -228,7 +351,7 @@ public class SignalingHandler extends TextWebSocketHandler {
                     break;
                 }
             }
-            Long exerciseType = (Long) session.getAttributes().get("exerciseType");
+            Long exerciseType = Long.parseLong(session.getAttributes().get("exerciseType").toString());
 
             // Redis cleanup 수행
             if (token != null && exerciseType != null) {
@@ -240,9 +363,6 @@ public class SignalingHandler extends TextWebSocketHandler {
             String roomId = userInfo.get(userUUID); // roomId
 
             if (roomId != null && userUUID != null) {
-                // 1. Remove user from sessions
-                sessions.remove(userUUID);
-
                 // 2. Remove user from userInfo
                 userInfo.remove(userUUID);
 
@@ -257,9 +377,6 @@ public class SignalingHandler extends TextWebSocketHandler {
                         log.info(">>> [ws] 빈 방이어서 #{}번 방 삭제 완료", roomId);
                     }
                 }
-
-                // 4. Remove user from tokenWithUid
-                tokenWithUid.entrySet().removeIf(entry -> entry.getValue().equals(userUUID));
 
                 // 5. Notify other users in the room about the exit
                 sessions.values().forEach(s -> {

@@ -1,5 +1,6 @@
 const { defineConfig } = require('@vue/cli-service');
 const fs = require('fs');
+const webpack = require('webpack');
 const path = require('path');
 
 const devConfig = {
@@ -11,6 +12,7 @@ const devConfig = {
       key: fs.readFileSync(path.join(__dirname, 'certs/localhost.key')),
       cert: fs.readFileSync(path.join(__dirname, 'certs/localhost.crt')),
     },
+    // https: false,
     port: 5173,
   } : {
     host: '0.0.0.0',
@@ -43,6 +45,13 @@ const devConfig = {
       ],
     },
   },
+  configureWebpack: {
+    plugins: [
+      new webpack.DefinePlugin({
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false), // ✅ Feature flag 명시적 정의
+      }),
+    ],
+  },
 };
 
 const prodConfig = {
@@ -52,7 +61,7 @@ const prodConfig = {
     themeColor: '#2D90A6',
     msTileColor: '#000000',
     manifestOptions: {
-      start_url: '.',
+      start_url: '/',
       display: 'standalone',
       icons: [
         {
@@ -67,6 +76,13 @@ const prodConfig = {
         },
       ],
     },
+  },
+  configureWebpack: {
+    plugins: [
+      new webpack.DefinePlugin({
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false), // ✅ Feature flag 명시적 정의
+      }),
+    ],
   },
 };
 

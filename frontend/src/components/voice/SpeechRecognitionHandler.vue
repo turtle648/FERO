@@ -1,111 +1,163 @@
-<!-- 음성인식 모델 설명
-Hey (수정예정)를 외치면 명령을 입력받을 수 있음.(콘솔창을 통해서 확인가능)
-이후 commands에 있는 명령어 목록을 말하면 해당 기능이 수행됨. 
-
-ex. 
-    1. "Hey"를 외쳐 봅니다.
-    2. 콘솔창에 "명령어 입력 대기 시작 (5초)" 로그가 생성된걸 확인
-    3. 명령어를 외쳐봅니다.(ex. 상태창 )
--->
-
 <template>
-    <div class="hidden"></div> <!-- UI 요소 없음 -->
-  </template>
-  
-  <script setup>
-  import { ref, onMounted, onUnmounted, defineEmits } from "vue"
-  
-  const emit = defineEmits(["voice-control"])
-  
-  const transcript = ref("") // 현재 인식된 텍스트
-  const isListening = ref(false) // 음성 인식 상태
-  const isWaitingCommand = ref(false) // 명령어 대기 상태
-  const timer = ref(0) // 5초 카운트다운
-  let recognition = null
-  let wakeUpTimer = null
-  
-  // 🔹 실행할 명령어 목록 
-  const commands = {
-    "종료": () => emit("voice-control", "close"),
-    "상태": () => emit("voice-control", "status"),
-    "설정": () => emit("voice-control", "setting"),
-    "전적": () => emit("voice-control", "record"),
-    "친구": () => emit("voice-control", "friend"),
-    "달력": () => emit("voice-control", "calendar"),
-    "운동": () => emit("voice-control", "fitness"),
-    "알림": () => emit("voice-control", "alarm"),
-    "캐릭터": () => emit("voice-control", "character"),
-    "퀘스트": () => emit("voice-control", "quest"),    
+     <div v-if="isWakeWordDetected" class="fixed top-[10vh] right-5 flex items-center space-x-2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-md">
+      <MicIcon class="w-6 h-6 text-red-400" />
+      <span>명령어 듣는 중...</span>
+      <div class="relative w-8 h-8">
+        <svg class="absolute top-0 left-0 w-full h-full">
+          <circle
+            class="text-gray-700"
+            stroke="currentColor"
+            stroke-width="4"
+            fill="transparent"
+            r="12"
+            cx="16"
+            cy="16"
+          />
+          <circle
+            class="text-blue-400 transition-all"
+            :style="{ strokeDasharray: '75.4', strokeDashoffset: `${(timer / 5) * 75.4}` }"
+            stroke="currentColor"
+            stroke-width="4"
+            fill="transparent"
+            r="12"
+            cx="16"
+            cy="16"
+          />
+        </svg>
+      </div>
+    </div>
+    <div class="hidden"></div>
+</template>
+
+<script setup>
+import { ref, onMounted, onUnmounted, defineEmits } from "vue";
+
+const emit = defineEmits(["voice-control"]);
+const transcript = ref("");
+const isListening = ref(false);
+const isWakeWordDetected = ref(false);
+const timer = ref(0);
+let recognition = null;
+
+const wakeWord = "파소콘";
+const commands = ["종료","상태","설정","전적","달력","운동","캐릭터","퀘스트"];
+const emits = { "종료": "close", "상태": "status", "설정": "setting", "전적": "record", "달력": "calendar", "운동": "fitness", "캐릭터": "character", "퀘스트": "quest" }
+const sendEmit = (command) => { emit("voice-control", command) }
+
+onMounted(() => {
+  if (!("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
+    console.warn("⚠️ 음성 인식을 지원하지 않는 브라우저입니다.");
+    return;
   }
-  
-  // 🔹 음성 인식 초기화
-  onMounted(() => {
-    if (!("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
-      console.warn("⚠️ 음성 인식을 지원하지 않는 브라우저입니다.")
-      return
-    }
-  
-    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)()
-    recognition.continuous = true
-    recognition.interimResults = false
-    recognition.lang = "ko-KR"
-  
-    recognition.onstart = () => isListening.value = true
-    recognition.onend = () => isListening.value = false
-    recognition.onerror = (event) => console.error("음성 인식 오류:", event)
-  
-    recognition.onresult = (event) => {
-      const finalTranscript = event.results[event.results.length - 1][0].transcript.trim()
-      transcript.value = finalTranscript
-      processSpeech(finalTranscript)
-    }
-  
-    recognition.start() // 🔹 백그라운드에서 계속 듣기
-  })
-  
-  // 🔹 "헤이" 또는 "hey" 감지 → 5초간 명령어 대기
-  const processSpeech = (text) => {
-    if (isWaitingCommand.value) return // 이미 대기 중이면 무시
-  
-    if (/(헤이|해이|hey|hay|Hey|Hay)/.test(text)) {
-      startCommandListening()
+
+  recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.continuous = true;
+  recognition.interimResults = false; // 🔥 최종 결과만 반영
+  recognition.lang = "ko-KR";
+
+  recognition.onstart = () => (isListening.value = true);
+  recognition.onend = () => {
+    isListening.value = false;
+    setTimeout(() => recognition.start(), 500);
+  };
+
+  recognition.onerror = (event) => {
+    console.error("음성 인식 오류:", event);
+    setTimeout(() => recognition.start(), 1000);
+  };
+
+  recognition.onresult = (event) => {
+    let finalTranscript = event.results[event.results.length - 1][0].transcript.trim();
+    transcript.value = normalizeText(finalTranscript);
+    processSpeech(transcript.value);
+  };
+
+  recognition.start();
+});
+
+const processSpeech = (text) => {
+  if (isWakeWordDetected.value) {
+    checkCommand(text);
+    return;
+  }
+
+  const words = text.split(/\s+/); // 단어 단위로 분리
+  for (const word of words) {
+    if (levenshteinDistance(word, wakeWord) <= 2) {
+      console.log(`🟢 웨이크워드 "${word}" 감지!`);
+      startCommandListening();
+      return; // 웨이크워드 감지 시 즉시 종료
     }
   }
-  
-  // 🔹 5초간 명령어 입력 대기
-  const startCommandListening = () => {
-    console.log("🔔 명령어 입력 대기 시작 (5초)")
-    transcript.value = "" // 기존 텍스트 초기화
-    isWaitingCommand.value = true
-    timer.value = 5 // 5초 타이머 시작
-  
-    const countdown = setInterval(() => {
-      timer.value--
-      if (timer.value <= 0) clearInterval(countdown)
-    }, 1000)
-  
-    clearTimeout(wakeUpTimer)
-    wakeUpTimer = setTimeout(() => {
-      executeCommand(transcript.value)
-      isWaitingCommand.value = false
-    }, 5000)
-  }
-  
-  // 🔹 명령어 실행
-  const executeCommand = (text) => {
-    for (const key in commands) {
-      if (text.includes(key)) {
-        commands[key]() // 
-        return
+};
+
+const checkCommand = (text) => {
+  const words = text.split(/\s+/);
+  for (const word of words) {
+    for (const command of commands) {
+      if (levenshteinDistance(word, command) <= 1) {
+        console.log(`✅ 명령어 "${word}" 감지됨!`);
+        executeCommand(command);
+        isWakeWordDetected.value = false
+        return;
       }
     }
-    console.log("⚠️ 인식된 명령어가 없습니다")
   }
-  
-  // 🔹 컴포넌트 제거 시 음성 인식 중지
-  onUnmounted(() => {
-    recognition?.abort()
-    clearTimeout(wakeUpTimer)
-  })
-  </script>
-  
+};
+
+const executeCommand = (command) => {
+  sendEmit(emits[command])
+};
+
+const startCommandListening = () => {
+  console.log("🔔 명령어 입력 대기 시작 (5초)");
+  isWakeWordDetected.value = true;
+  timer.value = 5;
+
+  const countdown = setInterval(() => {
+    timer.value--;
+    if (timer.value <= 0) {
+      clearInterval(countdown);
+      isWakeWordDetected.value = false;
+      console.log("❌ 명령어 대기 종료");
+    }
+  }, 1000);
+};
+
+const normalizeText = (text) => text.replace(/\s+/g, " ").trim();
+
+// 🎯 Levenshtein 거리 계산 함수
+const levenshteinDistance = (a, b) => {
+  const matrix = [];
+  const lenA = a.length;
+  const lenB = b.length;
+
+  if (!lenA) return lenB;
+  if (!lenB) return lenA;
+
+  for (let i = 0; i <= lenA; i++) matrix[i] = [i];
+  for (let j = 0; j <= lenB; j++) matrix[0][j] = j;
+
+  for (let i = 1; i <= lenA; i++) {
+    for (let j = 1; j <= lenB; j++) {
+      if (a.charAt(i - 1) === b.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1, // 삭제
+          matrix[i][j - 1] + 1, // 삽입
+          matrix[i - 1][j - 1] + 1 // 대체
+        );
+      }
+    }
+  }
+  return matrix[lenA][lenB];
+};
+
+onUnmounted(() => {
+  if (recognition) {
+    recognition.onend = null; // 자동 재시작 방지
+    recognition.stop();
+  }
+})
+</script>

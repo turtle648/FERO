@@ -8,5 +8,4 @@ import com.ssafy.db.entity.UserStats;
  */
 public interface UserStatsService {
 	UserStats getUserStats(String userId);
-	UserCharacter getUserLevel(String userId);
 }

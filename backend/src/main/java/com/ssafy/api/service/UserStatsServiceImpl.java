@@ -37,10 +37,6 @@ public class UserStatsServiceImpl implements UserStatsService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 캐릭터 정보를 찾을 수 없습니다."));
     }
 
-    @Override
-    public UserCharacter getUserLevel(String userId) {
-        return null;
-    }
 
     public List<Map<String, Object>> getMonthlyStatsHistory(Long userCharacterId, int year, int month) {
         // 해당 월의 시작일과 종료일 계산
