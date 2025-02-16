@@ -18,7 +18,7 @@ export const useMainStore = defineStore("main", () => {
   const uiTutorialCompleted = ref(false);
 
   const api = axios.create({
-    baseURL: "http://localhost:8076/api/v1",
+    baseURL: "https://i12e103.p.ssafy.io:8076/api/v1",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${authToken.value}`,
