@@ -15,18 +15,18 @@
         <!-- 요소 2 -->
         <div class="status-element status-2">
             <div>
-                전체 승: !!api수정을 통해 받기!! | 총 플레이 수: !!api수정을 통해 받기!! | myBest: !!api수정을 통해 받기!!
+                <!-- 전체 승: !!api수정을 통해 받기!! | 총 플레이 수: !!api수정을 통해 받기!! | myBest: !!api수정을 통해 받기!! -->
             </div>
             <div>
-                월간 승: !!전척api완성후추가!! | 월간 게임 수: !!전척api완성후추가!! | myBest: !!전척api완성후추가!!
+                <!-- 월간 승: !!전척api완성후추가!! | 월간 게임 수: !!전척api완성후추가!! | myBest: !!전척api완성후추가!! -->
             </div>
         </div>
   
         <!-- 요소 3: 퀘스트 달성률, 게이지바 -->
         <div class="status-element status-3">
         <div style="margin-bottom: 2%;">
-            <span style="margin-right: 10%;">미션 클리어 수: !!퀘스트api완성후추가!!</span>
-            <span>월간 클리어 수: !!퀘스트api완성후추가!!</span>
+            <!-- <span style="margin-right: 10%;">미션 클리어 수: !!퀘스트api완성후추가!!</span> -->
+            <!-- <span>월간 클리어 수: !!퀘스트api완성후추가!!</span> -->
         </div>
         <div class="progress-box">
             일일 달성률:
