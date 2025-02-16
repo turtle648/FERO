@@ -42,7 +42,7 @@ import { ref } from "vue"
 import { useRouter, useRoute } from "vue-router"
 import { useMainStore, TUTORIAL_IDS } from "@/stores/mainStore"
 import ExitButton from "@/components/button/ExitButton.vue"
-import ReportIssueButton from "@/components/button/ReportIssueButton.vue"
+import ReportIssueButton from "@/components/button/ReportButton.vue"
 
 const router = useRouter()
 const route = useRoute()

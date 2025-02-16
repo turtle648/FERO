@@ -29,13 +29,23 @@
 
   <!-- 하단 메뉴 -->
   <div class="footer absolute bottom-0 w-full h-[7vh] grid grid-cols-5 bg-white text-center">
-    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('calendar')">달력</div>
-    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('record')">전적</div>
-    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('fitness')">운동</div>
-    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('quest')">퀘스트</div>
-    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('setting')">설정</div>
+    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer flex" @click="openModal('calendar')">
+      <img src="@/assets/images/icon/icon-calendar.png" class="w-[5vh]" />
+    </div>
+    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('record')">
+      <img src="@/assets/images/icon/icon-report.png" class="w-[6vh]" alt="" />
+    </div>
+    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('fitness')">
+      <img src="@/assets/images/icon/icon-fitness.png" class="w-[7vh]" />
+    </div>
+    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('quest')">
+      <img src="@/assets/images/icon/icon-quest.png" class="w-[5vh]" alt="" />
+    </div>
+    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('setting')">
+      <img src="@/assets/images/icon/icon-setting.png" class="w-[5vh]" />
+    </div>
   </div>
-  
+
   <!-- 모달 컴포넌트 -->
   <StatusModal v-if="modals.status" @close-modal="closeModal('status')" @open-modal="openModal('status')" />
   <SettingModal v-if="modals.setting" @close-modal="closeModal('setting')" @open-modal="openModal('setting')" />
@@ -97,15 +107,15 @@ const closeModal = (type) => {
 const modalControl = (type) => {
   if (type === "close") {
     // 모든 모달 종료
-    modals.value = { status: false, record: false, setting: false, friend: false, calendar: false, fitness: false, alarm: false, character: false, quest: false, }
+    modals.value = { status: false, record: false, setting: false, friend: false, calendar: false, fitness: false, alarm: false, character: false, quest: false }
   } else if (isAnyModalOpen.value) {
-    const activeModal = Object.keys(modals.value).find(key => modals.value[key]) || null
+    const activeModal = Object.keys(modals.value).find((key) => modals.value[key]) || null
     if (activeModal === type) {
       modals.value[type] = false
     } else {
       modals.value[activeModal] = false
       modals.value[type] = true
-     }
+    }
   } else {
     modals.value[type] = true
   }
