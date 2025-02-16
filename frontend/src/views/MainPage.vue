@@ -7,7 +7,7 @@
   <!-- 헤더 -->
   <header class="absolute top-0 w-full h-[7vh] bg-green-400 text-white font-bold flex justify-between items-center px-4">
     <div class="flex items-center w-1/2 cursor-pointer" @click="openModal('status')">
-      <img src="@/assets/images/profile/default_profile.png" class="w-[7vh] h-[7vh] rounded-full object-cover" />
+      <img src="@/assets/images/profile/default-image-1.png" class="w-[7vh]" />
       <div class="ml-4 flex-1">
         <div class="text-[2vh]">{{ userInfo.userNickname }}</div>
         <div class="relative w-full h-[2vh] bg-gray-200 rounded-full mt-1">
