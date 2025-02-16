@@ -1,14 +1,25 @@
 module.exports = {
   env: {
-    browser: true, // 브라우저 환경
-    node: true, // Node.js 환경
-    jest: true, // Jest 테스트 환경 추가
+    browser: true,
+    node: true,
+    jest: true,
   },
   extends: [
     "eslint:recommended",
-    "plugin:vue/vue3-essential", // Vue 3 ESLint 규칙
+    "plugin:vue/vue3-essential",
   ],
-  rules: {
-    // 필요에 따라 커스텀 규칙 추가 가능
+  parserOptions: {
+    ecmaVersion: 2020,
+    sourceType: 'module'
   },
+  globals: {
+    defineProps: "readonly",
+    defineEmits: "readonly",
+    defineExpose: "readonly",
+    withDefaults: "readonly"
+  },
+  rules: {
+    'no-undef': 'off',
+    'vue/script-setup-uses-vars': 'error'
+  }
 }

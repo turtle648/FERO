@@ -1,65 +1,4 @@
-<template>
-  <!-- 배경 이미지 -->
-  <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
-    <img src="@/assets/images/bg_5.jpg" class="w-full h-full object-fill" />
-  </div>
-
-  <!-- 헤더 -->
-  <header class="absolute top-0 w-full h-[7vh] bg-green-400 text-white font-bold flex justify-between items-center px-4">
-    <div class="flex items-center w-1/2 cursor-pointer" @click="openModal('status')">
-      <img src="@/assets/images/profile/default-image-1.png" class="w-[7vh]" />
-      <div class="ml-4 flex-1">
-        <div class="text-[2vh]">{{ userInfo.userNickname }}</div>
-        <div class="relative w-full h-[2vh] bg-gray-200 rounded-full mt-1">
-          <div class="absolute inset-0 flex items-center justify-center text-black text-[1.5vh] font-bold">Lv. {{ userInfo.level }}</div>
-          <div class="bg-blue-500 h-full rounded-full" :style="{ width: Math.min(userInfo.experience / 2, 100) + '%' }"></div>
-        </div>
-      </div>
-    </div>
-    <!-- <img class="w-[5vh] h-[5vh] object-cover cursor-pointer" @click="openModal('setting')" src="@/assets/images/icon/setting.png" alt="설정" /> -->
-  </header>
-
-  <!-- 캐릭터 -->
-  <div class="absolute left-1/2 bottom-[10vh] transform -translate-x-1/2 w-[30vh] h-[60vh] flex items-center justify-center overflow-hidden cursor-pointer" @click="openModal('character')">
-    <img v-if="hair && face && body" :src="face" class="absolute w-[30vh] h-[48vh] top-0" />
-    <img v-if="hair && face && body" :src="hair" class="absolute w-[30vh] h-[48vh] top-0" />
-    <img v-if="hair && face && body" :src="body" class="absolute w-[30vh] h-[48vh] bottom-0" />
-    <div v-if="!face && !hair && !body" class="text-gray-500 text-center">캐릭터 없음</div>
-  </div>
-
-  <!-- 하단 메뉴 -->
-  <div class="footer absolute bottom-0 w-full h-[7vh] grid grid-cols-5 bg-white text-center">
-    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer flex" @click="openModal('calendar')">
-      <img src="@/assets/images/icon/icon-calendar.png" class="w-[5vh]" />
-    </div>
-    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('record')">
-      <img src="@/assets/images/icon/icon-report.png" class="w-[6vh]" alt="" />
-    </div>
-    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('fitness')">
-      <img src="@/assets/images/icon/icon-fitness.png" class="w-[7vh]" />
-    </div>
-    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('quest')">
-      <img src="@/assets/images/icon/icon-quest.png" class="w-[5vh]" alt="" />
-    </div>
-    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('setting')">
-      <img src="@/assets/images/icon/icon-setting.png" class="w-[5vh]" />
-    </div>
-  </div>
-
-  <!-- 모달 컴포넌트 -->
-  <StatusModal v-if="modals.status" @close-modal="closeModal('status')" @open-modal="openModal('status')" />
-  <SettingModal v-if="modals.setting" @close-modal="closeModal('setting')" @open-modal="openModal('setting')" />
-  <CharacterModal v-if="modals.character" @close-modal="closeModal('character')" @open-modal="openModal('character')" />
-  <CalendarModal v-if="modals.calendar" @close-modal="closeModal('calendar')" @open-modal="openModal('calendar')" />
-  <FitnessModal v-if="modals.fitness" @close-modal="closeModal('fitness')" @open-modal="openModal('fitness')" />
-  <RecordModal v-if="modals.record" @close-modal="closeModal('record')" @open-modal="openModal('record')" />
-  <QuestModal v-if="modals.quest" @close-modal="closeModal('quest')" @open-modal="openModal('quest')" />
-  <!-- 백그라운드 음성인식 -->
-  <SpeechRecognitionHandler @voice-control="modalControl" />
-</template>
-
 <script setup>
-// ==================================================
 import { onMounted, ref, computed, watchEffect } from "vue"
 import { storeToRefs } from "pinia"
 import { useUserDataStore } from "@/stores/userDataStore"
@@ -131,5 +70,66 @@ onMounted(async () => {
   await mainStore.loadTutorial()
 })
 </script>
+
+<template>
+  <!-- 배경 이미지 -->
+  <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
+    <img src="@/assets/images/bg_5.jpg" class="w-full h-full object-fill" />
+  </div>
+
+  <!-- 헤더 -->
+  <header class="absolute top-0 w-full h-[7vh] bg-green-400 text-white font-bold flex justify-between items-center px-4">
+    <div class="flex items-center w-1/2 cursor-pointer" @click="openModal('status')">
+      <img src="@/assets/images/profile/default-image-1.png" class="w-[7vh]" />
+      <div class="ml-4 flex-1">
+        <div class="text-[2vh]">{{ userInfo.userNickname }}</div>
+        <div class="relative w-full h-[2vh] bg-gray-200 rounded-full mt-1">
+          <div class="absolute inset-0 flex items-center justify-center text-black text-[1.5vh] font-bold">Lv. {{ userInfo.level }}</div>
+          <div class="bg-blue-500 h-full rounded-full" :style="{ width: Math.min(userInfo.experience / 2, 100) + '%' }"></div>
+        </div>
+      </div>
+    </div>
+    <img class="w-[5vh] h-[5vh] object-cover cursor-pointer" @click="openModal('setting')" src="@/assets/images/icon/setting.png" alt="설정" />
+  </header>
+
+  <!-- 캐릭터 -->
+  <div class="absolute left-1/2 bottom-[10vh] transform -translate-x-1/2 w-[30vh] h-[60vh] flex items-center justify-center overflow-hidden cursor-pointer" @click="openModal('character')">
+    <img v-if="hair && face && body" :src="face" class="absolute w-[30vh] h-[48vh] top-0" />
+    <img v-if="hair && face && body" :src="hair" class="absolute w-[30vh] h-[48vh] top-0" />
+    <img v-if="hair && face && body" :src="body" class="absolute w-[30vh] h-[48vh] bottom-0" />
+    <div v-if="!face && !hair && !body" class="text-gray-500 text-center">캐릭터 없음</div>
+  </div>
+
+  <!-- 하단 메뉴 -->
+  <div class="footer absolute bottom-0 w-full h-[7vh] grid grid-cols-5 bg-white text-center">
+    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer flex" @click="openModal('calendar')">
+      <img src="@/assets/images/icon/icon-calendar.png" class="w-[5vh]" />
+    </div>
+    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('record')">
+      <img src="@/assets/images/icon/icon-report.png" class="w-[6vh]" alt="" />
+    </div>
+    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('fitness')">
+      <img src="@/assets/images/icon/icon-fitness.png" class="w-[7vh]" />
+    </div>
+    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('quest')">
+      <img src="@/assets/images/icon/icon-quest.png" class="w-[5vh]" alt="" />
+    </div>
+    <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('setting')">
+      <img src="@/assets/images/icon/icon-setting.png" class="w-[5vh]" />
+    </div>
+  </div>
+
+  <!-- 모달 컴포넌트 -->
+  <StatusModal v-if="modals.status" @close-modal="closeModal('status')" @open-modal="openModal('status')" />
+  <SettingModal v-if="modals.setting" @close-modal="closeModal('setting')" @open-modal="openModal('setting')" />
+  <CharacterModal v-if="modals.character" @close-modal="closeModal('character')" @open-modal="openModal('character')" />
+  <CalendarModal v-if="modals.calendar" @close-modal="closeModal('calendar')" @open-modal="openModal('calendar')" />
+  <FitnessModal v-if="modals.fitness" @close-modal="closeModal('fitness')" @open-modal="openModal('fitness')" />
+  <RecordModal v-if="modals.record" @close-modal="closeModal('record')" @open-modal="openModal('record')" />
+  <QuestModal v-if="modals.quest" @close-modal="closeModal('quest')" @open-modal="openModal('quest')" />
+
+  <!-- 백그라운드 음성인식 -->
+  <SpeechRecognitionHandler @voice-control="modalControl" />
+</template>
 
 <style scoped></style>
