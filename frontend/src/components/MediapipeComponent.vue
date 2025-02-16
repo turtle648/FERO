@@ -7,7 +7,7 @@
     </div>
 
     <!-- 상단 영역 -->
-    <div class="timer-container text-4xl absolute top-4 left-4 z-0 nes-btn">{{ formattedTime }}</div>
+    <div class="timer-container text-2xl absolute top-4 left-4 z-0 nes-btn">{{ formattedTime }}</div>
 
     <!-- 본인 화면 -->
     <!-- <div class="relative w-full h-full flex justify-center items-center overflow-hidden">

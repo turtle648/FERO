@@ -11,14 +11,16 @@
 
     <div class="text-container absolute top-4 right-4">
       <!-- <div class="count text-yellow-500 text-4xl font-dgm bg-white">스쿼트 횟수: {{ count }}</div> -->
-      <button type="button" class="nes-btn is-primary text-2xl font-dgm">스쿼트 횟수: {{ count }}</button>
+      <button type="button" class="nes-btn is-primary text-1xl font-dgm">스쿼트 횟수: {{ count }}</button>
       <div v-if="showGreat" class="great-message text-red text-3xl">Great!</div>
     </div>
 
-    <div v-if="showErrorModal" class="landmark-error-modal absolute inset-x-0 top-[30%] transform flex items-center justify-center text-yellow-500 text-4xl z-20 font-dgm">
-      전신이 나오도록 위치를 수정해주세요
+    <div v-if="showErrorModal" class="landmark-error-modal absolute inset-x-0 top-[30%] transform flex items-center justify-center text-yellow-500 text-2xl z-20 font-dgm">
+      전신이 나오도록
+      <br />
+      위치를 수정해주세요
     </div>
-    <button v-if="isTutorialMode" @click="setCountToThree" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 absolute bottom-4 left-4 z-50">Set Count to 3</button>
+    <button v-if="isTutorialMode" @click="setCountToThree" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 absolute bottom-4 left-4 z-50">3</button>
   </div>
 </template>
 
