@@ -91,44 +91,43 @@ onMounted(async () => {
         </div>
 
         <!-- 헤더 -->
-<!-- 헤더 -->
-<header class="absolute top-0 w-full flex flex-col">
-  <!-- 타이틀 바 -->
-  <div class="w-full h-[7vh] bg-[#c3c3c3] flex justify-between items-center px-2">
-    <!-- 왼쪽: 타이틀 영역 -->
-    <div class="flex items-center h-full">
-      <div class="flex items-center h-[90%] px-2 border-t-2 border-l-2 border-[#ffffff] border-r-2 border-b-2 border-[#818181] bg-[#c3c3c3]">
-        <img src="@/assets/images/profile/default-image-1.png" class="w-[5vh] mr-2" />
-        <div class="flex flex-col">
-          <span class="text-black text-[2vh] font-bold">{{ userInfo.userNickname }}</span>
-          <div class="relative w-full h-[1.5vh] bg-gray-200 rounded-sm mt-1">
-            <div class="absolute inset-0 flex items-center justify-center text-black text-[1.2vh]">
-              Lv. {{ userInfo.level }}
+        <header class="absolute top-0 w-full flex flex-col">
+          <!-- 타이틀 바 -->
+          <div class="w-full h-[7vh] bg-[#c3c3c3] flex justify-between items-center px-2">
+            <!-- 왼쪽: 타이틀 영역 -->
+            <div class="flex items-center h-full" @click="openModal('status')">
+              <div class="flex items-center h-[90%] px-2 border-t-2 border-l-2 border-[#ffffff] border-r-2 border-b-2 border-[#818181] bg-[#c3c3c3]">
+                <img src="@/assets/images/profile/default-image-1.png" class="w-[5vh] mr-2" />
+                <div class="flex flex-col">
+                  <span class="text-black text-[2vh] font-bold">{{ userInfo.userNickname }}</span>
+                  <div class="relative w-full h-[1.5vh] bg-gray-200 rounded-sm mt-1">
+                    <div class="absolute inset-0 flex items-center justify-center text-black text-[1.2vh]">
+                      Lv. {{ userInfo.level }}
+                    </div>
+                    <div class="bg-blue-500 h-full" 
+                        :style="{ width: Math.min(userInfo.experience / 2, 100) + '%' }">
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="bg-blue-500 h-full" 
-                 :style="{ width: Math.min(userInfo.experience / 2, 100) + '%' }">
+
+            <!-- 오른쪽: 창 제어 버튼들 -->
+            <div class="flex space-x-1">
+              <!-- 최소화 버튼 -->
+              <button class="nes-btn h-12 w-12 flex items-center justify-center text-2xl font-bold">
+                _
+              </button>
+              <!-- 닫기 버튼 -->
+              <button 
+                @click="openModal('setting')"
+                class="nes-btn h-12 w-12 flex items-center justify-center text-2xl font-bold"
+              >
+                ×
+              </button>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 오른쪽: 창 제어 버튼들 -->
-    <div class="flex space-x-1">
-      <!-- 최소화 버튼 -->
-      <button class="nes-btn h-12 w-12 flex items-center justify-center text-2xl font-bold">
-        _
-      </button>
-      <!-- 닫기 버튼 -->
-      <button 
-        @click="openModal('setting')"
-        class="nes-btn h-12 w-12 flex items-center justify-center text-2xl font-bold"
-      >
-        ×
-      </button>
-    </div>
-  </div>
-</header>
+        </header>
 
 
         <!-- 캐릭터 -->
@@ -140,24 +139,44 @@ onMounted(async () => {
           <div v-if="!face && !hair && !body" class="text-gray-500 text-center">캐릭터 없음</div>
         </div>
 
-        <!-- 하단 메뉴 -->
-        <div class="footer absolute bottom-0 w-full h-[7vh] grid grid-cols-5 bg-white text-center">
-          <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer flex" @click="openModal('calendar')">
+        <!-- 작업 표시줄 (푸터) -->
+        <footer class="absolute bottom-0 w-full h-[7vh] bg-[#c3c3c3] border-t-2 border-[#ffffff] flex">
+          <button 
+            class="w-1/5 h-full flex items-center justify-center border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
+            @click="openModal('calendar')"
+          >
             <img src="@/assets/images/icon/icon-calendar.png" class="w-[5vh]" />
-          </div>
-          <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('record')">
-            <img src="@/assets/images/icon/icon-report.png" class="w-[6vh]" alt="" />
-          </div>
-          <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('fitness')">
+          </button>
+          
+          <button 
+            class="w-1/5 h-full flex items-center justify-center border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
+            @click="openModal('record')"
+          >
+            <img src="@/assets/images/icon/icon-report.png" class="w-[6vh]" />
+          </button>
+          
+          <button 
+            class="w-1/5 h-full flex items-center justify-center border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
+            @click="openModal('fitness')"
+          >
             <img src="@/assets/images/icon/icon-fitness.png" class="w-[7vh]" />
-          </div>
-          <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('quest')">
-            <img src="@/assets/images/icon/icon-quest.png" class="w-[5vh]" alt="" />
-          </div>
-          <div class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer" @click="openModal('setting')">
+          </button>
+          
+          <button 
+            class="w-1/5 h-full flex items-center justify-center border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
+            @click="openModal('quest')"
+          >
+            <img src="@/assets/images/icon/icon-quest.png" class="w-[5vh]" />
+          </button>
+          
+          <button 
+            class="w-1/5 h-full flex items-center justify-center border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
+            @click="openModal('setting')"
+          >
             <img src="@/assets/images/icon/icon-setting.png" class="w-[5vh]" />
-          </div>
-        </div>
+          </button>
+        </footer>
+
 
         <!-- 모달 컴포넌트 -->
         <StatusModal v-if="modals.status" @close-modal="closeModal('status')" @open-modal="openModal('status')" />
