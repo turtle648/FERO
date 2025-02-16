@@ -1,7 +1,7 @@
 <template>
-  <div class="tutorial-page w-screen h-screen flex flex-col items-center relative">
+  <div class="tutorial-page w-screen h-screen">
     <!-- 운동 컴포넌트 -->
-    <component :is="currentExerciseComponent" class="z-0" />
+    <component :is="currentExerciseComponent" />
   </div>
 </template>
 

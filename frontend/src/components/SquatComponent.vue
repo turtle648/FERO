@@ -1,19 +1,24 @@
 <template>
-  <div class="counter-container relative w-screen h-screen overflow-hidden">
-    <!-- Loading Spinner -->
-    <div v-if="showSpinner" class="fixed inset-0 flex items-center justify-center bg-gray-100 z-300">
-      <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 z-300"></div>
+  <div class="squat-container w-screen h-screen">
+    <div v-if="showSpinner" class="loading-spinner flex items-center justify-center h-screen">
+      <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 z-50"></div>
     </div>
 
-    <div class="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 text-center">
-      <div class="count z-10 text-black">스쿼트 횟수: {{ count }}</div>
+    <div class="media-container">
+      <MediapipeComponent @get-Time="getTime" @pose-detected="processPose" @open-modal="openModal" class="z-0" />
+      <CompleteModal v-if="showModal" :result="result" :count="count" class="z-20" />
+    </div>
+
+    <div class="text-container absolute top-4 right-4">
+      <!-- <div class="count text-yellow-500 text-4xl font-dgm bg-white">스쿼트 횟수: {{ count }}</div> -->
+      <button type="button" class="nes-btn is-primary text-2xl font-dgm">스쿼트 횟수: {{ count }}</button>
       <div v-if="showGreat" class="great-message text-red text-3xl">Great!</div>
     </div>
-    <MediapipeComponent @get-Time="getTime" @pose-detected="processPose" @open-modal="openModal" class="z-0" />
-    <CompleteModal v-if="showModal" :result="result" :count="count" class="z-50" />
 
-    <div v-if="showErrorModal" class="landmark-error-modal z-20">전신이 나오도록 카메라 위치를 수정해주세요</div>
-    <button v-if="isTutorialMode" @click="setCountToThree" class="fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded shadow-lg hover:bg-blue-600 z-50">Set Count to 3</button>
+    <div v-if="showErrorModal" class="landmark-error-modal absolute inset-x-0 top-[30%] transform flex items-center justify-center text-yellow-500 text-4xl z-20 font-dgm">
+      전신이 나오도록 위치를 수정해주세요
+    </div>
+    <button v-if="isTutorialMode" @click="setCountToThree" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 absolute bottom-4 left-4 z-50">Set Count to 3</button>
   </div>
 </template>
 
@@ -34,7 +39,7 @@ const showSpinner = ref(true) // 로딩 스피너 상태 변수
 const isTutorialMode = window.location.href.includes("tutorial")
 // const isSingleMode = window.location.href.includes("single-mode")
 
-const emit = defineEmits(['setCount', 'getTimeLeft'])
+const emit = defineEmits(["setCount", "getTimeLeft"])
 // 모드 리턴
 // const getMode = () => {
 //   if (isTutorialMode) return "Tutorial Mode"
@@ -42,21 +47,23 @@ const emit = defineEmits(['setCount', 'getTimeLeft'])
 //   return "Unknown Mode"
 // }
 
-const props = defineProps(['command'])
-const result = ref('')
-watch(() => props.command, (newCommand) => {
-  console.log(newCommand, '명령받음')
-  if (newCommand) {
-    showModal.value = true
-    result.value = newCommand
+const props = defineProps(["command"])
+const result = ref("")
+watch(
+  () => props.command,
+  (newCommand) => {
+    console.log(newCommand, "명령받음")
+    if (newCommand) {
+      showModal.value = true
+      result.value = newCommand
+    }
   }
-})
+)
 
 const getTime = (value) => {
-  console.log();
-  emit('getTimeLeft', value)
+  console.log()
+  emit("getTimeLeft", value)
 }
-
 
 // 필수 랜드마크 정의
 const requiredLandmarks = [0, 1, 2, 3, 4, 5, 6, 27, 28, 29, 30, 31, 32]
@@ -151,7 +158,7 @@ const processPose = (landmarks) => {
     } else if (isDown.value && avgKneeAngle > 160) {
       isDown.value = false
       count.value++
-      emit('setCount', count.value);
+      emit("setCount", count.value)
       feedback.value = `Up! Count: ${count.value}`
 
       showGreat.value = true
@@ -182,49 +189,4 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-.counter-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-}
-
-.count {
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.status {
-  font-size: 18px;
-  color: #666;
-  margin-bottom: 10px;
-}
-
-.form-feedback {
-  font-size: 14px;
-  color: #888;
-  font-style: italic;
-}
-
-.landmark-error-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  z-index: 100;
-}
-.set-count-button {
-  margin-top: 20px;
-  padding: 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  z-index: 100;
-}
-</style>
+<style scoped></style>

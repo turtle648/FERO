@@ -4,7 +4,8 @@ import App from "./App.vue"
 import router from "./router"
 import "./styles/app.css"
 import "./registerServiceWorker"
-import '@fontsource/press-start-2p'
+import "@fontsource/press-start-2p"
+// import "@/assets/styles/fonts.css"
 
 const app = createApp(App)
 const pinia = createPinia()
