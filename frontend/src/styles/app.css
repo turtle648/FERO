@@ -32,10 +32,19 @@ body {
   user-select: none;
 }
 
-body, img, .no-save {
+body,
+img,
+.no-save {
   -webkit-touch-callout: none; /* 모바일에서 이미지 길게 눌러 다운로드 차단 */
 }
 
 html {
   pointer-events: auto; /* 클릭 가능하도록 유지 */
+}
+
+@font-face {
+  font-family: "DungGeunMo"; /* 폰트 이름 */
+  src: url("@/assets/fonts/DungGeunMo.woff2") format("woff2"), /* 최신 브라우저용 */ url("@/assets/fonts/DungGeunMo.woff") format("woff"), /* 구형 브라우저용 */ url("@/assets/fonts/DungGeunMo.eot"); /* IE 8 이하용 */
+  font-weight: normal;
+  font-style: normal;
 }
