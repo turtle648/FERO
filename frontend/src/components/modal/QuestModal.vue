@@ -1,6 +1,6 @@
 <!-- components/modal/QuestModal.vue -->
 <template>
-  <BaseModal title="오늘의 퀘스트" @close-modal="$emit('close-modal')">
+  <BaseModal title="Quest" @close-modal="$emit('close-modal')">
     <!-- 로딩 상태 -->
     <div v-if="isLoading" class="flex justify-center items-center h-full">
       <div class="text-gray-500">데이터 불러오는 중...</div>

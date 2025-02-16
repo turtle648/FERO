@@ -1,6 +1,6 @@
 <!-- components/modal/RecordModal.vue -->
 <template>
-    <BaseModal title="유저 전적 확인창" @close-modal="$emit('close-modal')">
+    <BaseModal title="Records" @close-modal="$emit('close-modal')">
       <!-- 전적 리스트 컨테이너 -->
       <div 
         class="h-full overflow-y-auto"
