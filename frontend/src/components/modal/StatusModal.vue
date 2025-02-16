@@ -7,7 +7,7 @@
         <div class="status-element status-1">
           <!-- 차후, png로 대체할 것 -->
           <h2>Status</h2>
-          <div style="margin-top: 2%;">닉네임: {{ userInfo.userNickname }}</div>
+          <div style="margin-top: 2%;">Nick: {{ userInfo.userNickname }}</div>
           <div style="margin-top: 2%;">
             Lv. {{ userInfo.level }} | Rank: !!api수정을 통해 받기!!
           </div>

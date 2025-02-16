@@ -84,4 +84,3 @@
       matchData.value = getMatchData()
   })
   </script>
-  

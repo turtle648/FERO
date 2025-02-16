@@ -132,4 +132,8 @@ onMounted(async () => {
   <SpeechRecognitionHandler @voice-control="modalControl" />
 </template>
 
-<style scoped></style>
+<style scoped>
+img {
+  image-rendering: pixelated;
+}
+</style>
