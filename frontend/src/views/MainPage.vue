@@ -72,25 +72,40 @@ onMounted(async () => {
 </script>
 
 <template>
-  <!-- 배경 이미지 -->
-  <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
+  <div class="fixed inset-0 w-full h-full overflow-hidden">
+    <!-- 배경 이미지 -->
+  <div class="absolute inset-0 flex items-center justify-center w-screen overflow-hidden" style="image-rendering: pixelated;">
     <img src="@/assets/images/bg_5.jpg" class="w-full h-full object-fill" />
   </div>
 
-  <!-- 헤더 -->
-  <header class="absolute top-0 w-full h-[7vh] bg-green-400 text-white font-bold flex justify-between items-center px-4">
-    <div class="flex items-center w-1/2 cursor-pointer" @click="openModal('status')">
-      <img src="@/assets/images/profile/default-image-1.png" class="w-[7vh]" />
-      <div class="ml-4 flex-1">
-        <div class="text-[2vh]">{{ userInfo.userNickname }}</div>
-        <div class="relative w-full h-[2vh] bg-gray-200 rounded-full mt-1">
-          <div class="absolute inset-0 flex items-center justify-center text-black text-[1.5vh] font-bold">Lv. {{ userInfo.level }}</div>
-          <div class="bg-blue-500 h-full rounded-full" :style="{ width: Math.min(userInfo.experience / 2, 100) + '%' }"></div>
-        </div>
+<!-- 헤더 부분 -->
+<header class="w-full h-[7vh] flex justify-between items-center px-4 nes-container is-rounded">
+  <!-- 왼쪽: 유저 정보 탭 -->
+  <div class="flex items-center h-full">
+    <div class="nes-container is-rounded px-4 py-1 mr-2">
+      <span class="nes-text">{{ userInfo.userNickname }}</span>
+      <div class="text-xs">
+        Lv. {{ userInfo.level }}
       </div>
     </div>
-    <img class="w-[5vh] h-[5vh] object-cover cursor-pointer" @click="openModal('setting')" src="@/assets/images/icon/setting.png" alt="설정" />
-  </header>
+  </div>
+
+  <!-- 오른쪽: 창 제어 버튼 -->
+  <div class="flex space-x-2">
+    <button 
+      class="nes-btn is-warning h-8 w-8 flex items-center justify-center"
+      @click="minimizeWindow"
+    >
+      _
+    </button>
+    <button 
+      class="nes-btn is-error h-8 w-8 flex items-center justify-center"
+      @click="openModal('setting')"
+    >
+      ×
+    </button>
+  </div>
+</header>
 
   <!-- 캐릭터 -->
   <div class="absolute left-1/2 bottom-[10vh] transform -translate-x-1/2 w-[30vh] h-[60vh] flex items-center justify-center overflow-hidden cursor-pointer" @click="openModal('character')">
@@ -130,6 +145,8 @@ onMounted(async () => {
 
   <!-- 백그라운드 음성인식 -->
   <SpeechRecognitionHandler @voice-control="modalControl" />
+  </div>
+  
 </template>
 
 <style scoped></style>
