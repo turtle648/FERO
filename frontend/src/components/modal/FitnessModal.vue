@@ -1,6 +1,6 @@
 <!-- components/modal/FitnessModal.vue -->
 <template>
-  <BaseModal title="운동 선택" @close-modal="$emit('close-modal')">
+  <BaseModal title="Select Exercise" @close-modal="$emit('close-modal')">
     <!-- 메인 운동 선택 영역 -->
     <div class="flex flex-col w-full space-y-4">
       <!-- 스쿼트 그룹 -->
@@ -48,7 +48,7 @@
     >
       <div class="bg-white p-5 rounded-lg shadow-md w-[80%] max-w-md">
         <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold">모드 선택</h3>
+          <h3 class="text-lg font-semibold">Select Mode</h3>
           <button 
             class="text-gray-500 hover:text-gray-700"
             @click="showModeModal = false"

@@ -1,6 +1,6 @@
 <!-- components/modal/CalendarModal.vue -->
 <template>
-  <BaseModal @close-modal="$emit('close-modal')">
+  <BaseModal title="Calendar" @close-modal="$emit('close-modal')">
     <div class="flex flex-col w-full h-full max-w-[40vh] bg-white">
       <!-- 달력 헤더 -->
       <header class="flex justify-between items-center p-4 border-b">

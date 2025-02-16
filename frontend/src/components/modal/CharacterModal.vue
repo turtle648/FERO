@@ -1,6 +1,6 @@
 <!-- components/modal/CharacterModal.vue -->
 <template>
-  <BaseModal title="캐릭터 커스터마이징" @close-modal="$emit('close-modal')">
+  <BaseModal title="Customizer" @close-modal="$emit('close-modal')">
     <div class="flex flex-col items-center h-full">
       <!-- 선택된 캐릭터 미리보기 -->
       <div class="relative w-[40vw] aspect-square flex items-center justify-center mb-4 
