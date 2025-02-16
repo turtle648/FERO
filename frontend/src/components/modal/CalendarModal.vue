@@ -1,8 +1,12 @@
 <template>
   <div
-    class="fixed inset-x-20 inset-y-32 flex items-center justify-center bg-white h-[70vh] w-[40vh]"
+    class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-70"
+    @click.self="closeCalendarModal"
   >
-    <div class="flex flex-col bg-white relative w-full h-full pt-5 px-3">
+    <div
+      class="flex flex-col bg-white relative w-[40vh] h-[70vh] max-w-[90vw] max-h-[90vh] pt-5 px-3 shadow-lg rounded-lg"
+      @click.stop
+    >
       <button
         id="close-btn"
         @click="closeCalendarModal"
@@ -94,15 +98,16 @@ const currentMonth = ref(currentDate.getMonth());
 const daysContainer = ref(null);
 
 // 선택된 날짜의 데이터 가져오기
-const getSelectedDateData = () => {
+const getSelectedDateData = async () => {
   const year = selectedDate.value.getFullYear();
   const month = selectedDate.value.getMonth();
   const date = selectedDate.value.getDate();
   console.log("📅" + year + "년 " + month + "월 " + date + "일");
 
-  console.log(chartConfig.dummy);
+  const response = await mainStore.getMonthStatus(year, month);
+  console.log(response);
 
-  const dateData = chartConfig.dummy.find((value) => {
+  const dateData = response.find((value) => {
     return value.date === date;
   });
 
@@ -195,8 +200,8 @@ const renderCalendar = () => {
         : "text-red-500"
       : "";
 
-    daysHTML += `<span 
-      class="${isToday} ${isSelected} ${questClass} cursor-pointer hover:bg-gray-100" 
+    daysHTML += `<span
+      class="${isToday} ${isSelected} ${questClass} cursor-pointer hover:bg-gray-100"
       onclick="this.dispatchEvent(new CustomEvent('date-select', {detail: ${i}, bubbles: true}))"
     >${i}</span>`;
   }

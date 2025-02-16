@@ -18,7 +18,7 @@ export const useMainStore = defineStore("main", () => {
   const uiTutorialCompleted = ref(false);
 
   const api = axios.create({
-    baseURL: "https://i12e103.p.ssafy.io:8076/api/v1",
+    baseURL: "http://localhost:8076/api/v1",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${authToken.value}`,
@@ -113,6 +113,12 @@ export const useMainStore = defineStore("main", () => {
     }
   }
 
+  async function getMonthStatus(year, month) {
+    const params = { month, year };
+    const response = await api.get("/userStats/history", { params });
+    return response.data;
+  }
+
   return {
     tutorial,
     authToken,
@@ -121,5 +127,6 @@ export const useMainStore = defineStore("main", () => {
     loadTutorial,
     completeTutorial,
     isQuestCompleted,
+    getMonthStatus,
   };
 });
