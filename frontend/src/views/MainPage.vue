@@ -99,7 +99,7 @@ onMounted(async () => {
           <!-- 타이틀 바 -->
           <div class="w-full h-[12vh] bg-[#c3c3c3] flex flex-col">
             <!-- 상단 텍스트 영역 -->
-            <div class="h-[50%] flex items-center justify-center border-b-2 border-[#818181]">
+            <div class="h-[40%] flex items-center justify-center border-b-2 border-[#818181]">
               <span class="text-black text-nowrap font-bold max-w-fit">
                 <template v-for="(char, index) in 'Hero From ISAEKAI'" :key="index">
                   <span 
@@ -111,6 +111,9 @@ onMounted(async () => {
                 </template>
               </span>
             </div>
+
+            <!-- 여백 -->
+            <div class="h-[5%]"></div>
 
             <!-- 하단 컨트롤 영역 -->
             <div class="h-[45%] flex justify-between items-center px-2">
@@ -131,24 +134,25 @@ onMounted(async () => {
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- 오른쪽: 창 제어 버튼들 -->
-            <div class="flex space-x-1">
-              <!-- 최소화 버튼 -->
-              <button class="nes-btn h-12 w-12 flex items-center justify-center text-2xl font-bold">
-                _
-              </button>
-              <!-- 닫기 버튼 -->
-              <button 
-                @click="userStore.logOut()"
-                class="nes-btn h-12 w-12 flex items-center justify-center text-2xl font-bold"
-              >
-                ×
-              </button>
+              <!-- 오른쪽: 창 제어 버튼들 -->
+              <div class="flex space-x-1 h-full items-center">
+                <!-- 최소화 버튼 -->
+                <button class="nes-btn h-[90%] aspect-square flex items-center justify-center text-2xl font-bold">
+                  _
+                </button>
+                <!-- 닫기 버튼 -->
+                <button 
+                  @click="userStore.logOut()"
+                  class="nes-btn h-[90%] aspect-square flex items-center justify-center text-2xl font-bold"
+                >
+                  ×
+                </button>
+              </div>
             </div>
           </div>
         </header>
+
 
         <!-- 캐릭터 -->
         <div class="absolute left-1/2 bottom-[10vh] w-[30vw] h-[30vh] transform -translate-x-1/2 -translate-y-1/2" @click="openModal('character')"></div>
