@@ -6,23 +6,17 @@ export const options = {
         usePointStyle: true,
       },
     },
+    tooltip: {
+      callbacks: {
+        label: function (tooltipItem) {
+          console.log("📈 Tooltip Data:", tooltipItem);
+          return tooltipItem.raw;
+        },
+      },
+    },
   },
   responsive: true,
   maintainAspectRatio: false,
-  //   options: {
-  //     responsive: false,
-  //     scales: {
-  //       yAxes: [
-  //         {
-  //           ticks: {
-  //             min: 0,
-  //             max: 1000,
-  //             fontSize: 14,
-  //           },
-  //         },
-  //       ],
-  //     },
-  //   },
 };
 
 export const dummy = [

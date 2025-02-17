@@ -97,8 +97,8 @@ export const useMainStore = defineStore("main", () => {
       console.time(`[⏱️] Sending Date Year: ${year}, Month: ${month}`);
 
       // API 호출
-      const data = { year, month };
-      const response = await api.get("/exercise/monthly", data);
+      const params = { year, month };
+      const response = await api.get("/exercise/monthly", { params });
 
       console.log("✅ Date Sent Successfully:", response.data);
       return response.data; // 성공 시 응답 데이터 반환
@@ -115,7 +115,14 @@ export const useMainStore = defineStore("main", () => {
 
   async function getMonthStatus(year, month) {
     const params = { month, year };
+    console.time(
+      `[⏱️] GET MONTHSTATUS Sending Date Year: ${year}, Month: ${month}`
+    );
+
     const response = await api.get("/userStats/history", { params });
+
+    console.log("✅ Date Sent Successfully:", response.data);
+
     return response.data;
   }
 
