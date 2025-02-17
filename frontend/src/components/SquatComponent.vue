@@ -10,7 +10,6 @@
     </div>
 
     <div class="text-container absolute top-4 right-4">
-      <!-- <div class="count text-yellow-500 text-4xl font-dgm bg-white">스쿼트 횟수: {{ count }}</div> -->
       <button type="button" class="nes-btn is-primary text-1xl font-dgm">스쿼트 횟수: {{ count }}</button>
       <div v-if="showGreat" class="great-message text-red text-3xl">Great!</div>
     </div>
