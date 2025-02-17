@@ -1,37 +1,79 @@
+<!-- components/modal/CalendarModal.vue -->
 <template>
-  <div class="calendar-modal">
-    <div class="content">
-      <button id="close-btn" @click="closeCalendarModal">X</button>
-      <div class="calendar">
-        <header class="calendar-header">
-          <button id="prev-month" @click="prevMonth">❮</button>
-          <h2>{{ currentYear }}년 {{ currentMonth + 1 }}월</h2>
-          <button id="next-month" @click="nextMonth">❯</button>
-        </header>
-        <div class="calendar-body">
-          <div class="weekdays">
-            <span>일</span>
-            <span>월</span>
-            <span>화</span>
-            <span>수</span>
-            <span>목</span>
-            <span>금</span>
-            <span>토</span>
-          </div>
-          <div class="days"></div>
+  <BaseModal title="Calendar" @close-modal="$emit('close-modal')">
+    <div class="flex flex-col w-full h-full max-w-[40vh] bg-white">
+      <!-- 달력 헤더 -->
+      <header class="flex justify-between items-center p-4 border-b">
+        <button @click="prevMonth" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full transition-colors">❮</button>
+        <h2 class="text-lg font-bold">{{ currentYear }}년 {{ currentMonth + 1 }}월</h2>
+        <button @click="nextMonth" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full transition-colors">❯</button>
+      </header>
+
+      <!-- 달력 본문 -->
+      <div class="flex-1 p-4">
+        <!-- 요일 헤더 -->
+        <div class="grid grid-cols-7 mb-2">
+          <span v-for="day in ['일', '월', '화', '수', '목', '금', '토']" :key="day" class="text-center font-medium text-gray-600 text-sm py-2">
+            {{ day }}
+          </span>
+        </div>
+
+        <!-- 날짜 그리드 -->
+        <div ref="daysContainer" class="grid grid-cols-7 gap-1 days">
+          <!-- 날짜들은 renderCalendar 함수에서 동적으로 추가됨 -->
         </div>
       </div>
+      <div class="flex flex-col w-full h-[50%]">
+        <Bar :data="chartData" :options="options" />
+      </div>
     </div>
-  </div>
+  </BaseModal>
 </template>
 
 <script setup>
-import { ref, defineEmits, onMounted } from "vue"
+import BaseModal from "./BaseModal.vue"
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from "chart.js"
+import { ref, defineEmits, onMounted, computed } from "vue"
+import { useMainStore } from "@/stores/mainStore"
+import { Bar } from "vue-chartjs"
+import * as chartConfig from "../config/chartConfig.js"
 
-const emit = defineEmits(["closeCalendar"])
-const closeCalendarModal = () => {
-  emit("closeCalendar")
-}
+const mainStore = useMainStore()
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
+
+// defineEmits(["close-modal"])
+
+// 날짜 관련 상태
+// const currentDate = new Date()
+// const currentYear = ref(currentDate.getFullYear())
+// const currentMonth = ref(currentDate.getMonth())
+// const daysContainer = ref(null)
+// const questData = ref([])
+// 선택된 날짜 상태 관리
+const selectedDate = ref(new Date())
+
+// 차트 데이터 computed 속성으로 변경
+const chartData = computed(() => ({
+  labels: ["팔", "다리", "가슴", "복근", "등", "체력"],
+  datasets: [
+    {
+      label: "운동 데이터",
+      backgroundColor: "rgba(236, 72, 153, 1)",
+      pointBackgroundColor: "rgba(236, 72, 153, 1)",
+      pointBorderColor: "#fff",
+      pointHoverBackgroundColor: "#fff",
+      pointHoverBorderColor: "rgba(236, 72, 153, 1)",
+      data: getSelectedDateData(),
+    },
+  ],
+}))
+
+const options = ref(chartConfig.options)
+
+defineEmits(["close-modal"])
+// const closeCalendarModal = () => {
+//   emit("close-modal")
+// }
 
 // 날짜 관련 상태 관리
 const currentDate = new Date()
@@ -39,8 +81,60 @@ const currentYear = ref(currentDate.getFullYear())
 const currentMonth = ref(currentDate.getMonth())
 const daysContainer = ref(null)
 
-// 월별 날짜 렌더링 함수
+// 선택된 날짜의 데이터 가져오기
+const getSelectedDateData = async () => {
+  const year = selectedDate.value.getFullYear()
+  const month = selectedDate.value.getMonth()
+  const date = selectedDate.value.getDate()
+  console.log("📅" + year + "년 " + month + "월 " + date + "일")
+
+  const response = await mainStore.getMonthStatus(year, month)
+  console.log(response)
+
+  const dateData = response.find((value) => {
+    return value.date === date
+  })
+
+  console.log(dateData)
+
+  return dateData ? dateData.status : [0, 0, 0, 0, 0, 0]
+}
+
+// 퀘스트 데이터를 저장
+const questData = ref([])
+
+// 퀘스트 데이터 가져오기
+const fetchQuestData = async () => {
+  try {
+    const response = await mainStore.isQuestCompleted(currentYear.value, currentMonth.value + 1)
+
+    if (response && response.length > 0) {
+      questData.value = response
+    } else {
+      questData.value = []
+    }
+  } catch (error) {
+    if (error.response && error.response.status === 204) {
+      console.log("🚨 No data for this month")
+      questData.value = "no-data"
+    } else {
+      console.error("🚨 Error fetching quest data:", error)
+    }
+  } finally {
+    renderCalendar()
+  }
+}
+
+// 날짜 선택 핸들러
+const handleDateSelect = (day) => {
+  selectedDate.value = new Date(currentYear.value, currentMonth.value, day)
+}
+
+// 달력 렌더링
 const renderCalendar = () => {
+  // const firstDay = new Date(currentYear.value, currentMonth.value, 1).getDay()
+  // const lastDate = new Date(currentYear.value, currentMonth.value + 1, 0).getDate()
+  // const lastDatePrev = new Date(currentYear.value, currentMonth.value, 0).getDate()
   const firstDayOfMonth = new Date(currentYear.value, currentMonth.value, 1).getDay()
   const lastDateOfMonth = new Date(currentYear.value, currentMonth.value + 1, 0).getDate()
   const lastDayOfPrevMonth = new Date(currentYear.value, currentMonth.value, 0).getDate()
@@ -49,119 +143,75 @@ const renderCalendar = () => {
 
   // 이전 달 날짜
   for (let i = firstDayOfMonth; i > 0; i--) {
-    daysHTML += `<span class="inactive">${lastDayOfPrevMonth - i + 1}</span>`
+    daysHTML += `<span class="text-gray-400">${lastDayOfPrevMonth - i + 1}</span>`
   }
 
   // 현재 달 날짜
   for (let i = 1; i <= lastDateOfMonth; i++) {
-    const isToday = i === currentDate.getDate() && currentMonth.value === currentDate.getMonth() && currentYear.value === currentDate.getFullYear() ? "active" : ""
-    daysHTML += `<span class="${isToday}">${i}</span>`
+    const isToday = i === currentDate.getDate() && currentMonth.value === currentDate.getMonth() && currentYear.value === currentDate.getFullYear() ? "bg-blue-200" : ""
+
+    const isSelected =
+      i === selectedDate.value.getDate() && currentMonth.value === selectedDate.value.getMonth() && currentYear.value === selectedDate.value.getFullYear() ? "bg-blue-500 text-white" : ""
+
+    const questStatus = questData.value !== "no-data" && questData.value.find((q) => q.day === i)
+    const questClass = questStatus ? (questStatus.isCompleted ? "text-green-500" : "text-red-500") : ""
+
+    daysHTML += `<span
+      class="${isToday} ${isSelected} ${questClass} cursor-pointer hover:bg-gray-100"
+      onclick="this.dispatchEvent(new CustomEvent('date-select', {detail: ${i}, bubbles: true}))"
+    >${i}</span>`
   }
 
   // 다음 달 날짜
   const nextDays = 42 - (firstDayOfMonth + lastDateOfMonth)
   for (let i = 1; i <= nextDays; i++) {
-    daysHTML += `<span class="inactive">${i}</span>`
+    daysHTML += `<span class="text-gray-400">${i}</span>`
   }
 
   if (daysContainer.value) {
     daysContainer.value.innerHTML = daysHTML
+
+    if (questData.value === "no-data") {
+      daysContainer.value.classList.add("bg-red-100")
+    } else {
+      daysContainer.value.classList.remove("bg-red-100")
+    }
   }
 }
 
-// 이전/다음 달 이동 함수
-const prevMonth = () => {
+// 월 이동
+const prevMonth = async () => {
   if (currentMonth.value === 0) {
-    currentMonth.value = 11
     currentYear.value--
+    currentMonth.value = 11
   } else {
     currentMonth.value--
   }
-  renderCalendar()
+  await fetchQuestData()
 }
 
-const nextMonth = () => {
+const nextMonth = async () => {
   if (currentMonth.value === 11) {
-    currentMonth.value = 0
     currentYear.value++
+    currentMonth.value = 0
   } else {
     currentMonth.value++
   }
-  renderCalendar()
+
+  await fetchQuestData()
 }
 
-// 초기 렌더링
-onMounted(() => {
+// 이벤트 리스너 설정
+onMounted(async () => {
   daysContainer.value = document.querySelector(".days")
-  renderCalendar()
+
+  // 날짜 선택 이벤트 리스너
+  daysContainer.value.addEventListener("date-select", (event) => {
+    handleDateSelect(event.detail)
+  })
+
+  await fetchQuestData()
 })
 </script>
 
-<style scoped>
-.calendar-modal {
-  width: 40vh;
-  height: 55vh;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: antiquewhite;
-  display: flex;
-  flex-direction: column;
-}
-
-.content {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.calendar {
-  width: 100%; /* 부모 요소와 동일한 너비 */
-  height: 100%; /* 부모 요소와 동일한 높이 */
-  display: flex;
-  flex-direction: column;
-}
-
-.calendar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-}
-
-.calendar-body {
-  display: flex;
-  flex-direction: column;
-  height: calc(100% - 50px); /* 헤더 높이를 제외한 나머지 공간 */
-}
-
-.weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  text-align: center;
-  font-weight: bold;
-}
-
-.days {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px; /* 날짜 간격 */
-}
-.days span {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.days .inactive {
-  color: white !important; /* 이전, 다음 달 날짜를 흰색으로 설정했는데 왜 안됨? */
-}
-
-#close-btn {
-  position: absolute;
-  top: 2%;
-  right: 2%;
-}
-</style>
+<style scoped></style>

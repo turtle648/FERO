@@ -24,6 +24,10 @@ public class QUserCharacter extends EntityPathBase<UserCharacter> {
 
     public final QBaseEntity _super = new QBaseEntity(this);
 
+    public final StringPath avatar = createString("avatar");
+
+    public final ListPath<ExerciseLog, QExerciseLog> exerciseLogs = this.<ExerciseLog, QExerciseLog>createList("exerciseLogs", ExerciseLog.class, QExerciseLog.class, PathInits.DIRECT2);
+
     public final ComparablePath<Character> gender = createComparable("gender", Character.class);
 
     //inherited
@@ -38,8 +42,6 @@ public class QUserCharacter extends EntityPathBase<UserCharacter> {
     public final NumberPath<Short> userLevel = createNumber("userLevel", Short.class);
 
     public final StringPath userNickname = createString("userNickname");
-
-    public final NumberPath<Short> userRankScore = createNumber("userRankScore", Short.class);
 
     public QUserCharacter(String variable) {
         this(UserCharacter.class, forVariable(variable), INITS);

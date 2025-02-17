@@ -1,17 +1,21 @@
 package com.ssafy.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+@ToString
 public class Message {
+    private String auth;
+    private String remainTime;
+    private String exerciseType;
+    private String myCount;
+    private String peerCount;
+    private String peerToken;
     private String sender;    // 보내는 유저 UUID
     private String type;      // 메시지 타입
     private String receiver;  // 받는 사람

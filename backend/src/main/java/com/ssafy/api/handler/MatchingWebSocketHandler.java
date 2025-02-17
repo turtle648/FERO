@@ -3,6 +3,8 @@ package com.ssafy.api.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.api.service.MatchingService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
@@ -16,33 +18,66 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class MatchingWebSocketHandler extends TextWebSocketHandler {
     private final Set<WebSocketSession> sessions = ConcurrentHashMap.newKeySet();
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final MatchingService matchingService;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         sessions.add(session);
-        log.info("LOG : New WebSocket connnection established: {}", session.getId());
+        log.info("👌 LOG : New WebSocket connnection established: {}", session.getId());
+        log.info("Current session attributes: {}", session.getAttributes());
     }
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
+        log.info("💬 Received message from session {}: {}", session.getId(), payload);
 
-        // 메세지 처리 로직
-        JsonNode jsonNode = objectMapper.readTree(payload);
-        String type = jsonNode.get("type").asText();
+        try {
+            JsonNode jsonNode = objectMapper.readTree(payload);
+            String type = jsonNode.path("type").asText();
+            log.info("Message type: {}", type);
 
-        switch (type) {
-            case "ENTER_WAITING_ROOM":
-                handleEnterWaitingRoom(session, jsonNode);
-                break;
-            case "LEAVE_WAITING_ROOM":
-                handleLeaveWaitingRoom(session, jsonNode);
-                break;
-            default:
-                log.warn("Unknown message type: {}", type);
+            if ("ENTER_WAITING_ROOM".equals(type)) {
+                String userToken = jsonNode.path("userToken").asText();
+                JsonNode exerciseTypeNode = jsonNode.path("exerciseType");
+
+                log.info("Processing ENTER_WAITING_ROOM - Token: {}, Exercise node: {}",
+                        userToken, exerciseTypeNode);
+
+                if (userToken == null || userToken.isEmpty()) {
+                    log.error("❌ Missing or empty userToken");
+                    return;
+                }
+
+                Long exerciseType;
+                if (exerciseTypeNode.isNumber()) {
+                    exerciseType = exerciseTypeNode.asLong();
+                } else if (exerciseTypeNode.isTextual()) {
+                    exerciseType = Long.parseLong(exerciseTypeNode.asText());
+                } else {
+                    log.error("❌ Invalid exerciseType format: {}", exerciseTypeNode);
+                    return;
+                }
+
+                // 세션에 정보 저장
+                session.getAttributes().put("userToken", userToken);
+                session.getAttributes().put("exerciseType", exerciseType);
+
+                log.info("✅ Successfully stored in session - Token: {}, Exercise Type: {}",
+                        userToken, exerciseType);
+                log.info("Current session attributes: {}", session.getAttributes());
+
+                // 저장 확인을 위한 응답 메시지
+                sendMessage(session, createMessage("ENTERED", "Successfully entered waiting room"));
+            }
+        } catch (Exception e) {
+            log.error("❌ Error processing message: {}", e.getMessage());
+            log.error("Raw message payload: {}", payload);
+            e.printStackTrace();
         }
     }
 
@@ -78,8 +113,28 @@ public class MatchingWebSocketHandler extends TextWebSocketHandler {
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        sessions.remove(session);
-        log.info("LOG : WebSocket connection closed: {}", session.getId());
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        try {
+            log.info("Starting cleanup for session: {}", session.getId());
+            log.info("Session attributes before cleanup: {}", session.getAttributes());
+
+            String userToken = (String) session.getAttributes().get("userToken");
+            Long exerciseType = (Long) session.getAttributes().get("exerciseType");
+
+            if (userToken != null && exerciseType != null) {
+                log.info("🧹 Cleaning up Redis data for user: {}", userToken);
+                matchingService.leaveWaitingRoom(userToken, exerciseType);
+                log.info("✅ Successfully cleaned up Redis data");
+            } else {
+                log.warn("⚠️ No user data found in session to clean up. Token: {}, Exercise: {}",
+                        userToken, exerciseType);
+            }
+        } catch (Exception e) {
+            log.error("❌ Error during cleanup: {}", e.getMessage());
+            e.printStackTrace();
+        } finally {
+            sessions.remove(session);
+            log.info("❌ WebSocket connection closed: {}", session.getId());
+        }
     }
 }

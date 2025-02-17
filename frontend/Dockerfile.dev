@@ -1,9 +1,16 @@
 # Development Stage
 FROM node:18 AS dev-stage
 WORKDIR /app
-COPY package.json ./
-COPY package-lock.json ./
-RUN npm install
+
+# node_modules 캐싱을 활용한 종속성 설치 최적화
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# 불필요한 파일을 복사하지 않도록 .dockerignore 설정 필요
 COPY . .
-EXPOSE 5173
+
+# npm 설치 후 node_modules 제거 방지
+RUN chmod -R 777 node_modules
+
+# EXPOSE 생략 가능
 CMD ["npm", "run", "serve"]

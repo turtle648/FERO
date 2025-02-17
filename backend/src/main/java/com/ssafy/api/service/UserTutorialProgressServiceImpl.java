@@ -1,6 +1,7 @@
 package com.ssafy.api.service;
 
 import com.ssafy.api.response.GetTutorialRes;
+import com.ssafy.api.response.GetTutorialSimpleRes;
 import com.ssafy.db.entity.TutorialType;
 import com.ssafy.db.entity.User;
 import com.ssafy.db.entity.UserTutorialProgress;
@@ -35,6 +36,15 @@ public class UserTutorialProgressServiceImpl implements UserTutorialProgressServ
         List<UserTutorialProgress> tutorials = tutorialProgressRepository.findByUser_UserId(userId);
         return tutorials.stream()
                 .map(GetTutorialRes::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GetTutorialSimpleRes> getTutorialSimples(String userId) {
+        List<UserTutorialProgress> tutorials = tutorialProgressRepository.findByUser_UserId(userId);
+
+        return tutorials.stream()
+                .map(GetTutorialSimpleRes::fromEntity)
                 .collect(Collectors.toList());
     }
 

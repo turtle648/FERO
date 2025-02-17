@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>운동 매칭 서비스</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        .waiting { color: blue; }
+        .matched { color: green; }
+        .exercise-btn { margin: 5px; padding: 10px; }
+        .selected { background-color: #4CAF50; color: white; }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div v-if="!isLoggedIn">
+        <h2>로그인</h2>
+        <form @submit.prevent="handleLogin">
+            <input v-model="loginForm.id" type="text" placeholder="ID"><br>
+            <input v-model="loginForm.password" type="password" placeholder="Password"><br>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    <div v-else>
+        <h2>운동 매칭</h2>
+        <div v-if="!isWaiting">
+            <h3>운동 선택</h3>
+            <button
+                    v-for="exercise in exerciseTypes"
+                    :key="exercise.id"
+                    @click="selectExercise(exercise)"
+                    :class="['exercise-btn', { selected: selectedExercise && selectedExercise.id === exercise.id }]"
+            >
+                {{ exercise.name }}
+            </button>
+            <br>
+            <button @click="startMatching" :disabled="!selectedExercise">
+                매칭 시작
+            </button>
+        </div>
+        <div v-else>
+            <p class="waiting">매칭 대기 중... ({{ waitingTime }}초)</p>
+            <p>선택한 운동: {{ selectedExercise ? selectedExercise.name : '' }}</p>
+            <button @click="cancelMatching">매칭 취소</button>
+        </div>
+        <div v-if="matchStatus" class="matched">
+            {{ matchStatus }}
+        </div>
+    </div>
+</div>
+
+<script>
+    const { createApp } = Vue
+
+    createApp({
+        data() {
+            return {
+                isLoggedIn: false,
+                loginForm: {
+                    id: '',
+                    password: ''
+                },
+                exerciseTypes: [
+                    { id: 1, name: 'pushup' },
+                    { id: 2, name: 'squat' },
+                    { id: 3, name: 'lunge' },
+                    { id: 4, name: 'plank' }
+                ],
+                selectedExercise: null,
+                isWaiting: false,
+                waitingTime: 0,
+                matchStatus: '',
+                ws: null,
+                waitingInterval: null,
+                userId: ''
+            }
+        },
+        methods: {
+            async handleLogin() {
+                try {
+                    const response = await axios.post('/api/v1/auth/login', this.loginForm);
+                    if (response.data.statusCode === 200) {
+                        localStorage.setItem('token', response.data.accessToken);
+                        this.isLoggedIn = true;
+                        this.userId = this.loginForm.id;
+                        this.connectWebSocket();
+                    }
+                } catch (error) {
+                    console.error('Login failed:', error);
+                    alert('로그인 실패');
+                }
+            },
+            connectWebSocket() {
+                this.ws = new WebSocket(`ws://${window.location.host}/api/v1/matching`);
+                this.ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    console.log('Received WebSocket message:', data);
+                    switch(data.type) {
+                        case 'MATCH_SUCCESS':
+                            this.handleMatchSuccess(data);
+                            break;
+                        case 'MATCH_TIMEOUT':
+                            this.handleMatchTimeout(data);
+                            break;
+                        default:
+                            console.warn('Unknown message type:', data.type);
+                    }
+                };
+                this.ws.onclose = () => {
+                    console.log('WebSocket 연결 끝');
+                };
+            },
+            selectExercise(exercise) {
+                this.selectedExercise = exercise;
+            },
+            async startMatching() {
+                if (!this.selectedExercise) {
+                    alert("운동을 선택해주세요.");
+                    return;
+                }
+
+                const token = localStorage.getItem("token");
+                if (!token) {
+                    alert("로그인이 필요합니다.");
+                    return;
+                }
+
+                try {
+                    const response = await fetch("/api/v1/matching/enter", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: new URLSearchParams({
+                            exerciseType: this.selectedExercise.id
+                        })
+                    });
+
+                    const text = await response.text();
+
+                    if (response.ok) {
+                        alert(text);
+                        this.isWaiting = true;
+                        this.startWaitingTimer();
+                    } else {
+                        alert(text || "대기방 입장에 실패했습니다.");
+                    }
+                } catch (error) {
+                    console.error("매칭 요청 실패:", error);
+                    alert("매칭 요청 중 오류가 발생했습니다.");
+                }
+            },
+            startWaitingTimer() {
+                this.waitingTime = 0;
+                this.waitingInterval = setInterval(() => {
+                    this.waitingTime++;
+                    if (this.waitingTime >= 60) {
+                        this.handleMatchTimeout();
+                    }
+                }, 1000);
+            },
+            async cancelMatching() {
+                try {
+                    const token = localStorage.getItem('token');
+                    if (!token || !this.selectedExercise) {
+                        throw new Error('인증 정보 또는 운동 정보가 없습니다.');
+                    }
+
+                    const response = await fetch(`/api/v1/matching/leave?exerciseType=${this.selectedExercise.id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const text = await response.text();
+
+                    if (response.ok) {
+                        this.isWaiting = false;
+                        clearInterval(this.waitingInterval);
+                        this.matchStatus = '매칭이 취소되었습니다.';
+                        this.selectedExercise = null;
+                        this.waitingTime = 0;
+                    } else {
+                        throw new Error(text);
+                    }
+                } catch (error) {
+                    console.error('Matching cancel failed:', error);
+                    alert('매칭 취소 중 오류가 발생했습니다.');
+                }
+            },
+            handleMatchSuccess(matchData) {
+                this.isWaiting = false;
+                clearInterval(this.waitingInterval);
+                this.matchStatus = `매칭 성공! 상당방: ${matchData.player2Id}`;
+            },
+            handleMatchTimeout() {
+                this.isWaiting = false;
+                clearInterval(this.waitingInterval);
+                this.matchStatus = '매칭 시간이 초과되었습니다.';
+            }
+        },
+        beforeUnmount() {
+            if (this.ws) this.ws.close();
+            if (this.waitingInterval) clearInterval(this.waitingInterval);
+        }
+    }).mount('#app')
+</script>
+</body>
+</html>

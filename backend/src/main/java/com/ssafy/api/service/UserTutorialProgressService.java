@@ -1,6 +1,7 @@
 package com.ssafy.api.service;
 
 import com.ssafy.api.response.GetTutorialRes;
+import com.ssafy.api.response.GetTutorialSimpleRes;
 import com.ssafy.db.entity.UserTutorialProgress;
 
 import java.util.List;
@@ -8,6 +9,8 @@ import java.util.List;
 public interface UserTutorialProgressService {
 
     List<GetTutorialRes> getTutorials(String userId); // 튜토리얼 조회
+
+    List<GetTutorialSimpleRes> getTutorialSimples(String userId);
 
     boolean isTutorialCompleted(String userId, Long tutorialId); // 특정 튜토리얼 완료 여부 확인
 

@@ -19,7 +19,7 @@ public class WaitingUser implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String userId;
-    private String exerciseType;
+    private Long exerciseType;
     private Short rankScore;
     private LocalDateTime joinTime;
 
