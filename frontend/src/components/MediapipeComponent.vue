@@ -52,7 +52,7 @@ import ReportIssueButton from "@/components/button/ReportButton.vue"
 
 let intervalId = null // setInterval ID 저장 (타이머 초기화용)
 
-const selectedTime = ref(60 * 1000) // 기본값: 1분
+const selectedTime = ref(3 * 1000) // 기본값: 1분
 const timeLeft = ref(selectedTime.value) // 남은 시간 (ms)
 const formattedTime = ref(formatTime(timeLeft.value)) // 표시할 시간
 
@@ -191,7 +191,7 @@ onMounted(async () => {
     const timeFromUrl = parseInt(pathSegments[pathSegments.length - 1]) // 마지막 값 가져오기
     console.log(timeFromUrl, "인지된 시간")
     if (!isNaN(timeFromUrl)) {
-      selectedTime.value = timeFromUrl * 60 * 1000 // 초에서 밀리초 변환
+      selectedTime.value = timeFromUrl * 3 * 1000 // 초에서 밀리초 변환
     }
   } else if (window.location.href.includes("tutorial")) {
     // 튜토리얼 모드 기본값: 999분
