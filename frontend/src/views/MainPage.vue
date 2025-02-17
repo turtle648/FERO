@@ -97,7 +97,7 @@ onMounted(async () => {
           <!-- 타이틀 바 -->
           <div class="w-full h-[12vh] bg-[#c3c3c3] flex flex-col">
             <!-- 상단 텍스트 영역 -->
-            <div class="h-[40%] flex items-center justify-center border-b-2 border-[#818181]">
+            <!-- <div class="h-[40%] flex items-center justify-center border-b-2 border-[#818181]">
               <span class="text-black text-nowrap font-bold max-w-fit">
                 <template v-for="(char, index) in 'Hero From ISAEKAI'" :key="index">
                   <span 
@@ -108,10 +108,10 @@ onMounted(async () => {
                   </span>
                 </template>
               </span>
-            </div>
+            </div> -->
 
             <!-- 여백 -->
-            <div class="h-[5%]"></div>
+            <!-- <div class="h-[5%]"></div> -->
 
             <!-- 하단 컨트롤 영역 -->
             <div class="h-[45%] flex justify-between items-center px-2">
@@ -148,6 +148,26 @@ onMounted(async () => {
                 </button>
               </div>
             </div>
+            <!-- 여백 -->
+            <div class="h-[10%] border-b-2 border-[#818181]"></div>
+            <!-- 상단 텍스트 영역 (주소창 스타일 적용) -->
+            <div class="h-[40%] flex items-center px-2">
+              <div class="relative w-full nes-field flex items-center bg-white border-4 border-gray-700 px-4 py-2" 
+                   style="border-radius: 16px;">
+                <span class="text-black font-bold nes-text break-words w-full text-center text-lg leading-tight">
+                  <template v-for="(char, index) in 'Hero.From.ISAEKAI'" :key="index">
+                    <span 
+                      class="inline-block animate-pixel-wave" 
+                      :style="{ 'animation-delay': `${index * 0.1}s` }"
+                    >
+                      {{ char === ' ' ? '\u00A0' : char }}
+                    </span>
+                  </template>
+                </span>
+              </div>
+            </div>
+
+
           </div>
         </header>
 

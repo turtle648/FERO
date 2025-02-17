@@ -60,16 +60,30 @@ recognition.continuous = true;
 recognition.interimResults = false; // 🔥 최종 결과만 반영
 recognition.lang = "ko-KR";
 
-recognition.onstart = () => (isListening.value = true);
+recognition.onstart = () => (isListening.value = true)
 recognition.onend = () => {
- isListening.value = false;
- setTimeout(() => recognition.start(), 500);
-};
+  console.log("🛑 음성 인식 종료됨")
+  isListening.value = false
+  
+  setTimeout(() => {
+    if (!isListening.value) {
+      console.log("🔄 음성 인식 다시 시작")
+      recognition.start()
+    }
+  }, 500)
+}
 
 recognition.onerror = (event) => {
- console.error("음성 인식 오류:", event);
- setTimeout(() => recognition.start(), 1000);
-};
+  console.error("⚠️ 음성 인식 오류 발생:", event)
+  isListening.value = false
+
+  setTimeout(() => {
+    if (!isListening.value) {
+      console.log("오류 후 음성 인식 다시 시작")
+      recognition.start()
+    }
+  }, 3000)
+}
 
 recognition.onresult = (event) => {
  let finalTranscript = event.results[event.results.length - 1][0].transcript.trim();
