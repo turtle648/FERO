@@ -26,11 +26,11 @@
     </section>
 
     <!-- 튜토리얼 완료 버튼 -->
-    <div v-if="currentStep === 15" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center space-y-4 z-10">
-      <button class="px-4 py-2 nes-btn is-primary font-dgm" @click="completeUiTutorial">튜토리얼 완료!</button>
+    <div v-if="currentStep === 15" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center space-y-4 z-50">
+      <button class="px-4 py-2 nes-btn is-primary font-dgm z-50" @click="completeUiTutorial">튜토리얼 완료!</button>
     </div>
 
-    <div class="text-container absolute top-4 right-4">
+    <div class="text-container absolute top-4 right-4 z-50">
       <button type="button" class="nes-btn is-primary text-1xl font-dgm">스쿼트 횟수: 0</button>
     </div>
 
