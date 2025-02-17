@@ -3,7 +3,6 @@ import { ref } from "vue"
 import axios from "axios"
 import router from "@/router"
 
-<<<<<<< HEAD
 export const useUserStore = defineStore("user", () => {
   const BASE_URL = "https://i12e103.p.ssafy.io:8076/api/v1"
 
@@ -11,15 +10,6 @@ export const useUserStore = defineStore("user", () => {
   const sessionId = ref(localStorage.getItem("sessionId") || null)
   const userId = ref(localStorage.getItem("userId") || null)
 
-=======
-export const useUserStore = defineStore('user', () => {
-  const BASE_URL = 'https://i12e103.p.ssafy.io:8076/api/v1'
-  
-  const accessToken = ref(localStorage.getItem('authToken') || null)
-  const sessionId = ref(localStorage.getItem('sessionId') || null)
-  const userId = ref(localStorage.getItem('userId') || null)
-  
->>>>>>> 25dc83ec435c70c77449e52ec0d268259c545e2d
   function setAccessToken(token) {
     accessToken.value = token
     localStorage.setItem("authToken", token)
@@ -31,15 +21,9 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function clearSession() {
-<<<<<<< HEAD
     localStorage.removeItem("authToken")
     localStorage.removeItem("sessionId")
     localStorage.removeItem("userId")
-=======
-    localStorage.removeItem('authToken')
-    localStorage.removeItem('sessionId')
-    localStorage.removeItem('userId')
->>>>>>> 25dc83ec435c70c77449e52ec0d268259c545e2d
     accessToken.value = null
     sessionId.value = null
     userId.value = null
@@ -72,7 +56,6 @@ export const useUserStore = defineStore('user', () => {
   // 로그인 API 호출
   const logIn = async (id, password) => {
     try {
-<<<<<<< HEAD
       const response = await axios.post(`${BASE_URL}/auth/login`, { id, password })
       console.log(response.data["accessToken"])
       accessToken.value = response.data["accessToken"]
@@ -80,15 +63,6 @@ export const useUserStore = defineStore('user', () => {
       localStorage.setItem("authToken", response.data["accessToken"])
       localStorage.setItem("userId", id)
       return response.data["statusCode"]
-=======
-      const response = await axios.post(`${BASE_URL}/auth/login`, 
-        { id, password }
-      )
-      console.log(response.data)
-      localStorage.setItem('authToken', response.data['accessToken'])
-      localStorage.setItem('userId', id)
-      return response.data['accessToken']
->>>>>>> 25dc83ec435c70c77449e52ec0d268259c545e2d
     } catch (error) {
       console.error(`로그인 요청 중 에러 발생: `, error)
       return false
@@ -100,11 +74,7 @@ export const useUserStore = defineStore('user', () => {
     try {
       const token = accessToken.value
       if (!token) {
-<<<<<<< HEAD
         console.error("로그아웃 실패: 토큰이 없습니다.")
-=======
-        console.error('로그아웃 실패: 토큰이 없습니다.')
->>>>>>> 25dc83ec435c70c77449e52ec0d268259c545e2d
         return false
       }
 
@@ -133,23 +103,12 @@ export const useUserStore = defineStore('user', () => {
 
   const signUp = async (userId, password, userName, phoneNumber, userEmail) => {
     try {
-<<<<<<< HEAD
       const response = await axios.post(`${BASE_URL}/users`, { userId, password, userName, phoneNumber, userEmail })
       console.log("회원가입 1단계 API 호출 결과:", response)
       return response.data
     } catch (error) {
       console.error(error)
       throw new Error("회원가입 실패")
-=======
-      const response = await axios.post(`${BASE_URL}/users`, 
-        { userId, password, userName, phoneNumber, userEmail }
-      )
-      console.log('회원가입 1단계 API 호출 결과:', response)
-      return response.data
-    } catch (error) {
-      console.error(error)
-      throw new Error('회원가입 실패')
->>>>>>> 25dc83ec435c70c77449e52ec0d268259c545e2d
     }
   }
 
@@ -157,7 +116,6 @@ export const useUserStore = defineStore('user', () => {
   const checkEmailDuplicateAPI = async (email) => {
     try {
       const response = await axios.get(`${BASE_URL}/users/check-email`, {
-<<<<<<< HEAD
         params: { email },
       })
       if (response.data.statusCode === 200) {
@@ -166,16 +124,6 @@ export const useUserStore = defineStore('user', () => {
       }
     } catch (error) {
       alert("이메일 중복 확인 실패")
-=======
-        params: { email }
-      })
-      if (response.data.statusCode === 200) {  
-        console.log('이메일 중복 확인 결과:', response)
-        return true
-      }
-    } catch (error) {
-      alert('이메일 중복 확인 실패')
->>>>>>> 25dc83ec435c70c77449e52ec0d268259c545e2d
     }
   }
 
@@ -183,23 +131,12 @@ export const useUserStore = defineStore('user', () => {
   const sendEmail = async (email) => {
     try {
       // `email`을 쿼리스트링으로 전달
-<<<<<<< HEAD
       const response = await axios.post(`${BASE_URL}/users/send-email?email=${encodeURIComponent(email)}`)
       console.log("인증메일 발송 결과:", response)
       return response.data?.statusCode === 200
     } catch (error) {
       console.error("인증메일 발송 실패:", error)
       alert("인증메일 발송 실패")
-=======
-      const response = await axios.post(
-        `${BASE_URL}/users/send-email?email=${encodeURIComponent(email)}`
-      )
-      console.log('인증메일 발송 결과:', response)
-      return response.data?.statusCode === 200
-    } catch (error) {
-      console.error('인증메일 발송 실패:', error)
-      alert('인증메일 발송 실패')
->>>>>>> 25dc83ec435c70c77449e52ec0d268259c545e2d
       return false // 실패 시 false 반환
     }
   }
@@ -208,23 +145,12 @@ export const useUserStore = defineStore('user', () => {
   const verifyEmail = async (code, email) => {
     try {
       // `code`와 `email`을 쿼리스트링으로 전달
-<<<<<<< HEAD
       const response = await axios.post(`${BASE_URL}/users/verify-email?code=${code}&email=${encodeURIComponent(email)}`)
       console.log("이메일 인증 결과:", response)
       return response.data?.statusCode === 200
     } catch (error) {
       console.error("이메일 인증 실패:", error)
       alert("이메일 인증에 실패했습니다.")
-=======
-      const response = await axios.post(
-        `${BASE_URL}/users/verify-email?code=${code}&email=${encodeURIComponent(email)}`
-      )
-      console.log('이메일 인증 결과:', response)
-      return response.data?.statusCode === 200
-    } catch (error) {
-      console.error('이메일 인증 실패:', error)
-      alert('이메일 인증에 실패했습니다.')
->>>>>>> 25dc83ec435c70c77449e52ec0d268259c545e2d
       return false // 실패 시 false 반환
     }
   }
@@ -232,7 +158,6 @@ export const useUserStore = defineStore('user', () => {
   // 캐릭터 등록 API 호출
   const registerCharacter = async (gender, userNickname, avatar, sessionId) => {
     try {
-<<<<<<< HEAD
       const response = await axios.post(`${BASE_URL}/users/character?sessionId=${encodeURIComponent(sessionId)}`, { gender, userNickname, avatar })
       console.log("캐릭터 등록 결과:", response)
       return response.data?.statusCode === 200
@@ -259,22 +184,4 @@ export const useUserStore = defineStore('user', () => {
     verifyEmail,
     registerCharacter,
   }
-=======
-      const response = await axios.post(
-        `${BASE_URL}/users/character?sessionId=${encodeURIComponent(sessionId)}`, 
-        { gender, userNickname, avatar }
-      )
-      console.log('캐릭터 등록 결과:', response);
-      return response.data?.statusCode === 200;
-    } catch (error) {
-      console.error('캐릭터 등록 실패:', error);
-      throw new Error('캐릭터 등록 실패');
-    }
-  }
-
-  return { accessToken, sessionId, userId,
-           setAccessToken, setSessionId, clearSession, isTokenValid, setUserId, 
-           logIn, logOut, signUp, checkEmailDuplicateAPI, sendEmail, verifyEmail, registerCharacter
-         }
->>>>>>> 25dc83ec435c70c77449e52ec0d268259c545e2d
 })
