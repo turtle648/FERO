@@ -1,6 +1,6 @@
 <!-- components/modal/SettingModal.vue -->
 <template>
-  <BaseModal title="설정" @close-modal="$emit('close-modal')">
+  <BaseModal title="Settings" @close-modal="$emit('close-modal')">
     <div class="flex flex-col h-full">
       <!-- 메인 메뉴 리스트 -->
       <ul class="space-y-4 flex-1">
