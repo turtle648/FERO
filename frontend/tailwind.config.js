@@ -18,6 +18,7 @@ module.exports = {
       },
       fontFamily: {
         pixel: ["PixelFont", "monospace"],
+        dgm: ["DungGeunMo", "sans-serif"],
       },
       colors: {
         "custom-blue": "#1E40AF",

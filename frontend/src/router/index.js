@@ -1,18 +1,15 @@
 import { createRouter, createWebHistory } from "vue-router"
 import StartPage from "@/views/StartPage.vue"
 import MainPage from "@/views/MainPage.vue"
-import LoginPage from "@/views/LoginPage.vue"
 import FitnessTutorialPage from "@/views/FitnessTutorialPage.vue"
 import SingleModePage from "@/views/SingleModePage.vue"
-import MultiModePage from "@/views/MultiModePage.vue"
-// import MediapipeComponent from "@/components/MediapipeComponent.vue" // fix: 수정예정
 import QRComponent from "@/components/QRComponent.vue"
 import RankMatchPage from "@/views/RankMatchPage.vue"
 import UiTutorialPage from "@/views/UiTutorialPage.vue"
 import TestVoice from "@/components/voice/testVoice.vue"
 import RankMatchResultPage from "@/views/RankMatchResultPage.vue"
 
-import { useUserStore } from '@/stores/store'
+import { useUserStore } from "@/stores/store"
 import { useUserDataStore } from "@/stores/userDataStore"
 
 // 랭크매치, 랭크모드에 인증 관련 메타데이터 고려해볼 것
@@ -41,23 +38,11 @@ const routes = [
     meta: { isMobile: true, requiresAuth: true },
   },
   {
-    path: "/login",
-    name: "Login",
-    component: LoginPage,
-    meta: { isMobile: true, requiresAuth: true },
-  },
-  {
     path: "/tutorial/:exercise",
     name: "Tutorial",
     component: FitnessTutorialPage,
     meta: { isMobile: true, requiresAuth: true },
   },
-  // {
-  //   path: "/mediapipe",
-  //   name: "Mediapipe",
-  //   component: MediapipeComponent,
-  //   meta: { isMobile: true },
-  // },
   {
     path: "/single-mode/:exercise/:count",
     name: "SingleMode",
@@ -65,13 +50,13 @@ const routes = [
     props: true,
     meta: { isMobile: true, requiresAuth: true },
   },
-  {
-    path: "/multi-mode/:exercise",
-    name: "MultiMode",
-    component: MultiModePage,
-    props: true,
-    meta: { isMobile: true, requiresAuth: true },
-  },
+  // {
+  //   path: "/multi-mode/:exercise",
+  //   name: "MultiMode",
+  //   component: MultiModePage,
+  //   props: true,
+  //   meta: { isMobile: true, requiresAuth: true },
+  // },
   {
     path: "/rank-mode/:exercise",
     name: "RankMode",
@@ -119,15 +104,14 @@ const router = createRouter({
 
 // 네비게이션 가드 설정
 router.beforeEach(async (to, from, next) => {
-
   const userAgent = navigator.userAgent.toLowerCase()
   const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0
   const isMobileDevice = /android|iphone|ipad|ipod|blackberry|opera mini|iemobile|wpdesktop/i.test(userAgent)
   const isTablet = /ipad|tablet|playbook|silk/i.test(userAgent)
   const isWindowsPC = /windows nt/i.test(userAgent) && !isTablet // Windows PC (태블릿 제외)
-  const isMacPC = /macintosh/i.test(userAgent) && !isTouchDevice // Mac (터치스크린이 없을 경우)  
+  const isMacPC = /macintosh/i.test(userAgent) && !isTouchDevice // Mac (터치스크린이 없을 경우)
   const isMobile = (isMobileDevice || isTablet) && !isWindowsPC && !isMacPC
-  
+
   console.log("User-Agent:", userAgent)
   console.log("터치 디바이스 여부:", isTouchDevice)
   console.log("모바일 디바이스:", isMobileDevice)
@@ -135,22 +119,31 @@ router.beforeEach(async (to, from, next) => {
   console.log("Windows PC:", isWindowsPC)
   console.log("Mac PC:", isMacPC)
   console.log("최종 모바일 판정:", isMobile)
-  
+
   // ==================================================
-  if (to.path === "/qr") { return next()}
-  if (!isMobile) { return next("/qr")}
-  if (to.path === "/" || to.path === "" || to.path === ".") { return next() }
+  if (to.path === "/qr") {
+    return next()
+  }
+  if (!isMobile) {
+    return next("/qr")
+  }
+  if (to.path === "/" || to.path === "" || to.path === ".") {
+    return next()
+  }
 
   const userStore = useUserStore()
   const userDataStore = useUserDataStore()
   // 토큰 없는경우
   if (to.meta.requiresAuth && (!localStorage.getItem("authToken") || !localStorage.getItem("userId"))) {
+    console.log("토큰 없음")
     userStore.clearSession()
     return next("/")
   }
   // 토큰 유효성 검증 실패
   const isTokenValid = await userDataStore.checkUserInfo()
+  console.log(isTokenValid)
   if (!isTokenValid) {
+    console.log("토큰 유효성 검사 실패")
     userStore.clearSession()
     return next("/")
   }

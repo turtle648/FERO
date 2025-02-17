@@ -1,197 +1,29 @@
-<template>
-  <!-- 배경 이미지 -->
-  <div
-    class="absolute inset-0 flex items-center justify-center overflow-hidden"
-  >
-    <img
-      src="@/assets/images/background_image3.png"
-      class="w-full h-full object-fill"
-    />
-  </div>
-
-  <!-- 헤더 -->
-  <header
-    class="absolute top-0 w-full h-[7vh] bg-green-400 text-white font-bold flex justify-between items-center px-4"
-  >
-    <div
-      class="flex items-center w-1/2 cursor-pointer"
-      @click="openModal('status')"
-    >
-      <img
-        src="@/assets/images/profile/default_profile.png"
-        class="w-[7vh] h-[7vh] rounded-full object-cover"
-      />
-      <div class="ml-4 flex-1">
-        <div class="text-[2vh]">{{ userInfo.userNickname }}</div>
-        <div class="relative w-full h-[2vh] bg-gray-200 rounded-full mt-1">
-          <div
-            class="absolute inset-0 flex items-center justify-center text-black text-[1.5vh] font-bold"
-          >
-            Lv. {{ userInfo.level }}
-          </div>
-          <div
-            class="bg-blue-500 h-full rounded-full"
-            :style="{ width: Math.min(userInfo.experience / 2, 100) + '%' }"
-          ></div>
-        </div>
-      </div>
-    </div>
-    <img
-      class="w-[5vh] h-[5vh] object-cover cursor-pointer"
-      @click="openModal('setting')"
-      src="@/assets/images/icon/setting.png"
-      alt="설정"
-    />
-  </header>
-
-  <!-- 알림 아이콘 -->
-  <div
-    class="absolute top-[10vh] right-[2vh] w-[4vh] h-[3vh] cursor-pointer"
-    @click="openModal('alarm')"
-  >
-    <img src="@/assets/images/icon/alarm2.png" alt="알림" />
-  </div>
-
-  <!-- 캐릭터 -->
-  <div
-    class="absolute left-1/2 bottom-[6vh] transform -translate-x-1/2 w-[40vh] h-[50vh] flex items-center justify-center overflow-hidden cursor-pointer"
-    @click="openModal('character')"
-  >
-    <img
-      v-if="hair && face && body"
-      :src="face"
-      class="absolute w-[40vh] h-[40vh] top-0"
-    />
-    <img
-      v-if="hair && face && body"
-      :src="hair"
-      class="absolute w-[40vh] h-[40vh] top-0"
-    />
-    <img
-      v-if="hair && face && body"
-      :src="body"
-      class="absolute w-[40vh] h-[40vh] bottom-0"
-    />
-    <div v-if="!face && !hair && !body" class="text-gray-500 text-center">
-      캐릭터 없음
-    </div>
-  </div>
-
-  <!-- 하단 메뉴 -->
-  <div
-    class="footer absolute bottom-0 w-full h-[7vh] grid grid-cols-5 bg-white text-center"
-  >
-    <div
-      class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer"
-      @click="openModal('friend')"
-    >
-      친구
-    </div>
-    <div
-      class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer"
-      @click="openModal('calendar')"
-    >
-      달력
-    </div>
-    <div
-      class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer"
-      @click="openModal('fitness')"
-    >
-      운동
-    </div>
-    <div
-      class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer"
-      @click="openModal('record')"
-    >
-      전적
-    </div>
-    <div
-      class="footer-btn p-[1vh] bg-blue-500 text-white cursor-pointer"
-      @click="openModal('quest')"
-    >
-      퀘스트
-    </div>
-  </div>
-
-  <!-- 모달 컴포넌트 -->
-  <StatusModal
-    v-if="modals.status"
-    @close-modal="closeModal('status')"
-    @open-modal="openModal('status')"
-  />
-  <SettingModal
-    v-if="modals.setting"
-    @close-modal="closeModal('setting')"
-    @open-modal="openModal('setting')"
-  />
-  <AlarmModal
-    v-if="modals.alarm"
-    @close-modal="closeModal('alarm')"
-    @open-modal="openModal('alarm')"
-  />
-  <CharacterModal
-    v-if="modals.character"
-    @close-modal="closeModal('character')"
-    @open-modal="openModal('character')"
-  />
-  <FriendListModal
-    v-if="modals.friend"
-    @close-modal="closeModal('friend')"
-    @open-modal="openModal('friend')"
-  />
-  <CalendarModal
-    v-if="modals.calendar"
-    @close-modal="closeModal('calendar')"
-    @open-modal="openModal('calendar')"
-  />
-  <FitnessModal
-    v-if="modals.fitness"
-    @close-modal="closeModal('fitness')"
-    @open-modal="openModal('fitness')"
-  />
-  <MatchRecordModal
-    v-if="modals.record"
-    @close-modal="closeModal('record')"
-    @open-modal="openModal('record')"
-  />
-  <QuestModal
-    v-if="modals.quest"
-    @close-modal="closeModal('quest')"
-    @open-modal="openModal('quest')"
-  />
-  <!-- 백그라운드 음성인식 -->
-  <SpeechRecognitionHandler @voice-control="modalControl" />
-</template>
-
 <script setup>
-// ==================================================
-import { onMounted, ref, computed, watchEffect } from "vue";
-import { storeToRefs } from "pinia";
-import { useUserDataStore } from "@/stores/userDataStore";
-import { useMainStore } from "@/stores/mainStore";
-import { assets } from "@/assets.js";
+import { onMounted, ref, computed, watchEffect } from "vue"
+import { storeToRefs } from "pinia"
+import { useUserDataStore } from "@/stores/userDataStore"
+import { useMainStore } from "@/stores/mainStore"
+import { assets } from "@/assets.js"
 
-import StatusModal from "@/components/modal/StatusModal.vue";
-import SettingModal from "@/components/modal/SettingModal.vue";
-import AlarmModal from "@/components/modal/AlarmModal.vue";
-import CharacterModal from "@/components/modal/CharacterModal.vue";
-import FriendListModal from "@/components/modal/FriendListModal.vue";
-import CalendarModal from "@/components/modal/CalendarModal.vue";
-import FitnessModal from "@/components/modal/FitnessModal.vue";
-import MatchRecordModal from "@/components/modal/MatchRecordModal.vue";
-import QuestModal from "@/components/modal/QuestModal.vue";
-import SpeechRecognitionHandler from "@/components/voice/SpeechRecognitionHandler.vue";
+import StatusModal from "@/components/modal/StatusModal.vue"
+import SettingModal from "@/components/modal/SettingModal.vue"
+import CharacterModal from "@/components/modal/CharacterModal.vue"
+import CalendarModal from "@/components/modal/CalendarModal.vue"
+import FitnessModal from "@/components/modal/FitnessModal.vue"
+import RecordModal from "@/components/modal/RecordModal.vue"
+import QuestModal from "@/components/modal/QuestModal.vue"
+import SpeechRecognitionHandler from "@/components/voice/SpeechRecognitionHandler.vue"
 
 // 스토어 가져오기 ==================================================
 const userDataStore = useUserDataStore();
 const mainStore = useMainStore();
 // 반응형 상태 유지 ==================================================
-const { userInfo } = storeToRefs(userDataStore);
+const { userInfo } = storeToRefs(userDataStore)
 
 // 아바타  ==================================================
-const hair = ref("");
-const face = ref("");
-const body = ref("");
+const hair = ref("")
+const face = ref("")
+const body = ref("")
 // userInfo.avatar가 변경될 때 자동으로 캐릭터 이미지 업데이트
 watchEffect(() => {
   if (userInfo.value.avatar) {
@@ -202,66 +34,170 @@ watchEffect(() => {
     face.value = assets.face[faceIndex]?.[0] || "";
     body.value = assets.body[bodyIndex]?.[0] || "";
   }
-});
+})
 
 // 모달 상태 및 관리 메서드 ========================================
-const modals = ref({
-  status: false,
-  record: false,
-  setting: false,
-  friend: false,
-  calendar: false,
-  fitness: false,
-  alarm: false,
-  character: false,
-  quest: false,
-});
-const isAnyModalOpen = computed(() =>
-  Object.values(modals.value).some((v) => v)
-);
+const modals = ref({ status: false, record: false, setting: false, calendar: false, fitness: false, character: false, quest: false })
+const isAnyModalOpen = computed(() => Object.values(modals.value).some((v) => v))
 const openModal = (type) => {
-  if (!isAnyModalOpen.value) modals.value[type] = true;
-};
+  if (!isAnyModalOpen.value) modals.value[type] = true
+}
 const closeModal = (type) => {
-  modals.value[type] = false;
-};
+  modals.value[type] = false
+}
 const modalControl = (type) => {
   if (type === "close") {
     // 모든 모달 종료
-    modals.value = {
-      status: false,
-      record: false,
-      setting: false,
-      friend: false,
-      calendar: false,
-      fitness: false,
-      alarm: false,
-      character: false,
-      quest: false,
-    };
+    modals.value = { status: false, record: false, setting: false, friend: false, calendar: false, fitness: false, alarm: false, character: false, quest: false }
   } else if (isAnyModalOpen.value) {
-    const activeModal =
-      Object.keys(modals.value).find((key) => modals.value[key]) || null;
+    const activeModal = Object.keys(modals.value).find((key) => modals.value[key]) || null
     if (activeModal === type) {
-      modals.value[type] = false;
+      modals.value[type] = false
     } else {
-      modals.value[activeModal] = false;
-      modals.value[type] = true;
+      modals.value[activeModal] = false
+      modals.value[type] = true
     }
   } else {
-    modals.value[type] = true;
+    modals.value[type] = true
   }
-};
+}
 
 // 유저정보/ 튜토리얼정보 불러오기 ==================================================
 onMounted(async () => {
   try {
-    await userDataStore.checkUserInfo();
+    await userDataStore.checkUserInfo()
   } catch (error) {
-    console.error("User Data 로드 중 오류 발생:", error);
+    console.error("User Data 로드 중 오류 발생:", error)
   }
-  await mainStore.loadTutorial();
-});
+  await mainStore.loadTutorial()
+})
 </script>
 
-<style scoped></style>
+<template>
+  <div class="fixed inset-0 w-full h-full overflow-hidden">
+    <!-- Windows 98 스타일 테두리 -->
+    <div class="absolute inset-0">
+      <!-- 밝은 회색 테두리 (왼쪽, 위) -->
+      <div class="absolute top-0 left-0 w-full h-[3px] bg-[#dfdfdf]"></div>
+      <div class="absolute top-0 left-0 h-full w-[3px] bg-[#dfdfdf]"></div>
+      
+      <!-- 어두운 회색 테두리 (오른쪽, 아래) -->
+      <div class="absolute bottom-0 right-0 w-full h-[3px] bg-[#818181]"></div>
+      <div class="absolute top-0 right-0 h-full w-[3px] bg-[#818181]"></div>
+
+      <!-- 실제 내용물을 테두리 안쪽으로 3px 띄움 -->
+      <div class="absolute inset-[3px]">
+        <!-- 배경 이미지 -->
+        <div class="absolute inset-0 flex items-center justify-center w-screen overflow-hidden" style="image-rendering: pixelated;">
+          <img src="@/assets/images/bg_5.jpg" class="w-full h-full object-fill" />
+        </div>
+
+        <!-- 헤더 -->
+        <header class="absolute top-0 w-full flex flex-col">
+          <!-- 타이틀 바 -->
+          <div class="w-full h-[7vh] bg-[#c3c3c3] flex justify-between items-center px-2">
+            <!-- 왼쪽: 타이틀 영역 -->
+            <div class="flex items-center h-full" @click="openModal('status')">
+              <div class="flex items-center h-[90%] px-2 border-t-2 border-l-2 border-[#ffffff] border-r-2 border-b-2 border-[#818181] bg-[#c3c3c3]">
+                <img src="@/assets/images/profile/default-image-1.png" class="w-[5vh] mr-2" />
+                <div class="flex flex-col">
+                  <span class="text-black text-[2vh] font-bold">{{ userInfo.userNickname }}</span>
+                  <div class="relative w-full h-[1.5vh] bg-gray-200 rounded-sm mt-1">
+                    <div class="absolute inset-0 flex items-center justify-center text-black text-[1.2vh]">
+                      Lv. {{ userInfo.level }}
+                    </div>
+                    <div class="bg-blue-500 h-full" 
+                        :style="{ width: Math.min(userInfo.experience / 2, 100) + '%' }">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 오른쪽: 창 제어 버튼들 -->
+            <div class="flex space-x-1">
+              <!-- 최소화 버튼 -->
+              <button class="nes-btn h-12 w-12 flex items-center justify-center text-2xl font-bold">
+                _
+              </button>
+              <!-- 닫기 버튼 -->
+              <button 
+                @click="openModal('setting')"
+                class="nes-btn h-12 w-12 flex items-center justify-center text-2xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        </header>
+
+
+        <!-- 캐릭터 -->
+        <div class="absolute left-1/2 bottom-[10vh] transform -translate-x-1/2 w-[30vh] h-[60vh] flex items-center justify-center overflow-hidden cursor-pointer" 
+             @click="openModal('character')">
+          <img v-if="hair && face && body" :src="face" class="absolute w-[30vh] h-[48vh] top-0" />
+          <img v-if="hair && face && body" :src="hair" class="absolute w-[30vh] h-[48vh] top-0" />
+          <img v-if="hair && face && body" :src="body" class="absolute w-[30vh] h-[48vh] bottom-0" />
+          <div v-if="!face && !hair && !body" class="text-gray-500 text-center">캐릭터 없음</div>
+        </div>
+
+        <!-- 작업 표시줄 (푸터) -->
+        <footer class="absolute bottom-0 w-full h-[7vh] bg-[#c3c3c3] border-t-2 border-[#ffffff] flex">
+          <button 
+            class="w-1/5 h-full flex items-center justify-center border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
+            @click="openModal('calendar')"
+          >
+            <img src="@/assets/images/icon/icon-calendar.png" class="w-[5vh]" />
+          </button>
+          
+          <button 
+            class="w-1/5 h-full flex items-center justify-center border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
+            @click="openModal('record')"
+          >
+            <img src="@/assets/images/icon/icon-report.png" class="w-[6vh]" />
+          </button>
+          
+          <button 
+            class="w-1/5 h-full flex items-center justify-center border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
+            @click="openModal('fitness')"
+          >
+            <img src="@/assets/images/icon/icon-fitness.png" class="w-[7vh]" />
+          </button>
+          
+          <button 
+            class="w-1/5 h-full flex items-center justify-center border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
+            @click="openModal('quest')"
+          >
+            <img src="@/assets/images/icon/icon-quest.png" class="w-[5vh]" />
+          </button>
+          
+          <button 
+            class="w-1/5 h-full flex items-center justify-center border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
+            @click="openModal('setting')"
+          >
+            <img src="@/assets/images/icon/icon-setting.png" class="w-[5vh]" />
+          </button>
+        </footer>
+
+
+        <!-- 모달 컴포넌트 -->
+        <StatusModal v-if="modals.status" @close-modal="closeModal('status')" @open-modal="openModal('status')" />
+        <SettingModal v-if="modals.setting" @close-modal="closeModal('setting')" @open-modal="openModal('setting')" />
+        <CharacterModal v-if="modals.character" @close-modal="closeModal('character')" @open-modal="openModal('character')" />
+        <CalendarModal v-if="modals.calendar" @close-modal="closeModal('calendar')" @open-modal="openModal('calendar')" />
+        <FitnessModal v-if="modals.fitness" @close-modal="closeModal('fitness')" @open-modal="openModal('fitness')" />
+        <RecordModal v-if="modals.record" @close-modal="closeModal('record')" @open-modal="openModal('record')" />
+        <QuestModal v-if="modals.quest" @close-modal="closeModal('quest')" @open-modal="openModal('quest')" />
+
+        <!-- 백그라운드 음성인식 -->
+        <SpeechRecognitionHandler @voice-control="modalControl" />
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+img {
+  image-rendering: pixelated;
+}
+</style>

@@ -1,36 +1,32 @@
 <template>
-  <div class="modal" @click="closeStatusModal">
-    <div class="modal-content" @click.stop>
-      <!-- 모달 종료 버튼 -->
-      <button id="close-btn" @click="closeStatusModal">X</button>
-      <!-- 요소 1: 닉네임, 레벨, 랭크-->
-      <div class="status-element status-1">
-        <!-- 차후, png로 대체할 것 -->
-        <h2>Status</h2>
-        <div style="margin-top: 2%">닉네임: {{ userInfo.userNickname }}</div>
-        <div style="margin-top: 2%">
-          Lv. {{ userInfo.level }} | Rank: !!api수정을 통해 받기!!
+    <div class="modal" @click="closeStatusModal">
+      <div class="modal-content" @click.stop>
+        <!-- 모달 종료 버튼 -->
+        <button id="close-btn" @click="closeStatusModal">X</button>
+        <!-- 요소 1: 닉네임, 레벨, 랭크-->
+        <div class="status-element status-1">
+          <!-- 차후, png로 대체할 것 -->
+          <h2>Status</h2>
+          <div style="margin-top: 2%;">Nick: {{ userInfo.userNickname }}</div>
+          <div style="margin-top: 2%;">
+            Lv. {{ userInfo.level }} | Rank: !!api수정을 통해 받기!!
+          </div>
         </div>
-      </div>
-      <!-- 요소 2 -->
-      <div class="status-element status-2">
-        <div>
-          전체 승: !!api수정을 통해 받기!! | 총 플레이 수: !!api수정을 통해
-          받기!! | myBest: !!api수정을 통해 받기!!
+        <!-- 요소 2 -->
+        <div class="status-element status-2">
+            <div>
+                <!-- 전체 승: !!api수정을 통해 받기!! | 총 플레이 수: !!api수정을 통해 받기!! | myBest: !!api수정을 통해 받기!! -->
+            </div>
+            <div>
+                <!-- 월간 승: !!전척api완성후추가!! | 월간 게임 수: !!전척api완성후추가!! | myBest: !!전척api완성후추가!! -->
+            </div>
         </div>
-        <div>
-          월간 승: !!전척api완성후추가!! | 월간 게임 수: !!전척api완성후추가!! |
-          myBest: !!전척api완성후추가!!
-        </div>
-      </div>
-
-      <!-- 요소 3: 퀘스트 달성률, 게이지바 -->
-      <div class="status-element status-3">
-        <div style="margin-bottom: 2%">
-          <span style="margin-right: 10%"
-            >미션 클리어 수: !!퀘스트api완성후추가!!</span
-          >
-          <span>월간 클리어 수: !!퀘스트api완성후추가!!</span>
+  
+        <!-- 요소 3: 퀘스트 달성률, 게이지바 -->
+        <div class="status-element status-3">
+        <div style="margin-bottom: 2%;">
+            <!-- <span style="margin-right: 10%;">미션 클리어 수: !!퀘스트api완성후추가!!</span> -->
+            <!-- <span>월간 클리어 수: !!퀘스트api완성후추가!!</span> -->
         </div>
         <div class="progress-box">
           일일 달성률:
