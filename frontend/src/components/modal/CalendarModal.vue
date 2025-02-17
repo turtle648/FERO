@@ -101,12 +101,15 @@ const getSelectedDateData = async () => {
 }
 
 // 퀘스트 데이터를 저장
-const questData = ref([])
+const questData = ref([]);
 
 // 퀘스트 데이터 가져오기
 const fetchQuestData = async () => {
   try {
-    const response = await mainStore.isQuestCompleted(currentYear.value, currentMonth.value + 1)
+    const response = await mainStore.isQuestCompleted(
+      currentYear.value,
+      currentMonth.value + 1
+    );
 
     if (response && response.length > 0) {
       questData.value = response
@@ -118,12 +121,12 @@ const fetchQuestData = async () => {
       console.log("🚨 No data for this month")
       questData.value = "no-data"
     } else {
-      console.error("🚨 Error fetching quest data:", error)
+      console.error("🚨 Error fetching quest data:", error);
     }
   } finally {
     renderCalendar()
   }
-}
+};
 
 // 날짜 선택 핸들러
 const handleDateSelect = (day) => {
@@ -139,11 +142,13 @@ const renderCalendar = () => {
   const lastDateOfMonth = new Date(currentYear.value, currentMonth.value + 1, 0).getDate()
   const lastDayOfPrevMonth = new Date(currentYear.value, currentMonth.value, 0).getDate()
 
-  let daysHTML = ""
+  let daysHTML = "";
 
   // 이전 달 날짜
   for (let i = firstDayOfMonth; i > 0; i--) {
-    daysHTML += `<span class="text-gray-400">${lastDayOfPrevMonth - i + 1}</span>`
+    daysHTML += `<span class="text-gray-400">${
+      lastDayOfPrevMonth - i + 1
+    }</span>`;
   }
 
   // 현재 달 날짜
@@ -152,9 +157,9 @@ const renderCalendar = () => {
 
     const isSelected =
       i === selectedDate.value.getDate() && currentMonth.value === selectedDate.value.getMonth() && currentYear.value === selectedDate.value.getFullYear() ? "bg-blue-500 text-white" : ""
+      const questStatus = questData.value !== "no-data" && questData.value.find((q) => q.day === i)
 
-    const questStatus = questData.value !== "no-data" && questData.value.find((q) => q.day === i)
-    const questClass = questStatus ? (questStatus.isCompleted ? "text-green-500" : "text-red-500") : ""
+    const questClass = questStatus ? questStatus.isCompleted ? "text-green-500" : "text-red-500" : ""
 
     daysHTML += `<span
       class="${isToday} ${isSelected} ${questClass} cursor-pointer hover:bg-gray-100"
@@ -165,19 +170,19 @@ const renderCalendar = () => {
   // 다음 달 날짜
   const nextDays = 42 - (firstDayOfMonth + lastDateOfMonth)
   for (let i = 1; i <= nextDays; i++) {
-    daysHTML += `<span class="text-gray-400">${i}</span>`
+    daysHTML += `<span class="text-gray-400">${i}</span>`;
   }
 
   if (daysContainer.value) {
-    daysContainer.value.innerHTML = daysHTML
+    daysContainer.value.innerHTML = daysHTML;
 
     if (questData.value === "no-data") {
-      daysContainer.value.classList.add("bg-red-100")
+      daysContainer.value.classList.add("bg-red-100");
     } else {
-      daysContainer.value.classList.remove("bg-red-100")
+      daysContainer.value.classList.remove("bg-red-100");
     }
   }
-}
+};
 
 // 월 이동
 const prevMonth = async () => {
@@ -195,15 +200,15 @@ const nextMonth = async () => {
     currentYear.value++
     currentMonth.value = 0
   } else {
-    currentMonth.value++
+    currentMonth.value++;
   }
 
-  await fetchQuestData()
-}
+  await fetchQuestData();
+};
 
 // 이벤트 리스너 설정
 onMounted(async () => {
-  daysContainer.value = document.querySelector(".days")
+  daysContainer.value = document.querySelector(".days");
 
   // 날짜 선택 이벤트 리스너
   daysContainer.value.addEventListener("date-select", (event) => {

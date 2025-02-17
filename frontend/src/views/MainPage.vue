@@ -15,8 +15,8 @@ import QuestModal from "@/components/modal/QuestModal.vue"
 import SpeechRecognitionHandler from "@/components/voice/SpeechRecognitionHandler.vue"
 
 // 스토어 가져오기 ==================================================
-const userDataStore = useUserDataStore()
-const mainStore = useMainStore()
+const userDataStore = useUserDataStore();
+const mainStore = useMainStore();
 // 반응형 상태 유지 ==================================================
 const { userInfo } = storeToRefs(userDataStore)
 
@@ -27,10 +27,12 @@ const body = ref("")
 // userInfo.avatar가 변경될 때 자동으로 캐릭터 이미지 업데이트
 watchEffect(() => {
   if (userInfo.value.avatar) {
-    const [hairIndex, faceIndex, bodyIndex] = userInfo.value.avatar || [0, 0, 0]
-    hair.value = assets.hair[hairIndex]?.[0] || ""
-    face.value = assets.face[faceIndex]?.[0] || ""
-    body.value = assets.body[bodyIndex]?.[0] || ""
+    const [hairIndex, faceIndex, bodyIndex] = userInfo.value.avatar || [
+      0, 0, 0,
+    ];
+    hair.value = assets.hair[hairIndex]?.[0] || "";
+    face.value = assets.face[faceIndex]?.[0] || "";
+    body.value = assets.body[bodyIndex]?.[0] || "";
   }
 })
 
