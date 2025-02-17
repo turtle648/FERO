@@ -4,128 +4,178 @@
     <div class="flex flex-col w-full h-full max-w-[40vh] bg-white">
       <!-- 달력 헤더 -->
       <header class="flex justify-between items-center p-4 border-b">
-        <button 
-          @click="prevMonth"
-          class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          ❮
-        </button>
-        <h2 class="text-lg font-bold">
-          {{ currentYear }}년 {{ currentMonth + 1 }}월
-        </h2>
-        <button 
-          @click="nextMonth"
-          class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          ❯
-        </button>
+        <button @click="prevMonth" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full transition-colors">❮</button>
+        <h2 class="text-lg font-bold">{{ currentYear }}년 {{ currentMonth + 1 }}월</h2>
+        <button @click="nextMonth" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full transition-colors">❯</button>
       </header>
 
       <!-- 달력 본문 -->
       <div class="flex-1 p-4">
         <!-- 요일 헤더 -->
         <div class="grid grid-cols-7 mb-2">
-          <span 
-            v-for="day in ['일', '월', '화', '수', '목', '금', '토']" 
-            :key="day"
-            class="text-center font-medium text-gray-600 text-sm py-2"
-          >
+          <span v-for="day in ['일', '월', '화', '수', '목', '금', '토']" :key="day" class="text-center font-medium text-gray-600 text-sm py-2">
             {{ day }}
           </span>
         </div>
 
         <!-- 날짜 그리드 -->
-        <div 
-          ref="daysContainer"
-          class="grid grid-cols-7 gap-1 days"
-        >
+        <div ref="daysContainer" class="grid grid-cols-7 gap-1 days">
           <!-- 날짜들은 renderCalendar 함수에서 동적으로 추가됨 -->
         </div>
+      </div>
+      <div class="flex flex-col w-full h-[50%]">
+        <Bar :data="chartData" :options="options" />
       </div>
     </div>
   </BaseModal>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue"
+import BaseModal from "./BaseModal.vue"
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from "chart.js"
+import { ref, defineEmits, onMounted, computed } from "vue"
 import { useMainStore } from "@/stores/mainStore"
-import BaseModal from './BaseModal.vue'
+import { Bar } from "vue-chartjs"
+import * as chartConfig from "../config/chartConfig.js"
 
 const mainStore = useMainStore()
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
-defineEmits(["close-modal"])
+// defineEmits(["close-modal"])
 
 // 날짜 관련 상태
+// const currentDate = new Date()
+// const currentYear = ref(currentDate.getFullYear())
+// const currentMonth = ref(currentDate.getMonth())
+// const daysContainer = ref(null)
+// const questData = ref([])
+// 선택된 날짜 상태 관리
+const selectedDate = ref(new Date())
+
+// 차트 데이터 computed 속성으로 변경
+const chartData = computed(() => ({
+  labels: ["팔", "다리", "가슴", "복근", "등", "체력"],
+  datasets: [
+    {
+      label: "운동 데이터",
+      backgroundColor: "rgba(236, 72, 153, 1)",
+      pointBackgroundColor: "rgba(236, 72, 153, 1)",
+      pointBorderColor: "#fff",
+      pointHoverBackgroundColor: "#fff",
+      pointHoverBorderColor: "rgba(236, 72, 153, 1)",
+      data: getSelectedDateData(),
+    },
+  ],
+}))
+
+const options = ref(chartConfig.options)
+
+defineEmits(["close-modal"])
+// const closeCalendarModal = () => {
+//   emit("close-modal")
+// }
+
+// 날짜 관련 상태 관리
 const currentDate = new Date()
 const currentYear = ref(currentDate.getFullYear())
 const currentMonth = ref(currentDate.getMonth())
 const daysContainer = ref(null)
+
+// 선택된 날짜의 데이터 가져오기
+const getSelectedDateData = async () => {
+  const year = selectedDate.value.getFullYear()
+  const month = selectedDate.value.getMonth()
+  const date = selectedDate.value.getDate()
+  console.log("📅" + year + "년 " + month + "월 " + date + "일")
+
+  const response = await mainStore.getMonthStatus(year, month)
+  console.log(response)
+
+  const dateData = response.find((value) => {
+    return value.date === date
+  })
+
+  console.log(dateData)
+
+  return dateData ? dateData.status : [0, 0, 0, 0, 0, 0]
+}
+
+// 퀘스트 데이터를 저장
 const questData = ref([])
 
 // 퀘스트 데이터 가져오기
 const fetchQuestData = async () => {
   try {
-    const response = await mainStore.isQuestCompleted(
-      currentYear.value, 
-      currentMonth.value + 1
-    )
-    questData.value = response?.length > 0 ? response : "no-data"
+    const response = await mainStore.isQuestCompleted(currentYear.value, currentMonth.value + 1)
+
+    if (response && response.length > 0) {
+      questData.value = response
+    } else {
+      questData.value = []
+    }
   } catch (error) {
-    console.error("🚨 Error fetching quest data:", error)
-    questData.value = "no-data"
+    if (error.response && error.response.status === 204) {
+      console.log("🚨 No data for this month")
+      questData.value = "no-data"
+    } else {
+      console.error("🚨 Error fetching quest data:", error)
+    }
   } finally {
     renderCalendar()
   }
 }
 
+// 날짜 선택 핸들러
+const handleDateSelect = (day) => {
+  selectedDate.value = new Date(currentYear.value, currentMonth.value, day)
+}
+
 // 달력 렌더링
 const renderCalendar = () => {
-  const firstDay = new Date(currentYear.value, currentMonth.value, 1).getDay()
-  const lastDate = new Date(currentYear.value, currentMonth.value + 1, 0).getDate()
-  const lastDatePrev = new Date(currentYear.value, currentMonth.value, 0).getDate()
+  // const firstDay = new Date(currentYear.value, currentMonth.value, 1).getDay()
+  // const lastDate = new Date(currentYear.value, currentMonth.value + 1, 0).getDate()
+  // const lastDatePrev = new Date(currentYear.value, currentMonth.value, 0).getDate()
+  const firstDayOfMonth = new Date(currentYear.value, currentMonth.value, 1).getDay()
+  const lastDateOfMonth = new Date(currentYear.value, currentMonth.value + 1, 0).getDate()
+  const lastDayOfPrevMonth = new Date(currentYear.value, currentMonth.value, 0).getDate()
 
   let daysHTML = ""
 
   // 이전 달 날짜
-  for (let i = firstDay; i > 0; i--) {
-    daysHTML += `
-      <span class="text-center py-2 text-gray-400 text-sm">
-        ${lastDatePrev - i + 1}
-      </span>
-    `
+  for (let i = firstDayOfMonth; i > 0; i--) {
+    daysHTML += `<span class="text-gray-400">${lastDayOfPrevMonth - i + 1}</span>`
   }
 
   // 현재 달 날짜
-  for (let i = 1; i <= lastDate; i++) {
-    const isToday = i === currentDate.getDate() && 
-                    currentMonth.value === currentDate.getMonth() && 
-                    currentYear.value === currentDate.getFullYear()
-    
-    const questStatus = questData.value !== "no-data" && 
-                       questData.value.find(q => q.day === i)
-    
-    const classes = [
-      'text-center py-2',
-      isToday ? 'bg-blue-100 font-bold rounded' : '',
-      questStatus?.isCompleted ? 'text-green-600' : '',
-      !questStatus?.isCompleted && questStatus ? 'text-red-600' : ''
-    ].filter(Boolean).join(' ')
+  for (let i = 1; i <= lastDateOfMonth; i++) {
+    const isToday = i === currentDate.getDate() && currentMonth.value === currentDate.getMonth() && currentYear.value === currentDate.getFullYear() ? "bg-blue-200" : ""
 
-    daysHTML += `<span class="${classes}">${i}</span>`
+    const isSelected =
+      i === selectedDate.value.getDate() && currentMonth.value === selectedDate.value.getMonth() && currentYear.value === selectedDate.value.getFullYear() ? "bg-blue-500 text-white" : ""
+
+    const questStatus = questData.value !== "no-data" && questData.value.find((q) => q.day === i)
+    const questClass = questStatus ? (questStatus.isCompleted ? "text-green-500" : "text-red-500") : ""
+
+    daysHTML += `<span
+      class="${isToday} ${isSelected} ${questClass} cursor-pointer hover:bg-gray-100"
+      onclick="this.dispatchEvent(new CustomEvent('date-select', {detail: ${i}, bubbles: true}))"
+    >${i}</span>`
   }
 
   // 다음 달 날짜
-  const remainingDays = 42 - (firstDay + lastDate)
-  for (let i = 1; i <= remainingDays; i++) {
-    daysHTML += `
-      <span class="text-center py-2 text-gray-400 text-sm">
-        ${i}
-      </span>
-    `
+  const nextDays = 42 - (firstDayOfMonth + lastDateOfMonth)
+  for (let i = 1; i <= nextDays; i++) {
+    daysHTML += `<span class="text-gray-400">${i}</span>`
   }
 
   if (daysContainer.value) {
     daysContainer.value.innerHTML = daysHTML
+
+    if (questData.value === "no-data") {
+      daysContainer.value.classList.add("bg-red-100")
+    } else {
+      daysContainer.value.classList.remove("bg-red-100")
+    }
   }
 }
 
@@ -147,11 +197,21 @@ const nextMonth = async () => {
   } else {
     currentMonth.value++
   }
+
   await fetchQuestData()
 }
 
+// 이벤트 리스너 설정
 onMounted(async () => {
   daysContainer.value = document.querySelector(".days")
+
+  // 날짜 선택 이벤트 리스너
+  daysContainer.value.addEventListener("date-select", (event) => {
+    handleDateSelect(event.detail)
+  })
+
   await fetchQuestData()
 })
 </script>
+
+<style scoped></style>

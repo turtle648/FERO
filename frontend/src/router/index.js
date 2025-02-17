@@ -9,6 +9,9 @@ import UiTutorialPage from "@/views/UiTutorialPage.vue"
 import TestVoice from "@/components/voice/testVoice.vue"
 import RankMatchResultPage from "@/views/RankMatchResultPage.vue"
 
+import { useUserStore } from "@/stores/store"
+import { useUserDataStore } from "@/stores/userDataStore"
+
 // 랭크매치, 랭크모드에 인증 관련 메타데이터 고려해볼 것
 // meta: {
 //   requiresAuth: true,  // 인증 필요
@@ -26,36 +29,46 @@ const routes = [
     path: "/",
     name: "Start",
     component: StartPage,
-    meta: { isMobile: true },
+    meta: { isMobile: true, requiresAuth: false },
   },
   {
     path: "/main",
     name: "Main",
     component: MainPage,
-    meta: { isMobile: true },
+    meta: { isMobile: true, requiresAuth: true },
   },
   {
     path: "/tutorial/:exercise",
     name: "Tutorial",
     component: FitnessTutorialPage,
-    meta: { isMobile: true },
+    meta: { isMobile: true, requiresAuth: true },
   },
   {
     path: "/single-mode/:exercise/:count",
     name: "SingleMode",
     component: SingleModePage,
     props: true,
+    meta: { isMobile: true, requiresAuth: true },
   },
+  // {
+  //   path: "/multi-mode/:exercise",
+  //   name: "MultiMode",
+  //   component: MultiModePage,
+  //   props: true,
+  //   meta: { isMobile: true, requiresAuth: true },
+  // },
   {
     path: "/rank-mode/:exercise",
     name: "RankMode",
     component: RankMatchPage,
     props: true,
+    meta: { isMobile: true, requiresAuth: true },
   },
   {
     path: "/rank-result",
     name: "RankResult",
     component: RankMatchResultPage,
+    meta: { isMobile: true, requiresAuth: true },
   },
   {
     path: "/qr",
@@ -67,19 +80,20 @@ const routes = [
     name: "RankMatch",
     component: RankMatchPage,
     props: true,
+    meta: { isMobile: true, requiresAuth: true },
   },
   {
     path: "/ui-tutorial",
     name: "UiTutorial",
     component: UiTutorialPage,
-    meta: { isMobile: true },
+    meta: { isMobile: true, requiresAuth: true },
   },
   // 백그라운드 음성인식 반응속도 테스트용
   {
     path: "/testVoice",
     name: "testVoice",
     component: TestVoice,
-    meta: { isMobile: true },
+    meta: { isMobile: true, requiresAuth: true },
   },
 ]
 
@@ -89,22 +103,52 @@ const router = createRouter({
 })
 
 // 네비게이션 가드 설정
-// router.beforeEach((to, from, next) => {
-//   const token = localStorage.getItem("authToken")
-//   const isMobile = "ontouchstart" in window || navigator.maxTouchPoints > 0 // 터치스크린 기기 감지
+router.beforeEach(async (to, from, next) => {
+  const userAgent = navigator.userAgent.toLowerCase()
+  const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0
+  const isMobileDevice = /android|iphone|ipad|ipod|blackberry|opera mini|iemobile|wpdesktop/i.test(userAgent)
+  const isTablet = /ipad|tablet|playbook|silk/i.test(userAgent)
+  const isWindowsPC = /windows nt/i.test(userAgent) && !isTablet // Windows PC (태블릿 제외)
+  const isMacPC = /macintosh/i.test(userAgent) && !isTouchDevice // Mac (터치스크린이 없을 경우)
+  const isMobile = (isMobileDevice || isTablet) && !isWindowsPC && !isMacPC
 
-//   if (to.path !== "/qr" && to.meta.isMobile && !isMobile) {
-//     next("/qr")
-//     console.log("모바일이 아닙니다 → /qr로 이동")
-//     return
-//   }
+  console.log("User-Agent:", userAgent)
+  console.log("터치 디바이스 여부:", isTouchDevice)
+  console.log("모바일 디바이스:", isMobileDevice)
+  console.log("태블릿 여부:", isTablet)
+  console.log("Windows PC:", isWindowsPC)
+  console.log("Mac PC:", isMacPC)
+  console.log("최종 모바일 판정:", isMobile)
 
-//   if (to.meta.requiresAuth && !token) {
-//     next("/start")
-//     console.log("토큰 없어서 /start로 이동")
-//   } else {
-//     next()
-//   }
-// })
+  // ==================================================
+  if (to.path === "/qr") {
+    return next()
+  }
+  if (!isMobile) {
+    return next("/qr")
+  }
+  if (to.path === "/" || to.path === "" || to.path === ".") {
+    return next()
+  }
+
+  const userStore = useUserStore()
+  const userDataStore = useUserDataStore()
+  // 토큰 없는경우
+  if (to.meta.requiresAuth && (!localStorage.getItem("authToken") || !localStorage.getItem("userId"))) {
+    console.log("토큰 없음")
+    userStore.clearSession()
+    return next("/")
+  }
+  // 토큰 유효성 검증 실패
+  const isTokenValid = await userDataStore.checkUserInfo()
+  console.log(isTokenValid)
+  if (!isTokenValid) {
+    console.log("토큰 유효성 검사 실패")
+    userStore.clearSession()
+    return next("/")
+  }
+
+  return next()
+})
 
 export default router
