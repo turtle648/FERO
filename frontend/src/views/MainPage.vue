@@ -93,42 +93,55 @@ onMounted(async () => {
         <!-- 헤더 -->
         <header class="absolute top-0 w-full flex flex-col">
           <!-- 타이틀 바 -->
-          <div class="w-full h-[7vh] bg-[#c3c3c3] flex justify-between items-center px-2">
-            <!-- 왼쪽: 타이틀 영역 -->
-            <div class="flex items-center h-full" @click="openModal('status')">
-              <div class="flex items-center h-[90%] px-2 border-t-2 border-l-2 border-[#ffffff] border-r-2 border-b-2 border-[#818181] bg-[#c3c3c3]">
-                <img src="@/assets/images/profile/default-image-1.png" class="w-[5vh] mr-2" />
-                <div class="flex flex-col">
-                  <span class="text-black text-[2vh] font-bold">{{ userInfo.userNickname }}</span>
-                  <div class="relative w-full h-[1.5vh] bg-gray-200 rounded-sm mt-1">
-                    <div class="absolute inset-0 flex items-center justify-center text-black text-[1.2vh]">
-                      Lv. {{ userInfo.level }}
-                    </div>
-                    <div class="bg-blue-500 h-full" 
-                        :style="{ width: Math.min(userInfo.experience / 2, 100) + '%' }">
+          <div class="w-full h-[12vh] bg-[#c3c3c3] flex flex-col">
+            <!-- 상단 텍스트 영역 -->
+            <div class="h-[50%] flex items-center justify-center border-b-2 border-[#818181]">
+              <span class="text-black text-nowrap font-bold max-w-fit">
+                <template v-for="(char, index) in 'Hero From ISAEKAI'" :key="index">
+                  <span 
+                    class="inline-block animate-pixel-wave" 
+                    :style="{ 'animation-delay': `${index * 0.}s` }"
+                  >
+                    {{ char === ' ' ? '\u00A0' : char }}
+                  </span>
+                </template>
+              </span>
+            </div>
+
+            <!-- 하단 컨트롤 영역 -->
+            <div class="h-[45%] flex justify-between items-center px-2">
+              <!-- 왼쪽: 타이틀 영역 -->
+              <div class="flex items-center h-full" @click="openModal('status')">
+                <div class="flex items-center h-[90%] px-2 border-t-2 border-l-2 border-[#ffffff] border-r-2 border-b-2 border-[#818181] bg-[#c3c3c3]">
+                  <img src="@/assets/images/profile/default-image-1.png" class="h-[90%] mr-2" />
+                  <div class="flex flex-col">
+                    <span class="text-black text-[1.8vh] font-bold">{{ userInfo.userNickname }}</span>
+                    <div class="relative w-full h-[1.2vh] bg-gray-200 rounded-sm mt-1">
+                      <div class="absolute inset-0 flex items-center justify-center text-black text-[1vh]">
+                        Lv. {{ userInfo.level }}
+                      </div>
+                      <div class="bg-blue-500 h-full" 
+                          :style="{ width: Math.min(userInfo.experience / 2, 100) + '%' }">
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- 오른쪽: 창 제어 버튼들 -->
-            <div class="flex space-x-1">
-              <!-- 최소화 버튼 -->
-              <button class="nes-btn h-12 w-12 flex items-center justify-center text-2xl font-bold">
-                _
-              </button>
-              <!-- 닫기 버튼 -->
-              <button 
-                @click="openModal('setting')"
-                class="nes-btn h-12 w-12 flex items-center justify-center text-2xl font-bold"
-              >
-                ×
-              </button>
+              <!-- 오른쪽: 창 제어 버튼 -->
+              <div class="flex space-x-1 h-full items-center">
+
+                <!-- 닫기 버튼 -->
+                <button 
+                  @click="openModal('setting')"
+                  class="nes-btn h-[4.8vh] w-[4.8vh] flex items-center justify-center text-xl font-bold"
+                >
+                  ×
+                </button>
+              </div>
             </div>
           </div>
         </header>
-
 
         <!-- 캐릭터 -->
         <div class="absolute left-1/2 bottom-[10vh] transform -translate-x-1/2 w-[30vh] h-[60vh] flex items-center justify-center overflow-hidden cursor-pointer" 
@@ -141,41 +154,59 @@ onMounted(async () => {
 
         <!-- 작업 표시줄 (푸터) -->
         <footer class="absolute bottom-0 w-full h-[7vh] bg-[#c3c3c3] border-t-2 border-[#ffffff] flex">
-          <button 
-            class="w-1/5 h-full flex items-center justify-center border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
-            @click="openModal('calendar')"
-          >
-            <img src="@/assets/images/icon/icon-calendar.png" class="w-[5vh]" />
-          </button>
-          
-          <button 
-            class="w-1/5 h-full flex items-center justify-center border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
-            @click="openModal('record')"
-          >
-            <img src="@/assets/images/icon/icon-report.png" class="w-[6vh]" />
-          </button>
-          
-          <button 
-            class="w-1/5 h-full flex items-center justify-center border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
-            @click="openModal('fitness')"
-          >
-            <img src="@/assets/images/icon/icon-fitness.png" class="w-[7vh]" />
-          </button>
-          
-          <button 
-            class="w-1/5 h-full flex items-center justify-center border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
-            @click="openModal('quest')"
-          >
-            <img src="@/assets/images/icon/icon-quest.png" class="w-[5vh]" />
-          </button>
-          
-          <button 
-            class="w-1/5 h-full flex items-center justify-center border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
-            @click="openModal('setting')"
-          >
-            <img src="@/assets/images/icon/icon-setting.png" class="w-[5vh]" />
-          </button>
-        </footer>
+  <button 
+    class="w-1/5 h-full flex items-center justify-center relative border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
+    @click="openModal('calendar')"
+  >
+    <div class="flex flex-col items-center w-full">
+      <img src="@/assets/images/icon/icon-calendar.png" class="w-[5vh]" />
+      <span class="absolute bottom-[1%] w-full text-center text-[1.2vh] drop-shadow-[0_0_2px_rgba(255,255,255,1)] font-semibold">Calendar</span>
+    </div>
+  </button>
+  
+  <button 
+    class="w-1/5 h-full flex items-center justify-center relative border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
+    @click="openModal('record')"
+  >
+    <div class="flex flex-col items-center w-full">
+      <img src="@/assets/images/icon/icon-report.png" class="w-[6vh]" />
+      <span class="absolute bottom-[1%] w-full text-center text-[1.2vh] drop-shadow-[0_0_2px_rgba(255,255,255,1)] font-semibold">Record</span>
+    </div>
+  </button>
+  
+  <button 
+    class="w-1/5 h-full flex items-center justify-center relative border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
+    @click="openModal('fitness')"
+  >
+    <div class="flex flex-col items-center w-full">
+      <img src="@/assets/images/icon/icon-fitness.png" class="w-[7vh]" />
+      <span class="absolute bottom-[1%] w-full text-center text-[1.2vh] drop-shadow-[0_0_2px_rgba(255,255,255,1)] font-semibold">Fitness</span>
+    </div>
+  </button>
+  
+  <button 
+    class="w-1/5 h-full flex items-center justify-center relative border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
+    @click="openModal('quest')"
+  >
+    <div class="flex flex-col items-center w-full">
+      <img src="@/assets/images/icon/icon-quest.png" class="w-[5vh]" />
+      <span class="absolute bottom-[1%] w-full text-center text-[1.2vh] drop-shadow-[0_0_2px_rgba(255,255,255,1)] font-semibold">Quest</span>
+    </div>
+  </button>
+  
+  <button 
+    class="w-1/5 h-full flex items-center justify-center relative border-t border-l border-[#818181] border-r border-b border-[#ffffff] bg-[#c3c3c3]"
+    @click="openModal('setting')"
+  >
+    <div class="flex flex-col items-center w-full">
+      <img src="@/assets/images/icon/icon-setting.png" class="w-[5vh]" />
+      <span class="absolute bottom-[1%] w-full text-center text-[1.2vh] drop-shadow-[0_0_2px_rgba(255,255,255,1)] font-semibold">Setting</span>
+    </div>
+  </button>
+</footer>
+
+
+
 
 
         <!-- 모달 컴포넌트 -->
