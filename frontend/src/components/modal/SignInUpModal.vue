@@ -29,11 +29,19 @@
         <hr />
 
         <div class="social-login">
+<<<<<<< HEAD:frontend/src/components/modal/SignInUpModal.vue
           <img class="social-login-icon" src="@/assets/images/icon/kakao-talk-icon.png" alt="카카오톡" @click="handleSocialLogIn('kakao')" />
           <img class="social-login-icon" src="@/assets/images/icon/google-icon.png" />
           <img class="social-login-icon" src="@/assets/images/icon/facebook-icon.png" />
           <img class="social-login-icon" src="@/assets/images/icon/instagram-icon.png" />
         </div>
+=======
+          <img class="social-login-icon" src="@/assets/images/icon/kakao-talk-icon.png" alt="카카오톡" @click="handleSocialLogIn('kakao')">
+          <img class="social-login-icon" src="@/assets/images/icon/google-icon.png">
+          <img class="social-login-icon" src="@/assets/images/icon/facebook-icon.png">
+          <img class="social-login-icon" src="@/assets/images/icon/instagram-icon.png">
+        </div>  
+>>>>>>> 25dc83ec435c70c77449e52ec0d268259c545e2d:frontend/src/components/modal/SignInUp.vue
       </div>
 
       <!-- 회원가입 모드 -->
@@ -111,6 +119,14 @@
     </div>
   </div>
 </template>
+<<<<<<< HEAD:frontend/src/components/modal/SignInUpModal.vue
+=======
+  
+<script setup>
+import { ref, watchEffect, defineEmits } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/store'
+>>>>>>> 25dc83ec435c70c77449e52ec0d268259c545e2d:frontend/src/components/modal/SignInUp.vue
 
 <script setup>
 import { ref, watchEffect, defineEmits, nextTick } from "vue"
@@ -162,9 +178,15 @@ const resetFields = () => {
 const handleSubmit = async () => {
   try {
     const result = await userStore.logIn(id.value, password.value)
+<<<<<<< HEAD:frontend/src/components/modal/SignInUpModal.vue
     if (result == 200) {
       nextTick()
       router.push("/main")
+=======
+    if (result) { 
+      userStore.setAccessToken(result)
+      router.push('/main') 
+>>>>>>> 25dc83ec435c70c77449e52ec0d268259c545e2d:frontend/src/components/modal/SignInUp.vue
     }
   } catch (error) {
     console.log(error)
@@ -173,6 +195,7 @@ const handleSubmit = async () => {
 
 // 이메일 중복확인 API
 const checkEmailDuplicate = (email) => {
+<<<<<<< HEAD:frontend/src/components/modal/SignInUpModal.vue
   userStore.checkEmailDuplicateAPI(email).then((result) => {
     if (result) {
       isEmailAvailable.value = true
@@ -180,16 +203,31 @@ const checkEmailDuplicate = (email) => {
       userStore.sendEmail(email)
     }
   })
+=======
+  userStore.checkEmailDuplicateAPI(email)
+    .then((result) => {
+      if (result) {
+        isEmailAvailable.value = true
+        alert('이메일 중복확인이 완료되었습니다. 인증코드를 입력해주세요.')
+        userStore.sendEmail(email)
+      }
+    })
+>>>>>>> 25dc83ec435c70c77449e52ec0d268259c545e2d:frontend/src/components/modal/SignInUp.vue
 }
 
 // 인증 코드 확인 후 2페이지로 이동
 const handleSignUp1 = async () => {
   const result = await userStore.verifyEmail(emailConfirmCode.value, email.value)
+<<<<<<< HEAD:frontend/src/components/modal/SignInUpModal.vue
   if (result) {
     signUpPage.value = 2
   } else {
     alert("인증 코드가 유효하지 않습니다. 다시 시도해주세요.")
   }
+=======
+  if (result) { signUpPage.value = 2} 
+  else { alert('인증 코드가 유효하지 않습니다. 다시 시도해주세요.')}
+>>>>>>> 25dc83ec435c70c77449e52ec0d268259c545e2d:frontend/src/components/modal/SignInUp.vue
 }
 
 // 인증 코드 확인 후 3페이지로 이동
@@ -201,10 +239,18 @@ const handleSignUp2 = () => {
     alert("이메일 중복체크를 진행해 주세요.")
     return
   } else {
+<<<<<<< HEAD:frontend/src/components/modal/SignInUpModal.vue
     userStore.signUp(id.value, password.value, name.value, phone.value, email.value).then((result) => {
       userStore.setSessionId(result.message) // Pinia에서 sessionId 설정
       signUpPage.value = 3
     })
+=======
+    userStore.signUp(id.value, password.value, name.value, phone.value, email.value)
+      .then((result) => {
+        userStore.setSessionId(result.message) // Pinia에서 sessionId 설정
+        signUpPage.value = 3
+      })
+>>>>>>> 25dc83ec435c70c77449e52ec0d268259c545e2d:frontend/src/components/modal/SignInUp.vue
   }
 }
 
@@ -224,10 +270,14 @@ const handleSocialLogIn = (platform) => {
   alert(`${platform} 소셜 로그인! 미구현`)
 }
 
+<<<<<<< HEAD:frontend/src/components/modal/SignInUpModal.vue
 const openSignUp = () => {
   isSignUpMode.value = true
   resetFields()
 }
+=======
+const handleSocialLogIn = (platform) => { alert(`${platform} 소셜 로그인! 미구현`) }
+>>>>>>> 25dc83ec435c70c77449e52ec0d268259c545e2d:frontend/src/components/modal/SignInUp.vue
 
 const closeSignUp = () => {
   isSignUpMode.value = false
