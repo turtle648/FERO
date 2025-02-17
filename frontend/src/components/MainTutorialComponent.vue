@@ -1,13 +1,13 @@
 <template>
   <div class="img-container z-50 fixed inset-0 flex items-center justify-center" @click="nextStep">
     <!-- 설명 단계별로 표시 -->
-    <section class="message-list flex items-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+    <section class="message-list flex items-center absolute top-3/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
       <!-- 이미지 -->
       <img src="@/assets/images/pesocom.png" class="w-[15vh] object-contain mt-40" alt="Tutorial Image" />
 
       <!-- Balloon -->
-      <div class="desc-container nes-balloon from-left ml-4 w-[40vh] h-[20vh] -translate-y-8">
-        <span v-if="currentStep === 1" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">운동 기능을 설명해줌</span>
+      <div class="desc-container nes-balloon from-left ml-4 w-[37vh] h-[12vh] -translate-y-4">
+        <span v-if="currentStep === 1" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">ㅎㅇㅎㅇ 저는 파소콩</span>
         <span v-if="currentStep === 2" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">먼저 왼쪽 상단에는 타이머가 있어</span>
         <span v-if="currentStep === 3" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">운동 시간을 체크할 수 있음</span>
         <span v-if="currentStep === 4" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">그 옆 오른쪽에는 카운트!</span>
