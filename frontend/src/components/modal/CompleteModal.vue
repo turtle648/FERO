@@ -130,7 +130,7 @@ const completeFitnessSingle = async () => {
 
     // API 호출
     const response = await axios.post(
-      "https://your-backend-api.com/api/v1/exercise/log", // 실제 API URL로 변경
+      "https://i12e103.p.ssafy.io:8076/api/v1/exercise/log", // 실제 API URL로 변경
       requestData,
       {
         headers: {
