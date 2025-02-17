@@ -80,15 +80,13 @@ onMounted(async () => {
     <!-- Windows 98 스타일 테두리 -->
     <div class="absolute inset-0">
       <!-- 밝은 회색 테두리 (왼쪽, 위) -->
-      <div class="absolute top-0 left-0 w-full h-[3px] bg-[#dfdfdf]"></div>
-      <div class="absolute top-0 left-0 h-full w-[3px] bg-[#dfdfdf]"></div>
+      <!-- <div class="absolute top-0 left-0 w-full h-[3px] bg-[#dfdfdf]"></div>
+      <div class="absolute top-0 left-0 h-full w-[3px] bg-[#dfdfdf]"></div> -->
       
       <!-- 어두운 회색 테두리 (오른쪽, 아래) -->
-      <div class="absolute bottom-0 right-0 w-full h-[3px] bg-[#818181]"></div>
-      <div class="absolute top-0 right-0 h-full w-[3px] bg-[#818181]"></div>
+      <!-- <div class="absolute bottom-0 right-0 w-full h-[3px] bg-[#818181]"></div>
+      <div class="absolute top-0 right-0 h-full w-[3px] bg-[#818181]"></div> -->
 
-      <!-- 실제 내용물을 테두리 안쪽으로 3px 띄움 -->
-      <div class="absolute inset-[3px]">
         <!-- 배경 이미지 -->
         <div class="absolute inset-0 flex items-center justify-center w-screen overflow-hidden" style="image-rendering: pixelated;">
           <img src="@/assets/images/bg_5.jpg" class="w-full h-full object-fill" />
@@ -231,7 +229,6 @@ onMounted(async () => {
 
         <!-- 백그라운드 음성인식 -->
         <SpeechRecognitionHandler @voice-control="modalControl" />
-      </div>
     </div>
   </div>
 </template>

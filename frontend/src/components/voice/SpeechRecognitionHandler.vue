@@ -1,4 +1,4 @@
-<!-- <template>
+<template>
   <div v-if="isWakeWordDetected" class="fixed top-[10vh] right-5 flex items-center space-x-2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-md">
    <MicIcon class="w-6 h-6 text-red-400" />
    <span>명령어 듣는 중...</span>
@@ -31,6 +31,11 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, defineEmits } from "vue";
+import beepSound from "@/assets/musics/beep.mp3"
+const playBeep = () => {
+  const beepAudio = new Audio(beepSound)
+  beepAudio.play().catch(error => console.error("오디오 재생 실패:", error));
+}
 
 const emit = defineEmits(["voice-control"]);
 const transcript = ref("");
@@ -114,6 +119,9 @@ console.log("🔔 명령어 입력 대기 시작 (5초)");
 isWakeWordDetected.value = true;
 timer.value = 5;
 
+// 🔊 비프음 재생
+playBeep()
+
 const countdown = setInterval(() => {
  timer.value--;
  if (timer.value <= 0) {
@@ -160,8 +168,8 @@ if (recognition) {
  recognition.stop();
 }
 })
-</script> -->
-<template>
+</script>
+<!-- <template>
   <div>
 
   </div>
@@ -173,4 +181,4 @@ if (recognition) {
 
 <style lang="scss" scoped>
 
-</style>
+</style> -->

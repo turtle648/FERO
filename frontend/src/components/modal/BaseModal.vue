@@ -6,7 +6,7 @@
         <!-- 헤더 영역 -->
         
         <div 
-          class="relative w-full h-[10vh] flex items-center pl-[4vw] text-white text-xl font-bold"
+          class="relative w-full h-[10vh] flex justify-between items-center pl-[4vw] pr-[4vw] text-white text-xl font-bold"
           :style="{ 
             backgroundImage: `url(${require('@/assets/images/modal_header_background.png')})`, 
             backgroundSize: '100% 100%',  /* 부모 요소에 완전히 맞춤 (잘리는 부분 없음) */
@@ -15,9 +15,10 @@
           }"
         >
           <!-- <img class="w-full" src="@/assets/images/modal_header_background.png" alt=""> -->
-          <h2 class="text-xl font-bold"><slot name="header">{{ title }}</slot></h2>
+          <h2 class="font-bold" style="font-size: 2vh;"><slot name="header">{{ title }}</slot></h2>
           <button 
-            class="nes-btn is-normal absolute top-5 right-4 bg-white text-gray-500 text-2xl w-8 h-8 flex items-center justify-center shadow-md leading-none"
+            class="nes-btn is-normal bg-white text-gray-500 flex items-center justify-center shadow-md leading-none"
+            style="width:2vh; height:2vh; font-size: 2vh;"
             @click="$emit('close-modal')"
           >
             ×
