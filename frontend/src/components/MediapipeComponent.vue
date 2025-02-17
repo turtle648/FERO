@@ -52,7 +52,7 @@ import ReportIssueButton from "@/components/button/ReportButton.vue"
 
 let intervalId = null // setInterval ID 저장 (타이머 초기화용)
 
-const selectedTime = ref(0) // 기본값: 1분
+const selectedTime = ref(60 * 1000) // 기본값: 1분
 const timeLeft = ref(selectedTime.value) // 남은 시간 (ms)
 const formattedTime = ref(formatTime(timeLeft.value)) // 표시할 시간
 

@@ -16,9 +16,11 @@
     </div>
 
     <div v-if="showErrorModal" class="landmark-error-modal absolute inset-x-0 top-[30%] transform flex items-center justify-center text-yellow-500 text-2xl z-20 font-dgm">
-      전신이 나오도록
-      <br />
-      위치를 수정해주세요
+      <button type="button" class="nes-btn is-warning">
+        전신이 나오도록 위치를
+        <br />
+        수정해주세요
+      </button>
     </div>
     <button v-if="isTutorialMode" @click="setCountToThree" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 absolute bottom-4 left-4 z-50">3</button>
   </div>
