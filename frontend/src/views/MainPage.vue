@@ -2,6 +2,7 @@
 import { onMounted, ref, computed, watchEffect } from "vue"
 import { storeToRefs } from "pinia"
 import { useUserDataStore } from "@/stores/userDataStore"
+import { useUserStore } from "@/stores/store"
 import { useMainStore } from "@/stores/mainStore"
 import { assets } from "@/assets.js"
 
@@ -15,8 +16,9 @@ import QuestModal from "@/components/modal/QuestModal.vue"
 import SpeechRecognitionHandler from "@/components/voice/SpeechRecognitionHandler.vue"
 
 // 스토어 가져오기 ==================================================
-const userDataStore = useUserDataStore();
-const mainStore = useMainStore();
+const userDataStore = useUserDataStore()
+const userStore = useUserStore()
+const mainStore = useMainStore()
 // 반응형 상태 유지 ==================================================
 const { userInfo } = storeToRefs(userDataStore)
 
@@ -122,7 +124,7 @@ onMounted(async () => {
               </button>
               <!-- 닫기 버튼 -->
               <button 
-                @click="openModal('setting')"
+                @click="userStore.logOut()"
                 class="nes-btn h-12 w-12 flex items-center justify-center text-2xl font-bold"
               >
                 ×
@@ -133,11 +135,11 @@ onMounted(async () => {
 
 
         <!-- 캐릭터 -->
-        <div class="absolute left-1/2 bottom-[10vh] transform -translate-x-1/2 w-[30vh] h-[60vh] flex items-center justify-center overflow-hidden cursor-pointer" 
-             @click="openModal('character')">
-          <img v-if="hair && face && body" :src="face" class="absolute w-[30vh] h-[48vh] top-0" />
-          <img v-if="hair && face && body" :src="hair" class="absolute w-[30vh] h-[48vh] top-0" />
-          <img v-if="hair && face && body" :src="body" class="absolute w-[30vh] h-[48vh] bottom-0" />
+        <div class="absolute left-1/2 bottom-[10vh] w-[30vw] h-[30vh] transform -translate-x-1/2 -translate-y-1/2" @click="openModal('character')"></div>
+        <div class="absolute left-1/2 bottom-[2vh] transform -translate-x-1/2 w-[30vh] h-[72vh] flex items-center justify-center overflow-hidden cursor-pointer pointer-events-none">
+          <img v-if="hair && face && body" :src="face" class="absolute w-[30vh] h-[30vh] top-[16vh] pointer-events-none" />
+          <img v-if="hair && face && body" :src="hair" class="absolute w-[30vh] h-[30vh] top-[16vh] pointer-events-none" />
+          <img v-if="hair && face && body" :src="body" class="absolute w-[30vh] h-[48vh] bottom-[7vh] pointer-events-none" />
           <div v-if="!face && !hair && !body" class="text-gray-500 text-center">캐릭터 없음</div>
         </div>
 

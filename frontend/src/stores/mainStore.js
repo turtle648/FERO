@@ -93,6 +93,7 @@ export const useMainStore = defineStore("main", () => {
 
   // 퀘스트 한달치
   async function isQuestCompleted(year, month) {
+    console.log(month, year)
     try {
       console.time(`[⏱️] Sending Date Year: ${year}, Month: ${month}`);
 
