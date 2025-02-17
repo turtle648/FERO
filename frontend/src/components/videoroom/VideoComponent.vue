@@ -2,7 +2,7 @@
   <div class="video-container">
     <SquatComponent
       v-show="isMyVideoOn"
-      class="my-video"
+      class="my-video z-50"
       ref="myFace"
       @set-count="setCount"
       @get-time-left="setTime"
@@ -10,7 +10,11 @@
     />
 
     <div class="peer-container">
-      <video ref="peerVideo" class="peer-video" playsinline autoplay></video>
+      <MediapipeOnlyComponent
+        ref="peerVideo"
+        class="peer-video z-20"
+        :peerStream="peerStream"
+      />
     </div>
 
     <div class="controls">
@@ -41,6 +45,7 @@ import {
 } from "vue";
 import SquatComponent from "@/components/SquatComponent.vue";
 import axios from "axios";
+import MediapipeOnlyComponent from "@/components/MediapipeOnlyComponent.vue";
 // import router from '@/router'
 // import { setRouteData } from '@/router/routeData'
 // 기본 상태 관리
@@ -58,6 +63,7 @@ const peerCount = ref(0);
 const time = ref(-1);
 const myFace = ref(null);
 const peerVideo = ref(null);
+const peerStream = ref(null);
 const roomId = ref(null);
 const currentPeerId = ref(null);
 const peerToken = ref(null);
@@ -382,6 +388,8 @@ const initRTCPeerConnection = () => {
   myPeerConnection.ontrack = (event) => {
     if (peerVideo.value) {
       peerVideo.value.srcObject = event.streams[0];
+      peerStream.value = event.streams[0];
+      console.log(peerStream.value);
     }
   };
 };
@@ -461,12 +469,26 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+@media (max-width: 768px) {
+  video,
+  canvas {
+    object-fit: contain;
+  }
+}
+
+@media (min-width: 769px) {
+  video,
+  canvas {
+    object-fit: cover;
+  }
+}
+
 .video-container {
   @apply relative w-full h-screen bg-black;
 }
 
 .my-video {
-  @apply w-full h-full object-cover relative z-10;
+  @apply w-full h-full object-contain relative z-10;
 }
 
 .peer-container {
@@ -474,7 +496,7 @@ onBeforeUnmount(() => {
 }
 
 .peer-video {
-  @apply w-full h-full object-cover;
+  @apply w-full h-full object-contain;
 }
 
 .controls {
