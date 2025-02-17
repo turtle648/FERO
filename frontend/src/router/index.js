@@ -8,7 +8,7 @@ import RankMatchPage from "@/views/RankMatchPage.vue"
 import UiTutorialPage from "@/views/UiTutorialPage.vue"
 import TestVoice from "@/components/voice/testVoice.vue"
 import RankMatchResultPage from "@/views/RankMatchResultPage.vue"
-
+import setUp from "@/views/setUp.vue"
 import { useUserStore } from "@/stores/store"
 import { useUserDataStore } from "@/stores/userDataStore"
 
@@ -76,6 +76,11 @@ const routes = [
     component: QRComponent,
   },
   {
+    path: "/setUp",
+    name: "SetUp",
+    component: setUp,
+  },
+  {
     path: "/rank-match/:exercise",
     name: "RankMatch",
     component: RankMatchPage,
@@ -112,6 +117,9 @@ router.beforeEach(async (to, from, next) => {
   const isMacPC = /macintosh/i.test(userAgent) && !isTouchDevice // Mac (터치스크린이 없을 경우)
   const isMobile = (isMobileDevice || isTablet) && !isWindowsPC && !isMacPC
 
+  // 📌 PWA 여부 확인
+  const isPWA = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone
+
   console.log("User-Agent:", userAgent)
   console.log("터치 디바이스 여부:", isTouchDevice)
   console.log("모바일 디바이스:", isMobileDevice)
@@ -119,6 +127,7 @@ router.beforeEach(async (to, from, next) => {
   console.log("Windows PC:", isWindowsPC)
   console.log("Mac PC:", isMacPC)
   console.log("최종 모바일 판정:", isMobile)
+  console.log("PWA 여부:", isPWA)
 
   // ==================================================
   if (to.path === "/qr") {
@@ -127,6 +136,12 @@ router.beforeEach(async (to, from, next) => {
   if (!isMobile) {
     return next("/qr")
   }
+
+  // PWA가 아닌 경우 `/setUp` 페이지로 이동
+  if (!isPWA && to.path !== "/setUp") {
+    return next("/setUp")
+  }
+  
   if (to.path === "/" || to.path === "" || to.path === ".") {
     return next()
   }
