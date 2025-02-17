@@ -15,6 +15,7 @@ import RecordModal from "@/components/modal/RecordModal.vue"
 import QuestModal from "@/components/modal/QuestModal.vue"
 import SpeechRecognitionHandler from "@/components/voice/SpeechRecognitionHandler.vue"
 import TutorialConfirmModal from "@/components/modal/TutorialConfirmModal.vue"
+import MainTutorialComponent from "@/components/MainTutorialComponent.vue"
 
 // 스토어 가져오기 ==================================================
 const userDataStore = useUserDataStore()
@@ -23,9 +24,22 @@ const mainStore = useMainStore()
 
 // 메인페이지 튜토리얼=====================
 const showTutorialConfirm = ref(false)
+const showTutorialComponent = ref(false)
 
 const startTutorial = () => {
   showTutorialConfirm.value = false
+  showTutorialComponent.value = true
+}
+
+// 튜토리얼 종료
+const closeTutorial = () => {
+  showTutorialComponent.value = false
+}
+
+// 튜토리얼 거절
+const rejectTutorial = async () => {
+  showTutorialConfirm.value = false
+  await mainStore.completeTutorial(TUTORIAL_IDS.MAIN_PAGE)
 }
 
 // 반응형 상태 유지 ==================================================
@@ -87,7 +101,7 @@ onMounted(async () => {
   } catch (error) {
     console.error("User Data 로드 중 오류 발생:", error)
   }
-  // await mainStore.loadTutorial()
+  await mainStore.loadTutorial()
 })
 </script>
 
@@ -225,7 +239,10 @@ onMounted(async () => {
       <FitnessModal v-if="modals.fitness" @close-modal="closeModal('fitness')" @open-modal="openModal('fitness')" />
       <RecordModal v-if="modals.record" @close-modal="closeModal('record')" @open-modal="openModal('record')" />
       <QuestModal v-if="modals.quest" @close-modal="closeModal('quest')" @open-modal="openModal('quest')" />
+
+      <!-- 튜토리얼 -->
       <TutorialConfirmModal v-if="showTutorialConfirm" @accept="startTutorial" @reject="rejectTutorial" />
+      <MainTutorialComponent v-if="showTutorialComponent" @close="closeTutorial" @open-modal="openModal" />
 
       <!-- 백그라운드 음성인식 -->
       <SpeechRecognitionHandler @voice-control="modalControl" />
