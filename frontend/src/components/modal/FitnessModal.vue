@@ -39,7 +39,7 @@
 
         <div class="flex flex-col space-y-4">
           <!-- Single Mode -->
-          <button class="mode-button" :class="{ 'opacity-50': !selectedNumber }" @click="confirmMode('single')" :disabled="!selectedNumber">
+          <button class="mode-button" @click="handleSingleModeClick">
             <p class="text-lg font-medium mb-3">Single Mode</p>
             <div class="flex space-x-4">
               <button
@@ -76,6 +76,16 @@
         </div>
       </div>
     </div>
+
+    <!-- 시간 선택 경고 모달 -->
+    <div v-if="showTimeWarningModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70]">
+      <div class="bg-white p-6 rounded-lg shadow-md w-[80%] max-w-sm">
+        <h3 class="text-xl font-semibold mb-4">시간 선택을 하세요</h3>
+        <div class="flex justify-end space-x-4">
+          <button class="nes-btn is-primary" @click="closeTimeWarningModal">확인</button>
+        </div>
+      </div>
+    </div>
   </BaseModal>
 </template>
 
@@ -92,6 +102,7 @@ defineEmits(["close-modal"])
 
 const showModeModal = ref(false)
 const showConfirmationModal = ref(false)
+const showTimeWarningModal = ref(false) // 시간 선택 경고 모달 상태 추가
 const selectedNumber = ref(null)
 const selectedMode = ref(null)
 const confirmationMessage = ref("")
@@ -127,6 +138,15 @@ const handleSquatClick = () => {
 
 const selectNumber = (num) => {
   selectedNumber.value = selectedNumber.value === num ? null : num
+}
+
+// 싱글모드 클릭 시 시간 선택 여부 확인
+const handleSingleModeClick = () => {
+  if (!selectedNumber.value) {
+    showTimeWarningModal.value = true // 시간 선택 경고 모달 표시
+  } else {
+    confirmMode("single")
+  }
 }
 
 //선택된 모드에 따라 확인 모달 표시
@@ -182,13 +202,18 @@ const startMode = async (mode) => {
 const closeConfirmationModal = () => {
   showConfirmationModal.value = false
 }
+
+// 시간 선택 경고 모달 닫기
+const closeTimeWarningModal = () => {
+  showTimeWarningModal.value = false
+}
 </script>
 
 <style scoped>
 .mode-button {
-  @apply w-full h-24 px-4 py-3 bg-indigo-500 text-white rounded-lg 
-         hover:bg-indigo-600 transition-colors duration-200
-         flex flex-col items-center justify-center
-         disabled:bg-gray-400 disabled:cursor-not-allowed;
+  @apply w-full h-24 px-4 py-3 bg-indigo-500 text-white rounded-lg
+  hover:bg-indigo-600 transition-colors duration-200
+  flex flex-col items-center justify-center
+  disabled:bg-gray-400 disabled:cursor-not-allowed;
 }
 </style>
