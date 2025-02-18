@@ -1,4 +1,3 @@
-<!-- components/modal/RecordModal.vue -->
 <template>
   <BaseModal title="Records" @close-modal="$emit('close-modal')">
     <!-- 전적 리스트 컨테이너 -->
@@ -7,7 +6,7 @@
       <div v-for="(match, index) in matchData" :key="index" class="flex justify-between items-center p-3 border-b border-gray-200 hover:bg-gray-50">
         <!-- 왼쪽: 매치 정보 -->
         <div class="flex-1 text-left">
-          <div class="text-sm text-gray-600">{{ computeMatchTime(match.date, match.time) }} | {{ match.type }}</div>
+          <div class="text-sm text-gray-600">{{ formatDate(match.createdAt) }} | {{ match.gameId }}</div>
           <div class="font-medium">
             <span :class="match.result === 'WIN' ? 'text-blue-600' : match.result === 'LOSE' ? 'text-red-600' : 'text-gray-600'">
               {{ match.result === "WIN" ? "승리" : match.result === "LOSE" ? "패배" : "무승부" }}
@@ -39,27 +38,33 @@ const matchData = ref([])
 defineEmits(["close-modal"])
 
 // 매치 시간 계산 함수
-const computeMatchTime = (date, time) => {
-  const matchDateString = `${date}T${time}`
-  const matchDate = new Date(matchDateString)
-  const today = new Date()
-  const timeDiff = today - matchDate
-  const diffMinutes = Math.floor(timeDiff / (1000 * 60))
-  const diffHours = Math.floor(timeDiff / (1000 * 60 * 60))
-  const diffDays = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
-  const diffMonths = today.getMonth() - matchDate.getMonth() + (today.getFullYear() - matchDate.getFullYear()) * 12
-  const diffYears = today.getFullYear() - matchDate.getFullYear()
+// const computeMatchTime = (date, time) => {
+//   const matchDateString = `${date}T${time}`
+//   const matchDate = new Date(matchDateString)
+//   const today = new Date()
+//   const timeDiff = today - matchDate
+//   const diffMinutes = Math.floor(timeDiff / (1000 * 60))
+//   const diffHours = Math.floor(timeDiff / (1000 * 60 * 60))
+//   const diffDays = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
+//   const diffMonths = today.getMonth() - matchDate.getMonth() + (today.getFullYear() - matchDate.getFullYear()) * 12
+//   const diffYears = today.getFullYear() - matchDate.getFullYear()
 
-  if (diffMinutes < 60) return `${diffMinutes}분 전`
-  if (diffHours < 24) return `${diffHours}시간 전`
-  if (diffDays < 7) return `${diffDays}일 전`
-  if (diffDays < 10) return `1주 전`
-  if (diffDays < 17) return `2주 전`
-  if (diffDays < 24) return `3주 전`
-  if (diffDays < 28) return `4주 전`
-  if (diffDays < 30) return `1개월 전`
-  if (diffMonths < 12) return `${diffMonths}개월 전`
-  return `${diffYears}년 전`
+//   if (diffMinutes < 60) return `${diffMinutes}분 전`
+//   if (diffHours < 24) return `${diffHours}시간 전`
+//   if (diffDays < 7) return `${diffDays}일 전`
+//   if (diffDays < 10) return `1주 전`
+//   if (diffDays < 17) return `2주 전`
+//   if (diffDays < 24) return `3주 전`
+//   if (diffDays < 28) return `4주 전`
+//   if (diffDays < 30) return `1개월 전`
+//   if (diffMonths < 12) return `${diffMonths}개월 전`
+//   return `${diffYears}년 전`
+// }
+
+// 날짜 포맷팅 함수
+const formatDate = (dateString) => {
+  const options = { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }
+  return new Date(dateString).toLocaleDateString("ko-KR", options)
 }
 
 // 게임 결과 가져오기
