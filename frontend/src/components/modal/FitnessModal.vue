@@ -4,20 +4,13 @@
     <!-- 메인 운동 선택 영역 -->
     <div class="font-dgm grid grid-rows-4 w-full h-full justify-items-center content-between">
       <!-- 스쿼트 그룹 -->
-      <div class="relative flex flex-col space-y-2 w-full">
-        <button class="nes-btn is-primary w-full h-[10vh] px-[10vw] py-2 text-left bg-blue-500 rounded-lg hover:bg-blue-600 active:bg-blue-700 text-[4vh]" @click="handleSquatClick">
+        <button class="nes-btn is-primary w-full h-[10vh] px-[10vw] py-2 text-left bg-blue-500 rounded-lg hover:bg-blue-600 active:bg-blue-700 text-[4vh] relative" @click="handleSquatClick">
           스쿼트
           <a class="nes-btn border border-black flex items-center justify-center w-[3vh] h-[3vh] text-[3vh] absolute bottom-2 right-2 z-20" 
              style="color: black !important;"
-             @click="restartTutorial">
-            ?
-          </a>
-
+             @click="restartTutorial">?</a>
         </button>
-        <!-- <button class="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600" @click="toggleTutorialComplete">
-          {{ isSquatCompleted ? "튜토리얼 완료됨" : "튜토리얼 완료하기" }}
-        </button> -->
-      </div>
+
 
       <!-- 준비중인 운동들 -->
       <button class="nes-btn is-disabled w-full h-[10vh] px-[10vw] py-2 bg-gray-300 text-left text-gray-600 rounded-lg cursor-not-allowed text-[4vh] relative">
