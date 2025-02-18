@@ -11,16 +11,25 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, defineEmits } from "vue";
+import beepSound from "@/assets/musics/beep.mp3"
+const playBeep = () => {
+  const beepAudio = new Audio(beepSound)
+  beepAudio.play().catch(error => console.error("오디오 재생 실패:", error));
+}
 
+const emit = defineEmits(["voice-control"]);
+emit
 const transcript = ref("");
 const isListening = ref(false);
 const isWakeWordDetected = ref(false);
 const timer = ref(0);
 let recognition = null;
 
-const wakeWord = "파소콘";
-const commands = ["상태창", "상태", "창"];
+const wakeWord = "안녕";
+const commands = ["종료","상태","설정","전적","달력","운동","캐릭터","퀘스트"];
+const emits = { "종료": "close", "상태": "status", "설정": "setting", "전적": "record", "달력": "calendar", "운동": "fitness", "캐릭터": "character", "퀘스트": "quest" }
+const sendEmit = (command) => { console.log("voice-control", command) }
 
 onMounted(() => {
   if (!("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
@@ -83,15 +92,16 @@ const checkCommand = (text) => {
 };
 
 const executeCommand = (command) => {
-  if (command.includes("상태창")) {
-    console.log("📊 상태창을 열겠습니다!");
-  }
+  sendEmit(emits[command])
 };
 
 const startCommandListening = () => {
   console.log("🔔 명령어 입력 대기 시작 (5초)");
   isWakeWordDetected.value = true;
   timer.value = 5;
+
+  // 🔊 비프음 재생
+  playBeep()
 
   const countdown = setInterval(() => {
     timer.value--;

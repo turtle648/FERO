@@ -1,95 +1,65 @@
+<!-- components/modal/SettingModal.vue -->
 <template>
-  <div class="setting-modal">
-    <div class="content">
-      <button id="close-btn" @click="closeSettingModal">X</button>
-      <ul class="menu-list">
-        <li class="title">설정</li>
-        <li>설정에 들어올 정보들</li>
-        <li>회원정보</li>
-        <li>회원탈퇴</li>
-        <li><button class="logout-button" @click="goToStart">Logout</button></li>
-        <li><button class="logout-button" @click="checkUserNickname">본인정보조회</button></li>
-        <li><button class="logout-button" @click="checkUserLevel">본인레벨조회</button></li>
-        <li><button class="logout-button" @click="checkUserExperience">본인경험치조회</button></li>
-        <li><button @click="routeRTC">테스트webRTC</button></li>
-        <section class="settings-credits">
-          <h2>Music Credits</h2>
-          <p>"Getting it Done" Kevin MacLeod (incompetech.com)
-          Licensed under Creative Commons: By Attribution 3.0</p>
-        </section>
+  <BaseModal title="Settings" @close-modal="$emit('close-modal')">
+    <div class="flex flex-col h-full">
+      <!-- 메인 메뉴 리스트 -->
+      <ul class="flex-1 flex justify-center items-center">
+        <!-- <li class="text-gray-700">회원정보</li> -->
+        <button class="text-gray-700 nes-btn is-error">회원탈퇴</button>
+
+        <!-- 버튼 그룹 -->
+        <!-- <li class="space-y-2"> -->
+        <!-- <button @click="goToStart" class="w-full py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">로그아웃</button> -->
+
+        <!-- <button @click="checkUserNickname" class="w-full py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">본인정보조회</button> -->
+
+        <!-- <button @click="checkUserLevel" class="w-full py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">본인레벨조회</button> -->
+
+        <!-- <button @click="checkUserExperience" class="w-full py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">본인경험치조회</button> -->
+
+        <!-- <button @click="routeRTC" class="w-full py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">테스트webRTC</button> -->
+        <!-- </li> -->
       </ul>
+
+      <!-- 크레딧 섹션 -->
+      <section class="mt-auto pt-4 border-t border-gray-200">
+        <h2 class="text-lg font-bold text-gray-700 mb-2">Music Credits</h2>
+        <p class="text-sm text-gray-600">"Getting it Done" Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 3.0</p>
+      </section>
     </div>
-  </div>
+  </BaseModal>
 </template>
 
 <script setup>
-import { defineEmits } from "vue"
-import { useUserStore } from "@/stores/store"
-import { useUserDataStore } from "@/stores/userDataStore"
+// import { useRouter } from "vue-router"
+// import { useUserStore } from "@/stores/store"
+// import { useUserDataStore } from "@/stores/userDataStore"
+import BaseModal from "./BaseModal.vue"
 
-// 테스트용 코드( 추후 삭제 )
-import { useRouter } from "vue-router"
-const router = useRouter()
-const routeRTC = () => {
-  router.push({ name: "VideoRoom" })
-}
-// 테스트용 코드 ( 여기까지 )
+// const router = useRouter()
+// const userStore = useUserStore()
+// const userDataStore = useUserDataStore()
 
-const emit = defineEmits(['close-modal'])
-const closeSettingModal = () => {
-  emit('close-modal')
-}
+defineEmits(["close-modal"])
 
-const userStore = useUserStore()
-const userDataStore = useUserDataStore()
+// 라우팅 함수
+// const routeRTC = () => {
+//   router.push({ name: "VideoRoom" })
+// }
 
 // 로그아웃 함수
-const goToStart = async () => {
-  await userStore.logOut()
-}
+// const goToStart = async () => {
+//   await userStore.logOut()
+// }
 
-// 본인정보조회
-const checkUserNickname = () => { userDataStore.checkUserInfo() }
-// 본인레벨조회
-const checkUserLevel = () => { userDataStore.checkUserLevel() }
-// 본인경험치조회
-const checkUserExperience = () => {userDataStore.checkUserExperience() }
+// 사용자 정보 관련 함수들
+// const checkUserNickname = () => {
+//   userDataStore.checkUserInfo()
+// }
+// const checkUserLevel = () => {
+//   userDataStore.checkUserLevel()
+// }
+// const checkUserExperience = () => {
+//   userDataStore.checkUserExperience()
+// }
 </script>
-
-<style scoped>
-.setting-modal {
-  width: 40vh;
-  height: 60vh;
-  position: fixed;
-  top: 50%; /* 화면의 세로 중앙 */
-  left: 50%; /* 화면의 가로 중앙 */
-  transform: translate(-50%, -50%); /* 자신의 크기만큼 반으로 이동 */
-  background: rgba(255, 255, 255);
-  display: flex;
-}
-
-.content {
-  width: 100%;
-  text-align: center;
-}
-
-#close-btn {
-  position: fixed;
-  right: 3%;
-  top: 2%;
-}
-
-.title {
-  margin-bottom: 20px;
-  font-size: 3vh;
-}
-
-.menu-list {
-  list-style-type: none;
-  padding: 0;
-}
-
-.menu-list li {
-  margin-bottom: 10px;
-}
-</style>

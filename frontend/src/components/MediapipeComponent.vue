@@ -1,53 +1,39 @@
 <template>
-  <div class="container flex flex-col items-center justify-between p-4 h-fulll w-full">
-    <div class="flex justify-between w-full">
-      <div class="timer text-white-common z-20 absolute top-0 right-10">{{ formattedTime }}</div>
+  <div class="container">
+    <!-- 중앙 영역 -->
+    <div class="start-container flex absolute inset-0 items-center justify-center h-screen z-10">
+      <div v-if="countdown > 0" class="countdown text-5xl z-10">{{ countdown }}</div>
+      <div v-else-if="showStartText" class="start-text text-5xl z-10">START!</div>
     </div>
 
-    <!-- 중앙 영역 -->
-    <div v-if="countdown > 0" class="countdown text-4xl text-white z-10">{{ countdown }}</div>
-    <div v-else-if="showStartText" class="start-text text-4xl text-white z-10">START</div>
+    <!-- 상단 영역 -->
+    <div class="timer-container text-2xl absolute top-4 left-4 z-0 nes-btn">{{ formattedTime }}</div>
 
     <!-- 본인 화면 -->
-    <!-- 기존 코드 -->
-    <!-- <div class="video-container relative h-full">
-      <canvas ref="canvasElement" class="h-screen">
-        <video ref="videoElement" autoplay playsinline muted class="h-full object-cover overflow-hidden aspect-[9/16]"></video>
-      </canvas>
-    </div> -->
-
-    <!-- 수정 코드 -->
-    <!-- <div class="video-container relative h-full max-w-[800px] max-h-full">
-      <canvas ref="canvasElement" class="h-screen">
-        <video ref="videoElement" autoplay playsinline muted class="h-full w-full overflow-hidden"></video>
-      </canvas>
-    </div> -->
-
-    <!-- 수정 코드2 -->
-    <!--    <div class="video-container relative h-full overflow-hidden mx-auto">-->
-    <!--      <canvas ref="canvasElement" class="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">-->
-    <!--        <video ref="videoElement" autoplay playsinline muted class="h-full w-full overflow-hidden"></video>-->
-    <!--      </canvas>-->
-    <!--    </div>-->
-
-    <!-- 본인 화면 -->
-    <div class="relative w-full h-full flex justify-center items-center overflow-hidden">
+    <!-- <div class="relative w-full h-full flex justify-center items-center overflow-hidden">
       <canvas ref="canvasElement" class="">
         <video ref="videoElement" class="aspect-[9/16] w-full h-auto object-cover"></video>
       </canvas>
+    </div> -->
+
+    <div class="video-container">
+      <canvas ref="canvasElement" class="">
+        <video ref="videoElement" class="" />
+      </canvas>
     </div>
 
-    <!-- 하단 버튼 -->
-    <div class="absolute bottom-[2vh] button-container z-10">
-      <div class="flex justify-between items-center w-full mt-4 z-10">
-        <ExitButton class="px-4 py-2 rounded mx-auto" @click="stopCameraAndNavigate" />
+    <!-- 버튼 영역 -->
+    <div class="button-container flex absolute inset-0 items-end pb-4 z-30">
+      <!-- ExitButton을 하단 중앙에 배치 -->
+      <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+        <ExitButton @click="stopCameraAndNavigate" />
+      </div>
+
+      <!-- ReportIssueButton을 하단 오른쪽에 배치 -->
+      <div class="absolute bottom-4 right-4">
         <ReportIssueButton />
       </div>
     </div>
-    <!-- <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-between items-center w-[90%] max-w-md z-10">
-      <ExitButton class="rounded bg-red-500 text-white" @click="stopCameraAndNavigate" />
-      <ReportIssueButton class="rounded bg-blue-500 text-white" />
-    </div> -->
   </div>
 </template>
 
@@ -60,15 +46,13 @@ const emit = defineEmits(["pose-detected", "open-modal", "getTime"])
 const route = useRoute()
 const router = useRouter()
 
-// const isLoading = ref(true)
-
 // 버튼
 import ExitButton from "@/components/button/ExitButton.vue"
-import ReportIssueButton from "@/components/button/ReportIssueButton.vue"
+import ReportIssueButton from "@/components/button/ReportButton.vue"
 
 let intervalId = null // setInterval ID 저장 (타이머 초기화용)
 
-const selectedTime = ref(1 * 60 * 1000) // 기본값: 1분
+const selectedTime = ref(60 * 1000) // 기본값: 1분
 const timeLeft = ref(selectedTime.value) // 남은 시간 (ms)
 const formattedTime = ref(formatTime(timeLeft.value)) // 표시할 시간
 
@@ -101,13 +85,6 @@ function startTimer() {
   }, 1000)
 }
 
-// 타이머 리셋 함수 (시간 변경 시 호출)
-// function resetTimer() {
-//   clearInterval(intervalId) // 기존 타이머 초기화
-//   timeLeft.value = selectedTime.value // 선택된 시간으로 초기화
-//   formattedTime.value = formatTime(timeLeft.value)
-// }
-
 // 카운트다운
 const countdown = ref(4)
 const showStartText = ref(false)
@@ -138,8 +115,6 @@ function startCountdown() {
 // 미디어파이프 관련
 import { Camera } from "@mediapipe/camera_utils"
 import { Pose } from "@mediapipe/pose"
-// import { Pose, POSE_CONNECTIONS } from "@mediapipe/pose"
-// import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils"
 
 const videoElement = ref(null)
 const canvasElement = ref(null)
@@ -209,10 +184,6 @@ const onResults = (results) => {
 }
 
 onMounted(async () => {
-  // setTimeout(() => {
-  //   isLoading.value = false
-  // }, 2000)
-
   // Single Mode의 경우 시간을 URL BASE로 설정
   if (window.location.href.includes("single-mode")) {
     // 시작 시간 설정 by url prams
@@ -268,18 +239,6 @@ onMounted(async () => {
   }
 })
 
-// 로딩 상태가 변경되었을 때 동작 추가
-// watch(isLoading, async (newValue) => {
-//   if (!newValue) {
-//     try {
-//       await camera.start()
-//       startCountdown()
-//     } catch (error) {
-//       console.error("카메라 시작 오류:", error)
-//     }
-//   }
-// })
-
 // 종료 버튼 클릭 시
 function stopCameraAndNavigate() {
   if (camera) {
@@ -293,24 +252,4 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
-.text-white-common {
-  @apply text-white;
-}
-
-/* .container {
-  height: 100%;
-  width: 100%;
-} */
-
-.input-video {
-  position: absolute;
-  visibility: hidden;
-}
-
-.output-canvas {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
-</style>
+<style scoped></style>
