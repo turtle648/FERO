@@ -29,7 +29,7 @@
           v-for="category in categories"
           :key="category"
           @click="currentCategory = category"
-          class="w-[15vw] h-12 flex items-center justify-center border rounded-md transition duration-200 ease-in-out"
+          class="w-[15vw] h-12 flex items-center justify-center border rounded-md transition duration-200 ease-in-out nes-btn"
           :class="{ 'bg-blue-500 text-white': currentCategory === category }"
         >
           {{ category }}
@@ -59,9 +59,9 @@
       <div class="w-full mt-4 flex justify-center">
         <button
           @click="confirmSelection"
-          class="w-[15vw] h-[7.5vw] border rounded-md bg-blue-500 text-white hover:bg-green-600 transition duration-200 ease-in-out"
+          class="nes-btn is-primary w-[20vw] h-[7.5vw] border rounded-md bg-blue-500 text-white hover:bg-green-600 transition duration-200 ease-in-out"
         >
-          완료
+          Complete
         </button>
       </div>
     </div>
