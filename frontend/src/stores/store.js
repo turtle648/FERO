@@ -65,7 +65,7 @@ export const useUserStore = defineStore("user", () => {
       return response.data["statusCode"]
     } catch (error) {
       console.error(`로그인 요청 중 에러 발생: `, error)
-      return false
+      throw error.response?.status || 500
     }
   }
 

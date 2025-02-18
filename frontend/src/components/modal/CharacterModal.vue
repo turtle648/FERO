@@ -146,3 +146,10 @@ const confirmSelection = async () => {
 // 선택 박스 높이 계산
 const selectionBoxHeight = computed(() => `calc(70vh - 5rem - 40vw)`);
 </script>
+
+<style scoped>
+img {
+  image-rendering: pixelated;
+}
+</style>
+

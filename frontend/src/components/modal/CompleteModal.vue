@@ -3,34 +3,20 @@
     class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50"
   >
     <!-- 튜토리얼 결과 -->
-    <div
-      v-if="mode === 'tutorial'"
-      class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center"
-    >
-      <p class="text-lg font-bold mb-4">튜토리얼 완료!</p>
-      <button
-        @click="completeFitnessTutorial"
-        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        확인
-      </button>
+    <div v-if="mode === 'tutorial'" class="w-[30vh] h-[20vh] bg-white p-6 rounded-lg shadow-lg text-center w-[30vh] h-[15vh] flex flex-col justify-center items-center">
+      <p class="text-base mb-4 font-dgm">튜토리얼 완료!</p>
+      <button @click="completeFitnessTutorial" class="w-[10vh] nes-btn is-primary font-dgm">확인</button>
     </div>
 
     <!-- 싱글모드 결과 -->
-    <div
-      v-if="mode === 'single'"
-      class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center"
-    >
-      <p class="text-lg font-bold mb-4">싱글모드 결과!</p>
-      <p class="text-lg mb-4">Count: {{ count }}</p>
-      <hr class="my-4" />
-      <p>아래의 버튼에 Status Update method 추가 예정</p>
-      <button
-        @click="completeFitnessSingle"
-        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        확인
-      </button>
+    <div v-if="mode === 'single'" class="bg-white p-6 rounded-lg shadow-lg text-center w-[30vh] h-[35vh] flex flex-col justify-center">
+      <div class="text-container pb-4">
+        <p class="font-dgm mb-4 text-3xl">싱글모드 결과</p>
+        <p class="text-2xl font-dgm mb-4">횟수: {{ count }}</p>
+        <p class="text-2xl font-dgm mb-4">운동 시간: {{ exerciseDuration }}</p>
+      </div>
+
+      <button @click="completeFitnessSingle" class="text-white nes-btn is-primary font-dgm text-xl">확인</button>
     </div>
 
     <!-- 랭크모드 결과 -->
@@ -155,19 +141,23 @@
 </template>
 
 <script setup>
-import { useRouter, useRoute } from "vue-router";
-import { useMainStore, TUTORIAL_IDS } from "@/stores/mainStore";
-import { onMounted, ref, defineProps, watch } from "vue";
-import { useUserStore } from "@/stores/store";
-import axios from "axios";
+import { useRouter, useRoute } from "vue-router"
+import { useMainStore, TUTORIAL_IDS } from "@/stores/mainStore"
+import { onMounted, ref, defineProps, watch } from "vue"
+import { useUserStore } from "@/stores/store"
+import axios from "axios"
 
-const router = useRouter();
-const route = useRoute();
-const mainStore = useMainStore();
-const userStore = useUserStore();
-const mode = ref("");
-const rankResult = ref("");
-const isLoading = ref(false); // 로딩 상태
+const router = useRouter()
+const route = useRoute()
+const mainStore = useMainStore()
+const userStore = useUserStore()
+const mode = ref("")
+const rankResult = ref("")
+const isLoading = ref(false) // 로딩 상태
+
+const exerciseDuration = ref(0) // 운동 시간
+// const exerciseCnt = ref(0) // 운동 횟수
+const exerciseStatsRatioId = ref(2) // 운동 종류
 
 const props = defineProps(["count", "result"]);
 
@@ -175,15 +165,13 @@ const props = defineProps(["count", "result"]);
 watch(
   () => props.result,
   (newResult) => {
-    console.log(props.result);
-
     if (newResult) {
-      console.log("Updated result:", newResult);
-      fetchRankResult();
+      console.log("Updated result:", newResult)
+      fetchRankResult()
     }
   },
   { immediate: false }
-);
+)
 
 const completeFitnessTutorial = async () => {
   await mainStore.loadTutorial();
@@ -197,21 +185,58 @@ const completeFitnessTutorial = async () => {
   const tutorial = mainStore.tutorial.find((t) => t.tutorialId === tutorialId);
   if (tutorial) tutorial.completed = true;
 
-  mainStore.completeTutorial(TUTORIAL_IDS.SQUAT);
-  router.push({ name: "Main" });
-};
+  mainStore.completeTutorial(TUTORIAL_IDS.SQUAT)
+  router.push({ name: "Main" })
+}
 
-const completeFitnessSingle = () => {
-  router.push({ name: "Main" });
-};
+// 싱글모드 결과 전송
+const completeFitnessSingle = async () => {
+  try {
+    // 운동 데이터 설정
+    const requestData = {
+      exerciseCnt: props.count, // 운동 횟수
+      exerciseDuration: exerciseDuration.value, // 운동 시간
+      exerciseStatsRatioId: exerciseStatsRatioId.value, // 운동 종류 ID
+    }
+
+    console.log("싱글모드 데이터 전송:", requestData)
+
+    // 사용자 토큰 가져오기 (예: Vuex 또는 Pinia에서 userStore 사용)
+    const token = userStore.accessToken
+
+    // API 호출
+    const response = await axios.post(
+      "https://i12e103.p.ssafy.io:8076/api/v1/exercise/log", // 실제 API URL로 변경
+      requestData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // 헤더에 토큰 추가
+          "Content-Type": "application/json", // JSON 형식 명시
+        },
+      }
+    )
+
+    if (response.status === 200) {
+      console.log("싱글모드 결과 전송 성공:", response.data)
+
+      // 성공적으로 데이터 전송 후 페이지 이동
+      router.push({ name: "Main" })
+    } else {
+      console.error("싱글모드 결과 전송 실패:", response.status, response.data)
+    }
+  } catch (error) {
+    console.error("싱글모드 결과 전송 중 오류 발생:", error.response?.data || error.message)
+  }
+}
+
 const completeFitnessRank = () => {
-  router.push({ name: "Main" });
-};
+  router.push({ name: "Main" })
+}
 
 // 랭크 결과 API 호출 (최대 3번 재시도)
 const fetchRankResult = async () => {
-  let attempts = 0;
-  isLoading.value = true; // 로딩 시작
+  let attempts = 0
+  isLoading.value = true // 로딩 시작
 
   while (attempts < 3) {
     try {
@@ -222,15 +247,12 @@ const fetchRankResult = async () => {
       };
       console.log(`Rank Match API Request (Attempt ${attempts + 1}):`, payload);
 
-      const response = await axios.post(
-        "https://i12e103.p.ssafy.io:8076/api/v1/matching/endGame",
-        payload
-      );
-      console.log("Rank Match Response:", response.data);
+      const response = await axios.post("https://i12e103.p.ssafy.io:8076/api/v1/matching/endGame", payload)
+      console.log("Rank Match Response:", response.data)
 
-      rankResult.value = response.data ?? "결과를 불러올 수 없습니다.";
-      isLoading.value = false; // 로딩 종료
-      return;
+      rankResult.value = response.data ?? "결과를 불러올 수 없습니다."
+      isLoading.value = false // 로딩 종료
+      return
     } catch (error) {
       attempts++;
       console.error(
@@ -239,8 +261,8 @@ const fetchRankResult = async () => {
       );
 
       if (attempts >= 3) {
-        rankResult.value = "API 호출 중 오류 발생.";
-        isLoading.value = false; // 로딩 종료
+        rankResult.value = "API 호출 중 오류 발생."
+        isLoading.value = false // 로딩 종료
       }
     }
   }
@@ -249,14 +271,17 @@ const fetchRankResult = async () => {
 onMounted(() => {
   const url = window.location.href;
   if (url.includes("tutorial")) {
-    mode.value = "tutorial";
+    mode.value = "tutorial"
   } else if (url.includes("single-mode")) {
-    mode.value = "single";
+    mode.value = "single"
   } else if (url.includes("rank-match")) {
-    mode.value = "rank";
-    fetchRankResult();
+    mode.value = "rank"
   }
-});
+
+  const pathSegments = route.path.split("/").filter(Boolean) // URL을 '/' 기준으로 분할하고, 빈 요소(마지막 `/`) 제거
+  const timeFromUrl = parseInt(pathSegments[pathSegments.length - 1]) // 인지된 시간
+  exerciseDuration.value = timeFromUrl
+})
 </script>
 
 <style scoped></style>
