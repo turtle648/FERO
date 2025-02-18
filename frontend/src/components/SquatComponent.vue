@@ -10,7 +10,6 @@
     </div>
 
     <div class="text-container absolute top-4 right-4">
-      <!-- <div class="count text-yellow-500 text-4xl font-dgm bg-white">스쿼트 횟수: {{ count }}</div> -->
       <button type="button" class="nes-btn is-primary text-1xl font-dgm">스쿼트 횟수: {{ count }}</button>
       <div v-if="showGreat" class="great-message text-red text-3xl">Great!</div>
     </div>
@@ -22,7 +21,7 @@
         위치를 수정해주세요
       </button>
     </div>
-    <button v-if="isTutorialMode" @click="setCountToThree" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 absolute bottom-4 left-4 z-50">3</button>
+    <!-- <button v-if="isTutorialMode" @click="setCountToThree" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 absolute bottom-4 left-4 z-50">3</button> -->
   </div>
 </template>
 
@@ -178,12 +177,12 @@ const processPose = (landmarks) => {
 }
 
 // 임시 버튼 클릭 핸들러 함수
-const setCountToThree = () => {
-  count.value = 3
-  if (isTutorialMode) {
-    showModal.value = true // 튜토리얼 모드일 경우 완료 상태로 전환
-  }
-}
+// const setCountToThree = () => {
+//   count.value = 3
+//   if (isTutorialMode) {
+//     showModal.value = true // 튜토리얼 모드일 경우 완료 상태로 전환
+//   }
+// }
 
 // 로딩 스피너 타이머 설정
 onMounted(() => {
