@@ -7,19 +7,19 @@
     </div>
 
     <!-- 싱글모드 결과 -->
-    <div v-if="mode === 'single'" class="bg-white p-6 rounded-lg shadow-lg text-center w-[30vh] h-[35vh] flex flex-col justify-center">
+    <div v-if="mode === 'single'" class="bg-white p-6 rounded-lg shadow-lg text-center w-[30vh] h-[35vh] flex flex-col justify-center items-center">
       <div class="text-container pb-4">
-        <p class="font-dgm mb-4 text-3xl">싱글모드 결과</p>
-        <p class="text-2xl font-dgm mb-4">횟수: {{ count }}</p>
-        <p class="text-2xl font-dgm mb-4">운동 시간: {{ exerciseDuration }}</p>
+        <p class="font-dgm mb-4 text-base">싱글모드 결과</p>
+        <p class="text-base font-dgm mb-4">횟수: {{ count }}</p>
+        <p class="text-base font-dgm mb-4">운동 시간: {{ exerciseDuration }}</p>
       </div>
 
-      <button @click="completeFitnessSingle" class="text-white nes-btn is-primary font-dgm text-xl">확인</button>
+      <button @click="completeFitnessSingle" class="w-[10vh] nes-btn is-primary font-dgm p-1">확인</button>
     </div>
 
     <!-- 랭크모드 결과 -->
     <div v-if="mode === 'rank'" class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center">
-      <p class="text-lg font-bold mb-4">랭크모드 결과!</p>
+      <p class="text-base font-bold mb-4 font-dgm">랭크모드 결과!</p>
       <div v-if="isLoading" class="flex justify-center items-center">
         <svg class="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -28,7 +28,7 @@
       </div>
 
       <div v-else-if="rankResult">
-        <h2 class="text-lg font-bold">
+        <h2 class="text-base font-bold font-dgm">
           {{ rankResult.body.userScore > rankResult.body.opponentScore ? "승리" : rankResult.body.userScore < rankResult.body.opponentScore ? "패배" : "무승부" }}
         </h2>
         <p>{{ rankResult.body.userId }} vs {{ rankResult.body.opponentId }}</p>
@@ -54,9 +54,9 @@
         </ul>
       </div>
 
-      <p v-else class="text-red-500">랭크 결과를 불러오지 못했습니다.</p>
+      <p v-else class="text-red-500 font-dgm">랭크 결과를 불러오지 못했습니다.</p>
 
-      <button @click="completeFitnessRank" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">확인</button>
+      <button @click="completeFitnessRank" class="nes-btn is-primary font-dgm">확인</button>
     </div>
   </div>
 </template>
