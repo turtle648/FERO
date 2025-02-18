@@ -9,7 +9,7 @@
       :command="command"
     />
 
-    <div class="peer-container">
+    <div class="peer-container" :class="{ hidden: isClose }">
       <MediapipeOnlyComponent
         ref="peerVideo"
         class="peer-video z-20"
@@ -55,6 +55,7 @@ const isPeerAudioOn = ref(true);
 const needToSendFinal = ref(false);
 const isMyExerciseComplete = ref(false);
 const isPeerExerciseComplete = ref(false);
+const isClose = ref(false);
 
 const emit = defineEmits(["setIsMatched"]);
 const props = defineProps(["exercise"]);
@@ -128,6 +129,7 @@ const cleanupAndNavigate = (finalRoomId, finalPeerToken) => {
     peerVideo.value.srcObject = null;
   }
   if (myPeerConnection) {
+    isClose.value = true;
     myPeerConnection.close();
     myPeerConnection = null;
   }
@@ -148,7 +150,9 @@ const cleanupAndNavigate = (finalRoomId, finalPeerToken) => {
   command.value = {
     roomId: finalRoomId,
     peerToken: finalPeerToken,
+    remainTime: time.value,
   };
+  console.log(command.value);
 };
 
 // 비디오/오디오 토글 함수들
@@ -508,11 +512,11 @@ onBeforeUnmount(() => {
 }
 
 .control-btn {
-  @apply px-5 py-2.5 
-         rounded cursor-pointer 
-         bg-black/50 text-white 
-         border border-white/30 
-         font-semibold 
+  @apply px-5 py-2.5
+         rounded cursor-pointer
+         bg-black/50 text-white
+         border border-white/30
+         font-semibold
          min-w-[180px]
          transition-colors duration-300 ease-in-out
          shadow-lg;
@@ -520,5 +524,9 @@ onBeforeUnmount(() => {
 
 .control-btn:hover {
   @apply bg-black/70 border-white/50;
+}
+
+.hidden {
+  z-index: -1;
 }
 </style>

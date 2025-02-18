@@ -63,7 +63,10 @@
       </div>
 
       <div v-else-if="rankResult">
-        <h2 class="text-lg font-bold">
+        <h2 v-if="props.result.remainTime > 0" class="text-lg font-bold">
+          승리
+        </h2>
+        <h2 v-else class="text-lg font-bold">
           {{
             rankResult.body.userScore > rankResult.body.opponentScore
               ? "승리"
@@ -166,15 +169,14 @@ const mode = ref("");
 const rankResult = ref("");
 const isLoading = ref(false); // 로딩 상태
 
-const props = defineProps({
-  count: Number,
-  result: Object,
-});
+const props = defineProps(["count", "result"]);
 
 // result가 변경될 때 API 호출
 watch(
   () => props.result,
   (newResult) => {
+    console.log(props.result);
+
     if (newResult) {
       console.log("Updated result:", newResult);
       fetchRankResult();
@@ -252,6 +254,7 @@ onMounted(() => {
     mode.value = "single";
   } else if (url.includes("rank-match")) {
     mode.value = "rank";
+    fetchRankResult();
   }
 });
 </script>

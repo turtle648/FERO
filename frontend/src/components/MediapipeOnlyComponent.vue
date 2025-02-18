@@ -1,5 +1,5 @@
 <template>
-  <div class="video-container" :class="{ hidden: isClose }">
+  <div class="video-container">
     <canvas ref="canvasElement">
       <video ref="videoElement" autoplay playsinline muted />
     </canvas>
@@ -11,18 +11,12 @@ import { ref, onMounted, onUnmounted, watch } from "vue";
 import { defineEmits, defineProps } from "vue";
 import { Pose } from "@mediapipe/pose";
 
-const props = defineProps({
-  peerStream: {
-    type: MediaStream,
-    required: true,
-  },
-});
+const props = defineProps(["peerStream"]);
 
 const emit = defineEmits(["pose-detected", "open-modal", "getTime"]);
 
 const videoElement = ref(null);
 const canvasElement = ref(null);
-const isClose = ref(false);
 let pose = null;
 let animationFrameId = null;
 
@@ -51,11 +45,7 @@ watch(
     console.log(newStream);
 
     if (newStream) {
-      isClose.value = false;
       await setupVideo(newStream);
-    }
-    if (newStream == null) {
-      isClose.value = true;
     }
   },
   { immediate: true }
@@ -95,7 +85,7 @@ const onResults = (results) => {
     const rightEar = landmarks[8];
     const leftShoulder = landmarks[11];
     const rightShoulder = landmarks[12];
-    const emoji = "😎";
+    const emoji = "🤓";
 
     if (nose && leftEar && rightEar && leftShoulder && rightShoulder) {
       const faceX =

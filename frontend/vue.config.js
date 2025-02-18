@@ -18,8 +18,8 @@ const devConfig = {
           port: 5173,
         }
       : {
-          // host: "0.0.0.0",
-          // allowedHosts: "all",
+          host: "0.0.0.0",
+          allowedHosts: "all",
           // https: {
           //   key: fs.readFileSync(path.join(__dirname, "certs/localhost.key")),
           //   cert: fs.readFileSync(path.join(__dirname, "certs/localhost.crt")),
