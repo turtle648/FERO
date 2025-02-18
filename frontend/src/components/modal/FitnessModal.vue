@@ -1,4 +1,3 @@
-<!-- components/modal/FitnessModal.vue -->
 <template>
   <BaseModal class="font-dgm" title="Select Exercise" @close-modal="$emit('close-modal')">
     <!-- 메인 운동 선택 영역 -->
@@ -6,36 +5,27 @@
       <!-- 스쿼트 그룹 -->
       <div class="relative flex flex-col space-y-2 w-full">
         <button class="nes-btn is-primary w-full h-[10vh] px-[10vw] py-2 text-left bg-blue-500 rounded-lg hover:bg-blue-600 active:bg-blue-700 text-[4vh]" @click="handleSquatClick">
-          스쿼트
-          <a class="nes-btn border border-black flex items-center justify-center w-[3vh] h-[3vh] text-[3vh] absolute bottom-2 right-2 z-20" 
-             style="color: black !important;"
-             @click="restartTutorial">
+          SQUAT
+          <a class="nes-btn border border-black flex items-center justify-center w-[3vh] h-[3vh] text-[3vh] absolute bottom-2 right-2 z-20" style="color: black !important" @click="restartTutorial">
             ?
           </a>
-
         </button>
-        <!-- <button class="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600" @click="toggleTutorialComplete">
-          {{ isSquatCompleted ? "튜토리얼 완료됨" : "튜토리얼 완료하기" }}
-        </button> -->
       </div>
 
       <!-- 준비중인 운동들 -->
       <button class="nes-btn is-disabled w-full h-[10vh] px-[10vw] py-2 bg-gray-300 text-left text-gray-600 rounded-lg cursor-not-allowed text-[4vh] relative">
-        런지
+        LUNGE
         <a class="nes-btn bg-white border border-black flex items-center justify-center w-[3vh] h-[3vh] text-[3vh] absolute bottom-2 right-2 z-20">?</a>
       </button>
 
       <button class="nes-btn is-disabled w-full h-[10vh] px-[10vw] py-2 bg-gray-300 text-left text-gray-600 rounded-lg cursor-not-allowed text-[4vh]" disabled>
-        푸쉬업
+        PUSH UP
         <a class="nes-btn bg-white border border-black flex items-center justify-center w-[3vh] h-[3vh] text-[3vh] absolute bottom-2 right-2 z-20">?</a>
-        <!-- <span class="text-sm">준비중</span> -->
       </button>
 
-      <!-- 준비중인 운동들 -->
       <button class="nes-btn is-disabled w-full h-[10vh] px-[10vw] py-2 bg-gray-300 text-left text-gray-600 rounded-lg cursor-not-allowed text-[4vh]" disabled>
-        플랭크
+        PLANK
         <a class="nes-btn bg-white border border-black flex items-center justify-center w-[3vh] h-[3vh] text-[3vh] absolute bottom-2 right-2 z-20">?</a>
-        <!-- <span class="text-sm">준비중</span> -->
       </button>
     </div>
 
@@ -49,7 +39,7 @@
 
         <div class="flex flex-col space-y-4">
           <!-- Single Mode -->
-          <button class="mode-button" :class="{ 'opacity-50': !selectedNumber }" @click="selectMode('single')" :disabled="!selectedNumber">
+          <button class="mode-button" :class="{ 'opacity-50': !selectedNumber }" @click="confirmMode('single')" :disabled="!selectedNumber">
             <p class="text-lg font-medium mb-3">Single Mode</p>
             <div class="flex space-x-4">
               <button
@@ -66,16 +56,8 @@
             </div>
           </button>
 
-          <!-- Multi Mode -->
-          <!-- <button 
-            class="mode-button"
-            @click="selectMode('multi')"
-          >
-            <p class="text-lg font-medium">Multi Mode</p>
-          </button> -->
-
           <!-- Rank Mode -->
-          <button class="mode-button" @click="selectMode('rank')" :disabled="isLoading || !isSquatCompleted">
+          <button class="mode-button" @click="confirmMode('rank')" :disabled="isLoading || !isSquatCompleted">
             <p class="text-lg font-medium">
               {{ isLoading ? "처리중..." : "Rank Mode" }}
             </p>
@@ -83,10 +65,22 @@
         </div>
       </div>
     </div>
+
+    <!-- 게임 시작 확인 모달 -->
+    <div v-if="showConfirmationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
+      <div class="bg-white p-6 rounded-lg shadow-md w-[80%] max-w-sm">
+        <h3 class="text-xl font-semibold mb-4">{{ confirmationMessage }}</h3>
+        <div class="flex justify-end space-x-4">
+          <button class="nes-btn" @click="closeConfirmationModal">취소</button>
+          <button class="nes-btn is-primary" @click="confirmGameStart">확인</button>
+        </div>
+      </div>
+    </div>
   </BaseModal>
 </template>
 
 <script setup>
+// 기존 코드 유지
 import { ref, computed, defineEmits } from "vue"
 import { useRouter } from "vue-router"
 import { useMainStore, TUTORIAL_IDS } from "@/stores/mainStore"
@@ -97,10 +91,12 @@ const mainStore = useMainStore()
 defineEmits(["close-modal"])
 
 const showModeModal = ref(false)
+const showConfirmationModal = ref(false)
 const selectedNumber = ref(null)
+const selectedMode = ref(null)
+const confirmationMessage = ref("")
 const isLoading = ref(false)
 
-// computed 속성은 유지
 const isUICompleted = computed(() => {
   const uiTutorial = mainStore.tutorial.find((t) => t.tutorialId === TUTORIAL_IDS.UI)
   return uiTutorial?.completed || false
@@ -111,12 +107,11 @@ const isSquatCompleted = computed(() => {
   return squatTutorial?.completed || false
 })
 
-// handleSquatClick 함수 수정 - computed 속성 활용
 const handleSquatClick = () => {
   if (!isUICompleted.value) {
     router.push({
       name: "UiTutorial",
-      params: { exercise: TUTORIAL_IDS.SQUAT }, // 선택한 운동 값 전달
+      params: { exercise: TUTORIAL_IDS.SQUAT },
     })
     return (showModeModal.value = false)
   } else if (!isSquatCompleted.value) {
@@ -134,8 +129,25 @@ const selectNumber = (num) => {
   selectedNumber.value = selectedNumber.value === num ? null : num
 }
 
-const selectMode = async (mode) => {
-  const exerciseId = TUTORIAL_IDS.SQUAT // 스쿼트 ID(2) 사용
+//선택된 모드에 따라 확인 모달 표시
+const confirmMode = (mode) => {
+  selectedMode.value = mode
+  if (mode === "single") {
+    confirmationMessage.value = `싱글모드 ${selectedNumber.value}분을 시작하시겠습니까?`
+  } else if (mode === "rank") {
+    confirmationMessage.value = "랭크모드를 시작하시겠습니까?"
+  }
+  showConfirmationModal.value = true
+}
+
+// confirmGameStart 함수 추가 - 게임 시작 처리
+const confirmGameStart = () => {
+  startMode(selectedMode.value)
+}
+
+// startMode 함수 수정 - 실제 라우트 이동 처리
+const startMode = async (mode) => {
+  const exerciseId = TUTORIAL_IDS.SQUAT
 
   switch (mode) {
     case "single":
@@ -145,13 +157,6 @@ const selectMode = async (mode) => {
         params: { exercise: exerciseId, count: selectedNumber.value },
       })
       break
-
-    // case "multi":
-    //   router.push({
-    //     name: "MultiMode",
-    //     params: { exercise: exerciseId },
-    //   })
-    //   break
 
     case "rank":
       try {
@@ -166,22 +171,17 @@ const selectMode = async (mode) => {
         })
       } finally {
         isLoading.value = false
-        showModeModal.value = false
       }
       break
   }
 
-  showModeModal.value = false
+  closeConfirmationModal()
 }
 
-const restartTutorial = () => {
-  // isUICompleted.value = false
-  isUICompleted
+// 확인 모달 닫기
+const closeConfirmationModal = () => {
+  showConfirmationModal.value = false
 }
-
-  // const toggleTutorialComplete = () => {
-  //   // [옵션] 서버와 연동할 경우 mainStore.completeTutorial() 호출
-  // }
 </script>
 
 <style scoped>
