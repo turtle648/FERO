@@ -10,16 +10,16 @@
       </header>
 
       <!-- 달력 본문 -->
-      <div class="flex-1 p-4">
+      <div class="flex-1">
         <!-- 요일 헤더 -->
-        <div class="grid grid-cols-7 mb-2">
+        <div class="grid grid-cols-7 mb-1">
           <span v-for="day in ['일', '월', '화', '수', '목', '금', '토']" :key="day" class="text-center font-medium text-gray-600 text-sm py-2">
             {{ day }}
           </span>
         </div>
 
         <!-- 날짜 그리드 -->
-        <div ref="daysContainer" class="grid grid-cols-7 gap-1 days">
+        <div ref="daysContainer" class="grid grid-cols-7 gap-1 days text-center">
           <!-- 날짜들은 renderCalendar 함수에서 동적으로 추가됨 -->
         </div>
       </div>
