@@ -9,13 +9,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref,nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import StartPageLayout from '@/components/layouts/StartPageLayout.vue'
 
 const router = useRouter()
 const showModal = ref(false)
-const audioPlayerRef = ref(null)
 const token = localStorage.getItem('authToken')
 
 const goToMain = async () => {
@@ -34,22 +33,4 @@ const goToMain = async () => {
 const closeModal = () => { 
   showModal.value = false 
 }
-
-const playMusic = async () => {
-  await nextTick()
-  if (audioPlayerRef.value) {
-    audioPlayerRef.value.playAudio()
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('click', playMusic, { once: true })
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', playMusic)
-  if (audioPlayerRef.value) {
-    audioPlayerRef.value.pauseAudio()
-  }
-})
 </script>
