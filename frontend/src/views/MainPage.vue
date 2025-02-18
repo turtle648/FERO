@@ -124,67 +124,59 @@ onMounted(async () => {
 
       <!-- 헤더 -->
       <header class="absolute top-0 w-full flex flex-col">
-        <!-- 타이틀 바 -->
-        <div class="w-full h-[12vh] bg-[#c3c3c3] flex flex-col">
-          <!-- 상단 텍스트 영역 -->
-          <!-- <div class="h-[40%] flex items-center justify-center border-b-2 border-[#818181]">
-              <span class="text-black text-nowrap font-bold max-w-fit">
-                <template v-for="(char, index) in 'Hero From ISAEKAI'" :key="index">
-                  <span 
-                    class="inline-block animate-pixel-wave" 
-                    :style="{ 'animation-delay': `${index * 0.}s` }"
-                  >
-                    {{ char === ' ' ? '\u00A0' : char }}
-                  </span>
-                </template>
-              </span>
-            </div> -->
-
-          <!-- 여백 -->
-          <!-- <div class="h-[5%]"></div> -->
-
-          <!-- 하단 컨트롤 영역 -->
-          <div class="h-[45%] flex justify-between items-center px-2">
-            <!-- 왼쪽: 타이틀 영역 -->
-            <div class="flex items-center h-full" @click="openModal('status')">
-              <div class="flex items-center h-[90%] px-2 border-t-2 border-l-2 border-[#ffffff] border-r-2 border-b-2 border-[#818181] bg-[#c3c3c3]">
-                <img src="@/assets/images/profile/default-image-1.png" class="h-[90%] mr-2" />
-                <div class="flex flex-col">
-                  <span class="text-black text-[1.8vh] font-bold">{{ userInfo.userNickname }}</span>
-                  <div class="relative w-full h-[1.2vh] bg-gray-200 rounded-sm mt-1">
-                    <div class="absolute inset-0 flex items-center justify-center text-black text-[1vh]">Lv. {{ userInfo.level }}</div>
-                    <div class="bg-blue-500 h-full" :style="{ width: Math.min(userInfo.experience / 2, 100) + '%' }"></div>
-                  </div>
-                </div>
+  <!-- 타이틀 바 -->
+  <div class="w-full h-[12vh] bg-[#c3c3c3] flex flex-col relative">
+    <!-- 중앙 구분선 -->
+    <div class="absolute top-1/2 w-full h-[0.2vh] bg-[#818181] transform -translate-y-1/2"></div>
+    
+    <!-- 상단 영역 (45%, 중앙 정렬) -->
+    <div class="absolute top-1/2 transform -translate-y-full h-[45%] w-full flex justify-between items-center px-[1vh]">
+      <!-- 왼쪽: 타이틀 영역 -->
+      <div class="flex items-center h-full" @click="openModal('status')">
+        <div class="flex items-center h-[90%] px-[1vh] border-t-[0.2vh] border-l-[0.2vh] border-[#ffffff] border-r-[0.2vh] border-b-[0.2vh] border-[#818181] bg-[#c3c3c3]">
+          <img src="@/assets/images/profile/default-image-1.png" class="h-[90%] mr-[1vh]" />
+          <div class="flex flex-col">
+            <span class="text-black text-[1.8vh] font-bold">{{ userInfo.userNickname }}</span>
+            <div class="relative w-full h-[1.2vh] bg-gray-200 rounded-[0.2vh] mt-[0.5vh]">
+              <div class="absolute inset-0 flex items-center justify-center text-black text-[1vh]">
+                Lv. {{ userInfo.level }}
               </div>
-            </div>
-
-            <!-- 오른쪽: 창 제어 버튼들 -->
-            <div class="flex space-x-1 h-full items-center">
-              <!-- 최소화 버튼 -->
-              <button class="nes-btn h-[90%] aspect-square flex items-center justify-center text-2xl font-bold">_</button>
-              <!-- 닫기 버튼 -->
-              <button @click="userStore.logOut()" class="nes-btn h-[90%] aspect-square flex items-center justify-center text-2xl font-bold">×</button>
-            </div>
-          </div>
-          <!-- 여백 -->
-          <div class="h-[10%] border-b-2 border-[#818181]"></div>
-          <!-- 상단 텍스트 영역 (주소창 스타일 적용) -->
-          <div class="h-[40%] flex items-center px-2">
-            <div class="relative w-full nes-field flex items-center bg-white border-4 border-gray-700 px-4 py-2" style="border-radius: 16px">
-              <span class="text-black font-bold nes-text w-full text-center whitespace-nowrap overflow-visible"
-                    style="font-size: clamp(0.1rem, 4vw, 2rem)">
-                <template v-for="(char, index) in 'Fero.From.ISAEKAI.com'" :key="index">
-                  <span class="inline-block animate-pixel-wave" 
-                        :style="{ 'animation-delay': `${index * 0.1}s` }">
-                    {{ char === " " ? "\u00A0" : char }}
-                  </span>
-                </template>
-              </span>
+              <div class="bg-blue-500 h-full" :style="{ width: Math.min(userInfo.experience / 2, 100) + '%' }"></div>
             </div>
           </div>
         </div>
-      </header>
+      </div>
+
+      <!-- 오른쪽: 창 제어 버튼들 -->
+      <div class="flex space-x-[0.5vh] h-full items-center">
+        <!-- <button class="nes-btn h-[80%] aspect-square flex items-center justify-center text-[2vh] font-bold">_</button> -->
+        <button @click="userStore.logOut()" class="nes-btn h-[80%] aspect-square flex items-center justify-center text-[2vh] font-bold">×</button>
+      </div>
+      
+    </div>
+
+    <!-- 하단 영역 (45%, 중앙 정렬) -->
+    <div class="absolute top-1/2 h-[45%] w-full flex items-center px-[1%]">
+      <div class="relative w-full nes-field flex items-center bg-white border-[0.4%] border-gray-700 px-[2%] py-[1%]" style="border-radius: 1.6%">
+        <div class="w-[95%] mx-auto translate-y-[5%]">
+          <span class="text-black font-bold nes-text w-full text-center whitespace-nowrap block"
+                style="font-size: 100%">
+            <template v-for="(char, index) in 'Fero.From.ISAEKAI.com'" :key="index">
+              <span class="inline-block animate-pixel-wave" 
+                    :style="{ 'animation-delay': `${index * 0.1}s` }">
+                {{ char === " " ? "\u00A0" : char }}
+              </span>
+            </template>
+          </span>
+        </div>
+      </div>
+</div>
+
+  </div>
+</header>
+
+
+
 
       <!-- 캐릭터 -->
       <div class="absolute left-1/2 bottom-[10vh] w-[30vw] h-[30vh] transform -translate-x-1/2 -translate-y-1/2" @click="openModal('character')"></div>
