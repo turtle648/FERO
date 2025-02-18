@@ -50,7 +50,7 @@
   import { ref, onMounted } from 'vue'
   import { getMatchData } from '@/api/userAPI'
   import BaseModal from './BaseModal.vue'
-  
+  import axios from "axios"
   const matchData = ref()
   defineEmits(['close-modal'])
   
@@ -79,8 +79,26 @@
       return `${diffYears}년 전`
   }
   
+  const api = axios.create({
+    baseURL: "https://i12e103.p.ssafy.io:8076/api/v1",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+    },
+  })
+  const gameResults = async () => {
+    try {
+      const response = await api.get("/gameResults/")
+      console.log(response.data)
+      return response.data
+    } catch (error) {
+      console.error('전적 조회 중 오류 발생:', error)
+      throw error
+    }
+  }
   // 데이터 로드
   onMounted(() => {
       matchData.value = getMatchData()
+      gameResults()
   })
   </script>
