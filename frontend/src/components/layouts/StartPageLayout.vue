@@ -2,7 +2,7 @@
 <template>
   <div class="h-full w-full fixed overflow-hidden">
     <BackgroundOrganism ref="audioPlayer" />
-    <AudioControlButton 
+    <AudioControlButtonMolecule 
       class="fixed top-4 right-4 z-50"
       @toggleAudio="handleAudioToggle"
     />
@@ -17,7 +17,7 @@ import BackgroundOrganism from '@/components/organisms/BackgroundOrganism.vue'
 import LogoOrganism from '@/components/organisms/LogoOrganism.vue'
 import StartButtonOrganism from '@/components/organisms/StartButtonOrganism.vue'
 import SignInUpModal from '@/components/modal/SignInUpModal.vue'
-import AudioControlButton from '@/components/molecules/AudioControlButton.vue'
+import AudioControlButtonMolecule from '@/components/molecules/AudioControlButtonMolecule.vue'
 import { defineProps, defineEmits, defineExpose, ref } from 'vue'
 
 defineProps({
