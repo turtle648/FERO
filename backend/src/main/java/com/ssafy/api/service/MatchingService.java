@@ -327,6 +327,7 @@ public class MatchingService {
     }
     }
 
+    // 게임 끝날 때 변화값 띄우기
     @Transactional
     public GameResultInfoRes saveGameResult(GameResultReq gameResultReq) {
         GameResultInfoRes gameResultInfoRes = new GameResultInfoRes();
@@ -381,12 +382,13 @@ public class MatchingService {
         exerciseLogReq.setExerciseStatsRatioId(gameResultReq.getExerciseId());
         exerciseLogReq.setExerciseDuration(gameResultReq.getDuration());
         exerciseLogService.addExerciseLogAndUpdateStats(new EventExerciseLog(userId, exerciseLogReq));
+        log.info(exerciseLogReq.toString());
 
         // DB 반영 - 업데이트된 상태 저장
         entityManager.flush();
         entityManager.clear();
 
-        Integer result;
+        int result;
         if (gameResultReq.getUser1Score() > gameResultReq.getUser2Score()) {
             result = 1;  // user1 승리
         } else if (gameResultReq.getUser1Score() < gameResultReq.getUser2Score()) {
@@ -396,8 +398,8 @@ public class MatchingService {
         }
 
         ExerciseResultEvent exerciseResultEvent = new ExerciseResultEvent(
-                gameResultReq.getUserToken1(),
-                gameResultReq.getUserToken2(),
+                userId,
+                opponentId,
                 gameResultReq.getUser1Score(),
                 gameResultReq.getUser2Score(),
                 result,
@@ -405,11 +407,14 @@ public class MatchingService {
         );
 
         RankUpdateRes rankUpdateRes = userRankScoresServiceImpl.updateRankScore(exerciseResultEvent);
+        log.info("@@@@@@@@===========================");
+
         gameResultInfoRes.setBeforeRankScore(rankUpdateRes.getUser1PreviousScore());
         gameResultInfoRes.setAfterRankScore(rankUpdateRes.getUser1NewScore());
 
-        // 새로운 트랜잭션에서 after 상태 조회를 위해 clear
+//        // 새로운 트랜잭션에서 after 상태 조회를 위해 clear
         entityManager.clear();
+
 
         // 업데이트된 after 상태 조회
         UserStats afterStats = userStatsRepository.findByUser(user).orElse(null);

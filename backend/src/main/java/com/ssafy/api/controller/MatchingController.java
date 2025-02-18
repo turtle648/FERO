@@ -28,6 +28,7 @@ public class MatchingController {
     private final MatchingService matchingService;
     private final UserRankScoresRepository userRankScoresRepository;
     private final GameResultRepository gameResultRepository;
+    private final JwtTokenUtil jwtTokenUtil;
 
     // 1. 대기방 입장
     @PostMapping("/enter")
@@ -115,15 +116,19 @@ public class MatchingController {
     @PostMapping("/endGame")
     public ResponseEntity<?> endGmae(@RequestBody EndGameReq endGameReq){
 
+        String userId = JwtTokenUtil.getUserIdFromJWT(endGameReq.getUserToken());
+
         GameResultReq gameResultReq = new GameResultReq(
-                gameResultRepository.findByGameId(endGameReq.getGameId()).get(0).getExerciseId(),
+                gameResultRepository.findByGameIdAndUserId(endGameReq.getGameId(), userId).get(0).getExerciseId(),
                 endGameReq.getGameId(),
-                gameResultRepository.findByGameId(endGameReq.getGameId()).get(0).getDuration(),
+                gameResultRepository.findByGameIdAndUserId(endGameReq.getGameId(), userId).get(0).getDuration(),
                 endGameReq.getUserToken(),
                 endGameReq.getOpponentToken(),
-                (int) gameResultRepository.findByGameId(endGameReq.getGameId()).get(0).getUserScore(),
-                (int) gameResultRepository.findByGameId(endGameReq.getGameId()).get(0).getOpponentScore()
+                (int) gameResultRepository.findByGameIdAndUserId(endGameReq.getGameId(), userId).get(0).getUserScore(),
+                (int) gameResultRepository.findByGameIdAndUserId(endGameReq.getGameId(), userId).get(0).getOpponentScore()
         );
+
+        log.info("#$#$#$#$#$#$#$#$#$#$======{}============", gameResultReq);
 
         GameResultInfoRes gameResultInfoRes = matchingService.saveGameResult(gameResultReq);
 

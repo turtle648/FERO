@@ -27,11 +27,10 @@ public class GameResultController {
         return ResponseEntity.ok("Game result saved successfully");
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping
     @ApiOperation(value = "유저 경기 전적 조회", notes = "특정 유저의 최근 경기 전적을 조회한다.")
     public ResponseEntity<List<GameResult>> getUserGameRecords(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        String userId = JwtTokenUtil.extractUserIdFromToken(authHeader);
+        String userId = JwtTokenUtil.extractUserIdFromToken(request.getHeader("Authorization"));
 
         return ResponseEntity.ok(gameResultService.getUserGameRecords(userId));
     }

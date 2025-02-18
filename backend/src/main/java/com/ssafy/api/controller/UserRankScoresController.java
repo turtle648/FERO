@@ -10,6 +10,8 @@ import com.ssafy.api.response.RankUpdateRes;
 import com.ssafy.db.entity.UserRankScores;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +29,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/userRankScores")
 public class UserRankScoresController {
 
+    private static final Logger log = LogManager.getLogger(UserRankScoresController.class);
     private final UserRankScoresService userRankScoresService;
 
     public UserRankScoresController(UserRankScoresService userRankScoresService) {
@@ -68,8 +71,12 @@ public class UserRankScoresController {
 //        Long exerciseId = rankUpdateReq.getExerciseId();
 //        int result =rankUpdateReq.getResult();
 
+        log.info("=======================================================");
+        log.info(exerciseResultEvent);
+
         try {
             RankUpdateRes response = userRankScoresService.updateRankScore(exerciseResultEvent);
+            log.info("response: {}",response);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
