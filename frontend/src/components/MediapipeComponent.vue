@@ -17,7 +17,7 @@
     </div> -->
 
     <div class="video-container">
-      <canvas ref="canvasElement" class="">
+      <canvas ref="canvasElement" class="w-full h-full">
         <video ref="videoElement" class="" />
       </canvas>
     </div>
