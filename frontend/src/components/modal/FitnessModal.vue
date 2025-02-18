@@ -6,7 +6,12 @@
       <div class="relative flex flex-col space-y-2 w-full">
         <button class="nes-btn is-primary w-full h-[10vh] px-[10vw] py-2 text-left bg-blue-500 rounded-lg hover:bg-blue-600 active:bg-blue-700 text-[4vh]" @click="handleSquatClick">
           SQUAT
-          <a class="nes-btn border border-black flex items-center justify-center w-[3vh] h-[3vh] text-[3vh] absolute bottom-2 right-2 z-20" style="color: black !important" @click="restartTutorial">
+          <a
+            class="nes-btn border border-black flex items-center justify-center w-[3vh] h-[3vh] text-[3vh] absolute bottom-2 right-2 z-20"
+            style="color: black !important"
+            href="#"
+            @click.prevent="restartTutorial"
+          >
             ?
           </a>
         </button>
@@ -39,7 +44,7 @@
 
         <div class="flex flex-col space-y-4">
           <!-- Single Mode -->
-          <button class="mode-button" @click="handleSingleModeClick">
+          <button class="mode-button" :class="{ 'opacity-50': !selectedNumber }" @click="confirmMode('single')" :disabled="!selectedNumber">
             <p class="text-lg font-medium mb-3">Single Mode</p>
             <div class="flex space-x-4">
               <button
@@ -76,16 +81,6 @@
         </div>
       </div>
     </div>
-
-    <!-- 시간 선택 경고 모달 -->
-    <div v-if="showTimeWarningModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70]">
-      <div class="bg-white p-6 rounded-lg shadow-md w-[80%] max-w-sm">
-        <h3 class="text-xl font-semibold mb-4">시간 선택을 하세요</h3>
-        <div class="flex justify-end space-x-4">
-          <button class="nes-btn is-primary" @click="closeTimeWarningModal">확인</button>
-        </div>
-      </div>
-    </div>
   </BaseModal>
 </template>
 
@@ -102,7 +97,6 @@ defineEmits(["close-modal"])
 
 const showModeModal = ref(false)
 const showConfirmationModal = ref(false)
-const showTimeWarningModal = ref(false) // 시간 선택 경고 모달 상태 추가
 const selectedNumber = ref(null)
 const selectedMode = ref(null)
 const confirmationMessage = ref("")
@@ -138,15 +132,6 @@ const handleSquatClick = () => {
 
 const selectNumber = (num) => {
   selectedNumber.value = selectedNumber.value === num ? null : num
-}
-
-// 싱글모드 클릭 시 시간 선택 여부 확인
-const handleSingleModeClick = () => {
-  if (!selectedNumber.value) {
-    showTimeWarningModal.value = true // 시간 선택 경고 모달 표시
-  } else {
-    confirmMode("single")
-  }
 }
 
 //선택된 모드에 따라 확인 모달 표시
@@ -203,9 +188,8 @@ const closeConfirmationModal = () => {
   showConfirmationModal.value = false
 }
 
-// 시간 선택 경고 모달 닫기
-const closeTimeWarningModal = () => {
-  showTimeWarningModal.value = false
+const restartTutorial = () => {
+  router.push({ name: "UiTutorial" }) // UiTutorial로 이동
 }
 </script>
 
