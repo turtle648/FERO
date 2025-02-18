@@ -1,8 +1,8 @@
 <!-- components/modal/BaseModal.vue -->
 <template>
   <Teleport to="body">
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div class="bg-white w-[75%] h-[70%] max-w-4xl max-h-[80vh] rounded-lg shadow-lg flex flex-col">
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" @click="$emit('close-modal')">
+      <div class="bg-white w-[75%] h-[70%] max-w-4xl max-h-[80vh] rounded-lg shadow-lg flex flex-col" @click.stop>
         <!-- 헤더 영역 -->
         
         <div 

@@ -140,6 +140,7 @@ public class AuthController {
 		AllCharacterInfoRes allCharacterInfoRes = AllCharacterInfoRes.of(userInfo, userCharacter);
 		UserStats userStats = userStatsRepository.findByUser(userInfo).orElseThrow(() -> new RuntimeException("UserStats not found"));
 
+
 		allCharacterInfoRes.setUserStats(userStats);
 
 		return ResponseEntity.ok(allCharacterInfoRes);

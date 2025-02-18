@@ -209,7 +209,9 @@ const handleSubmit = async () => {
       }
     }
   } catch (error) {
-    console.log(error)
+    if (error == 401) {alert("아이디 혹은 비밀번호가 틀렸습니다.")}
+    else if (error == 403) {alert("임시 비밀번호를 사용중입니다.")}
+    else {alert("잠시후에 다시 시도해주십시오.")}
   }
 }
 

@@ -2,15 +2,19 @@
   <div class="video-container">
     <SquatComponent
       v-show="isMyVideoOn"
-      class="my-video"
+      class="my-video z-50"
       ref="myFace"
       @set-count="setCount"
       @get-time-left="setTime"
       :command="command"
     />
 
-    <div class="peer-container">
-      <video ref="peerVideo" class="peer-video" playsinline autoplay></video>
+    <div class="peer-container" :class="{ hidden: isClose }">
+      <MediapipeOnlyComponent
+        ref="peerVideo"
+        class="peer-video z-20"
+        :peerStream="peerStream"
+      />
     </div>
 
     <div class="controls">
@@ -41,6 +45,7 @@ import {
 } from "vue";
 import SquatComponent from "@/components/SquatComponent.vue";
 import axios from "axios";
+import MediapipeOnlyComponent from "@/components/MediapipeOnlyComponent.vue";
 // import router from '@/router'
 // import { setRouteData } from '@/router/routeData'
 // 기본 상태 관리
@@ -50,6 +55,7 @@ const isPeerAudioOn = ref(true);
 const needToSendFinal = ref(false);
 const isMyExerciseComplete = ref(false);
 const isPeerExerciseComplete = ref(false);
+const isClose = ref(false);
 
 const emit = defineEmits(["setIsMatched"]);
 const props = defineProps(["exercise"]);
@@ -58,6 +64,7 @@ const peerCount = ref(0);
 const time = ref(-1);
 const myFace = ref(null);
 const peerVideo = ref(null);
+const peerStream = ref(null);
 const roomId = ref(null);
 const currentPeerId = ref(null);
 const peerToken = ref(null);
@@ -122,6 +129,7 @@ const cleanupAndNavigate = (finalRoomId, finalPeerToken) => {
     peerVideo.value.srcObject = null;
   }
   if (myPeerConnection) {
+    isClose.value = true;
     myPeerConnection.close();
     myPeerConnection = null;
   }
@@ -142,7 +150,9 @@ const cleanupAndNavigate = (finalRoomId, finalPeerToken) => {
   command.value = {
     roomId: finalRoomId,
     peerToken: finalPeerToken,
+    remainTime: time.value,
   };
+  console.log(command.value);
 };
 
 // 비디오/오디오 토글 함수들
@@ -382,6 +392,8 @@ const initRTCPeerConnection = () => {
   myPeerConnection.ontrack = (event) => {
     if (peerVideo.value) {
       peerVideo.value.srcObject = event.streams[0];
+      peerStream.value = event.streams[0];
+      console.log(peerStream.value);
     }
   };
 };
@@ -461,12 +473,26 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+@media (max-width: 768px) {
+  video,
+  canvas {
+    object-fit: contain;
+  }
+}
+
+@media (min-width: 769px) {
+  video,
+  canvas {
+    object-fit: cover;
+  }
+}
+
 .video-container {
   @apply relative w-full h-screen bg-black;
 }
 
 .my-video {
-  @apply w-full h-full object-cover relative z-10;
+  @apply w-full h-full object-contain relative z-10;
 }
 
 .peer-container {
@@ -474,7 +500,7 @@ onBeforeUnmount(() => {
 }
 
 .peer-video {
-  @apply w-full h-full object-cover;
+  @apply w-full h-full object-contain;
 }
 
 .controls {
@@ -486,11 +512,11 @@ onBeforeUnmount(() => {
 }
 
 .control-btn {
-  @apply px-5 py-2.5 
-         rounded cursor-pointer 
-         bg-black/50 text-white 
-         border border-white/30 
-         font-semibold 
+  @apply px-5 py-2.5
+         rounded cursor-pointer
+         bg-black/50 text-white
+         border border-white/30
+         font-semibold
          min-w-[180px]
          transition-colors duration-300 ease-in-out
          shadow-lg;
@@ -498,5 +524,9 @@ onBeforeUnmount(() => {
 
 .control-btn:hover {
   @apply bg-black/70 border-white/50;
+}
+
+.hidden {
+  z-index: -1;
 }
 </style>
