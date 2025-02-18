@@ -81,34 +81,43 @@ const chartData = computed(() => ({
   datasets: [
     {
       label: "운동 데이터",
-      backgroundColor: "rgba(236, 72, 153, 1)",
-      pointBackgroundColor: "rgba(236, 72, 153, 1)",
-      pointBorderColor: "#fff",
-      pointHoverBackgroundColor: "#fff",
-      pointHoverBorderColor: "rgba(236, 72, 153, 1)",
+      backgroundColor: [
+        "rgba(255, 99, 132, 0.8)", // 팔 - 빨강
+        "rgba(54, 162, 235, 0.8)", // 다리 - 파랑
+        "rgba(255, 206, 86, 0.8)", // 가슴 - 노랑
+        "rgba(75, 192, 192, 0.8)", // 복근 - 청록
+        "rgba(153, 102, 255, 0.8)", // 등 - 보라
+        "rgba(255, 140, 0, 0.8)", // 체력 - 주황
+      ],
+      borderColor: "#fff",
+      borderWidth: 1,
+      hoverBackgroundColor: [
+        "rgba(255, 99, 132, 1)",
+        "rgba(54, 162, 235, 1)",
+        "rgba(255, 206, 86, 1)",
+        "rgba(75, 192, 192, 1)",
+        "rgba(153, 102, 255, 1)",
+        "rgba(255, 140, 0, 1)",
+      ],
       data: getSelectedDateData(),
     },
   ],
 }));
 
 const getSelectedDateData = () => {
-  const data = new Array(
-    userInfo.value.userStats.armsStats,
-    userInfo.value.userStats.legsStats,
-    userInfo.value.userStats.chestStats,
-    userInfo.value.userStats.absStats,
-    userInfo.value.userStats.backStats,
-    userInfo.value.userStats.staminaStats
-  );
-
-  console.log(data);
-
-  return data ? data : [0, 0, 0, 0, 0, 0];
+  const data = [
+    userInfo.value.userStats.armsStats, // 팔
+    userInfo.value.userStats.legsStats, // 다리
+    userInfo.value.userStats.chestStats, // 가슴
+    userInfo.value.userStats.absStats, // 복근
+    userInfo.value.userStats.backStats, // 등
+    userInfo.value.userStats.staminaStats, // 체력
+  ];
+  return data || [0, 0, 0, 0, 0, 0];
 };
 
 const emit = defineEmits(["close-modal"]);
 
-// 모달 외부 클릭 시 상태창 모달 종료
 const closeStatusModal = () => {
   emit("close-modal");
 };
