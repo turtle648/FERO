@@ -1,13 +1,14 @@
 <template>
-  <!-- 영상 플레이어 (로그인 후 표시) -->
+  <!-- 영상 플레이어 -->
   <video 
     v-if="showVideo"
     ref="introVideo"
     :src="require('@/assets/Fero_Intro.mp4')"
-    class="fixed inset-0 w-full h-full object-cover pointer-events-none"
-    style="z-index: 20;"
+    class="absolute top-0 left-0 w-screen h-screen object-fill"
+    style="z-index: 20; pointer-events: auto;" 
     autoplay
     @ended="navigateToMain"
+    @click.stop
   />
   <div class="modal" @click="closeModalOutside">
     <div class="modal-content" @click.stop>
@@ -126,6 +127,7 @@
 import { ref, watchEffect, defineEmits, nextTick } from "vue"
 import { useRouter } from "vue-router"
 import { useUserStore } from "@/stores/store"
+import axios from "axios"
 
 const emit = defineEmits(["close"])
 const userStore = useUserStore() // Pinia store 사용
@@ -147,6 +149,7 @@ const avatar = ref("")
 
 const showVideo = ref(false)
 const introVideo = ref(null)
+
 
 // watch()를 사용하여 gender 변경 감지
 watchEffect(() => {
@@ -176,13 +179,34 @@ const handleSubmit = async () => {
   try {
     const result = await userStore.logIn(id.value, password.value)
     if (result == 200) {
-      showVideo.value = true // 영상 표시
-
-      // nextTick()을 사용해 UI가 업데이트된 후 실행
-      await nextTick()
-
-      // 자동 재생 보장 (일부 브라우저에서 필요)
-      introVideo.value?.play().catch(console.error)
+      const api = axios.create({
+        baseURL: "https://i12e103.p.ssafy.io:8076/api/v1",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      })
+      
+      // 스토리 튜토리얼 데이터 로드
+      const loadSpecificTutorial = async () => {
+        try {
+          const response = await api.get("/Tutorial/97")
+          return response.data
+        } catch (error) {
+          console.error("[❗] Load Error:", error)
+          throw error
+        }
+      }
+      const isTutorialComplete = await loadSpecificTutorial()
+      // 튜토리얼 정보 조회 후... true면 
+      if (isTutorialComplete) { navigateToMain() }
+      else {
+        showVideo.value = true // 영상 표시
+        // nextTick()을 사용해 UI가 업데이트된 후 실행
+        await nextTick()      
+        // 자동 재생 보장 (일부 브라우저에서 필요)
+        introVideo.value?.play().catch(console.error)
+      }
     }
   } catch (error) {
     console.log(error)
@@ -191,8 +215,27 @@ const handleSubmit = async () => {
 
 // 영상이 끝난 후 메인 페이지로 이동
 const navigateToMain = () => {
+  const api = axios.create({
+    baseURL: "https://i12e103.p.ssafy.io:8076/api/v1",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+    },
+  })
+  const completeTutorial = async () => {
+    try {
+      const response = await api.post("/Tutorial/complete/97")
+      console.log('튜토리얼 완료:', response.data)
+      return response.data
+    } catch (error) {
+      console.error('튜토리얼 완료 처리 중 오류 발생:', error)
+      throw error
+    }
+  }
+  completeTutorial()
   router.push("/main")
 }
+
 // 이메일 중복확인 API
 const checkEmailDuplicate = (email) => {
   userStore.checkEmailDuplicateAPI(email).then((result) => {
