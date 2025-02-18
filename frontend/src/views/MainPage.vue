@@ -229,7 +229,7 @@ onMounted(async () => {
       </footer>
 
       <!-- 모달 컴포넌트 -->
-      <StatusModal v-if="modals.status" @close-modal="closeModal('status')" @open-modal="openModal('status')" />
+      <StatusModal v-if="modals.status" @close-modal="closeModal('status')" @open-modal="openModal('status')"/>
       <SettingModal v-if="modals.setting" @close-modal="closeModal('setting')" @open-modal="openModal('setting')" />
       <CharacterModal v-if="modals.character" @close-modal="closeModal('character')" @open-modal="openModal('character')" />
       <CalendarModal v-if="modals.calendar" @close-modal="closeModal('calendar')" @open-modal="openModal('calendar')" />
