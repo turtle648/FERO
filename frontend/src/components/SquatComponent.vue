@@ -14,7 +14,7 @@
       <div v-if="showGreat" class="great-message text-red text-3xl">Great!</div>
     </div>
 
-    <div v-if="showErrorModal" class="landmark-error-modal absolute inset-x-0 top-[30%] transform flex items-center justify-center text-yellow-500 text-2xl z-20 font-dgm">
+    <div v-if="showErrorModal" class="landmark-error-modal absolute inset-x-0 top-[30%] transform flex items-center justify-center text-yellow-500 text-xl z-20 font-dgm">
       <button type="button" class="nes-btn is-warning">
         몸 전체가 화면에 나오도록
         <br />

@@ -1,9 +1,9 @@
 <template>
   <div class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-[9999]">
     <!-- 튜토리얼 결과 -->
-    <div v-if="mode === 'tutorial'" class="bg-white p-6 rounded-lg shadow-lg text-center w-[30vh] h-[15vh] flex flex-col justify-center">
-      <p class="text-3xl mb-4 font-dgm">튜토리얼 완료!</p>
-      <button @click="completeFitnessTutorial" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 font-dgm">확인</button>
+    <div v-if="mode === 'tutorial'" class="w-[30vh] h-[20vh] bg-white p-6 rounded-lg shadow-lg text-center w-[30vh] h-[15vh] flex flex-col justify-center items-center">
+      <p class="text-base mb-4 font-dgm">튜토리얼 완료!</p>
+      <button @click="completeFitnessTutorial" class="w-[10vh] nes-btn is-primary font-dgm">확인</button>
     </div>
 
     <!-- 싱글모드 결과 -->
