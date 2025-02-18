@@ -32,6 +32,7 @@ CREATE TABLE user_character (
                                 user_rank VARCHAR(12) DEFAULT "-" 
                                 CHECK (user_rank IN ('Bronze', 'Silver', 'Gold', 'Diamond', '-')),
 
+
                                 points SMALLINT UNSIGNED NOT NULL DEFAULT 0 CHECK (points <= 50000),
                                 FOREIGN KEY (user_id) REFERENCES user_info(user_id) ON DELETE CASCADE
 );
@@ -435,6 +436,39 @@ END //
 DELIMITER ;
 
 
+-- 유저 랭크 업데이트 트리거
+DELIMITER //
+
+CREATE TRIGGER update_user_rank_on_update
+AFTER UPDATE ON user_rank_scores
+FOR EACH ROW
+BEGIN
+    DECLARE avg_rank_score INT;
+    DECLARE new_rank VARCHAR(12);
+
+    -- 해당 유저의 운동별 랭크 점수 평균 계산
+    SELECT AVG(rank_score) INTO avg_rank_score
+    FROM user_rank_scores
+    WHERE user_id = NEW.user_id;
+
+    -- 랭크 결정 로직
+    IF avg_rank_score >= 1300 THEN
+        SET new_rank = 'Diamond';
+    ELSEIF avg_rank_score >= 1200 THEN
+        SET new_rank = 'Gold';
+    ELSEIF avg_rank_score >= 1100 THEN
+        SET new_rank = 'Silver';
+    ELSE
+        SET new_rank = 'Bronze';
+    END IF;
+
+    -- user_character 테이블의 user_rank 업데이트
+    UPDATE user_character
+    SET user_rank = new_rank
+    WHERE user_id = NEW.user_id;
+END // 
+
+
 -- EVENT SCHEDULER
 
 -- 전날 퀘스트 성공 여부를 체크하는 이벤트 스케줄러
@@ -501,75 +535,6 @@ DELIMITER ;
 
 -- 이벤트 스케줄러 활성화 
 SET GLOBAL event_scheduler = ON;
-
-
--- 유저 랭크 업데이트 트리거
-DELIMITER //
-
-CREATE TRIGGER update_user_rank_on_update
-AFTER UPDATE ON user_rank_scores
-FOR EACH ROW
-BEGIN
-    DECLARE avg_rank_score INT;
-    DECLARE new_rank VARCHAR(12);
-
-    -- 해당 유저의 운동별 랭크 점수 평균 계산
-    SELECT AVG(rank_score) INTO avg_rank_score
-    FROM user_rank_scores
-    WHERE user_id = NEW.user_id;
-
-    -- 랭크 결정 로직
-    IF avg_rank_score >= 1300 THEN
-        SET new_rank = 'Diamond';
-    ELSEIF avg_rank_score >= 1200 THEN
-        SET new_rank = 'Gold';
-    ELSEIF avg_rank_score >= 1100 THEN
-        SET new_rank = 'Silver';
-    ELSE
-        SET new_rank = 'Bronze';
-    END IF;
-
-    -- user_character 테이블의 user_rank 업데이트
-    UPDATE user_character
-    SET user_rank = new_rank
-    WHERE user_id = NEW.user_id;
-END // 
-
-DELIMITER ;
-
--- insert시에 실행
--- DELIMITER $$
-
--- CREATE TRIGGER update_user_rank_on_insert_update
--- AFTER INSERT ON user_rank_scores
--- FOR EACH ROW
--- BEGIN
---     DECLARE avg_rank_score INT;
---     DECLARE new_rank VARCHAR(12);
-
---     -- 해당 유저의 운동별 랭크 점수 평균 계산
---     SELECT AVG(rank_score) INTO avg_rank_score
---     FROM user_rank_scores
---     WHERE user_id = NEW.user_id;
-
---     -- 랭크 결정 로직
---     IF avg_rank_score >= 1300 THEN
---         SET new_rank = 'Diamond';
---     ELSEIF avg_rank_score >= 1200 THEN
---         SET new_rank = 'Gold';
---     ELSEIF avg_rank_score >= 1100 THEN
---         SET new_rank = 'Silver';
---     ELSE
---         SET new_rank = 'Bronze';
---     END IF;
-
---     -- user_character 테이블의 user_rank 업데이트
---     UPDATE user_character
---     SET user_rank = new_rank
---     WHERE user_id = NEW.user_id;
--- END $$
-
--- DELIMITER ;
 
 -- -- -- -- -- 데이터 삽입 -- -- -- -- --
 
@@ -638,6 +603,7 @@ INSERT INTO user_character (user_id, user_nickname, gender, avatar, user_level, 
     ('joo345', 'JiHoonJjang', 'M', '3-9-2', 7, 155, 'Gold', 1800),
     ('ryu456', 'JunYeolBest', 'M', '8-2-4', 4, 101, 'Diamond', 900),
     ('kwon567', 'SangWooPower', 'M', '7-6-1', 5, 139, 'Gold', 1400);
+
 
 
 TRUNCATE TABLE user_rank_scores;

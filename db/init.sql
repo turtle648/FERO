@@ -1,6 +1,6 @@
--- DROP DATABASE IF EXISTS E103_DB;
+DROP DATABASE IF EXISTS E103_DB;
 
--- CREATE DATABASE E103_DB;
+CREATE DATABASE E103_DB;
 
 USE E103_DB;
 
@@ -28,6 +28,10 @@ CREATE TABLE user_character (
 
                                 user_level SMALLINT UNSIGNED NOT NULL DEFAULT 1 CHECK (user_level <= 999),
                                 user_experience INT NOT NULL DEFAULT 0,
+                                
+                                user_rank VARCHAR(12) DEFAULT "-" 
+                                CHECK (user_rank IN ('Bronze', 'Silver', 'Gold', 'Diamond', '-')),
+
 
                                 points SMALLINT UNSIGNED NOT NULL DEFAULT 0 CHECK (points <= 50000),
                                 FOREIGN KEY (user_id) REFERENCES user_info(user_id) ON DELETE CASCADE
@@ -432,6 +436,39 @@ END //
 DELIMITER ;
 
 
+-- 유저 랭크 업데이트 트리거
+DELIMITER //
+
+CREATE TRIGGER update_user_rank_on_update
+AFTER UPDATE ON user_rank_scores
+FOR EACH ROW
+BEGIN
+    DECLARE avg_rank_score INT;
+    DECLARE new_rank VARCHAR(12);
+
+    -- 해당 유저의 운동별 랭크 점수 평균 계산
+    SELECT AVG(rank_score) INTO avg_rank_score
+    FROM user_rank_scores
+    WHERE user_id = NEW.user_id;
+
+    -- 랭크 결정 로직
+    IF avg_rank_score >= 1300 THEN
+        SET new_rank = 'Diamond';
+    ELSEIF avg_rank_score >= 1200 THEN
+        SET new_rank = 'Gold';
+    ELSEIF avg_rank_score >= 1100 THEN
+        SET new_rank = 'Silver';
+    ELSE
+        SET new_rank = 'Bronze';
+    END IF;
+
+    -- user_character 테이블의 user_rank 업데이트
+    UPDATE user_character
+    SET user_rank = new_rank
+    WHERE user_id = NEW.user_id;
+END // 
+
+
 -- EVENT SCHEDULER
 
 -- 전날 퀘스트 성공 여부를 체크하는 이벤트 스케줄러
@@ -543,28 +580,29 @@ INSERT INTO user_info (user_id, user_password, user_name, user_email, phone_numb
     ('ryu456', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Ryu Jun-yeol', 'ryu456@gmail.com', '010-9999-0000'),
     ('kwon567', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Kwon Sang-woo', 'kwon567@naver.com', '010-0000-1111');
 
-INSERT INTO user_character (user_id, user_nickname, gender, avatar, user_level, user_experience, points) VALUES
-    ('ssafy123', 'GilDong', 'M', '7-3-9', 5, 128, 1000),
-    ('kim456', 'ChulSoo123', 'M', '2-6-4', 3, 57, 500),
-    ('lee789', 'YoungHee', 'F', '1-8-10', 7, 184, 1500),
-    ('park234', 'JiSungSoccer', 'M', '5-9-2', 4, 76, 800),
-    ('choi567', 'MinSooKing', 'M', '4-7-1', 2, 93, 300),
-    ('jung111', 'SoHeeJjang', 'F', '10-3-5', 8, 42, 2000),
-    ('kang222', 'DongWonOppa', 'M', '6-2-8', 6, 177, 1200),
-    ('yoon333', 'SeoJunMan', 'M', '9-4-1', 9, 25, 2300),
-    ('shin444', 'MinAhGirl', 'F', '3-7-6', 3, 134, 600),
-    ('song555', 'HyeKyoNim', 'F', '8-5-2', 5, 61, 1100),
-    ('yang666', 'HyunSeokBoss', 'M', '7-4-9', 6, 90, 1700),
-    ('han777', 'JiMinLove', 'F', '5-3-2', 4, 130, 900),
-    ('oh888', 'YeonSeoStar', 'F', '2-9-6', 7, 145, 1600),
-    ('seo999', 'InGukRocks', 'M', '1-6-4', 5, 112, 1200),
-    ('bae000', 'SuzyBae', 'F', '9-8-5', 3, 98, 700),
-    ('cha123', 'EunWooOppa', 'M', '6-7-3', 6, 121, 1300),
-    ('moon234', 'ChaeWonMoon', 'F', '4-5-7', 5, 80, 1100),
-    ('joo345', 'JiHoonJjang', 'M', '3-9-2', 7, 150, 1800),
-    ('ryu456', 'JunYeolBest', 'M', '8-2-4', 4, 101, 900),
-    ('kwon567', 'SangWooPower', 'M', '7-6-1', 5, 139, 1400);
 
+-- 유저 캐릭터 정보
+INSERT INTO user_character (user_id, user_nickname, gender, avatar, user_level, user_experience, user_rank, points) VALUES
+    ('ssafy123', 'GilDong', 'M', '7-3-9', 5, 138, 'Silver', 1000),
+    ('kim456', 'ChulSoo123', 'M', '2-6-4', 3, 67, 'Diamond', 500),
+    ('lee789', 'YoungHee', 'F', '1-8-10', 7, 184, 'Diamond', 1500),
+    ('park234', 'JiSungSoccer', 'M', '5-9-2', 4, 76, 'Gold', 800),
+    ('choi567', 'MinSooKing', 'M', '4-7-1', 2, 98, 'Diamond', 300),
+    ('jung111', 'SoHeeJjang', 'F', '10-3-5', 8, 47, 'Diamond', 2000),
+    ('kang222', 'DongWonOppa', 'M', '6-2-8', 6, 182, 'Diamond', 1200),
+    ('yoon333', 'SeoJunMan', 'M', '9-4-1', 9, 35, 'Diamond', 2300),
+    ('shin444', 'MinAhGirl', 'F', '3-7-6', 3, 144, 'Diamond', 600),
+    ('song555', 'HyeKyoNim', 'F', '8-5-2', 5, 61, 'Bronze', 1100),
+    ('yang666', 'HyunSeokBoss', 'M', '7-4-9', 6, 95, 'Gold', 1700),
+    ('han777', 'JiMinLove', 'F', '5-3-2', 4, 135, 'Diamond', 900),
+    ('oh888', 'YeonSeoStar', 'F', '2-9-6', 7, 150, 'Gold', 1600),
+    ('seo999', 'InGukRocks', 'M', '1-6-4', 5, 122, 'Silver', 1200),
+    ('bae000', 'SuzyBae', 'F', '9-8-5', 3, 103, 'Silver', 700),
+    ('cha123', 'EunWooOppa', 'M', '6-7-3', 6, 131, 'Gold', 1300),
+    ('moon234', 'ChaeWonMoon', 'F', '4-5-7', 5, 85, 'Bronze', 1100),
+    ('joo345', 'JiHoonJjang', 'M', '3-9-2', 7, 155, 'Gold', 1800),
+    ('ryu456', 'JunYeolBest', 'M', '8-2-4', 4, 101, 'Diamond', 900),
+    ('kwon567', 'SangWooPower', 'M', '7-6-1', 5, 139, 'Gold', 1400);
 
 
 
