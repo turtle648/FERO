@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50"
-  >
+  <div class="fixed inset-0 flex justify-center items-center z-50">
     <!-- 튜토리얼 결과 -->
     <div v-if="mode === 'tutorial'" class="w-[30vh] h-[20vh] bg-white p-6 rounded-lg shadow-lg text-center w-[30vh] h-[15vh] flex flex-col justify-center items-center">
       <p class="text-base mb-4 font-dgm">튜토리얼 완료!</p>
@@ -20,109 +18,41 @@
     </div>
 
     <!-- 랭크모드 결과 -->
-    <div
-      v-if="mode === 'rank'"
-      class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center z-50"
-    >
+    <div v-if="mode === 'rank'" class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center z-50">
       <p class="text-lg font-bold mb-4">랭크모드 결과!</p>
       <div v-if="isLoading" class="flex justify-center items-center">
-        <svg
-          class="animate-spin h-8 w-8 text-blue-500"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            class="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            stroke-width="4"
-          ></circle>
-          <path
-            class="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8v8H4z"
-          ></path>
+        <svg class="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
         </svg>
       </div>
 
       <div v-else-if="rankResult">
-        <h2 v-if="props.result.remainTime > 0" class="text-lg font-bold">
-          승리
-        </h2>
+        <h2 v-if="props.result.remainTime > 0" class="text-lg font-bold">승리</h2>
         <h2 v-else class="text-lg font-bold">
-          {{
-            rankResult.body.userScore > rankResult.body.opponentScore
-              ? "승리"
-              : rankResult.body.userScore < rankResult.body.opponentScore
-              ? "패배"
-              : "무승부"
-          }}
+          {{ rankResult.body.userScore > rankResult.body.opponentScore ? "승리" : rankResult.body.userScore < rankResult.body.opponentScore ? "패배" : "무승부" }}
         </h2>
         <p>{{ rankResult.body.userId }} vs {{ rankResult.body.opponentId }}</p>
         <p>운동 종류: {{ rankResult.body.exerciseId }}</p>
         <p>운동 개수: {{ props.count }}</p>
-        <p>
-          랭크 점수 변화: {{ rankResult.body.beforeRankScore }} →
-          {{ rankResult.body.afterRankScore }} ({{
-            rankResult.body.afterRankScore - rankResult.body.beforeRankScore
-          }})
-        </p>
+        <p>랭크 점수 변화: {{ rankResult.body.beforeRankScore }} → {{ rankResult.body.afterRankScore }} ({{ rankResult.body.afterRankScore - rankResult.body.beforeRankScore }})</p>
         <p>
           레벨 변화: {{ rankResult.body.beforeUserLevel }} →
           {{ rankResult.body.afterUserLevel }}
         </p>
-        <p>
-          경험치 변화: {{ rankResult.body.beforeUserExperience }} →
-          {{ rankResult.body.afterUserExperience }} ({{
-            rankResult.body.afterUserExperience -
-            rankResult.body.beforeUserExperience
-          }})
-        </p>
+        <p>경험치 변화: {{ rankResult.body.beforeUserExperience }} → {{ rankResult.body.afterUserExperience }} ({{ rankResult.body.afterUserExperience - rankResult.body.beforeUserExperience }})</p>
         <p>근력 변화 ==========</p>
         <ul>
+          <li>팔: {{ rankResult.body.beforeStats.armsStats }} → {{ rankResult.body.afterStats.armsStats }} ({{ rankResult.body.beforeStats.armsStats - rankResult.body.afterStats.armsStats }})</li>
+          <li>다리: {{ rankResult.body.beforeStats.legsStats }} → {{ rankResult.body.afterStats.legsStats }} ({{ rankResult.body.beforeStats.legsStats - rankResult.body.afterStats.legsStats }})</li>
           <li>
-            팔: {{ rankResult.body.beforeStats.armsStats }} →
-            {{ rankResult.body.afterStats.armsStats }} ({{
-              rankResult.body.beforeStats.armsStats -
-              rankResult.body.afterStats.armsStats
-            }})
+            가슴: {{ rankResult.body.beforeStats.chestStats }} → {{ rankResult.body.afterStats.chestStats }} ({{ rankResult.body.beforeStats.chestStats - rankResult.body.afterStats.chestStats }})
           </li>
+          <li>복부: {{ rankResult.body.beforeStats.absStats }} → {{ rankResult.body.afterStats.absStats }} ({{ rankResult.body.beforeStats.absStats - rankResult.body.afterStats.absStats }})</li>
+          <li>등: {{ rankResult.body.beforeStats.backStats }} → {{ rankResult.body.afterStats.backStats }} ({{ rankResult.body.beforeStats.backStats - rankResult.body.afterStats.backStats }})</li>
           <li>
-            다리: {{ rankResult.body.beforeStats.legsStats }} →
-            {{ rankResult.body.afterStats.legsStats }} ({{
-              rankResult.body.beforeStats.legsStats -
-              rankResult.body.afterStats.legsStats
-            }})
-          </li>
-          <li>
-            가슴: {{ rankResult.body.beforeStats.chestStats }} →
-            {{ rankResult.body.afterStats.chestStats }} ({{
-              rankResult.body.beforeStats.chestStats -
-              rankResult.body.afterStats.chestStats
-            }})
-          </li>
-          <li>
-            복부: {{ rankResult.body.beforeStats.absStats }} →
-            {{ rankResult.body.afterStats.absStats }} ({{
-              rankResult.body.beforeStats.absStats -
-              rankResult.body.afterStats.absStats
-            }})
-          </li>
-          <li>
-            등: {{ rankResult.body.beforeStats.backStats }} →
-            {{ rankResult.body.afterStats.backStats }} ({{
-              rankResult.body.beforeStats.backStats -
-              rankResult.body.afterStats.backStats
-            }})
-          </li>
-          <li>
-            지구력: {{ rankResult.body.beforeStats.staminaStats }} →
-            {{ rankResult.body.afterStats.staminaStats }} ({{
-              rankResult.body.beforeStats.staminaStats -
-              rankResult.body.afterStats.staminaStats
+            지구력: {{ rankResult.body.beforeStats.staminaStats }} → {{ rankResult.body.afterStats.staminaStats }} ({{
+              rankResult.body.beforeStats.staminaStats - rankResult.body.afterStats.staminaStats
             }})
           </li>
         </ul>
@@ -154,7 +84,7 @@ const exerciseDuration = ref(0) // 운동 시간
 // const exerciseCnt = ref(0) // 운동 횟수
 const exerciseStatsRatioId = ref(2) // 운동 종류
 
-const props = defineProps(["count", "result"]);
+const props = defineProps(["count", "result"])
 
 // result가 변경될 때 API 호출
 watch(
@@ -169,16 +99,16 @@ watch(
 )
 
 const completeFitnessTutorial = async () => {
-  await mainStore.loadTutorial();
-  const tutorialId = Number(route.params.exercise) || null;
+  await mainStore.loadTutorial()
+  const tutorialId = Number(route.params.exercise) || null
 
   if (!tutorialId) {
-    console.error("Invalid tutorial ID:", route.params.exercise);
-    return;
+    console.error("Invalid tutorial ID:", route.params.exercise)
+    return
   }
 
-  const tutorial = mainStore.tutorial.find((t) => t.tutorialId === tutorialId);
-  if (tutorial) tutorial.completed = true;
+  const tutorial = mainStore.tutorial.find((t) => t.tutorialId === tutorialId)
+  if (tutorial) tutorial.completed = true
 
   mainStore.completeTutorial(TUTORIAL_IDS.SQUAT)
   router.push({ name: "Main" })
@@ -239,8 +169,8 @@ const fetchRankResult = async () => {
         gameId: props.result.roomId,
         opponentToken: props.result.peerToken,
         userToken: userStore.accessToken,
-      };
-      console.log(`Rank Match API Request (Attempt ${attempts + 1}):`, payload);
+      }
+      console.log(`Rank Match API Request (Attempt ${attempts + 1}):`, payload)
 
       const response = await axios.post("https://i12e103.p.ssafy.io:8076/api/v1/matching/endGame", payload)
       console.log("Rank Match Response:", response.data)
@@ -249,11 +179,8 @@ const fetchRankResult = async () => {
       isLoading.value = false // 로딩 종료
       return
     } catch (error) {
-      attempts++;
-      console.error(
-        `Error fetching rank match result (Attempt ${attempts}):`,
-        error.response?.data || error
-      );
+      attempts++
+      console.error(`Error fetching rank match result (Attempt ${attempts}):`, error.response?.data || error)
 
       if (attempts >= 3) {
         rankResult.value = "API 호출 중 오류 발생."
@@ -261,10 +188,10 @@ const fetchRankResult = async () => {
       }
     }
   }
-};
+}
 
 onMounted(() => {
-  const url = window.location.href;
+  const url = window.location.href
   if (url.includes("tutorial")) {
     mode.value = "tutorial"
   } else if (url.includes("single-mode")) {
