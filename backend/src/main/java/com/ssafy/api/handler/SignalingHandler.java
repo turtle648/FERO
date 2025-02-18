@@ -153,6 +153,7 @@ public class SignalingHandler extends TextWebSocketHandler {
     @EventListener
     public void matchResult(MatchSuccessEvent event) {
         log.info(">>> ❤️ [ws] 이벤트 리스너 동작!: {}", event);
+
         String user1 = event.getUserToken1();
         String user2 = event.getUserToken2();
         Date date = new Date();

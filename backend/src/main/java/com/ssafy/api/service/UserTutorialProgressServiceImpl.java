@@ -31,6 +31,7 @@ public class UserTutorialProgressServiceImpl implements UserTutorialProgressServ
         this.tutorialTypeRepository = tutorialTypeRepository;
     }
 
+    @Transactional
     @Override
     public List<GetTutorialRes> getTutorials(String userId) {
         List<UserTutorialProgress> tutorials = tutorialProgressRepository.findByUser_UserId(userId);
@@ -39,6 +40,7 @@ public class UserTutorialProgressServiceImpl implements UserTutorialProgressServ
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public List<GetTutorialSimpleRes> getTutorialSimples(String userId) {
         List<UserTutorialProgress> tutorials = tutorialProgressRepository.findByUser_UserId(userId);
@@ -48,8 +50,10 @@ public class UserTutorialProgressServiceImpl implements UserTutorialProgressServ
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public boolean isTutorialCompleted(String userId, Long tutorialId) {
+        log.info("isTutorialCompleted: {}, {}", userId, tutorialId);
         TutorialType tutorialType = tutorialTypeRepository.findById(tutorialId).orElse(null);
         if (tutorialType == null) return false;
 
@@ -59,6 +63,8 @@ public class UserTutorialProgressServiceImpl implements UserTutorialProgressServ
     @Transactional
     @Override
     public void completeTutorial(String userId, Long tutorialId) {
+        log.info("isTutorialCompleted: {}, {}", userId, tutorialId);
+
         TutorialType tutorialType = tutorialTypeRepository.findById(tutorialId).orElse(null);
         if (tutorialType == null) {
             throw new IllegalArgumentException("해당 튜토리얼이 존재하지 않습니다.");

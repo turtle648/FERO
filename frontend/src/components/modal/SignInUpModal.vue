@@ -318,7 +318,7 @@ const navigateToMain = () => {
     baseURL: "https://i12e103.p.ssafy.io:8076/api/v1",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      Authorization: `${localStorage.getItem("authToken")}`,
     },
   });
   const completeTutorial = async () => {

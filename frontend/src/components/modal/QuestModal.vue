@@ -14,11 +14,13 @@
           <p class="text-gray-700">운동 횟수: {{ questData.real_cnt }}</p>
           <p class="text-gray-700">목표 갯수: {{ questData.exercise_cnt }}</p>
           <p class="text-gray-700">
-            상태: 
-            <span 
-              :class="questData.is_completed ? 'text-green-600' : 'text-red-600'"
+            상태:
+            <span
+              :class="
+                questData.is_completed ? 'text-green-600' : 'text-red-600'
+              "
             >
-              {{ questData.is_completed ? '완료' : '미완료' }}
+              {{ questData.is_completed ? "완료" : "미완료" }}
             </span>
           </p>
           <p class="text-gray-700">메세지: {{ questData.message }}</p>
@@ -29,40 +31,39 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue"
-import axios from "axios"
-import BaseModal from './BaseModal.vue'
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import BaseModal from "./BaseModal.vue";
 
-const questData = ref([])
-const isLoading = ref(false)
+const questData = ref([]);
+const isLoading = ref(false);
 
-defineEmits(['close-modal'])
+defineEmits(["close-modal"]);
 
 const getQuestData = async () => {
-    isLoading.value = true
-    try {
-        const today = new Date().toISOString().split('T')[0]
-        const token = localStorage.getItem('authToken')
+  isLoading.value = true;
+  try {
+    const today = new Date().toISOString().split("T")[0];
+    const token = localStorage.getItem("authToken");
 
-        const response = await axios.get('/dummy_data/getQuestData.json', {
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
-            params: {
-                date: today
-            }
-        })
+    const response = await axios.get("/dummy_data/getQuestData.json", {
+      headers: {
+        Authorization: `${token}`,
+      },
+      params: {
+        date: today,
+      },
+    });
 
-        questData.value = response.data
-
-    } catch (error) {
-        console.error('퀘스트 데이터 조회 실패', error)
-    } finally {
-        isLoading.value = false
-    }
-}
+    questData.value = response.data;
+  } catch (error) {
+    console.error("퀘스트 데이터 조회 실패", error);
+  } finally {
+    isLoading.value = false;
+  }
+};
 
 onMounted(() => {
-    getQuestData()
-})
+  getQuestData();
+});
 </script>
