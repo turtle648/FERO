@@ -15,7 +15,10 @@
       <!-- 로그인 모드 -->
       <div v-if="!isSignUpMode">
         <div class="sign-in-mode-header">
-          <img src="@/assets/images/fitnessHeroFromISAEKAI.png" alt="" />
+          <img class="w-[90%]" src="@/assets/images/fitnessHero.png" alt="" />
+          <!-- <div class="font-bold text-3xl sm:text-4xl md:text-5xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-wide">
+            Fitness Hero
+          </div> -->
           <button class="close-btn" @click="close">X</button>
         </div>
         <form @submit.prevent="handleSubmit">
@@ -28,7 +31,9 @@
             <input type="password" id="password" v-model="password" placeholder="비밀번호를 입력하세요" required @invalid="(e) => e.preventDefault()"/>
           </div>
           <div>
-            <button type="submit" class="log-in-button">로그인</button>
+            <hr>
+            <!-- <button type="submit" class="log-in-button">로그인</button> -->
+            <button type="submit" class="nes-btn is-primary w-[98%]" style="border:solid;">로그인</button>
           </div>
         </form>
         <hr class="mt-2 mb-2"/>
