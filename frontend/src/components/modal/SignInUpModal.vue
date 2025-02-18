@@ -1,4 +1,14 @@
 <template>
+  <!-- 영상 플레이어 (로그인 후 표시) -->
+  <video 
+    v-if="showVideo"
+    ref="introVideo"
+    :src="require('@/assets/Fero_Intro.mp4')"
+    class="fixed inset-0 w-full h-full object-cover pointer-events-none"
+    style="z-index: 20;"
+    autoplay
+    @ended="navigateToMain"
+  />
   <div class="modal" @click="closeModalOutside">
     <div class="modal-content" @click.stop>
       <!-- 로그인 모드 -->
@@ -135,6 +145,9 @@ const gender = ref("")
 const userNickname = ref("")
 const avatar = ref("")
 
+const showVideo = ref(false)
+const introVideo = ref(null)
+
 // watch()를 사용하여 gender 변경 감지
 watchEffect(() => {
   if (gender.value === "F") {
@@ -163,14 +176,23 @@ const handleSubmit = async () => {
   try {
     const result = await userStore.logIn(id.value, password.value)
     if (result == 200) {
-      nextTick()
-      router.push("/main")
+      showVideo.value = true // 영상 표시
+
+      // nextTick()을 사용해 UI가 업데이트된 후 실행
+      await nextTick()
+
+      // 자동 재생 보장 (일부 브라우저에서 필요)
+      introVideo.value?.play().catch(console.error)
     }
   } catch (error) {
     console.log(error)
   }
 }
 
+// 영상이 끝난 후 메인 페이지로 이동
+const navigateToMain = () => {
+  router.push("/main")
+}
 // 이메일 중복확인 API
 const checkEmailDuplicate = (email) => {
   userStore.checkEmailDuplicateAPI(email).then((result) => {
@@ -256,7 +278,7 @@ const closeModalOutside = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: 10;
 }
 
 .modal-content {

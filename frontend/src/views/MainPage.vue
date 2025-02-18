@@ -172,7 +172,7 @@ onMounted(async () => {
           <!-- 상단 텍스트 영역 (주소창 스타일 적용) -->
           <div class="h-[40%] flex items-center px-2">
             <div class="relative w-full nes-field flex items-center bg-white border-4 border-gray-700 px-4 py-2" style="border-radius: 16px">
-              <span class="text-black font-bold nes-text break-words w-full text-center text-lg leading-tight">
+              <span class="text-black font-bold nes-text break-words w-full h-[1.5vh] text-center text-lg leading-tight">
                 <template v-for="(char, index) in 'Hero.From.ISAEKAI'" :key="index">
                   <span class="inline-block animate-pixel-wave" :style="{ 'animation-delay': `${index * 0.1}s` }">
                     {{ char === " " ? "\u00A0" : char }}
