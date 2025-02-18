@@ -57,7 +57,6 @@ export const useUserStore = defineStore("user", () => {
   const logIn = async (id, password) => {
     try {
       const response = await axios.post(`${BASE_URL}/auth/login`, { id, password })
-      console.log(response.data["accessToken"])
       accessToken.value = response.data["accessToken"]
       userId.value = id
       localStorage.setItem("authToken", response.data["accessToken"])

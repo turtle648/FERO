@@ -178,6 +178,7 @@ const resetFields = () => {
 const handleSubmit = async () => {
   try {
     const result = await userStore.logIn(id.value, password.value)
+    console.log('로그인 API 호출 결과:', result)
     if (result == 200) {
       const api = axios.create({
         baseURL: "https://i12e103.p.ssafy.io:8076/api/v1",
@@ -191,6 +192,7 @@ const handleSubmit = async () => {
       const loadSpecificTutorial = async () => {
         try {
           const response = await api.get("/Tutorial/97")
+          console.log("튜토리얼 조회결과:", response)
           return response.data
         } catch (error) {
           console.error("[❗] Load Error:", error)

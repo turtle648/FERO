@@ -1,25 +1,41 @@
 <!-- components/modal/FitnessModal.vue -->
 <template>
-  <BaseModal title="Select Exercise" @close-modal="$emit('close-modal')">
+  <BaseModal class="font-dgm" title="Select Exercise" @close-modal="$emit('close-modal')">
     <!-- 메인 운동 선택 영역 -->
-    <div class="flex flex-col w-full space-y-4">
+    <div class="font-dgm grid grid-rows-4 w-full h-full justify-items-center content-between">
       <!-- 스쿼트 그룹 -->
-      <div class="flex flex-col space-y-2 w-full">
-        <button class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 active:bg-blue-700" @click="handleSquatClick">스쿼트</button>
-        <button class="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600" @click="toggleTutorialComplete">
-          {{ isSquatCompleted ? "튜토리얼 완료됨" : "튜토리얼 완료하기" }}
+      <div class="relative flex flex-col space-y-2 w-full">
+        <button class="nes-btn is-primary w-full h-[10vh] px-[10vw] py-2 text-left bg-blue-500 rounded-lg hover:bg-blue-600 active:bg-blue-700 text-[4vh]" @click="handleSquatClick">
+          스쿼트
+          <a class="nes-btn border border-black flex items-center justify-center w-[3vh] h-[3vh] text-[3vh] absolute bottom-2 right-2 z-20" 
+             style="color: black !important;"
+             @click="restartTutorial">
+            ?
+          </a>
+
         </button>
+        <!-- <button class="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600" @click="toggleTutorialComplete">
+          {{ isSquatCompleted ? "튜토리얼 완료됨" : "튜토리얼 완료하기" }}
+        </button> -->
       </div>
 
       <!-- 준비중인 운동들 -->
-      <button class="w-full px-4 py-2 bg-gray-300 text-gray-600 rounded-lg cursor-not-allowed" disabled>
+      <button class="nes-btn is-disabled w-full h-[10vh] px-[10vw] py-2 bg-gray-300 text-left text-gray-600 rounded-lg cursor-not-allowed text-[4vh] relative">
         런지
-        <span class="text-sm">준비중</span>
+        <a class="nes-btn bg-white border border-black flex items-center justify-center w-[3vh] h-[3vh] text-[3vh] absolute bottom-2 right-2 z-20">?</a>
       </button>
 
-      <button class="w-full px-4 py-2 bg-gray-300 text-gray-600 rounded-lg cursor-not-allowed" disabled>
+      <button class="nes-btn is-disabled w-full h-[10vh] px-[10vw] py-2 bg-gray-300 text-left text-gray-600 rounded-lg cursor-not-allowed text-[4vh]" disabled>
         푸쉬업
-        <span class="text-sm">준비중</span>
+        <a class="nes-btn bg-white border border-black flex items-center justify-center w-[3vh] h-[3vh] text-[3vh] absolute bottom-2 right-2 z-20">?</a>
+        <!-- <span class="text-sm">준비중</span> -->
+      </button>
+
+      <!-- 준비중인 운동들 -->
+      <button class="nes-btn is-disabled w-full h-[10vh] px-[10vw] py-2 bg-gray-300 text-left text-gray-600 rounded-lg cursor-not-allowed text-[4vh]" disabled>
+        플랭크
+        <a class="nes-btn bg-white border border-black flex items-center justify-center w-[3vh] h-[3vh] text-[3vh] absolute bottom-2 right-2 z-20">?</a>
+        <!-- <span class="text-sm">준비중</span> -->
       </button>
     </div>
 
@@ -158,9 +174,14 @@ const selectMode = async (mode) => {
   showModeModal.value = false
 }
 
-const toggleTutorialComplete = () => {
-  // [옵션] 서버와 연동할 경우 mainStore.completeTutorial() 호출
+const restartTutorial = () => {
+  // isUICompleted.value = false
+  isUICompleted
 }
+
+  // const toggleTutorialComplete = () => {
+  //   // [옵션] 서버와 연동할 경우 mainStore.completeTutorial() 호출
+  // }
 </script>
 
 <style scoped>
