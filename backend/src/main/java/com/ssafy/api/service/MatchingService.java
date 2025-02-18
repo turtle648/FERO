@@ -259,6 +259,7 @@ public class MatchingService {
                 currentIndex++;
                 continue;
             }
+
             // 3-2. 매칭 가능한 상대 찾기 (rankScore +- 100 범위)
             // 후보자가 sorted-set 에 없으면 스킵 -- queue에서 삭제
             Double currentZScore = redisTemplate.opsForZSet().score(sortedSetKey, currentUserToken);

@@ -35,11 +35,12 @@ public class MatchingController {
     public ResponseEntity<?> enterWaitingRoom(@RequestParam Long exerciseType,
                                               HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(BaseResponseBody.of(401, "Unauthorized"));
         }
-        String accessToken = authHeader.replace(JwtTokenUtil.TOKEN_PREFIX, "");
+        String accessToken = request.getHeader("Authorization");
+//        String userId = JwtTokenUtil.getUserIdFromJWT(authHeader);
         if (!JwtTokenUtil.validateToken(accessToken)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(BaseResponseBody.of(401, "Invalid Access Token"));
         }
@@ -78,12 +79,13 @@ public class MatchingController {
             @RequestParam Long exerciseType,
             HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(BaseResponseBody.of(401, "Unauthorized"));
         }
+        String accessToken = request.getHeader("Authorization");
 
-        String accessToken = authHeader.replace(JwtTokenUtil.TOKEN_PREFIX, "");
+//        String accessToken = authHeader.replace(JwtTokenUtil.TOKEN_PREFIX, "");
         if (!JwtTokenUtil.validateToken(accessToken)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(BaseResponseBody.of(401, "Invalid Access Token"));
