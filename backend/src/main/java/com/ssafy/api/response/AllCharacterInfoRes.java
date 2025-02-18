@@ -43,6 +43,9 @@ public class AllCharacterInfoRes {
     @ApiModelProperty(name = "유저 스탯")
     private UserStats userStats;
 
+    @ApiModelProperty(name = "유저 랭크")
+    private String userRank;
+
     // static factory method to convert from UserInfo and UserCharacter
     public static AllCharacterInfoRes of(User userInfo, UserCharacter userCharacter) {
         AllCharacterInfoRes res = new AllCharacterInfoRes();
@@ -54,6 +57,7 @@ public class AllCharacterInfoRes {
         res.setAvatar(userCharacter.getAvatar());
         res.setLevel(userCharacter.getUserLevel());
         res.setExperience(userCharacter.getUserExperience());
+        res.setUserRank(userCharacter.getUserRank());
         return res;
     }
 }
