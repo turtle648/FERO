@@ -87,7 +87,7 @@ const modalControl = (type) => {
   }
 }
 
-// 로그아웃웃 ==================================================
+// 로그아웃 ==================================================
 // 로그아웃 확인 모달 상태
 const showLogoutConfirm = ref(false)
 
@@ -98,11 +98,7 @@ const handleCloseClick = () => {
 
 // 로그아웃 처리
 const handleLogout = async () => {
-  // 로그아웃 로직 구현
-  await userStore.logout()
-  showLogoutConfirm.value = false
-  // 로그인 페이지로 리다이렉트
-  router.push('/login')
+  await userStore.logOut()
 }
 
 // 유저정보/ 튜토리얼정보 불러오기 ==================================================
