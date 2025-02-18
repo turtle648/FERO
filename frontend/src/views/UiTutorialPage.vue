@@ -6,7 +6,7 @@
       <img src="@/assets/images/pesocom.png" class="w-[15vh] object-contain mt-40" alt="Tutorial Image" />
 
       <!-- Balloon -->
-      <div class="desc-container nes-balloon from-left ml-4 w-[40vh] h-[22vh] -translate-y-8 flex justify-center items-center">
+      <div class="desc-container nes-balloon from-left ml-4 w-[40vh] h-[15vh] -translate-y-8 flex justify-center items-center">
         <span v-if="currentStep === 1" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">운동 페이지의 기능에 대해 설명을 해드리겠습니다</span>
         <span v-if="currentStep === 2" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">먼저 왼쪽 상단에는 남은 시간 체크를 위한</span>
         <span v-if="currentStep === 3" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">
