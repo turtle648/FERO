@@ -8,7 +8,7 @@ import RankMatchPage from "@/views/RankMatchPage.vue"
 import UiTutorialPage from "@/views/UiTutorialPage.vue"
 import TestVoice from "@/components/voice/testVoice.vue"
 import RankMatchResultPage from "@/views/RankMatchResultPage.vue"
-import setUp from "@/views/setUp.vue"
+// import setUp from "@/views/setUp.vue"
 import { useUserStore } from "@/stores/store"
 import { useUserDataStore } from "@/stores/userDataStore"
 
@@ -75,11 +75,11 @@ const routes = [
     name: "QR",
     component: QRComponent,
   },
-  {
-    path: "/setUp",
-    name: "SetUp",
-    component: setUp,
-  },
+  // {
+  //   path: "/setUp",
+  //   name: "SetUp",
+  //   component: setUp,
+  // },
   {
     path: "/rank-match/:exercise",
     name: "RankMatch",
@@ -138,9 +138,9 @@ router.beforeEach(async (to, from, next) => {
   }
 
   // PWA가 아닌 경우 `/setUp` 페이지로 이동
-  if (!isPWA && to.path !== "/setUp") {
-    return next("/setUp")
-  }
+  // if (!isPWA && to.path !== "/setUp") {
+  //   return next("/setUp")
+  // }
   
   if (to.path === "/" || to.path === "" || to.path === ".") {
     return next()
