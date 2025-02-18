@@ -86,14 +86,15 @@ const options = ref({
   ...chartConfig.options,
   plugins: {
     legend: {
-      labels: {
-        font: {
-          family: "font-dgm",
-          size: 14,
-          style: "normal",
-          weight: "normal",
-        },
-      },
+      // labels: {
+      //   font: {
+      //     family: "font-dgm",
+      //     size: 14,
+      //     style: "normal",
+      //     weight: "normal",
+      //   },
+      // },
+      display: false,
     },
     title: {
       display: true,
