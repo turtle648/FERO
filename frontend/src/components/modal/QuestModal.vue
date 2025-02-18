@@ -10,7 +10,8 @@
     <div v-else class="space-y-4">
       <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
         <div class="space-y-2">
-          <p class="text-gray-700">시간: {{ questData.quest_time }}</p>
+          <p>{{ questData }}</p>
+          <!-- <p class="text-gray-700">시간: {{ questData.quest_time }}</p>
           <p class="text-gray-700">운동 횟수: {{ questData.real_cnt }}</p>
           <p class="text-gray-700">목표 갯수: {{ questData.exercise_cnt }}</p>
           <p class="text-gray-700">
@@ -21,7 +22,7 @@
               {{ questData.is_completed ? '완료' : '미완료' }}
             </span>
           </p>
-          <p class="text-gray-700">메세지: {{ questData.message }}</p>
+          <p class="text-gray-700">메세지: {{ questData.message }}</p> -->
         </div>
       </div>
     </div>
@@ -41,18 +42,19 @@ defineEmits(['close-modal'])
 const getQuestData = async () => {
     isLoading.value = true
     try {
-        const today = new Date().toISOString().split('T')[0]
+        // const today = new Date().toISOString().split('T')[0]
         const token = localStorage.getItem('authToken')
+        console.log('token:', token) // 토큰이 제대로 저장되어 있는지 확인
 
-        const response = await axios.get('/dummy_data/getQuestData.json', {
+        const response = await axios.get('https://i12e103.p.ssafy.io:8076/api/v1/exercise/today', {
             headers: {
                 Authorization: `Bearer ${token}`
             },
-            params: {
-                date: today
-            }
+            // params: {
+            //     date: today
+            // }
         })
-
+        console.log('API Response:', response.data) // 리스폰스 값 확인
         questData.value = response.data
 
     } catch (error) {
