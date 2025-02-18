@@ -38,7 +38,6 @@ public class TutorialController {
 //        String userId = JwtTokenUtil.getUserIdFromJWT(token);  // JWT 토큰에서 userId 추출
         String userId = JwtTokenUtil.getUserIdFromJWT(request.getHeader("Authorization"));
 
-
         List<GetTutorialRes> tutorials = userTutorialProgressService.getTutorials(userId);
 
         return ResponseEntity.ok(tutorials);
