@@ -3,7 +3,7 @@
   <BaseModal class="font-dgm" title="Calendar" @close-modal="$emit('close-modal')">
     <div class="flex flex-col w-full h-full bg-white font-dgm">
       <!-- 달력 헤더 -->
-      <header class="flex justify-between items-center p-4 border-b">
+      <header class="flex justify-between items-center border-b">
         <button @click="prevMonth" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full transition-colors">❮</button>
         <h2 class="text-lg font-bold">{{ currentYear }}년 {{ currentMonth + 1 }}월</h2>
         <button @click="nextMonth" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full transition-colors">❯</button>
@@ -53,8 +53,10 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 const selectedDate = ref(new Date())
 
 // 글로벌 폰트 설정
-// ChartJS.defaults.font.family = "font-dgm"
-// ChartJS.defaults.color = "#000"
+ChartJS.defaults.font.family = "DungGeunMo" // 원하는 폰트 이름
+ChartJS.defaults.font.size = 12 // 폰트 크기
+ChartJS.defaults.font.weight = "normal" // 폰트 굵기
+ChartJS.defaults.color = "#000" // 텍스트 색상
 
 // 차트 데이터 computed 속성으로 변경
 const chartData = ref({
@@ -62,8 +64,15 @@ const chartData = ref({
   datasets: [
     {
       label: "운동 데이터",
-      backgroundColor: "rgba(236, 72, 153, 1)",
-      pointBackgroundColor: ["rgba(236, 72, 153, 1)"],
+      backgroundColor: [
+        "rgba(255, 99, 132, 0.8)", // 빨강
+        "rgba(54, 162, 235, 0.8)", // 파랑
+        "rgba(255, 206, 86, 0.8)", // 노랑
+        "rgba(75, 192, 192, 0.8)", // 청록
+        "rgba(153, 102, 255, 0.8)", // 보라
+        "rgba(255, 159, 64, 0.8)", // 주황
+      ],
+      // pointBackgroundColor: ["rgba(236, 72, 153, 1)"],
       pointBorderColor: "#fff",
       pointHoverBackgroundColor: "#fff",
       pointHoverBorderColor: "rgba(236, 72, 153, 1)",
@@ -91,7 +100,7 @@ const options = ref({
       text: "운동 데이터 차트",
       font: {
         family: "font-dgm",
-        size: 16,
+        size: 14,
         style: "normal",
         weight: "bold",
       },
