@@ -30,6 +30,7 @@
     "gsap": "^3.12.7",
     "json-server": "^1.0.0-beta.3",
     "livekit-client": "^2.8.1",
+    "lucide-vue-next": "^0.475.0",
     "nes.css": "^2.2.1",
     "pinia": "^2.3.1",
     "register-service-worker": "^1.7.2",

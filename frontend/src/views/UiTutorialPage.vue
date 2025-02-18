@@ -6,28 +6,46 @@
       <img src="@/assets/images/pesocom.png" class="w-[15vh] object-contain mt-40" alt="Tutorial Image" />
 
       <!-- Balloon -->
-      <div class="desc-container nes-balloon from-left ml-4 w-[40vh] h-[20vh] -translate-y-8">
-        <span v-if="currentStep === 1" class="font-dgm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">운동 기능을 설명해줌</span>
-        <span v-if="currentStep === 2" class="font-dgm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">먼저 왼쪽 상단에는 타이머가 있어</span>
-        <span v-if="currentStep === 3" class="font-dgm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">운동 시간을 체크할 수 있음</span>
-        <span v-if="currentStep === 4" class="font-dgm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">그 옆 오른쪽에는 카운트!</span>
-        <span v-if="currentStep === 5" class="font-dgm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">바른 자세로 운동을 하면 카운트가 +1</span>
-        <span v-if="currentStep === 6" class="font-dgm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">스쿼트를 할 때 자세에 대해 알려드림</span>
-        <span v-if="currentStep === 7" class="font-dgm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">카메라를 약간 측면으로 보고 서서</span>
-        <span v-if="currentStep === 8" class="font-dgm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">무릎이 90도가 될 때까지</span>
-        <span v-if="currentStep === 9" class="font-dgm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">내려갔다가 올라오면 카운트가 + 1</span>
-        <span v-if="currentStep === 10" class="font-dgm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">아래의 가운데에는 종료 버튼이 있음</span>
-        <span v-if="currentStep === 11" class="font-dgm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">운동을 하다가 종료하고 싶을 때 클릭!</span>
-        <span v-if="currentStep === 12" class="font-dgm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">종료 버튼 옆에는 신고 버튼이 있음</span>
-        <span v-if="currentStep === 13" class="font-dgm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">운동을 하다가 버그가 발생했거나</span>
-        <span v-if="currentStep === 14" class="font-dgm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">불쾌한 옷차림의 유저를 만났을 때 신고하면 됨</span>
-        <span v-if="currentStep === 15" class="font-dgm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">자 그럼 바로 운동을 하러 가볼까?</span>
+      <div class="desc-container nes-balloon from-left ml-4 w-[40vh] h-[22vh] -translate-y-8 flex justify-center items-center">
+        <span v-if="currentStep === 1" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">운동 페이지의 기능에 대해 설명을 해드리겠습니다</span>
+        <span v-if="currentStep === 2" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">먼저 왼쪽 상단에는 남은 시간 체크를 위한</span>
+        <span v-if="currentStep === 3" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">
+          <span class="text-red-500">타이머</span>
+          가 있습니다
+        </span>
+        <span v-if="currentStep === 4" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">그리고 타이머의 오른쪽에는</span>
+        <span v-if="currentStep === 5" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">
+          운동 횟수를 볼 수 있는
+          <span class="text-red-500">카운트</span>
+          가 있습니다
+        </span>
+        <span v-if="currentStep === 6" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">
+          하단에는 운동을 종료할 수 있는
+          <span class="text-red-500">종료버튼</span>
+          ,
+        </span>
+        <span v-if="currentStep === 7" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">운동을 하다가 버그가 발생했거나</span>
+        <span v-if="currentStep === 8" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">불쾌한 옷차림의 유저를 만났을 때</span>
+        <span v-if="currentStep === 9" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">
+          사용할 수 있는
+          <span class="text-red-500">신고버튼</span>
+          이 있습니다
+        </span>
+        <span v-if="currentStep === 10" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">
+          이제 운동을 할 때
+          <span class="text-red-500">유의점</span>
+          을 알려드리겠습니다
+        </span>
+        <span v-if="currentStep === 11" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">먼저 카메라에 머리부터 발 끝까지 나오도록 서주세요</span>
+        <span v-if="currentStep === 12" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">그 다음 정확한 측정을 위해 약간 측면으로 돌아주세요</span>
+        <span v-if="currentStep === 13" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">스쿼트가 측정이 되기 위해서는 무릎이 90도가 될 때까지 내려가야합니다</span>
+        <span v-if="currentStep === 14" class="font-dgm sm:text-base md:text-lg lg:text-xl xl:text-2xl">자 그럼 이제 바로 운동을 하러 가볼까요?</span>
       </div>
     </section>
 
     <!-- 튜토리얼 완료 버튼 -->
-    <div v-if="currentStep === 15" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center space-y-4 z-50">
-      <button class="px-4 py-2 nes-btn is-primary font-dgm z-50" @click="completeUiTutorial">튜토리얼 완료!</button>
+    <div v-if="currentStep === 14" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center space-y-4 z-50">
+      <button class="px-4 py-2 nes-btn is-primary font-dgm z-50 text-sm" @click="completeUiTutorial">튜토리얼 완료!</button>
     </div>
 
     <div class="text-container absolute top-4 right-4 z-50">
@@ -67,7 +85,7 @@ const currentStep = ref(1)
 
 // 다음 단계로 이동하는 함수
 const nextStep = () => {
-  if (currentStep.value < 15) {
+  if (currentStep.value < 14) {
     currentStep.value += 1 // 다음 단계로 이동
   }
 }

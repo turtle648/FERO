@@ -73,7 +73,7 @@ export const useUserDataStore = defineStore("userData", () => {
   // 아바타 수정 API
   const updateAvatar = async (newAvatar) => {
     try {
-      const token = userStore.accessToken;
+      const token = userStore.accessToken
       if (!token) {
         console.error("아바타 수정 실패: 토큰이 없습니다.")
         return false
@@ -95,7 +95,7 @@ export const useUserDataStore = defineStore("userData", () => {
         // userInfo.avatar 업데이트
         userInfo.value.avatar = newAvatar.split("-").map(Number)
 
-        return true;
+        return true
       } else {
         console.error("아바타 수정 실패: 서버에서 응답 실패")
         return false
@@ -105,7 +105,7 @@ export const useUserDataStore = defineStore("userData", () => {
       if (error.response) console.error("에러 응답:", error.response.data)
       return false
     }
-  };
+  }
 
   // 유저 레벨 조회
   const checkUserLevel = async () => {
