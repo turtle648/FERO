@@ -16,6 +16,7 @@ import QuestModal from "@/components/modal/QuestModal.vue"
 import SpeechRecognitionHandler from "@/components/voice/SpeechRecognitionHandler.vue"
 import TutorialConfirmModal from "@/components/modal/TutorialConfirmModal.vue"
 import MainTutorialComponent from "@/components/MainTutorialComponent.vue"
+import SmallBaseModal from "@/components/modal/SmallBaseModal.vue"
 
 // 스토어 가져오기 ==================================================
 const userDataStore = useUserDataStore()
@@ -86,6 +87,24 @@ const modalControl = (type) => {
   }
 }
 
+// 로그아웃웃 ==================================================
+// 로그아웃 확인 모달 상태
+const showLogoutConfirm = ref(false)
+
+// 로그아웃 확인 모달 표시
+const handleCloseClick = () => {
+  showLogoutConfirm.value = true
+}
+
+// 로그아웃 처리
+const handleLogout = async () => {
+  // 로그아웃 로직 구현
+  await userStore.logout()
+  showLogoutConfirm.value = false
+  // 로그인 페이지로 리다이렉트
+  router.push('/login')
+}
+
 // 유저정보/ 튜토리얼정보 불러오기 ==================================================
 onMounted(async () => {
   try {
@@ -109,13 +128,6 @@ onMounted(async () => {
   <div class="fixed inset-0 w-full h-full overflow-hidden">
     <!-- Windows 98 스타일 테두리 -->
     <div class="absolute inset-0">
-      <!-- 밝은 회색 테두리 (왼쪽, 위) -->
-      <!-- <div class="absolute top-0 left-0 w-full h-[3px] bg-[#dfdfdf]"></div>
-      <div class="absolute top-0 left-0 h-full w-[3px] bg-[#dfdfdf]"></div> -->
-
-      <!-- 어두운 회색 테두리 (오른쪽, 아래) -->
-      <!-- <div class="absolute bottom-0 right-0 w-full h-[3px] bg-[#818181]"></div>
-      <div class="absolute top-0 right-0 h-full w-[3px] bg-[#818181]"></div> -->
 
       <!-- 배경 이미지 -->
       <div class="absolute inset-0 flex items-center justify-center w-screen overflow-hidden" style="image-rendering: pixelated">
@@ -124,58 +136,53 @@ onMounted(async () => {
 
       <!-- 헤더 -->
       <header class="absolute top-0 w-full flex flex-col">
-  <!-- 타이틀 바 -->
-  <div class="w-full h-[12vh] bg-[#c3c3c3] flex flex-col relative">
-    <!-- 중앙 구분선 -->
-    <div class="absolute top-1/2 w-full h-[0.2vh] bg-[#818181] transform -translate-y-1/2"></div>
-    
-    <!-- 상단 영역 (45%, 중앙 정렬) -->
-    <div class="absolute top-1/2 transform -translate-y-full h-[45%] w-full flex justify-between items-center px-[1vh]">
-      <!-- 왼쪽: 타이틀 영역 -->
-      <div class="flex items-center h-full" @click="openModal('status')">
-        <div class="flex items-center h-[90%] px-[1vh] border-t-[0.2vh] border-l-[0.2vh] border-[#ffffff] border-r-[0.2vh] border-b-[0.2vh] border-[#818181] bg-[#c3c3c3]">
-          <img src="@/assets/images/profile/default-image-1.png" class="h-[90%] mr-[1vh]" />
-          <div class="flex flex-col">
-            <span class="text-black text-[1.8vh] font-bold">{{ userInfo.userNickname }}</span>
-            <div class="relative w-full h-[1.2vh] bg-gray-200 rounded-[0.2vh] mt-[0.5vh]">
-              <div class="absolute inset-0 flex items-center justify-center text-black text-[1vh]">
-                Lv. {{ userInfo.level }}
+        <!-- 타이틀 바 -->
+        <div class="w-full h-[12vh] bg-[#c3c3c3] flex flex-col relative">
+          <!-- 중앙 구분선 -->
+          <div class="absolute top-1/2 w-full h-[0.2vh] bg-[#818181] transform -translate-y-1/2"></div>
+            
+          <!-- 상단 영역 (45%, 중앙 정렬) -->
+            <div class="absolute top-1/2 transform -translate-y-full h-[45%] w-full flex justify-between items-center px-[1vh]">
+            <!-- 왼쪽: 타이틀 영역 -->
+              <div class="flex items-center h-full" @click="openModal('status')">
+                <div class="flex items-center h-[90%] px-[1vh] border-t-[0.2vh] border-l-[0.2vh] border-[#ffffff] border-r-[0.2vh] border-b-[0.2vh] border-[#818181] bg-[#c3c3c3]">
+                  <img src="@/assets/images/profile/default-image-1.png" class="h-[90%] mr-[1vh]" />
+                  <div class="flex flex-col">
+                    <span class="text-black text-[1.8vh] font-bold">{{ userInfo.userNickname }}</span>
+                    <div class="relative w-full h-[1.2vh] bg-gray-200 rounded-[0.2vh] mt-[0.5vh]">
+                      <div class="absolute inset-0 flex items-center justify-center text-black text-[1vh]">
+                      Lv. {{ userInfo.level }}
+                      </div>
+                      <div class="bg-blue-500 h-full" :style="{ width: Math.min(userInfo.experience / 2, 100) + '%' }"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="bg-blue-500 h-full" :style="{ width: Math.min(userInfo.experience / 2, 100) + '%' }"></div>
+              <!-- 오른쪽: 창 제어 버튼들 -->
+              <div class="flex space-x-[0.5vh] h-full items-center">
+                <!-- <button class="nes-btn h-[80%] aspect-square flex items-center justify-center text-[2vh] font-bold">_</button> -->
+                <button @click="handleCloseClick" class="nes-btn h-[80%] aspect-square flex items-center justify-center text-[2vh] font-bold">×</button>
+              </div>
+            </div>
+
+          <!-- 하단 영역 (45%, 중앙 정렬) -->
+          <div class="absolute top-1/2 h-[45%] w-full flex items-center px-[1%]">
+            <div class="relative w-full nes-field flex items-center bg-white border-[0.4%] border-gray-700 px-[2%] py-[1%]" style="border-radius: 1.6%">
+              <div class="w-[95%] mx-auto translate-y-[5%]">
+                <span class="text-black font-bold nes-text w-full text-center whitespace-nowrap block"
+                style="font-size: 100%">
+                  <template v-for="(char, index) in 'Fero.From.ISAEKAI.com'" :key="index">
+                    <span class="inline-block animate-pixel-wave" 
+                        :style="{ 'animation-delay': `${index * 0.1}s` }">
+                    {{ char === " " ? "\u00A0" : char }}
+                    </span>
+                  </template>
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- 오른쪽: 창 제어 버튼들 -->
-      <div class="flex space-x-[0.5vh] h-full items-center">
-        <!-- <button class="nes-btn h-[80%] aspect-square flex items-center justify-center text-[2vh] font-bold">_</button> -->
-        <button @click="userStore.logOut()" class="nes-btn h-[80%] aspect-square flex items-center justify-center text-[2vh] font-bold">×</button>
-      </div>
-      
-    </div>
-
-    <!-- 하단 영역 (45%, 중앙 정렬) -->
-    <div class="absolute top-1/2 h-[45%] w-full flex items-center px-[1%]">
-      <div class="relative w-full nes-field flex items-center bg-white border-[0.4%] border-gray-700 px-[2%] py-[1%]" style="border-radius: 1.6%">
-        <div class="w-[95%] mx-auto translate-y-[5%]">
-          <span class="text-black font-bold nes-text w-full text-center whitespace-nowrap block"
-                style="font-size: 100%">
-            <template v-for="(char, index) in 'Fero.From.ISAEKAI.com'" :key="index">
-              <span class="inline-block animate-pixel-wave" 
-                    :style="{ 'animation-delay': `${index * 0.1}s` }">
-                {{ char === " " ? "\u00A0" : char }}
-              </span>
-            </template>
-          </span>
-        </div>
-      </div>
-</div>
-
-  </div>
-</header>
-
-
+      </header>
 
 
       <!-- 캐릭터 -->
@@ -240,6 +247,16 @@ onMounted(async () => {
 
       <!-- 백그라운드 음성인식 -->
       <SpeechRecognitionHandler @voice-control="modalControl" />
+
+      <!-- 로그아웃 확인 모달 추가 -->
+      <SmallBaseModal
+        v-if="showLogoutConfirm"
+        title="Logout"
+        @close-modal="showLogoutConfirm = false"
+        @confirm="handleLogout"
+      >
+        <p>정말 로그아웃 하시겠습니까?</p>
+      </SmallBaseModal>
     </div>
   </div>
 </template>
