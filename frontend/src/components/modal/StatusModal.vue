@@ -1,80 +1,57 @@
 <template>
-    <div class="modal" @click="closeStatusModal">
-      <div class="modal-content" @click.stop>
-        <!-- 모달 종료 버튼 -->
-        <button id="close-btn" @click="closeStatusModal">X</button>
-        <!-- 요소 1: 닉네임, 레벨, 랭크-->
-        <div class="status-element status-1">
-          <!-- 차후, png로 대체할 것 -->
-          <h2>Status</h2>
-          <div style="margin-top: 2%;">Nick: {{ userInfo.userNickname }}</div>
-          <div style="margin-top: 2%;">
-            Lv. {{ userInfo.level }} | Rank: !!api수정을 통해 받기!!
-          </div>
-        </div>
-        <!-- 요소 2 -->
-        <div class="status-element status-2">
-            <div>
-                <!-- 전체 승: !!api수정을 통해 받기!! | 총 플레이 수: !!api수정을 통해 받기!! | myBest: !!api수정을 통해 받기!! -->
-            </div>
-            <div>
-                <!-- 월간 승: !!전척api완성후추가!! | 월간 게임 수: !!전척api완성후추가!! | myBest: !!전척api완성후추가!! -->
-            </div>
-        </div>
-  
-        <!-- 요소 3: 퀘스트 달성률, 게이지바 -->
-        <div class="status-element status-3">
-        <div style="margin-bottom: 2%;">
-            <!-- <span style="margin-right: 10%;">미션 클리어 수: !!퀘스트api완성후추가!!</span> -->
-            <!-- <span>월간 클리어 수: !!퀘스트api완성후추가!!</span> -->
-        </div>
-        <div class="progress-box">
-          일일 달성률:
-          <!-- 여기서 박스를 채우기 위해 v-for로 박스를 순회하며 스타일을 적용 -->
-          <span
-            v-for="n in 5"
-            :key="n"
-            :class="{
-              filled: (85 % 100) / 20 >= n,
-              empty: (85 % 100) / 20 < n,
-            }"
-            class="progress-box-cell"
-          >
-          </span>
-          <!-- (!!퀘스트api완성후추가!!%) -->
-          85%
-          <!-- ({{ userStatus.todayQuestProgress }}%) -->
+  <BaseModal class="font-dgm" title="Status" @close-modal="$emit('close-modal')">
+    <div class="h-full">
+      <div class="info-container flex items-center space-x-8">
+        <img class="w-[8vh]" src="@/assets/images/profile/default-image-1.png" alt="랭크" />
+
+        <!-- 유저 정보 -->
+        <div class="user-container flex flex-col">
+          <p class="font-dgm text-lg">Lv.</p>
+          <p class="font-dgm text-lg">경험치 :</p>
+          <p class="font-dgm text-lg">닉네임 :</p>
+          <!-- <span class="font-dgm">Lv.{{ userInfo.level }}</span>
+        <span class="font-dgm">경험치 : {{ userInfo.experience }}</span>
+        <span class="font-dgm">닉네임 : {{ userInfo.userNickname }}</span> -->
         </div>
       </div>
 
-      <!-- 요소 4: 그래프 이미지 박스 -->
+      <!-- 일일 달성률 -->
+      <div class="progress-container space-y-2 mt-2 mb-3">
+        <span class="font-dgm">일일 달성률</span>
+        <progress class="nes-progress is-primary w-[100%] h-[3vh]" value="{{ userStatus.todayQuestProgress }}" max="100"></progress>
+      </div>
+
+      <!-- 그래프 이미지 -->
       <div class="status-element status-4">
         <div class="status-graph">
           <PolarArea :data="chartData" :options="options" />
         </div>
       </div>
     </div>
-  </div>
+  </BaseModal>
 </template>
 
 <script setup>
-import { defineEmits, ref, computed } from "vue";
-import { useUserDataStore } from "@/stores/userDataStore";
-import {
-  Chart as ChartJS,
-  RadialLinearScale,
-  ArcElement,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { PolarArea } from "vue-chartjs";
-import * as chartConfig from "../config/chartConfig.js";
+import BaseModal from "./BaseModal.vue"
+import { ref, computed } from "vue"
+import { useUserDataStore } from "@/stores/userDataStore"
+import { Chart as ChartJS, RadialLinearScale, ArcElement, Tooltip, Legend } from "chart.js"
+import { PolarArea } from "vue-chartjs"
+import * as chartConfig from "../config/chartConfig.js"
 
-ChartJS.register(RadialLinearScale, ArcElement, Tooltip, Legend);
+defineEmits(["close-modal"])
 
-const options = ref(chartConfig.options);
-const userDataStore = useUserDataStore();
-const userInfo = ref(userDataStore.userInfo);
+ChartJS.register(RadialLinearScale, ArcElement, Tooltip, Legend)
+
+// 글로벌 폰트 설정
+ChartJS.defaults.font.family = "DungGeunMo" // 원하는 폰트 이름
+ChartJS.defaults.font.size = 14 // 폰트 크기
+ChartJS.defaults.font.weight = "normal" // 폰트 굵기
+ChartJS.defaults.color = "#000" // 텍스트 색상
+
+const options = ref(chartConfig.options)
+const userDataStore = useUserDataStore()
+const userInfo = ref(userDataStore.userInfo)
 
 const chartData = computed(() => ({
   labels: ["팔", "다리", "가슴", "복근", "등", "체력"],
@@ -91,18 +68,11 @@ const chartData = computed(() => ({
       ],
       borderColor: "#fff",
       borderWidth: 1,
-      hoverBackgroundColor: [
-        "rgba(255, 99, 132, 1)",
-        "rgba(54, 162, 235, 1)",
-        "rgba(255, 206, 86, 1)",
-        "rgba(75, 192, 192, 1)",
-        "rgba(153, 102, 255, 1)",
-        "rgba(255, 140, 0, 1)",
-      ],
+      hoverBackgroundColor: ["rgba(255, 99, 132, 1)", "rgba(54, 162, 235, 1)", "rgba(255, 206, 86, 1)", "rgba(75, 192, 192, 1)", "rgba(153, 102, 255, 1)", "rgba(255, 140, 0, 1)"],
       data: getSelectedDateData(),
     },
   ],
-}));
+}))
 
 const getSelectedDateData = () => {
   const data = [
@@ -112,140 +82,9 @@ const getSelectedDateData = () => {
     userInfo.value.userStats.absStats, // 복근
     userInfo.value.userStats.backStats, // 등
     userInfo.value.userStats.staminaStats, // 체력
-  ];
-  return data || [0, 0, 0, 0, 0, 0];
-};
-
-const emit = defineEmits(["close-modal"]);
-
-const closeStatusModal = () => {
-  emit("close-modal");
-};
+  ]
+  return data || [0, 0, 0, 0, 0, 0]
+}
 </script>
 
-<style scoped>
-/* 임시 */
-h2 {
-  margin: 0px;
-}
-
-/* 모달 관련 */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.5); /* 배경에 반투명 검정색 추가 */
-}
-
-.modal-content {
-  position: absolute;
-  background: rgba(
-    255,
-    255,
-    255,
-    0.8
-  ); /* 콘텐츠 영역 배경을 반투명 흰색으로 설정 */
-  padding: 0;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  width: 90%;
-  height: 70%;
-  text-align: center;
-  display: flex;
-  flex-direction: column; /* 요소들을 세로로 나열 */
-}
-
-/* 모달 내부요소 사이즈 지정 */
-.status-1 {
-  width: 100%; /* 너비는 100% */
-  height: 20%; /* 높이를 20%로 설정 */
-  background-color: hsla(125, 100%, 89%, 0.4); /* 차후 삭제 */
-  border: solid;
-}
-
-.status-2 {
-  width: 100%; /* 너비는 100% */
-  height: 10%; /* 높이를 10%로 설정 */
-  background-color: hsla(125, 100%, 89%, 0.4); /* 차후 삭제 */
-  border: solid;
-}
-
-.status-3 {
-  width: 100%; /* 너비는 100% */
-  height: 10%; /* 높이를 10%로 설정 */
-  background-color: hsla(125, 100%, 89%, 0.4); /* 차후 삭제 */
-  border: solid;
-}
-
-.status-4 {
-  width: 100%; /* 너비는 100% */
-  height: 60%; /* 높이를 10%로 설정 */
-  background-color: hsla(125, 100%, 89%, 0.4); /* 차후 삭제 */
-  border: solid;
-}
-
-.status-graph {
-  position: relative;
-  width: 100%; /* 부모 요소의 너비에 맞추기 */
-  height: 100%; /* 부모 요소의 높이에 맞추기 */
-}
-
-.status-graph::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0; /* 요소 안에서 이미지가 꽉 차도록 설정 */
-  background-image: url("@/assets/images/status/statusBackgroundImage.png");
-  background-size: contain; /* 이미지를 요소 크기에 맞게 꽉 차게 설정 */
-  background-repeat: no-repeat; /* 이미지 반복을 막기 */
-  background-position: center; /* 이미지의 중심을 기준으로 배치 */
-  opacity: 1; /* 투명도 설정 */
-  z-index: -1; /* 이미지가 요소 뒤에 위치하도록 설정 */
-}
-
-/* progress-box는 박스를 감싸는 div */
-.progress-box {
-  display: flex;
-  width: 100%; /* 5개의 박스 크기를 맞추기 위한 설정 */
-  justify-content: space-between;
-}
-
-/* progress-box-cell은 각 박스의 스타일 */
-.progress-box-cell {
-  width: 10%;
-  border: 2px solid #ccc;
-  background-color: #fff;
-  border-radius: 2px;
-}
-
-.filled {
-  background-color: #4caf50; /* 채워진 박스 색상 */
-}
-
-.empty {
-  background-color: #ddd; /* 비어있는 박스 색상 */
-}
-
-#close-btn {
-  position: absolute;
-  padding: 5px 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: xx-small;
-}
-
-#close-btn {
-  top: 2%;
-  right: 2%;
-}
-</style>
+<style scoped></style>
