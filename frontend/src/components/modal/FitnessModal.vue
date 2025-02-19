@@ -35,7 +35,7 @@
     </div>
 
     <!-- 모드 선택 모달 -->
-    <div v-if="showModeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <MediumBaseModal v-if="showModeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white p-5 rounded-lg shadow-md w-[80%] max-w-md">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">Select Mode</h3>
@@ -61,6 +61,8 @@
             </div>
           </button>
 
+          <!-- Mul -->
+
           <!-- Rank Mode -->
           <button class="mode-button" @click="confirmMode('rank')" :disabled="isLoading || !isSquatCompleted">
             <p class="text-lg font-medium">
@@ -69,7 +71,7 @@
           </button>
         </div>
       </div>
-    </div>
+    </MediumBaseModal>
 
     <!-- 게임 시작 확인 모달 -->
     <div v-if="showConfirmationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
@@ -89,7 +91,8 @@
 import { ref, computed, defineEmits } from "vue"
 import { useRouter } from "vue-router"
 import { useMainStore, TUTORIAL_IDS } from "@/stores/mainStore"
-import BaseModal from "./BaseModal.vue"
+import BaseModal from "@/components/modal/BaseModal.vue"
+import MediumBaseModal from "@/components/modal/BaseModal.vue"
 
 const router = useRouter()
 const mainStore = useMainStore()
