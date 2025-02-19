@@ -600,7 +600,7 @@ FROM user_character uc;
 END //
 DELIMITER ;
 
--- 이벤트 스케줄러 활성화 
+-- 이벤트 스케줄러 활성화
 SET GLOBAL event_scheduler = ON;
 
 -- -- -- -- -- 데이터 삽입 -- -- -- -- --
