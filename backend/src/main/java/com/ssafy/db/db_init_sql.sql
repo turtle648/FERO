@@ -1,6 +1,6 @@
--- DROP DATABASE IF EXISTS E103_DB;
+DROP DATABASE IF EXISTS E103_DB;
 
--- CREATE DATABASE E103_DB;
+CREATE DATABASE E103_DB;
 
 USE E103_DB;
 
@@ -120,6 +120,7 @@ CREATE TABLE game_results (
     user_score SMALLINT NOT NULL,              -- 유저의 점수
     opponent_score SMALLINT NOT NULL,          -- 상대방 점수
     result ENUM('WIN', 'LOSE', 'DRAW') NOT NULL, -- 유저 기준 결과
+    duration SMALLINT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_user_id (user_id)           -- 유저별 조회 최적화
 );
@@ -699,6 +700,35 @@ SET
     stamina_stats = FLOOR(10 + (RAND() * (1000 - 10))),
     updated_at = DATE_ADD(NOW(), INTERVAL -FLOOR(RAND() * 365) DAY)
 WHERE id > 0;
+
+INSERT INTO quests (user_character_id, quest_date, quest_time, exercise_id, exercise_cnt, real_cnt, is_completed, message) 
+VALUES 
+('1', current_date(), NULL, '2', '7', '7', '1', '스쿼트를 7번 해주세요!'),
+('2', current_date(), '00:00:53', '2', '7', '2', '0', '스쿼트를 7번 해주세요!');
+
+
+-- 게임 전적 정보 입력
+INSERT INTO game_results (game_id, duration, exercise_id, user_id, opponent_id, user_score, opponent_score, result) VALUES
+('game_001', 60, 2, 'hong123', 'kim456', 10, 8, 'WIN'),
+('game_001', 60, 2, 'kim456', 'hong123', 8, 10, 'LOSE'),
+('game_002', 60, 2, 'lee789', 'park234', 12, 12, 'DRAW'),
+('game_002', 60, 2, 'park234', 'lee789', 12, 12, 'DRAW'),
+('game_003', 60, 2, 'choi567', 'jung111', 5, 9, 'LOSE'),
+('game_003', 60, 2, 'jung111', 'choi567', 9, 5, 'WIN'),
+('game_004', 60, 2, 'kang222', 'yoon333', 15, 18, 'LOSE'),
+('game_004', 60, 2, 'yoon333', 'kang222', 18, 15, 'WIN'),
+('game_005', 60, 2, 'shin444', 'song555', 7, 7, 'DRAW'),
+('game_005', 60, 2, 'song555', 'shin444', 7, 7, 'DRAW'),
+('game_006', 60, 2, 'yang666', 'han777', 13, 10, 'WIN'),
+('game_006', 60, 2, 'han777', 'yang666', 10, 13, 'LOSE'),
+('game_007', 60, 2, 'oh888', 'seo999', 6, 14, 'LOSE'),
+('game_007', 60, 2, 'seo999', 'oh888', 14, 6, 'WIN'),
+('game_008', 60, 2, 'bae000', 'cha123', 20, 19, 'WIN'),
+('game_008', 60, 2, 'cha123', 'bae000', 19, 20, 'LOSE'),
+('game_009', 60, 2, 'moon234', 'joo345', 9, 11, 'LOSE'),
+('game_009', 60, 2, 'joo345', 'moon234', 11, 9, 'WIN'),
+('game_010', 60, 2, 'ryu456', 'kwon567', 15, 15, 'DRAW'),
+('game_010', 60, 2, 'kwon567', 'ryu456', 15, 15, 'DRAW');
 
 INSERT INTO exercise_log (user_id, exercise_duration, exercise_cnt, exercise_stats_ratio_id, exercise_date)
 SELECT
