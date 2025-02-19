@@ -289,7 +289,6 @@ const handleWebSocketMessage = async (event) => {
     }
 
     case "offer": {
-      needToSendFinal.value = true;
       currentPeerId.value = message.sender;
 
       if (!myPeerConnection) {
@@ -312,6 +311,8 @@ const handleWebSocketMessage = async (event) => {
     }
 
     case "answer": {
+      needToSendFinal.value = true;
+
       await myPeerConnection.setRemoteDescription(
         new RTCSessionDescription(message.sdp)
       );

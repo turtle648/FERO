@@ -142,9 +142,16 @@
         </ul>
       </div>
 
-      <p v-else class="text-red-500">랭크 결과를 불러오지 못했습니다.</p>
-
+      <p v-else class="text-red-500 font-dgm">💫 결과 계산 중 입니다 💫</p>
       <button
+        v-if="mode === 'rank' && isDisabled"
+        disabled
+        class="px-4 py-2 bg-gray-500 text-white rounded"
+      >
+        확인
+      </button>
+      <button
+        v-else
         @click="completeFitnessRank"
         class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
       >
@@ -167,6 +174,7 @@ const mainStore = useMainStore();
 const userStore = useUserStore();
 const mode = ref("");
 const rankResult = ref("");
+const isDisabled = ref(true);
 const isLoading = ref(false); // 로딩 상태
 
 const props = defineProps(["count", "result"]);
@@ -179,7 +187,8 @@ watch(
 
     if (newResult) {
       console.log("Updated result:", newResult);
-      fetchRankResult();
+      isDisabled.value = false;
+      fetchRankResult(userStore.accessToken, props.result.peerToken);
     }
   },
   { immediate: false }
@@ -212,6 +221,7 @@ const completeFitnessRank = () => {
 const fetchRankResult = async (userToken, opponentToken) => {
   let attempts = 0;
   isLoading.value = true; // 로딩 시작
+  console.log(userToken + ":" + opponentToken);
 
   while (attempts < 3) {
     try {
@@ -254,10 +264,11 @@ onMounted(() => {
     mode.value = "single";
   } else if (url.includes("rank-match")) {
     mode.value = "rank";
-    if (props.result.remainTime) {
+    if (props.result.remainTime > 0 || props.result.remainTime == -1) {
+      isDisabled.value = false;
       fetchRankResult(props.result.peerToken, userStore.accessToken);
+      fetchRankResult(userStore.accessToken, props.result.peerToken);
     }
-    fetchRankResult(userStore.accessToken, props.result.peerToken);
   }
 });
 </script>
