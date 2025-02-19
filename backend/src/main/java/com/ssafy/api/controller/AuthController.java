@@ -67,6 +67,7 @@ public class AuthController {
         @ApiResponse(code = 401, message = "인증 실패", response = BaseResponseBody.class),
 		@ApiResponse(code = 403, message = "임시 비밀번호 사용중", response = BaseResponseBody.class),
         @ApiResponse(code = 404, message = "사용자 없음", response = BaseResponseBody.class),
+		@ApiResponse(code = 410, message = "탈퇴한 회원", response = BaseResponseBody.class),
         @ApiResponse(code = 500, message = "서버 오류", response = BaseResponseBody.class)
     })
 	public ResponseEntity<UserLoginPostRes> login(@RequestBody @ApiParam(value="로그인 정보", required = true) UserLoginPostReq loginInfo) {
@@ -77,6 +78,10 @@ public class AuthController {
 
 		User user = userService.getUserByUserId(userId);
 
+		// 탈퇴한 회원인지 확인
+		if (!user.getIsValid()){
+			return ResponseEntity.status(410).body(UserLoginPostRes.of(410, "탈퇴한 회원입니다.", null, false));
+		}
 		// 로그인 요청한 유저로부터 입력된 패스워드와 디비에 저장된 유저의 암호화된 패스워드가 같은지 확인.(유효한 패스워드인지 여부 확인)
 		if(passwordEncoder.matches(password, user.getUserPassword())) {
 			// 임시 비밀번호로 로그인 된 경우 비밀번호 변경 필요하다는 응답.
