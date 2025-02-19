@@ -14,6 +14,7 @@ export const TUTORIAL_IDS = {
 }
 
 export const questData = ref('')
+
 export const useMainStore = defineStore("main", () => {
   const tutorial = ref([]);
   const authToken = ref(localStorage.getItem("authToken"));
@@ -128,7 +129,8 @@ export const useMainStore = defineStore("main", () => {
 
     return response.data;
   }
-
+  
+  // 퀘스트 확인 및 퀘스트데이터 업데이트
   const getQuestData = async () => {
     try {
         const response = await api.get('/exercise/today')
