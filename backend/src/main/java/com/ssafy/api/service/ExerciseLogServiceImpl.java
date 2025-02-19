@@ -36,7 +36,7 @@ public class ExerciseLogServiceImpl implements ExerciseLogService {
 
     @Override
     @Transactional
-    @EventListener
+//    @EventListener
     public ExerciseLog addExerciseLogAndUpdateStats(EventExerciseLog event) {
         String userId = event.getUserId();
         ExerciseLogReq req = event.getReq();

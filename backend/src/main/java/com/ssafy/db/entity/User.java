@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
 @Access(AccessType.FIELD)
 @Getter
 @Setter
+@ToString
 @Table(name = "user_info")
 public class User{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,6 +56,6 @@ public class User{
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserStats userStats;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
     private List<UserTutorialProgress> tutorialProgress;
 }

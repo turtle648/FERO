@@ -53,7 +53,7 @@ public class ExerciseController {
         String authHeader = request.getHeader("Authorization");
 
         // 헤더에서 토큰을 통해 사용자 ID 추출
-        String userId = JwtTokenUtil.extractUserIdFromToken(authHeader);
+        String userId = JwtTokenUtil.getUserIdFromJWT(authHeader);
 
         ExerciseLog savedExerciseLog = exerciseLogService.addExerciseLogAndUpdateStats(
                 new EventExerciseLog(userId, exerciseLogReq)
@@ -76,7 +76,7 @@ public class ExerciseController {
         }
 
         try {
-            String userId = JwtTokenUtil.extractUserIdFromToken(authHeader);
+            String userId = JwtTokenUtil.getUserIdFromJWT(authHeader);
             System.out.println("조회 대상 사용자 ID : " + userId);
 
             // DTO 대신 파라미터 직접 전달
@@ -101,7 +101,7 @@ public class ExerciseController {
             @ApiParam(value = "조회할 연도", required = true) @RequestParam int year,
             @ApiParam(value = "조회할 월", required = true) @RequestParam int month
     ) {
-        String userId = JwtTokenUtil.extractUserIdFromToken(request.getHeader("Authorization"));
+        String userId = JwtTokenUtil.getUserIdFromJWT(request.getHeader("Authorization"));
         return questService.getMonthlyQuestStatus(userId, year, month)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
@@ -110,7 +110,7 @@ public class ExerciseController {
     @GetMapping("/today")
     @ApiOperation(value = "오늘의 퀘스트 조회", notes = "현재 로그인한 사용자의 오늘 퀘스트 정보를 조회")
     public ResponseEntity<List<QuestsRes>> getTodayQuests(HttpServletRequest request) {
-        String userId = JwtTokenUtil.extractUserIdFromToken(request.getHeader("Authorization"));
+        String userId = JwtTokenUtil.getUserIdFromJWT(request.getHeader("Authorization"));
 
         return questService.getTodayQuest(userId, LocalDate.now())
                 .map(ResponseEntity::ok)
