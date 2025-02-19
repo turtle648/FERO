@@ -1,11 +1,11 @@
 <template>
   <!-- 영상 플레이어 -->
-  <video 
+  <video
     v-if="showVideo"
     ref="introVideo"
     :src="require('@/assets/Fero_Intro.mp4')"
     class="absolute top-0 left-0 w-screen h-screen object-fill"
-    style="z-index: 20; pointer-events: auto;" 
+    style="z-index: 20; pointer-events: auto"
     autoplay
     @ended="navigateToMain"
     @click.stop
@@ -53,7 +53,7 @@
           <i class="nes-icon facebook is-large"></i>
           <i class="nes-icon twitter is-large"></i> -->
         <!-- </div> -->
-        <dialog class="nes-dialog is-rounded" id="dialog-rounded">
+        <dialog class="nes-dialog is-rounded" id="dialog-rounded" ref="dialogRef">
           <form method="dialog">
             <p class="title">Log In Error!</p>
             <p>{{ dialogContent }}</p>
@@ -67,7 +67,10 @@
       <!-- 회원가입 모드 -->
       <div v-else>
         <div class="sign-up-mode-header">
-          <img class="sign-up-step-icon" :src="require(`@/assets/images/icon/sign-up-${signUpPage}.png`)" />
+          <img
+            class="sign-up-step-icon"
+            :src="require(`@/assets/images/icon/sign-up-${signUpPage}.png`)"
+          />
           <button class="close-btn" @click="close">X</button>
         </div>
         <form v-if="signUpPage === 1" @submit.prevent="handleSignUp1">
@@ -128,8 +131,18 @@
           </div>
           <hr />
           <div class="select-box">
-            <img class="defalt-character" :class="{ 'selected-character': gender === 'M' }" src="@/assets/images/character/defalt_character_M.png" @click="selectCharacter('M')" />
-            <img class="defalt-character" :class="{ 'selected-character': gender === 'F' }" src="@/assets/images/character/defalt_character_F.png" @click="selectCharacter('F')" />
+            <img
+              class="defalt-character"
+              :class="{ 'selected-character': gender === 'M' }"
+              src="@/assets/images/character/defalt_character_M.png"
+              @click="selectCharacter('M')"
+            />
+            <img
+              class="defalt-character"
+              :class="{ 'selected-character': gender === 'F' }"
+              src="@/assets/images/character/defalt_character_F.png"
+              @click="selectCharacter('F')"
+            />
           </div>
           <div>
             <button type="submit">완료</button>
@@ -141,56 +154,55 @@
 </template>
 
 <script setup>
-import { ref, watchEffect, defineEmits, nextTick } from "vue"
-import { useRouter } from "vue-router"
-import { useUserStore } from "@/stores/store"
-import axios from "axios"
+import { ref, watchEffect, defineEmits, nextTick } from "vue";
+import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/store";
+import axios from "axios";
 
-const emit = defineEmits(["close"])
-const userStore = useUserStore() // Pinia store 사용
-const router = useRouter()
-const isSignUpMode = ref(false)
-const signUpPage = ref(1)
+const emit = defineEmits(["close"]);
+const userStore = useUserStore(); // Pinia store 사용
+const router = useRouter();
+const isSignUpMode = ref(false);
+const signUpPage = ref(1);
 
-const id = ref("")
-const password = ref("")
-const confirmPassword = ref("")
-const name = ref("")
-const phone = ref("")
-const email = ref("")
-const isEmailAvailable = ref(false)
-const emailConfirmCode = ref("")
-const gender = ref("")
-const userNickname = ref("")
-const avatar = ref("")
-
-const showVideo = ref(false)
-const introVideo = ref(null)
+const id = ref("");
+const password = ref("");
+const confirmPassword = ref("");
+const name = ref("");
+const phone = ref("");
+const email = ref("");
+const isEmailAvailable = ref(false);
+const emailConfirmCode = ref("");
+const gender = ref("");
+const userNickname = ref("");
+const avatar = ref("");
 
 const dialogContent = ref("")
+
+const dialogRef = ref(null)
 
 // watch()를 사용하여 gender 변경 감지
 watchEffect(() => {
   if (gender.value === "F") {
-    avatar.value = "0-0-1"
+    avatar.value = "0-0-1";
   } else {
-    avatar.value = "0-0-0"
+    avatar.value = "0-0-0";
   }
-})
+});
 
 // 변수 초기화
 const resetFields = () => {
-  id.value = ""
-  password.value = ""
-  confirmPassword.value = ""
-  email.value = ""
-  phone.value = ""
-  name.value = ""
-  gender.value = ""
-  isEmailAvailable.value = false
-  emailConfirmCode.value = ""
-  userNickname.value = ""
-}
+  id.value = "";
+  password.value = "";
+  confirmPassword.value = "";
+  email.value = "";
+  phone.value = "";
+  name.value = "";
+  gender.value = "";
+  isEmailAvailable.value = false;
+  emailConfirmCode.value = "";
+  userNickname.value = "";
+};
 
 // 로그인 API 호출
 const handleSubmit = async () => {
@@ -202,10 +214,10 @@ const handleSubmit = async () => {
         baseURL: "https://i12e103.p.ssafy.io:8076/api/v1",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
-      })
-      
+      });
+
       // 스토리 튜토리얼 데이터 로드
       const loadSpecificTutorial = async () => {
         try {
@@ -213,36 +225,40 @@ const handleSubmit = async () => {
           console.log("튜토리얼 조회결과:", response)
           return response.data
         } catch (error) {
-          console.error("[❗] Load Error:", error)
-          throw error
+          console.error("[❗] Load Error:", error);
+          throw error;
         }
-      }
-      const isTutorialComplete = await loadSpecificTutorial()
-      // 튜토리얼 정보 조회 후... true면 
-      if (isTutorialComplete) { navigateToMain() }
-      else {
-        showVideo.value = true // 영상 표시
+      };
+      const isTutorialComplete = await loadSpecificTutorial();
+      // 튜토리얼 정보 조회 후... true면
+      if (isTutorialComplete) {
+        navigateToMain();
+      } else {
+        showVideo.value = true; // 영상 표시
         // nextTick()을 사용해 UI가 업데이트된 후 실행
-        await nextTick()      
+        await nextTick();
         // 자동 재생 보장 (일부 브라우저에서 필요)
-        introVideo.value?.play().catch(console.error)
+        introVideo.value?.play().catch(console.error);
       }
     }
   } catch (error) {
     if (error == 401) {
       dialogContent.value = "아이디 혹은 비밀번호가 틀렸습니다."
-      document.getElementById('dialog-rounded').showModal();
+      // document.getElementById('dialog-rounded').showModal();
+      dialogRef.value?.showModal()
     }
     else if (error == 403) {
       dialogContent.value = "임시 비밀번호를 사용중입니다."
-      document.getElementById('dialog-rounded').showModal();
+      // document.getElementById('dialog-rounded').showModal();
+      dialogRef.value?.showModal()
     }
     else {
       dialogContent.value = "잠시후에 다시 시도해주십시오."
-      document.getElementById('dialog-rounded ').showModal();
+      // document.getElementById('dialog-rounded ').showModal();
+      dialogRef.value?.showModal()
     }
   }
-}
+};
 
 // 영상이 끝난 후 메인 페이지로 이동
 const navigateToMain = () => {
@@ -250,95 +266,105 @@ const navigateToMain = () => {
     baseURL: "https://i12e103.p.ssafy.io:8076/api/v1",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+      Authorization: `${localStorage.getItem("authToken")}`,
     },
-  })
+  });
   const completeTutorial = async () => {
     try {
-      const response = await api.post("/Tutorial/complete/97")
-      console.log('튜토리얼 완료:', response.data)
-      return response.data
+      const response = await api.post("/Tutorial/complete/97");
+      console.log("튜토리얼 완료:", response.data);
+      return response.data;
     } catch (error) {
-      console.error('튜토리얼 완료 처리 중 오류 발생:', error)
-      throw error
+      console.error("튜토리얼 완료 처리 중 오류 발생:", error);
+      throw error;
     }
-  }
-  completeTutorial()
-  router.push("/main")
-}
+  };
+  completeTutorial();
+  router.push("/main");
+};
 
 // 이메일 중복확인 API
 const checkEmailDuplicate = (email) => {
   userStore.checkEmailDuplicateAPI(email).then((result) => {
     if (result) {
-      isEmailAvailable.value = true
-      alert("이메일 중복확인이 완료되었습니다. 인증코드를 입력해주세요.")
-      userStore.sendEmail(email)
+      isEmailAvailable.value = true;
+      alert("이메일 중복확인이 완료되었습니다. 인증코드를 입력해주세요.");
+      userStore.sendEmail(email);
     }
-  })
-}
+  });
+};
 
 // 인증 코드 확인 후 2페이지로 이동
 const handleSignUp1 = async () => {
-  const result = await userStore.verifyEmail(emailConfirmCode.value, email.value)
+  const result = await userStore.verifyEmail(
+    emailConfirmCode.value,
+    email.value
+  );
   if (result) {
-    signUpPage.value = 2
+    signUpPage.value = 2;
   } else {
-    alert("인증 코드가 유효하지 않습니다. 다시 시도해주세요.")
+    alert("인증 코드가 유효하지 않습니다. 다시 시도해주세요.");
   }
-}
+};
 
 // 인증 코드 확인 후 3페이지로 이동
 const handleSignUp2 = () => {
   if (password.value !== confirmPassword.value) {
-    alert("비밀번호가 일치하지 않습니다.")
-    return
+    alert("비밀번호가 일치하지 않습니다.");
+    return;
   } else if (!isEmailAvailable.value) {
-    alert("이메일 중복체크를 진행해 주세요.")
-    return
+    alert("이메일 중복체크를 진행해 주세요.");
+    return;
   } else {
-    userStore.signUp(id.value, password.value, name.value, phone.value, email.value).then((result) => {
-      userStore.setSessionId(result.message) // Pinia에서 sessionId 설정
-      signUpPage.value = 3
-    })
+    userStore
+      .signUp(id.value, password.value, name.value, phone.value, email.value)
+      .then((result) => {
+        userStore.setSessionId(result.message); // Pinia에서 sessionId 설정
+        signUpPage.value = 3;
+      });
   }
-}
+};
 
 const handleSignUp3 = async () => {
-  const result = await userStore.registerCharacter(gender.value, userNickname.value, avatar.value, userStore.sessionId)
+  const result = await userStore.registerCharacter(
+    gender.value,
+    userNickname.value,
+    avatar.value,
+    userStore.sessionId
+  );
   if (result) {
-    alert("회원가입이 완료되었습니다.")
+    alert("회원가입이 완료되었습니다.");
   }
-  closeSignUp()
-}
+  closeSignUp();
+};
 
 const selectCharacter = (gen) => {
-  gender.value = gen
-}
+  gender.value = gen;
+};
 
 // const handleSocialLogIn = (platform) => {
 //   alert(`${platform} 소셜 로그인! 미구현`)
 // }
 
 const openSignUp = () => {
-  isSignUpMode.value = true
-  resetFields()
-}
+  isSignUpMode.value = true;
+  resetFields();
+};
 
 const closeSignUp = () => {
-  isSignUpMode.value = false
-  resetFields()
-}
+  isSignUpMode.value = false;
+  resetFields();
+};
 
 const close = () => {
-  resetFields()
-  emit("close")
-}
+  resetFields();
+  emit("close");
+};
 
 const closeModalOutside = () => {
-  resetFields()
-  emit("close")
-}
+  resetFields();
+  emit("close");
+};
 </script>
 
 <style scoped>

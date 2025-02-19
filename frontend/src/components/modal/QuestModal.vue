@@ -60,8 +60,8 @@ import { ref, onMounted, onUnmounted } from "vue"
 import axios from "axios"
 import BaseModal from './BaseModal.vue'
 
-const questData = ref([])
-const isLoading = ref(false)
+const questData = ref([]);
+const isLoading = ref(false);
 
 const messageText = ref(null)
 const fontSize = ref(24) // 초기 폰트 사이즈 (text-2xl과 동일)

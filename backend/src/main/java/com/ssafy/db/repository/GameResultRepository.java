@@ -17,6 +17,10 @@ public interface GameResultRepository extends JpaRepository<GameResult, Long> {
     // 특정 경기 ID로 모든 기록 조회 (디버깅용)
     List<GameResult> findByGameId(String gameId);
 
+    // 특정 경기 ID로 모든 기록 조회 (디버깅용)
+    List<GameResult> findByGameIdAndUserId(String gameId, String userId);
+
+
     // 마지막 매칭id 가져오기
     @Query("SELECT MAX(g.gameId) FROM GameResult g")
     Optional<Long> findLatestGameId();

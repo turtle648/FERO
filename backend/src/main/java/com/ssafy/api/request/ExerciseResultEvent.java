@@ -1,17 +1,16 @@
 package com.ssafy.api.request;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @ToString
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class ExerciseResultEvent {
-    private final String user1Id;
-    private final String user2Id;
-    private final int userScore1;
-    private final int userScore2;
-    private final int result;
-    private final Long exerciseType;
+    private String user1Id;
+    private String user2Id;
+    private int userScore1;
+    private int userScore2;
+    private int result;
+    private Long exerciseType;
 }
