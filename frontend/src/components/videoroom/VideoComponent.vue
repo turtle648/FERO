@@ -420,7 +420,7 @@ async function clickSubmitRoomId() {
     "https://i12e103.p.ssafy.io:8076/api/v1/matching/enter",
     null,
     {
-      headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
+      headers: { Authorization: `${localStorage.getItem("authToken")}` },
       params: { exerciseType: props.exercise },
     }
   );

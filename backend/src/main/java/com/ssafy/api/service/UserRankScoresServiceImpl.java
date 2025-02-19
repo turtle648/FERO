@@ -8,6 +8,7 @@ import com.ssafy.db.repository.UserRankScoresRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -29,7 +30,6 @@ public class UserRankScoresServiceImpl implements UserRankScoresService {
     }
 
 
-
     @Override
     public UserRankScores getRankScoreByUserIdAndId(String userId, Long exerciseId) {
         return userRankScoresRepository.findByUser_UserIdAndId(userId, exerciseId)
@@ -37,11 +37,11 @@ public class UserRankScoresServiceImpl implements UserRankScoresService {
     }
 
     @Override
-    @EventListener
     @Transactional
     public RankUpdateRes updateRankScore(ExerciseResultEvent event) {
-        String user1Id = JwtTokenUtil.getUserIdFromJWT(event.getUser1Id());
-        String user2Id = JwtTokenUtil.getUserIdFromJWT(event.getUser2Id());
+        log.info("========================updateRankScore===========================");
+        String user1Id = event.getUser1Id();
+        String user2Id = event.getUser2Id();
         Long exerciseId = event.getExerciseType();
         double result = event.getResult();
 
@@ -56,39 +56,46 @@ public class UserRankScoresServiceImpl implements UserRankScoresService {
                 .findByUser_UserIdAndExerciseStatsRatio_Id(user2Id, exerciseId)
                 .orElseThrow(() -> new RuntimeException("유저2의 랭크 데이터 없음"));
 
+        log.info(">>> user1Rank : {}", user1Rank.getUser());
+        log.info(">>> user2Rank : {}", user2Rank.getUser());
+
         // 현재 점수 가져오기
         short user1PrevScore = user1Rank.getRankScore();
         short user2PrevScore = user2Rank.getRankScore();
+
+        log.info(">>> user1PrevScore : {}", user1PrevScore);
 
         // 결과에 따른 Elo 점수 계산
         short user1ChangeScore, user2ChangeScore;
         if (result == 1) { // user1 승리
             user1ChangeScore = calculateEloChange(user1PrevScore, user2PrevScore, true);
-            user2ChangeScore = calculateEloChange(user2PrevScore, user1PrevScore, false);
+//            user2ChangeScore = calculateEloChange(user2PrevScore, user1PrevScore, false);
         } else if (result == 2) { // user2 승리
             user1ChangeScore = calculateEloChange(user1PrevScore, user2PrevScore, false);
-            user2ChangeScore = calculateEloChange(user2PrevScore, user1PrevScore, true);
+//            user2ChangeScore = calculateEloChange(user2PrevScore, user1PrevScore, true);
         } else { // "DRAW"
             user1ChangeScore = calculateEloChange(user1PrevScore, user2PrevScore, null);
-            user2ChangeScore = calculateEloChange(user2PrevScore, user1PrevScore, null);
+//            user2ChangeScore = calculateEloChange(user2PrevScore, user1PrevScore, null);
         }
 
         // 새로운 점수 계산
         short user1NewScore = (short) (user1PrevScore + user1ChangeScore);
-        short user2NewScore = (short) (user2PrevScore + user2ChangeScore);
+//        short user2NewScore = (short) (user2PrevScore + user2ChangeScore);
+
+        log.info(">>> user1NewScore : {}", user1NewScore);
 
         // DB 반영
         userRankScoresRepository.updateUserRankScore(user1Id, exerciseId, user1ChangeScore);
-        userRankScoresRepository.updateUserRankScore(user2Id, exerciseId, user2ChangeScore);
+//        userRankScoresRepository.updateUserRankScore(user2Id, exerciseId, user2ChangeScore);
 
-        log.info("Elo 점수 업데이트 완료! [운동 ID: {}] 유저1: {} ({} → {}), 유저2: {} ({} → {})",
-                exerciseId, user1Id, user1PrevScore, user1NewScore,
-                user2Id, user2PrevScore, user2NewScore);
+        log.info("Elo 점수 업데이트 완료! [운동 ID: {}] 유저1: {} ({} → {})",
+                exerciseId, user1Id, user1PrevScore, user1NewScore);
+//                user2Id, user2PrevScore, user2NewScore);
 
         return new RankUpdateRes(
-                user1Id, user1PrevScore, user1NewScore,
-                user2Id, user2PrevScore, user2NewScore
-        );
+                user1Id, user1PrevScore, user1NewScore);
+//                user2Id, user2PrevScore, user2NewScore
+//        );
     }
 
     private short calculateEloChange(short playerScore, short opponentScore, Boolean isWinner) {
