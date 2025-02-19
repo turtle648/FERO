@@ -1,86 +1,112 @@
-<!-- components/modal/RecordModal.vue -->
 <template>
-    <BaseModal title="Records" @close-modal="$emit('close-modal')">
-      <!-- 전적 리스트 컨테이너 -->
-      <div 
-        class="h-full overflow-y-auto"
-        ref="matchDataContainer"
-        @touchstart="handleTouchStart"
-        @touchmove="handleTouchMove"
-        @touchend="handleTouchEnd"
-      >
-        <!-- 전적 아이템 -->
-        <div 
-          v-for="(match, index) in matchData" 
-          :key="index"
-          class="flex justify-between items-center p-3 border-b border-gray-200 hover:bg-gray-50"
-        >
-          <!-- 왼쪽: 매치 정보 -->
-          <div class="flex-1 text-left">
-            <div class="text-sm text-gray-600">
-              {{ computeMatchTime(match.date, match.time) }} | {{ match.type }}
-            </div>
-            <div class="font-medium">
-              <span 
-                :class="match.result === '승리' ? 'text-blue-600' : 'text-red-600'"
-              >
-                {{ match.result }}
-              </span>
-              <span class="ml-2">{{ match.score }}점</span>
-            </div>
+  <BaseModal title="Records" @close-modal="$emit('close-modal')">
+    <!-- 전적 리스트 컨테이너 -->
+    <div class="h-full w-full overflow-y-auto" ref="matchDataContainer" @touchstart="handleTouchStart" @touchmove="handleTouchMove" @touchend="handleTouchEnd">
+      <!-- 전적 아이템 -->
+      <div v-for="(match, index) in matchData" :key="index" class="w-full flex flex-col border-b border-gray-200 hover:bg-gray-50 p-4">
+        <!-- 매치 날짜 -->
+        <p class="text-base w-full text-gray-500 mb-2">
+          {{ formatDate(match.createdAt) }}
+        </p>
+
+        <!-- 매치 정보 -->
+        <div class="info-container flex w-full items-center">
+          <div class="result text-3xl w-[35%] text-white text-center p-2" :class="match.result === 'WIN' ? 'bg-green-500' : match.result === 'LOSE' ? 'bg-red-500' : 'bg-gray-500'">
+            {{ match.result }}
           </div>
-  
-          <!-- 오른쪽: 참가자 정보 -->
-          <div class="flex flex-col items-end">
-            <span class="text-xs text-gray-500">
-              {{ match.partners?.length }}인 게임
-            </span>
-            <button 
-              class="mt-1 px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-            >
-              참여자 확인
-            </button>
+
+          <div class="result-info flex-1 ml-4 flex flex-col items-center">
+            <p class="text-4xl flex items-center justify-center gap-2">
+              <span class="user">
+                {{ match.userScore }}
+                <br />
+                <span class="text-lg">me</span>
+              </span>
+              <span class="center">
+                :
+                <br />
+                <span class="text-base">:</span>
+              </span>
+              <span class="opponent">
+                {{ match.opponentScore }}
+                <br />
+                <span class="text-lg">{{ match.opponentId }}</span>
+              </span>
+            </p>
+            <!-- <p class="text-lg flex items-center justify-center gap-2">
+              <span class="user">ME</span>
+              <span class="center">:</span>
+              <span class="opponent">{{ match.opponentId }}</span>
+            </p> -->
           </div>
         </div>
       </div>
-    </BaseModal>
-  </template>
-  
-  <script setup>
-  import { ref, onMounted } from 'vue'
-  import { getMatchData } from '@/api/userAPI'
-  import BaseModal from './BaseModal.vue'
-  
-  const matchData = ref()
-  defineEmits(['close-modal'])
-  
-  // 매치 시간 계산 함수
-  const computeMatchTime = (date, time) => {
-      const matchDateString = `${date}T${time}`
-      const matchDate = new Date(matchDateString)
-      const today = new Date()
-      const timeDiff = today - matchDate
-      const diffMinutes = Math.floor(timeDiff / (1000 * 60))
-      const diffHours = Math.floor(timeDiff / (1000 * 60 * 60))
-      const diffDays = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
-      const diffMonths = today.getMonth() - matchDate.getMonth() + 
-                        (today.getFullYear() - matchDate.getFullYear()) * 12
-      const diffYears = today.getFullYear() - matchDate.getFullYear()
-  
-      if (diffMinutes < 60) return `${diffMinutes}분 전`
-      if (diffHours < 24) return `${diffHours}시간 전`
-      if (diffDays < 7) return `${diffDays}일 전`
-      if (diffDays < 10) return `1주 전`
-      if (diffDays < 17) return `2주 전`
-      if (diffDays < 24) return `3주 전`
-      if (diffDays < 28) return `4주 전`
-      if (diffDays < 30) return `1개월 전`
-      if (diffMonths < 12) return `${diffMonths}개월 전`
-      return `${diffYears}년 전`
+    </div>
+  </BaseModal>
+</template>
+
+<script setup>
+import { ref, onMounted } from "vue"
+import BaseModal from "./BaseModal.vue"
+import { useUserStore } from "@/stores/store"
+import axios from "axios"
+
+const userStore = useUserStore()
+
+const matchData = ref([])
+
+defineEmits(["close-modal"])
+
+// 날짜 포맷팅 함수
+const formatDate = (dateString) => {
+  const date = new Date(dateString)
+
+  // 날짜 부분 포맷
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0") // 1월이 0부터 시작하므로 +1
+  const day = String(date.getDate()).padStart(2, "0")
+
+  // 시간 부분 포맷
+  let hours = date.getHours()
+  const minutes = String(date.getMinutes()).padStart(2, "0")
+  const period = hours >= 12 ? "PM" : "AM"
+
+  // 12시간제로 변환
+  hours = hours % 12 || 12
+
+  return `${year}.${month}.${day} ${period} ${String(hours).padStart(2, "0")}:${minutes}`
+}
+
+// 게임 결과 가져오기
+const fetchGameResults = async () => {
+  try {
+    console.log("게임 결과 요청 시작")
+
+    const token = userStore.accessToken
+
+    // API 호출
+    const response = await axios.get("https://i12e103.p.ssafy.io:8076/api/gameResults", {
+      headers: {
+        Authorization: `Bearer ${token}`, // 헤더에 토큰 추가
+        "Content-Type": "application/json", // JSON 형식 명시
+      },
+    })
+
+    if (response.status === 200) {
+      console.log("게임 결과 가져오기 성공:", response.data)
+
+      // 응답 데이터를 matchData에 저장
+      matchData.value = response.data
+    } else {
+      console.error("게임 결과 가져오기 실패:", response.status, response.data)
+    }
+  } catch (error) {
+    console.error("게임 결과 가져오는 중 오류 발생:", error.response?.data || error.message)
   }
-  
-  // 데이터 로드
-  onMounted(() => {
-      matchData.value = getMatchData()
-  })
-  </script>
+}
+
+// 데이터 로드
+onMounted(() => {
+  fetchGameResults()
+})
+</script>

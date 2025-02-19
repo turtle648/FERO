@@ -29,7 +29,7 @@
           v-for="category in categories"
           :key="category"
           @click="currentCategory = category"
-          class="w-[15vw] h-12 flex items-center justify-center border rounded-md transition duration-200 ease-in-out"
+          class="w-[15vw] h-12 flex items-center justify-center border rounded-md transition duration-200 ease-in-out nes-btn"
           :class="{ 'bg-blue-500 text-white': currentCategory === category }"
         >
           {{ category }}
@@ -50,11 +50,7 @@
             :src="item[0]"
             @click="selectItem(currentCategory, item)"
             class="w-[15vw] aspect-square border-2 p-1 bg-white cursor-pointer rounded-md transition-all duration-200 ease-in-out"
-            :class="{
-              'border-blue-600 bg-blue-100':
-                selected[currentCategory]?.[1] === item[1],
-              'border-gray-300': selected[currentCategory]?.[1] !== item[1],
-            }"
+            :class="{ 'selected-item': selected[currentCategory]?.[1] === item[1] }"
           />
         </div>
       </div>
@@ -63,9 +59,9 @@
       <div class="w-full mt-4 flex justify-center">
         <button
           @click="confirmSelection"
-          class="w-[15vw] h-[7.5vw] border rounded-md bg-blue-500 text-white hover:bg-green-600 transition duration-200 ease-in-out"
+          class="nes-btn is-primary w-[20vw] h-[7.5vw] border rounded-md bg-blue-500 text-white hover:bg-green-600 transition duration-200 ease-in-out"
         >
-          완료
+          Complete
         </button>
       </div>
     </div>
@@ -73,23 +69,23 @@
 </template>
 
 <script setup>
-import { ref, computed, watchEffect, onMounted } from "vue";
-import { storeToRefs } from "pinia";
-import { assets } from "@/assets.js";
-import { useUserDataStore } from "@/stores/userDataStore";
-import BaseModal from "./BaseModal.vue";
+import { ref, computed, watchEffect, onMounted } from "vue"
+import { storeToRefs } from "pinia"
+import { assets } from "@/assets.js"
+import { useUserDataStore } from "@/stores/userDataStore"
+import BaseModal from "./BaseModal.vue"
 
-const userDataStore = useUserDataStore();
-const { userInfo } = storeToRefs(userDataStore);
+const userDataStore = useUserDataStore()
+const { userInfo } = storeToRefs(userDataStore)
 
-const emit = defineEmits(["close-modal"]);
+const emit = defineEmits(["close-modal"])
 
 // 선택 가능한 카테고리 목록
-const categories = ["hair", "face", "body"];
-const currentCategory = ref("hair");
+const categories = ["hair", "face", "body"]
+const currentCategory = ref("hair")
 
 // 선택된 캐릭터 정보 저장
-const selected = ref({ hair: null, face: null, body: null });
+const selected = ref({ hair: null, face: null, body: null })
 
 // userInfo.avatar 값 변경 시 selected 업데이트
 watchEffect(() => {
@@ -97,17 +93,17 @@ watchEffect(() => {
     selected.value.hair = selected.value.hair || [
       assets["hair"][userInfo.value.avatar[0]][0],
       userInfo.value.avatar[0],
-    ];
+    ]
     selected.value.face = selected.value.face || [
       assets["face"][userInfo.value.avatar[1]][0],
       userInfo.value.avatar[1],
-    ];
+    ]
     selected.value.body = selected.value.body || [
       assets["body"][userInfo.value.avatar[2]][0],
       userInfo.value.avatar[2],
-    ];
+    ]
   }
-});
+})
 
 // 기본값 설정
 onMounted(() => {
@@ -150,6 +146,10 @@ const selectionBoxHeight = computed(() => `calc(70vh - 5rem - 40vw)`);
 <style scoped>
 img {
   image-rendering: pixelated;
+}
+
+.selected-item {
+  @apply border-2 border-solid border-blue-600 bg-blue-100;
 }
 </style>
 

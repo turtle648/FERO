@@ -10,67 +10,58 @@
     @ended="navigateToMain"
     @click.stop
   />
-  <div class="modal" @click="closeModalOutside">
+  <div class="modal font-dgm" @click="closeModalOutside">
     <div class="modal-content" @click.stop>
       <!-- 로그인 모드 -->
       <div v-if="!isSignUpMode">
         <div class="sign-in-mode-header">
-          <img src="@/assets/images/fitnessHeroFromISAEKAI.png" alt="" />
+          <img class="w-[90%]" src="@/assets/images/fitnessHero.png" alt="" />
+          <!-- <div class="font-bold text-3xl sm:text-4xl md:text-5xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-wide">
+            Fitness Hero
+          </div> -->
           <button class="close-btn" @click="close">X</button>
         </div>
         <form @submit.prevent="handleSubmit">
           <div class="input-group">
             <label for="id">ID</label>
-            <input
-              type="text"
-              id="id"
-              v-model="id"
-              placeholder="아이디를 입력하세요"
-              required
-            />
+            <input type="text" id="id" v-model="id" placeholder="아이디를 입력하세요" required @invalid="(e) => e.preventDefault()"/>
           </div>
           <div class="input-group">
             <label for="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              v-model="password"
-              placeholder="비밀번호를 입력하세요"
-              required
-            />
+            <input type="password" id="password" v-model="password" placeholder="비밀번호를 입력하세요" required @invalid="(e) => e.preventDefault()"/>
           </div>
           <div>
-            <button type="submit" class="log-in-button">로그인</button>
+            <hr>
+            <!-- <button type="submit" class="log-in-button">로그인</button> -->
+            <button type="submit" class="nes-btn is-primary w-[98%]" style="border:solid;">로그인</button>
           </div>
         </form>
-        <hr />
+        <hr class="mt-2 mb-2"/>
         <div class="sign-in-mode-footer">
           <a href="#" class="disabled-link">ID 찾기</a>
           <a href="#" class="disabled-link">PW 찾기</a>
           <a href="#" class="disabled-link" @click="openSignUp">회원가입</a>
         </div>
-        <hr />
 
-        <div class="social-login">
-          <img
-            class="social-login-icon"
-            src="@/assets/images/icon/kakao-talk-icon.png"
-            alt="카카오톡"
-            @click="handleSocialLogIn('kakao')"
-          />
-          <img
-            class="social-login-icon"
-            src="@/assets/images/icon/google-icon.png"
-          />
-          <img
-            class="social-login-icon"
-            src="@/assets/images/icon/facebook-icon.png"
-          />
-          <img
-            class="social-login-icon"
-            src="@/assets/images/icon/instagram-icon.png"
-          />
-        </div>
+        <!-- <div class="social-login"> -->
+          <!-- <img class="social-login-icon" src="@/assets/images/icon/kakao-talk-icon.png" alt="카카오톡" @click="handleSocialLogIn('kakao')" />
+          <img class="social-login-icon" src="@/assets/images/icon/google-icon.png" />
+          <img class="social-login-icon" src="@/assets/images/icon/facebook-icon.png" /> -->
+          <!-- <img class="social-login-icon" src="@/assets/images/icon/instagram-icon.png" /> -->
+          <!-- <i class="nes-icon google is-large" @click="handleSocialLogIn('google')"></i>
+          <i class="nes-icon instagram is-large"></i>
+          <i class="nes-icon facebook is-large"></i>
+          <i class="nes-icon twitter is-large"></i> -->
+        <!-- </div> -->
+        <dialog class="nes-dialog is-rounded" id="dialog-rounded" ref="dialogRef">
+          <form method="dialog">
+            <p class="title">Log In Error!</p>
+            <p>{{ dialogContent }}</p>
+            <menu class="dialog-menu flex justify-end">
+              <button class="nes-btn">Cancel</button>
+            </menu>
+          </form>
+        </dialog>
       </div>
 
       <!-- 회원가입 모드 -->
@@ -86,30 +77,12 @@
           <div class="input-group">
             <label for="user-email">Email</label>
             <div class="input-with-button">
-              <input
-                type="email"
-                id="user-email"
-                v-model="email"
-                placeholder="이메일을 입력하세요"
-                required
-                :disabled="isEmailAvailable"
-              />
-              <button
-                type="button"
-                class="check-email-button"
-                @click="checkEmailDuplicate(email)"
-              >
-                중복 체크
-              </button>
+              <input type="email" id="user-email" v-model="email" placeholder="이메일을 입력하세요" required :disabled="isEmailAvailable" @invalid="(e) => e.preventDefault()" />
+              <button type="button" class="check-email-button" @click="checkEmailDuplicate(email)">중복 체크</button>
             </div>
           </div>
           <div class="input-group">
-            <input
-              type="text"
-              v-model="emailConfirmCode"
-              placeholder="인증 코드를 입력하세요"
-              required
-            />
+            <input type="text" v-model="emailConfirmCode" placeholder="인증 코드를 입력하세요" required @invalid="(e) => e.preventDefault()"/>
           </div>
           <div>
             <button type="submit">다음</button>
@@ -119,53 +92,23 @@
         <form v-if="signUpPage === 2" @submit.prevent="handleSignUp2">
           <div class="input-group">
             <label for="signup-id">ID</label>
-            <input
-              type="text"
-              id="signup-id"
-              v-model="id"
-              placeholder="아이디를 입력하세요"
-              required
-            />
+            <input type="text" id="signup-id" v-model="id" placeholder="아이디를 입력하세요" maxlength="12" required @invalid="(e) => e.preventDefault()" />
           </div>
           <div class="input-group">
             <label for="signup-password">Password</label>
-            <input
-              type="password"
-              id="signup-password"
-              v-model="password"
-              placeholder="비밀번호를 입력하세요"
-              required
-            />
+            <input type="password" id="signup-password" v-model="password" placeholder="비밀번호를 입력하세요" maxlength="20" required @invalid="(e) => e.preventDefault()" />
           </div>
           <div class="input-group">
             <label for="confirm-password">Confirm Password</label>
-            <input
-              type="password"
-              id="confirm-password"
-              v-model="confirmPassword"
-              placeholder="비밀번호를 다시 입력하세요"
-              required
-            />
+            <input type="password" id="confirm-password" v-model="confirmPassword" placeholder="비밀번호를 다시 입력하세요" maxlength="20" required @invalid="(e) => e.preventDefault()" />
           </div>
           <div class="input-group">
             <label for="user-name">Name</label>
-            <input
-              type="text"
-              id="user-name"
-              v-model="name"
-              placeholder="이름을 입력하세요"
-              required
-            />
+            <input type="text" id="user-name" v-model="name" placeholder="이름을 입력하세요" maxlength="7" required @invalid="(e) => e.preventDefault()" />
           </div>
           <div class="input-group">
             <label for="user-phone">Phone Number</label>
-            <input
-              type="text"
-              id="user-phone"
-              v-model="phone"
-              placeholder="전화번호를 입력하세요"
-              required
-            />
+            <input type="text" id="user-phone" v-model="phone" placeholder="연락처를 입력하세요(010-xxxx-xxxx)" maxlength="13" required @invalid="(e) => e.preventDefault()" />
           </div>
           <div>
             <button type="submit">다음</button>
@@ -176,17 +119,11 @@
           <div class="input-group select-character-info">
             <div class="input-group">
               <label for="user-nickname">User Nickname</label>
-              <input
-                type="text"
-                id="user-nickname"
-                v-model="userNickname"
-                placeholder="유저 닉네임"
-                required
-              />
+              <input type="text" id="user-nickname" v-model="userNickname" placeholder="유저 닉네임" required @invalid="(e) => e.preventDefault()" />
             </div>
             <div class="input-group">
               <label for="user-gender">Gender</label>
-              <select id="gender" v-model="gender" required>
+              <select id="gender" v-model="gender" required @invalid="(e) => e.preventDefault()">
                 <option value="M">M</option>
                 <option value="F">F</option>
               </select>
@@ -239,8 +176,10 @@ const emailConfirmCode = ref("");
 const gender = ref("");
 const userNickname = ref("");
 const avatar = ref("");
+const dialogContent = ref("")
 
 const showVideo = ref(false);
+const dialogRef = ref(null)
 const introVideo = ref(null);
 
 // watch()를 사용하여 gender 변경 감지
@@ -269,7 +208,8 @@ const resetFields = () => {
 // 로그인 API 호출
 const handleSubmit = async () => {
   try {
-    const result = await userStore.logIn(id.value, password.value);
+    const result = await userStore.logIn(id.value, password.value)
+    console.log('로그인 API 호출 결과:', result)
     if (result == 200) {
       const api = axios.create({
         baseURL: "https://i12e103.p.ssafy.io:8076/api/v1",
@@ -282,8 +222,9 @@ const handleSubmit = async () => {
       // 스토리 튜토리얼 데이터 로드
       const loadSpecificTutorial = async () => {
         try {
-          const response = await api.get("/Tutorial/97");
-          return response.data;
+          const response = await api.get("/Tutorial/97")
+          console.log("튜토리얼 조회결과:", response)
+          return response.data
         } catch (error) {
           console.error("[❗] Load Error:", error);
           throw error;
@@ -302,12 +243,22 @@ const handleSubmit = async () => {
       }
     }
   } catch (error) {
+    console.log(error);
+    
     if (error == 401) {
-      alert("아이디 혹은 비밀번호가 틀렸습니다.");
-    } else if (error == 403) {
-      alert("임시 비밀번호를 사용중입니다.");
-    } else {
-      alert("잠시후에 다시 시도해주십시오.");
+      dialogContent.value = "아이디 혹은 비밀번호가 틀렸습니다."
+      // document.getElementById('dialog-rounded').showModal();
+      dialogRef.value?.showModal()
+    }
+    else if (error == 403) {
+      dialogContent.value = "임시 비밀번호를 사용중입니다."
+      // document.getElementById('dialog-rounded').showModal();
+      dialogRef.value?.showModal()
+    }
+    else {
+      dialogContent.value = "잠시후에 다시 시도해주십시오."
+      // document.getElementById('dialog-rounded ').showModal();
+      dialogRef.value?.showModal()
     }
   }
 };
@@ -394,9 +345,9 @@ const selectCharacter = (gen) => {
   gender.value = gen;
 };
 
-const handleSocialLogIn = (platform) => {
-  alert(`${platform} 소셜 로그인! 미구현`);
-};
+// const handleSocialLogIn = (platform) => {
+//   alert(`${platform} 소셜 로그인! 미구현`)
+// }
 
 const openSignUp = () => {
   isSignUpMode.value = true;
@@ -612,4 +563,30 @@ input:disabled {
 .selected-character {
   border: 3px solid #ff9f9f; /* 선택된 캐릭터에 테두리 추가 */
 }
+
+img {
+  image-rendering: pixelated;
+}
+
+.selected-item {
+  @apply border-2 border-solid border-blue-600 bg-blue-100;
+}
+
+input:invalid {
+  border: 2px solid red;
+  background-color: rgba(255, 0, 0, 0.1);
+  position: relative;
+}
+
+/* 커스텀 느낌표 아이콘 추가 */
+input:invalid::after {
+  content: "❗";
+  color: red;
+  font-size: 16px;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 </style>
