@@ -33,7 +33,7 @@ public class UserCharacter extends BaseEntity implements Serializable {
     private String avatar;
 
     @Column(name = "user_rank", nullable = false)
-    private String userRank;
+    private String userRank = "-";
 
     @Column(name = "user_level", nullable = false, columnDefinition = "SMALLINT UNSIGNED DEFAULT 1")
     private Short userLevel = 1;

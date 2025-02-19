@@ -32,7 +32,6 @@ CREATE TABLE user_character (
                                 user_rank VARCHAR(12) DEFAULT "-" 
                                 CHECK (user_rank IN ('Bronze', 'Silver', 'Gold', 'Diamond', '-')),
 
-
                                 points SMALLINT UNSIGNED NOT NULL DEFAULT 0 CHECK (points <= 50000),
                                 FOREIGN KEY (user_id) REFERENCES user_info(user_id) ON DELETE CASCADE
 );
