@@ -150,7 +150,7 @@ const cleanupAndNavigate = (finalRoomId, finalPeerToken) => {
   command.value = {
     roomId: finalRoomId,
     peerToken: finalPeerToken,
-    remainTime: time.value,
+    remainTime: time.value > 0 ? -1 : time.value,
   };
   console.log(command.value);
 };
