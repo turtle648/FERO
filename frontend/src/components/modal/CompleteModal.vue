@@ -36,7 +36,9 @@
       </div>
 
       <div v-else-if="rankResult">
-        <h2 v-if="props.result.remainTime > 0" class="text-lg font-bold">승리</h2>
+        <h2 v-if="props.result.remainTime == -1" class="text-lg font-bold">
+          승리
+        </h2>
         <h2 v-else class="text-lg font-bold">
           {{ rankResult.body.userScore > rankResult.body.opponentScore ? "승리" : rankResult.body.userScore < rankResult.body.opponentScore ? "패배" : "무승부" }}
         </h2>
@@ -66,9 +68,21 @@
         </ul>
       </div>
 
-      <p v-else class="text-red-500 font-dgm">랭크 결과를 불러오지 못했습니다.</p>
-
-      <button @click="completeFitnessRank" class="nes-btn is-primary font-dgm">확인</button>
+      <p v-else class="text-red-500 font-dgm">💫 결과 계산 중 입니다 💫</p>
+      <button
+        v-if="mode === 'rank' && isDisabled"
+        disabled
+        class="px-4 py-2 bg-gray-500 text-white rounded"
+      >
+        확인
+      </button>
+      <button
+        v-else
+        @click="completeFitnessRank"
+        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        확인
+      </button>
     </div>
   </div>
 </template>
@@ -86,6 +100,7 @@ const mainStore = useMainStore();
 const userStore = useUserStore();
 const mode = ref("");
 const rankResult = ref("");
+const isDisabled = ref(true);
 const isLoading = ref(false); // 로딩 상태
 
 const props = defineProps(["count", "result"])
@@ -94,14 +109,16 @@ const props = defineProps(["count", "result"])
 watch(
   () => props.result,
   (newResult) => {
+    console.log("completemodal watch 실행");
     console.log(props.result);
 
     if (newResult) {
       console.log("Updated result:", newResult);
-      fetchRankResult();
+      isDisabled.value = false;
+      fetchRankResult(userStore.accessToken, props.result.peerToken);
     }
   },
-  { immediate: false }
+  { deep: true, immediate: false }
 );
 
 const completeFitnessTutorial = async () => {
@@ -131,6 +148,7 @@ const completeFitnessRank = () => {
 const fetchRankResult = async (userToken, opponentToken) => {
   let attempts = 0;
   isLoading.value = true; // 로딩 시작
+  console.log(userToken + ":" + opponentToken);
 
   while (attempts < 3) {
     try {
@@ -170,10 +188,15 @@ onMounted(() => {
     mode.value = "single";
   } else if (url.includes("rank-match")) {
     mode.value = "rank";
-    if (props.result.remainTime) {
+    console.log("props의 값" + props.count);
+    console.log("props의 값" + props.result);
+
+    // 상대방의 예기치 못한 종료로 인해 remainTime이 -1 임
+    if (props.result.remainTime == -1) {
+      isDisabled.value = false;
       fetchRankResult(props.result.peerToken, userStore.accessToken);
+      fetchRankResult(userStore.accessToken, props.result.peerToken);
     }
-    fetchRankResult(userStore.accessToken, props.result.peerToken);
   }
 });
 </script>
