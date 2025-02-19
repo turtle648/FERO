@@ -167,7 +167,7 @@ onMounted(async () => {
               <div class="w-[95%] mx-auto translate-y-[5%]">
                 <span class="text-black font-bold nes-text w-full text-center whitespace-nowrap block"
                 style="font-size: 100%">
-                  <template v-for="(char, index) in 'Fero.From.ISAEKAI.com'" :key="index">
+                  <template v-for="(char, index) in 'Fero.From.ISEKAI.com'" :key="index">
                     <span class="inline-block animate-pixel-wave" 
                         :style="{ 'animation-delay': `${index * 0.1}s` }">
                     {{ char === " " ? "\u00A0" : char }}
