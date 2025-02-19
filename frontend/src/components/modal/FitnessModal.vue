@@ -44,15 +44,9 @@
 
   <!-- 모드 선택 모달 -->
   <MediumBaseModal v-if="showModeModal" title="Select Mode" @close-modal="$emit('close-modal')">
-    <!-- <div class="bg-white p-5 rounded-lg shadow-md w-[80%] max-w-md"> -->
-    <!-- <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold">Select Mode</h3>
-          <button class="text-gray-500 hover:text-gray-700" @click="showModeModal = false">×</button>
-        </div> -->
-
     <div class="flex flex-col space-y-4">
       <!-- Single Mode -->
-      <button class="mode-button" :class="{ 'opacity-50': !selectedNumber }" @click="confirmMode('single')" :disabled="!selectedNumber">
+      <button class="mode-button" @click="handleSingleModeClick">
         <p class="text-lg font-medium mb-3">Single Mode</p>
         <div class="flex space-x-4">
           <button
@@ -75,6 +69,11 @@
           {{ isLoading ? "처리중..." : "Rank Mode" }}
         </p>
       </button>
+
+      <!-- 시간 선택 경고 모달 -->
+      <MiniModal title="Time" v-if="showTimeWarningModal" @close-modal="closeTimeWarningModal">
+        <h3 class="text-xl font-semibold mb-2 mt-8">시간을 선택 하세요</h3>
+      </MiniModal>
     </div>
   </MediumBaseModal>
 </template>
@@ -87,6 +86,7 @@ import { useMainStore, TUTORIAL_IDS } from "@/stores/mainStore"
 import BaseModal from "@/components/modal/BaseModal.vue"
 import MediumBaseModal from "@/components/modal/BaseModal.vue"
 import SmallBaseModal from "@/components/modal/SmallBaseModal.vue"
+import MiniModal from "@/components/modal/MiniBaseModal.vue"
 
 const router = useRouter()
 const mainStore = useMainStore()
@@ -99,6 +99,7 @@ const selectedNumber = ref(null)
 const selectedMode = ref(null)
 const confirmationMessage = ref("")
 const isLoading = ref(false)
+const showTimeWarningModal = ref(false)
 
 const isUICompleted = computed(() => {
   const uiTutorial = mainStore.tutorial.find((t) => t.tutorialId === TUTORIAL_IDS.UI)
@@ -130,6 +131,15 @@ const handleSquatClick = () => {
 
 const selectNumber = (num) => {
   selectedNumber.value = selectedNumber.value === num ? null : num
+}
+
+// 싱글모드 클릭 시 시간 선택 여부 확인
+const handleSingleModeClick = () => {
+  if (!selectedNumber.value) {
+    showTimeWarningModal.value = true // 시간 선택 경고 모달 표시
+  } else {
+    confirmMode("single")
+  }
 }
 
 //선택된 모드에 따라 확인 모달 표시
@@ -188,6 +198,11 @@ const closeConfirmationModal = () => {
 
 const restartTutorial = () => {
   router.push({ name: "UiTutorial" }) // UiTutorial로 이동
+}
+
+// 시간 선택 경고 모달 닫기
+const closeTimeWarningModal = () => {
+  showTimeWarningModal.value = false
 }
 </script>
 
