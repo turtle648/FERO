@@ -1,7 +1,7 @@
 <template>
   <div class="tutorial-page w-screen h-screen flex flex-col items-center relative">
     <!-- <div class="w-screen h-screen bg-black bg-opacity-60 z-5"></div> -->
-    <component :is="currentExerciseComponent" class="z-0" />
+    <component :is="currentExerciseComponent" class="z-0 fixed inset-0 overflow-hidden" />
   </div>
 </template>
 
