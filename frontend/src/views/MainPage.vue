@@ -106,7 +106,8 @@ onMounted(async () => {
   try {
     await userDataStore.checkUserInfo()
     await mainStore.loadTutorial()
-
+    await mainStore.getQuestData()
+    
     // 메인페이지 튜토리얼 진행 여부 확인
     const mainTutorial = mainStore.tutorial.find((t) => t.tutorialId === TUTORIAL_IDS.MAIN_PAGE)
 
