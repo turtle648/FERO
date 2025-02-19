@@ -7,31 +7,26 @@
         <!-- 유저 정보 -->
         <div class="user-container flex flex-col">
           <p class="font-dgm text-lg">Lv.{{ userInfo.level }}</p>
-          <p class="font-dgm text-lg">경험치 :{{ userInfo.experience }}</p>
-          <p class="font-dgm text-lg">닉네임 :{{ userInfo.userNickname }}</p>
+          <p class="font-dgm text-lg">{{ userInfo.userNickname }}</p>
+          <p class="font-dgm text-lg">경험치: {{ userInfo.experience*100/200 }}%</p>
         </div>
       </div>
 
       <!-- 일일 달성률 -->
       <div class="progress-container space-y-2 mt-2 mb-3">
         <span class="font-dgm">일일 달성률</span>
-        <progress class="nes-progress is-primary w-[100%] h-[3vh]" value="{{ userStatus.todayQuestProgress }}" max="100"></progress>
+        <progress class="nes-progress is-primary w-[100%] h-[3vh]" 
+          :value="(questData.realCnt / questData.exerciseCnt) * 100" 
+          max="100">
+        </progress>
+        <span v-for="n in 5" :key="n"
+          :class="{
+            filled: (100 * questData.realCnt / questData.exerciseCnt) / 20 >= n,
+            empty: (100 * questData.realCnt / questData.exerciseCnt) / 20 < n,
+          }"
+          class="progress-box-cell"
+        ></span>
       </div>
-      <!-- <div class="progress-box"> -->
-      <!-- <span class="font-dgm">일일 달성률:</span> -->
-      <!-- <progress class="nes-progress is-primary w-[24vh] h-[3vh]" value="80" max="100"></progress> -->
-      <!-- 여기서 박스를 채우기 위해 v-for로 박스를 순회하며 스타일을 적용 -->
-      <!-- <span v-for="n in 5" :key="n"
-        :class="{
-          filled: (85 % 100) / 20 >= n,
-          empty: (85 % 100) / 20 < n,
-        }"
-        class="progress-box-cell"
-      ></span>
-      (!!퀘스트api완성후추가!!%)
-      85% -->
-      <!-- ({{ userStatus.todayQuestProgress }}%) -->
-      <!-- </div> -->
 
       <!-- 그래프 이미지 -->
       <div class="status-element status-4">
@@ -47,6 +42,8 @@
 import BaseModal from "./BaseModal.vue"
 import { ref, computed } from "vue"
 import { useUserDataStore } from "@/stores/userDataStore"
+import { questData } from "@/stores/mainStore"
+
 import { Chart as ChartJS, RadialLinearScale, ArcElement, Tooltip, Legend } from "chart.js"
 import { PolarArea } from "vue-chartjs"
 import * as chartConfig from "../config/chartConfig.js"

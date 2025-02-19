@@ -11,7 +11,9 @@ export const TUTORIAL_IDS = {
   SQUAT: 2,
   LUNGE: 3,
   PLANK: 4,
-};
+}
+
+export const questData = ref('')
 
 export const useMainStore = defineStore("main", () => {
   const tutorial = ref([]);
@@ -127,15 +129,29 @@ export const useMainStore = defineStore("main", () => {
 
     return response.data;
   }
+  
+  // 퀘스트 확인 및 퀘스트데이터 업데이트
+  const getQuestData = async () => {
+    try {
+        const response = await api.get('/exercise/today')
+
+        console.log('API Response:', response.data) // 리스폰스 값 확인
+        questData.value = response.data[0]
+    } catch (error) {
+        console.error('퀘스트 데이터 조회 실패', error)
+    }
+}
 
   return {
     tutorial,
     authToken,
+    questData,
     uiTutorialCompleted,
     TUTORIAL_IDS, // 상수 노출
     loadTutorial,
     completeTutorial,
     isQuestCompleted,
     getMonthStatus,
+    getQuestData,
   };
 });
