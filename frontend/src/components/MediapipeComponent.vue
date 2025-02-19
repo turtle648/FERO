@@ -1,45 +1,39 @@
 <template>
-  <div class="container">
-    <!-- 중앙 영역 -->
-    <div class="start-container flex absolute inset-0 items-center justify-center h-screen z-10">
-      <div v-if="countdown > 0" class="countdown text-5xl z-10">
-        {{ countdown }}
-      </div>
-      <div v-else-if="showStartText" class="start-text text-5xl z-10">START!</div>
+  <div class="fixed inset-0 overflow-hidden">
+    <!-- 중앙 영역 (카운트다운) -->
+    <div class="absolute inset-0 flex items-center justify-center z-20">
+      <div v-if="countdown > 0" class="text-5xl">{{ countdown }}</div>
+      <div v-else-if="showStartText" class="text-5xl">START!</div>
     </div>
 
-    <!-- 상단 영역 -->
-    <div class="timer-container text-2xl absolute top-4 left-4 z-0 nes-btn">
+    <!-- 상단 영역 (타이머) -->
+    <div class="timer-container absolute top-4 left-4 z-20 text-2xl nes-btn">
       {{ formattedTime }}
     </div>
 
-    <!-- 본인 화면 -->
-    <!-- <div class="relative w-full h-full flex justify-center items-center overflow-hidden">
-      <canvas ref="canvasElement" class="">
-        <video ref="videoElement" class="aspect-[9/16] w-full h-auto object-cover"></video>
-      </canvas>
-    </div> -->
-
-    <div class="video-container">
-      <canvas ref="canvasElement" class="h-screen w-screen">
-        <video ref="videoElement" class="" muted />
+    <!-- 비디오 영역 -->
+    <div class="video-container fixed inset-0 overflow-hidden">
+      <canvas ref="canvasElement" class="h-screen w-auto object-cover absolute left-1/2 -translate-x-1/2">
+        <video ref="videoElement" class="object-cover" muted />
       </canvas>
     </div>
 
+
     <!-- 버튼 영역 -->
-    <div class="button-container flex absolute inset-0 items-end pb-4 z-30">
-      <!-- ExitButton을 하단 중앙에 배치 -->
-      <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+    <div class="absolute bottom-0 inset-x-0 p-4 flex justify-between items-center z-20">
+      <div class="flex-1">
+        <!-- 왼쪽 여백 -->
+      </div>
+      <div class="flex-1 flex justify-center">
         <ExitButton @click="stopCameraAndNavigate" />
       </div>
-
-      <!-- ReportIssueButton을 하단 오른쪽에 배치 -->
-      <div class="absolute bottom-4 right-4">
+      <div class="flex-1 flex justify-end">
         <ReportIssueButton />
       </div>
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue"
@@ -143,45 +137,45 @@ const onResults = (results) => {
   if (results.poseLandmarks) {
     emit("pose-detected", results.poseLandmarks)
 
-    const landmarks = results.poseLandmarks
-    const nose = landmarks[0]
-    const leftEar = landmarks[7]
-    const rightEar = landmarks[8]
-    const leftShoulder = landmarks[11]
-    const rightShoulder = landmarks[12]
-    const emoji = "😎" // 사용할 이모지
+    // const landmarks = results.poseLandmarks
+    // const nose = landmarks[0]
+    // const leftEar = landmarks[7]
+    // const rightEar = landmarks[8]
+    // const leftShoulder = landmarks[11]
+    // const rightShoulder = landmarks[12]
+    // const emoji = "😎" // 사용할 이모지
 
-    if (nose && leftEar && rightEar && leftShoulder && rightShoulder) {
-      const faceX = ((nose.x + leftEar.x + rightEar.x) / 3) * canvasElement.value.width
-      const faceY = ((nose.y + leftEar.y + rightEar.y) / 3) * canvasElement.value.height
-      const faceWidth = Math.abs(leftEar.x - rightEar.x) * 2.5 * canvasElement.value.width
-      const faceHeight = Math.abs(nose.y - (leftShoulder.y + rightShoulder.y) / 2) * 2.5 * canvasElement.value.height
+    // if (nose && leftEar && rightEar && leftShoulder && rightShoulder) {
+    //   const faceX = ((nose.x + leftEar.x + rightEar.x) / 3) * canvasElement.value.width
+    //   const faceY = ((nose.y + leftEar.y + rightEar.y) / 3) * canvasElement.value.height
+    //   const faceWidth = Math.abs(leftEar.x - rightEar.x) * 2.5 * canvasElement.value.width
+    //   const faceHeight = Math.abs(nose.y - (leftShoulder.y + rightShoulder.y) / 2) * 2.5 * canvasElement.value.height
 
-      // ✅ **1. 블러 처리 먼저 수행**
-      const offscreenCanvas = document.createElement("canvas")
-      offscreenCanvas.width = faceWidth
-      offscreenCanvas.height = faceHeight
-      const offscreenCtx = offscreenCanvas.getContext("2d")
+    //   // ✅ **1. 블러 처리 먼저 수행**
+    //   const offscreenCanvas = document.createElement("canvas")
+    //   offscreenCanvas.width = faceWidth
+    //   offscreenCanvas.height = faceHeight
+    //   const offscreenCtx = offscreenCanvas.getContext("2d")
 
-      // 블러 적용할 영역 복사
-      offscreenCtx.drawImage(results.image, faceX - faceWidth / 2, faceY - faceHeight / 2, faceWidth, faceHeight, 0, 0, faceWidth, faceHeight)
+    //   // 블러 적용할 영역 복사
+    //   offscreenCtx.drawImage(results.image, faceX - faceWidth / 2, faceY - faceHeight / 2, faceWidth, faceHeight, 0, 0, faceWidth, faceHeight)
 
-      // 블러 필터 적용
-      offscreenCtx.filter = "blur(40px)"
-      offscreenCtx.drawImage(offscreenCanvas, 0, 0)
+    //   // 블러 필터 적용
+    //   offscreenCtx.filter = "blur(40px)"
+    //   offscreenCtx.drawImage(offscreenCanvas, 0, 0)
 
-      // 블러된 이미지 캔버스에 그리기
-      canvasCtx.drawImage(offscreenCanvas, faceX - faceWidth / 2, faceY - faceHeight / 2, faceWidth, faceHeight)
+    //   // 블러된 이미지 캔버스에 그리기
+    //   canvasCtx.drawImage(offscreenCanvas, faceX - faceWidth / 2, faceY - faceHeight / 2, faceWidth, faceHeight)
 
-      // ✅ **2. 블러 처리 후 이모지 그리기**
-      const earDistance = Math.abs(leftEar.x - rightEar.x) * canvasElement.value.width // 귀 간 거리 계산
-      const emojiSize = earDistance * 2 // 이모지 크기를 얼굴 크기에 맞게 조절
+    //   // ✅ **2. 블러 처리 후 이모지 그리기**
+    //   const earDistance = Math.abs(leftEar.x - rightEar.x) * canvasElement.value.width // 귀 간 거리 계산
+    //   const emojiSize = earDistance * 2 // 이모지 크기를 얼굴 크기에 맞게 조절
 
-      canvasCtx.font = `${emojiSize}px sans-serif` // 동적으로 크기 설정
-      canvasCtx.textAlign = "center"
-      canvasCtx.textBaseline = "middle" // 중앙 정렬
-      canvasCtx.fillText(emoji, faceX, faceY)
-    }
+    //   canvasCtx.font = `${emojiSize}px sans-serif` // 동적으로 크기 설정
+    //   canvasCtx.textAlign = "center"
+    //   canvasCtx.textBaseline = "middle" // 중앙 정렬
+    //   canvasCtx.fillText(emoji, faceX, faceY)
+    // }
   }
 
   canvasCtx.restore()
@@ -209,8 +203,8 @@ onMounted(async () => {
   }
 
   // Canvas 크기 설정
-  canvasElement.value.width = videoElement.value.videoWidth || window.innerWidth
-  canvasElement.value.height = videoElement.value.videoHeight || window.innerHeight
+  // canvasElement.value.width = videoElement.value.videoWidth || window.innerWidth
+  // canvasElement.value.height = videoElement.value.videoHeight || window.innerHeight
 
   pose = new Pose({
     locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`,
