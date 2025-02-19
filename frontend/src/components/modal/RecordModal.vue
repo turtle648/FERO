@@ -1,24 +1,44 @@
 <template>
   <BaseModal title="Records" @close-modal="$emit('close-modal')">
     <!-- 전적 리스트 컨테이너 -->
-    <div class="h-full overflow-y-auto" ref="matchDataContainer" @touchstart="handleTouchStart" @touchmove="handleTouchMove" @touchend="handleTouchEnd">
+    <div class="h-full w-full overflow-y-auto" ref="matchDataContainer" @touchstart="handleTouchStart" @touchmove="handleTouchMove" @touchend="handleTouchEnd">
       <!-- 전적 아이템 -->
-      <div v-for="(match, index) in matchData" :key="index" class="flex justify-between items-center p-3 border-b border-gray-200 hover:bg-gray-50">
-        <!-- 왼쪽: 매치 정보 -->
-        <div class="flex-1 text-left">
-          <div class="text-sm text-gray-600">{{ formatDate(match.createdAt) }} | {{ match.gameId }}</div>
-          <div class="font-medium">
-            <span :class="match.result === 'WIN' ? 'text-blue-600' : match.result === 'LOSE' ? 'text-red-600' : 'text-gray-600'">
-              {{ match.result === "WIN" ? "승리" : match.result === "LOSE" ? "패배" : "무승부" }}
-            </span>
-            <span class="ml-2">{{ match.userScore }}점</span>
-          </div>
-        </div>
+      <div v-for="(match, index) in matchData" :key="index" class="w-full flex flex-col border-b border-gray-200 hover:bg-gray-50 p-4">
+        <!-- 매치 날짜 -->
+        <p class="text-base w-full text-gray-500 mb-2">
+          {{ formatDate(match.createdAt) }}
+        </p>
 
-        <!-- 오른쪽: 참가자 정보 -->
-        <div class="flex flex-col items-end">
-          <span class="text-xs text-gray-500">상대 점수: {{ match.opponentScore }}</span>
-          <button class="mt-1 px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">참여자 확인</button>
+        <!-- 매치 정보 -->
+        <div class="info-container flex w-full items-center">
+          <div class="result text-3xl w-[35%] text-white text-center p-2" :class="match.result === 'WIN' ? 'bg-green-500' : match.result === 'LOSE' ? 'bg-red-500' : 'bg-gray-500'">
+            {{ match.result }}
+          </div>
+
+          <div class="result-info flex-1 ml-4 flex flex-col items-center">
+            <p class="text-4xl flex items-center justify-center gap-2">
+              <span class="user">
+                {{ match.userScore }}
+                <br />
+                <span class="text-lg">me</span>
+              </span>
+              <span class="center">
+                :
+                <br />
+                <span class="text-base">:</span>
+              </span>
+              <span class="opponent">
+                {{ match.opponentScore }}
+                <br />
+                <span class="text-lg">{{ match.opponentId }}</span>
+              </span>
+            </p>
+            <!-- <p class="text-lg flex items-center justify-center gap-2">
+              <span class="user">ME</span>
+              <span class="center">:</span>
+              <span class="opponent">{{ match.opponentId }}</span>
+            </p> -->
+          </div>
         </div>
       </div>
     </div>
@@ -37,34 +57,24 @@ const matchData = ref([])
 
 defineEmits(["close-modal"])
 
-// 매치 시간 계산 함수
-// const computeMatchTime = (date, time) => {
-//   const matchDateString = `${date}T${time}`
-//   const matchDate = new Date(matchDateString)
-//   const today = new Date()
-//   const timeDiff = today - matchDate
-//   const diffMinutes = Math.floor(timeDiff / (1000 * 60))
-//   const diffHours = Math.floor(timeDiff / (1000 * 60 * 60))
-//   const diffDays = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
-//   const diffMonths = today.getMonth() - matchDate.getMonth() + (today.getFullYear() - matchDate.getFullYear()) * 12
-//   const diffYears = today.getFullYear() - matchDate.getFullYear()
-
-//   if (diffMinutes < 60) return `${diffMinutes}분 전`
-//   if (diffHours < 24) return `${diffHours}시간 전`
-//   if (diffDays < 7) return `${diffDays}일 전`
-//   if (diffDays < 10) return `1주 전`
-//   if (diffDays < 17) return `2주 전`
-//   if (diffDays < 24) return `3주 전`
-//   if (diffDays < 28) return `4주 전`
-//   if (diffDays < 30) return `1개월 전`
-//   if (diffMonths < 12) return `${diffMonths}개월 전`
-//   return `${diffYears}년 전`
-// }
-
 // 날짜 포맷팅 함수
 const formatDate = (dateString) => {
-  const options = { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }
-  return new Date(dateString).toLocaleDateString("ko-KR", options)
+  const date = new Date(dateString)
+
+  // 날짜 부분 포맷
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0") // 1월이 0부터 시작하므로 +1
+  const day = String(date.getDate()).padStart(2, "0")
+
+  // 시간 부분 포맷
+  let hours = date.getHours()
+  const minutes = String(date.getMinutes()).padStart(2, "0")
+  const period = hours >= 12 ? "PM" : "AM"
+
+  // 12시간제로 변환
+  hours = hours % 12 || 12
+
+  return `${year}.${month}.${day} ${period} ${String(hours).padStart(2, "0")}:${minutes}`
 }
 
 // 게임 결과 가져오기
