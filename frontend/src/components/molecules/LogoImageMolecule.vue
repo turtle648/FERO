@@ -9,7 +9,7 @@
     <BaseImageAtom 
       :src= LogoImage2
       alt="로고 이미지2 로딩 에러"
-      class="w-[50%]"
+      class="w-[80%]"
     />
   </div>
 </template>
