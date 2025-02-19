@@ -13,10 +13,29 @@
 
     <!-- 비디오 영역 -->
     <div class="video-container fixed inset-0 overflow-hidden">
-      <canvas ref="canvasElement" class="h-screen w-auto object-cover absolute left-1/2 -translate-x-1/2">
-        <video ref="videoElement" class="object-cover" muted />
+      <canvas ref="canvasElement" class="absolute left-1/2 -translate-x-1/2">
+        <video 
+          ref="videoElement" 
+          muted 
+          playsinline
+          class="object-cover"
+        />
       </canvas>
     </div>
+
+    <!-- ver.1 -->
+    <!-- <div class="video-container fixed inset-0 overflow-hidden">
+      <canvas ref="canvasElement" width="300" height="150" class="h-screen w-auto object-contain absolute left-1/2 -translate-x-1/2">
+        <video ref="videoElement" class="object-cover" muted />
+      </canvas>
+    </div> -->
+
+    <!-- 옛날꺼 -->
+    <!-- <div class="absolute inset-0 z-10">
+      <canvas ref="canvasElement" class="h-full w-full object-cover">
+        <video ref="videoElement" muted class="object-cover" />
+      </canvas>
+    </div> -->
 
 
     <!-- 버튼 영역 -->
@@ -205,7 +224,10 @@ onMounted(async () => {
   // Canvas 크기 설정
   // canvasElement.value.width = videoElement.value.videoWidth || window.innerWidth
   // canvasElement.value.height = videoElement.value.videoHeight || window.innerHeight
+  const canvas = canvasElement.value;
+  const video = videoElement.value;
 
+  // MediaPipe Pose 설정
   pose = new Pose({
     locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`,
   })
@@ -219,6 +241,18 @@ onMounted(async () => {
 
   pose.onResults(onResults)
 
+  // 비디오가 로드되었을 때 캔버스 크기 설정
+  video.addEventListener('canplay', () => {
+    // 세로 길이를 화면 높이로 설정
+    canvas.height = window.innerHeight;
+    
+    // 비디오의 원본 비율 계산
+    const aspectRatio = video.videoWidth / video.videoHeight;
+    
+    // 세로 길이에 맞춘 가로 길이 계산
+    canvas.width = canvas.height * aspectRatio;
+  }, { once: true });
+  
   camera = new Camera(videoElement.value, {
     onFrame: async () => {
       if (pose && videoElement.value) {
