@@ -163,7 +163,7 @@ const cleanupAndNavigate = (finalRoomId, finalPeerToken) => {
   command.value = {
     roomId: finalRoomId,
     peerToken: finalPeerToken,
-    remainTime: time.value,
+    remainTime: time.value > 0 ? -1 : time.value,
   };
   console.log(command.value);
 };
@@ -302,7 +302,6 @@ const handleWebSocketMessage = async (event) => {
     }
 
     case "offer": {
-      needToSendFinal.value = true;
       currentPeerId.value = message.sender;
 
       if (!myPeerConnection) {
@@ -325,6 +324,8 @@ const handleWebSocketMessage = async (event) => {
     }
 
     case "answer": {
+      needToSendFinal.value = true;
+
       await myPeerConnection.setRemoteDescription(
         new RTCSessionDescription(message.sdp)
       );

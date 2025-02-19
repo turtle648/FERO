@@ -4,6 +4,7 @@
       ref="audioPlayer"
       :src="require('@/assets/musics/background_music.mp3')"
       type="audio/mp3"
+      :volume="0.2"
       :loop="true"
     />
   </template>

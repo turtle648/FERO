@@ -21,13 +21,13 @@
             style="width:2vh; height:2vh; font-size: 2vh;"
             @click="$emit('close-modal')"
           >
-            ×
+            x
           </button>
         </div>
         
         <!-- 컨텐츠 영역 -->
         <div 
-          class="flex-1 overflow-y-auto pl-[7vw] pr-[7vw] pt-[2vh] pb-[4vh] max-h-[80vh] min-h-0"
+          class="font-dgm flex-1 overflow-y-auto pl-[7vw] pr-[7vw] pt-[2vh] pb-[4vh] max-h-[80vh] min-h-0"
           :style="{ 
             backgroundImage: `url(${require('@/assets/images/modal_body_background.png')})`, 
             backgroundSize: '100% 100%',

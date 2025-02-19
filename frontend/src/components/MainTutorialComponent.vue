@@ -32,19 +32,18 @@
         </span>
         <span v-if="currentStep === 8" class="font-dgm sm:text-xs md:text-lg lg:text-xl xl:text-2xl">퀘스트 달성 여부와 스탯 성장률을 볼 수 있습니다</span>
         <span v-if="currentStep === 9" class="font-dgm sm:text-xs md:text-lg lg:text-xl xl:text-2xl">
-          <span class="text-red-500"></span>
-          Record를 클릭하면 유저의 전적 기록을 확인할 수 있습니다
+          <span class="text-red-500">Record</span>
+          를 클릭하면 유저의 전적 기록을 확인할 수 있습니다
         </span>
         <span v-if="currentStep === 10" class="font-dgm sm:text-xs md:text-lg lg:text-xl xl:text-2xl">
           가운데
-          <span class="text-red-500"></span>
-          Fitness 버튼은 운동을 할 때 사용할 수 있습니다
+          <span class="text-red-500">Fitness</span>
+          버튼은 운동을 할 때 사용할 수 있습니다
         </span>
         <span v-if="currentStep === 11" class="font-dgm sm:text-xs md:text-lg lg:text-xl xl:text-2xl">하고 싶은 종목과 모드를 선택하여 운동을 할 수 있습니다</span>
         <span v-if="currentStep === 12" class="font-dgm sm:text-xs md:text-lg lg:text-xl xl:text-2xl">
           모드는 혼자 운동을 할 수 있는
-          <span class="text-red-500"></span>
-          싱글 모드
+          <span class="text-red-500">싱글 모드</span>
         </span>
         <span v-if="currentStep === 13" class="font-dgm sm:text-xs md:text-lg lg:text-xl xl:text-2xl">
           랜덤 매칭을 하고 랭크를 올릴 수 있는
