@@ -176,10 +176,11 @@ const emailConfirmCode = ref("");
 const gender = ref("");
 const userNickname = ref("");
 const avatar = ref("");
-
 const dialogContent = ref("")
 
+const showVideo = ref(false);
 const dialogRef = ref(null)
+const introVideo = ref(null);
 
 // watch()를 사용하여 gender 변경 감지
 watchEffect(() => {
@@ -242,6 +243,8 @@ const handleSubmit = async () => {
       }
     }
   } catch (error) {
+    console.log(error);
+    
     if (error == 401) {
       dialogContent.value = "아이디 혹은 비밀번호가 틀렸습니다."
       // document.getElementById('dialog-rounded').showModal();
