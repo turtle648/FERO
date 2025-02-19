@@ -86,8 +86,10 @@ watch(
     if (newCommand) {
       showModal.value = true;
       result.value = newCommand;
+      console.log("change result", newCommand);
     }
-  }
+  },
+  { deep: true }
 );
 
 const getTime = (value) => {

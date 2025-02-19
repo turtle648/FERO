@@ -63,7 +63,7 @@
       </div>
 
       <div v-else-if="rankResult">
-        <h2 v-if="props.result.remainTime > 0" class="text-lg font-bold">
+        <h2 v-if="props.result.remainTime == -1" class="text-lg font-bold">
           승리
         </h2>
         <h2 v-else class="text-lg font-bold">
@@ -183,6 +183,7 @@ const props = defineProps(["count", "result"]);
 watch(
   () => props.result,
   (newResult) => {
+    console.log("completemodal watch 실행");
     console.log(props.result);
 
     if (newResult) {
@@ -191,7 +192,7 @@ watch(
       fetchRankResult(userStore.accessToken, props.result.peerToken);
     }
   },
-  { immediate: false }
+  { deep: true, immediate: false }
 );
 
 const completeFitnessTutorial = async () => {
@@ -264,7 +265,11 @@ onMounted(() => {
     mode.value = "single";
   } else if (url.includes("rank-match")) {
     mode.value = "rank";
-    if (props.result.remainTime > 0 || props.result.remainTime == -1) {
+    console.log("props의 값" + props.count);
+    console.log("props의 값" + props.result);
+
+    // 상대방의 예기치 못한 종료로 인해 remainTime이 -1 임
+    if (props.result.remainTime == -1) {
       isDisabled.value = false;
       fetchRankResult(props.result.peerToken, userStore.accessToken);
       fetchRankResult(userStore.accessToken, props.result.peerToken);
