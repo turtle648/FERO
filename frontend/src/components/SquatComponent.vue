@@ -108,13 +108,14 @@ const processPose = (landmarks) => {
     handTouchedKnee.value = true;
   }
 
-  // ✅ 스쿼트 상태 변경
-  if (state.value === "up" && avgKneeAngle < 100) {
+  // ✅ 스쿼트 상태 변경 (down 판정 완화)
+  if (state.value === "up" && avgKneeAngle < 115) {
+    // 기존 100 → 115로 완화
     state.value = "down";
     feedback.value = "Down";
   } else if (
     state.value === "down" &&
-    avgKneeAngle >= 120 &&
+    avgKneeAngle >= 125 && // 기존 120 → 125로 완화
     avgKneeAngle < 165
   ) {
     state.value = "middle";
