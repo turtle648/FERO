@@ -76,7 +76,6 @@
         </p>
       </button>
     </div>
-    <!-- </div> -->
   </MediumBaseModal>
 </template>
 
