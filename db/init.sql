@@ -475,7 +475,7 @@ END //
 DELIMITER //
 CREATE EVENT quest_completion_check
 ON SCHEDULE EVERY 1 DAY
-STARTS CURRENT_DATE + INTERVAL 1 DAY
+STARTS TIMESTAMP(CURRENT_DATE) + INTERVAL 1 DAY
 DO
 BEGIN
     -- 전날 퀘스트의 달성 여부 업데이트
@@ -484,7 +484,7 @@ SET is_completed = CASE
                        WHEN real_cnt >= exercise_cnt THEN TRUE
                        ELSE FALSE
     END
-WHERE quest_date = DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY);
+WHERE quest_date = DATE_SUB(TIMESTAMP(CURRENT_DATE), INTERVAL 1 DAY);
 END //
 DELIMITER ;
 
@@ -515,14 +515,14 @@ DELIMITER ;
 DELIMITER //
 CREATE EVENT daily_quest_creation
 ON SCHEDULE EVERY 1 DAY
-STARTS CURRENT_DATE + INTERVAL 1 DAY
+STARTS TIMESTAMP(CURRENT_DATE) + INTERVAL 1 DAY
 DO
 BEGIN
     -- 모든 사용자에 대해 스쿼트 퀘스트만 생성
 INSERT INTO quests (user_character_id, quest_date, exercise_id, exercise_cnt, real_cnt, message)
 SELECT
     uc.id,
-    CURRENT_DATE,
+    TIMESTAMP(CURRENT_DATE),
     2,  -- 스쿼트의 exercise_id
     calculate_exercise_count(uc.user_level),
     0,  -- real_cnt 초기값
@@ -764,5 +764,23 @@ ORDER BY RAND()
 
 INSERT INTO quests (user_character_id, quest_date, quest_time, exercise_id, exercise_cnt, real_cnt, is_completed, message) 
 VALUES 
-('1', '2025-02-12', NULL, '2', '7', '7', '1', '스쿼트를 7번 해주세요!'),
-('1', '2025-02-13', '00:40:53', '2', '7', '2', '0', '스쿼트를 7번 해주세요!');
+    (1, '2025-02-20', NULL, '2', 7, 0, 0, '스쿼트를 7번 해주세요!'),
+    (2, '2025-02-20', '00:04:32', '2', 7, 2, 0, '스쿼트를 7번 해주세요!'),
+    (3, '2025-02-20', '00:02:15', '2', 9, 5, 0, '스쿼트를 9번 해주세요!'),
+    (4, '2025-02-20', NULL, '2', 5, 0, 0, '스쿼트를 5번 해주세요!'),
+    (5, '2025-02-20', '00:05:21', '2', 5, 3, 0, '스쿼트를 5번 해주세요!'),
+    (6, '2025-02-20', NULL, '2', 7, 0, 0, '스쿼트를 7번 해주세요!'),
+    (7, '2025-02-20', '00:03:48', '2', 9, 6, 0, '스쿼트를 9번 해주세요!'),
+    (8, '2025-02-20', NULL, '2', 5, 0, 0, '스쿼트를 5번 해주세요!'),
+    (9, '2025-02-20', '00:01:55', '2', 7, 4, 0, '스쿼트를 7번 해주세요!'),
+    (10, '2025-02-20', '00:05:10', '2', 5, 2, 0, '스쿼트를 5번 해주세요!'),
+    (11, '2025-02-20', NULL, '2', 7, 0, 0, '스쿼트를 7번 해주세요!'),
+    (12, '2025-02-20', '00:03:22', '2', 9, 7, 0, '스쿼트를 9번 해주세요!'),
+    (13, '2025-02-20', NULL, '2', 5, 0, 0, '스쿼트를 5번 해주세요!'),
+    (14, '2025-02-20', '00:02:50', '2', 7, 3, 0, '스쿼트를 7번 해주세요!'),
+    (15, '2025-02-20', '00:04:44', '2', 9, 5, 0, '스쿼트를 9번 해주세요!'),
+    (16, '2025-02-20', NULL, '2', 5, 0, 0, '스쿼트를 5번 해주세요!'),
+    (17, '2025-02-20', '00:03:10', '2', 7, 4, 0, '스쿼트를 7번 해주세요!'),
+    (18, '2025-02-20', NULL, '2', 5, 0, 0, '스쿼트를 5번 해주세요!'),
+    (19, '2025-02-20', '00:01:40', '2', 9, 6, 0, '스쿼트를 9번 해주세요!'),
+    (20, '2025-02-20', '00:02:59', '2', 7, 2, 0, '스쿼트를 7번 해주세요!');
