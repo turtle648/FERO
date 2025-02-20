@@ -14,4 +14,5 @@ public class UserIdGameResultReq {
     private final String user2Id;
     private final Integer user1Score;
     private final Integer user2Score;
+    private final Integer remainTime;
 }

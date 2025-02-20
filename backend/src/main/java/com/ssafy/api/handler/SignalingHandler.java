@@ -98,7 +98,7 @@ public class SignalingHandler extends TextWebSocketHandler {
 
 
         log.info("⚠️ exercise result publish :: {}", new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
-        log.info("⚠️ game result publish :: {}", new GameResultReq(exerciseType, roomId, 1, userToken1, userToken2, userScore1, userScore2));
+        log.info("⚠️ game result publish :: {}", new GameResultReq(exerciseType, roomId, 1, userToken1, userToken2, userScore1, userScore2, remainTime));
 
         // 세션 상태 체크 후 메시지 전송
         WebSocketSession session1 = sessions.get(userUUID1);
@@ -144,7 +144,7 @@ public class SignalingHandler extends TextWebSocketHandler {
         tokenWithUid.entrySet().removeIf(entry -> entry.getValue().equals(userUUID2));
 
 
-        eventPublisher.publishEvent(new UserIdGameResultReq(exerciseType, roomId, 60, JwtTokenUtil.getUserIdFromJWT(userToken1), JwtTokenUtil.getUserIdFromJWT(userToken2), userScore1, userScore2));
+        eventPublisher.publishEvent(new GameResultReq(exerciseType, roomId, 60, JwtTokenUtil.getUserIdFromJWT(userToken1), JwtTokenUtil.getUserIdFromJWT(userToken2), userScore1, userScore2, remainTime));
 //        eventPublisher.publishEvent(new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
 //        eventPublisher.publishEvent(new EventExerciseLog(JwtTokenUtil.getUserIdFromJWT(userToken1), user1LogReq));
 //        eventPublisher.publishEvent(new EventExerciseLog(JwtTokenUtil.getUserIdFromJWT(userToken2), user2LogReq));
