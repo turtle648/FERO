@@ -38,7 +38,7 @@
                 :style="{
                   width: '40%',
                   height: '70%',
-                  fontSize: 'clamp(0.75rem, 2vw, 1rem)',
+                  fontSize: 'clamp(1rem, 3vw, 1.5rem)',
                 }"
                 @click="$emit('close-modal')"
               >

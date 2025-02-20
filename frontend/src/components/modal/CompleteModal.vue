@@ -1,13 +1,18 @@
 <template>
   <div class="fixed inset-0 flex justify-center items-center z-50">
     <!-- 튜토리얼 결과 -->
-    <MiniBaseModal v-if="mode === 'tutorial'" class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center" @close-modal="completeFitnessTutorial">
-      <p class="text-lg font-bold mb-4">튜토리얼 완료!</p>
+    <MiniBaseModal v-if="mode === 'tutorial'" title="Result" class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center" @close-modal="completeFitnessTutorial">
+      <p class="text-lg font-bold mb-1 mt-4">튜토리얼 완료!</p>
       <!-- <button @click="completeFitnessTutorial" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">확인</button> -->
     </MiniBaseModal>
 
     <!-- 싱글모드 결과 -->
-    <MiniBaseModal v-if="mode === 'single'" class="bg-white p-6 rounded-lg shadow-lg text-center w-[30vh] h-[35vh] flex flex-col justify-center items-center" @close-modal="completeFitnessSingle">
+    <MiniBaseModal
+      v-if="mode === 'single'"
+      title="Result"
+      class="bg-white p-6 rounded-lg shadow-lg text-center w-[30vh] h-[35vh] flex flex-col justify-center items-center"
+      @close-modal="completeFitnessSingle"
+    >
       <div class="text-container pb-4">
         <p class="font-dgm mb-4 text-xl mt-3">싱글모드 결과</p>
         <p class="text-base font-dgm mb-4">횟수: {{ count }}</p>
