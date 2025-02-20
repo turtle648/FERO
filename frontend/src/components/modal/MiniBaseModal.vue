@@ -1,6 +1,6 @@
 <template>
-  <!-- <Teleport to="body"> -->
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" @click="$emit('close-modal')">
+  <Teleport to="body">
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" @click.self="$emit('close-modal')">
       <!-- 모달 본체: 화면 중앙 70% x 20% -->
       <div class="absolute bg-white rounded-lg shadow-lg flex flex-col" style="width: 70%; height: 20%; top: 50%; left: 50%; transform: translate(-50%, -50%)" @click.stop>
         <!-- 헤더 영역 -->
@@ -34,11 +34,11 @@
             <div class="w-[80%] flex">
               <!--  버튼 -->
               <button
-                class="font-dgm text-bold nes-btn is-primary whitespace-nowrap flex items-center justify-center ml-auto mb-5"
+                class="font-dgm text-bold nes-btn is-primary whitespace-nowrap flex items-center justify-center ml-auto mb-5 z-50"
                 :style="{
                   width: '40%',
                   height: '70%',
-                  fontSize: 'clamp(0.75rem, 2vw, 1rem)',
+                  fontSize: 'clamp(1rem, 3vw, 1.5rem)',
                 }"
                 @click="$emit('close-modal')"
               >
@@ -49,7 +49,7 @@
         </div>
       </div>
     </div>
-  <!-- </Teleport> -->
+  </Teleport>
 </template>
 
 <script setup>
