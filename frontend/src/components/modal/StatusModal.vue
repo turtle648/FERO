@@ -104,4 +104,7 @@ const getSelectedDateData = () => {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+* {
+  background-color: rgb(255, 50, 211);
+}</style>
