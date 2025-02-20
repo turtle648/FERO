@@ -1,34 +1,66 @@
 <!-- components/modal/QuestModal.vue -->
 <template>
-  <BaseModal title="Quest" @close-modal="$emit('close-modal')">
+  <BaseModal title="Quest" @close-modal="$emit('close-modal')" class="overflow-hidden">
     <!-- 로딩 상태 -->
-    <div v-if="!questData" class="flex justify-center items-center h-full">
+    <div v-if="!questData" class="flex justify-center items-center h-64">
       <div class="text-gray-500">데이터 불러오는 중...</div>
     </div>
 
     <!-- 퀘스트 데이터 -->
-    <div v-else class="space-y-4">
-      <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
-        <div class="space-y-2">
-          <!-- 전체를 감싸는 컨테이너에 flex와 중앙 정렬 적용 -->
-          <div class="flex flex-col items-center w-full">
-            <!-- Today's Fitness는 이미 중앙 정렬되어 있음 -->
-            <h1 class="text-4xl font-bold mb-4 text-center">Today's Fitness<br>[Squart]</h1>
+    <div v-else class="max-h-[80vh] px-6 py-3">
+      <div class="flex flex-col items-center space-y-3">
+        <!-- 헤더 섹션 -->
+        <div class="text-center w-full">
+          <h1 class="text-4xl font-bold text-gray-800">Today's Fitness</h1>
+          <h2 class="text-3xl font-semibold text-blue-600 mt-1">[Squart]</h2>
+          <div class="flex justify-between items-center mt-2">
+            <span class="text-lg font-medium">일일 퀘스트</span>
+            <span :class="[
+              questData.isCompleted 
+                ? 'text-blue-500 font-semibold'
+                : 'text-gray-500'
+            ]">
+              {{ questData.isCompleted ? '성공' : '진행중' }}
+            </span>
+          </div>
+        </div>
 
-            <!-- Goal/Now 섹션을 위한 컨테이너 -->
-            <div class="w-48"> <!-- 원하는 너비로 조정 가능 -->
-              당신의 레벨에 맞는 갯수를 제안합니다.
-              {{ questData.message }}
-              <hr>
-              <div class="grid grid-cols-[1fr_auto_1fr] gap-2">
-                <p class="text-2xl font-bold mb-4 text-right">Goal</p>
-                <p class="text-2xl font-bold mb-4 text-center">:</p>
-                <p class="text-2xl font-bold mb-4 text-left">{{ questData.exerciseCnt }}</p>
-                <p class="text-2xl font-bold mb-4 text-right">now</p>
-                <p class="text-2xl font-bold mb-4 text-center">:</p>
-                <p class="text-2xl font-bold mb-4 text-left">{{ questData.realCnt }}</p>
+        <!-- 퀘스트 상태 카드 -->
+        <div class="w-full bg-gray-50 rounded-xl p-5">
+          <!-- 강자 되기 섹션 -->
+          <div>
+            <h3 class="text-lg font-medium">강자가 되기 위한 준비</h3>
+            <p class="text-gray-700 mt-2">{{ questData.message }}</p>
+          </div>
+
+          <hr class="border-gray-300 border-t-2 my-3">
+
+          <!-- 진행도 표시 -->
+          <div class="flex items-center justify-center py-2">
+            <div class="flex items-center gap-4">
+              <span class="font-bold text-xl">NOW</span>
+              <div class="flex items-center gap-2">
+                <span :class="[
+                  'text-2xl font-bold',
+                  questData.isCompleted ? 'text-blue-600' : 'text-gray-600'
+                ]">{{ questData.realCnt }}</span>
+                <span class="text-gray-500">/</span>
+                <span class="text-xl">{{ questData.exerciseCnt }}</span>
               </div>
             </div>
+          </div>
+
+          <hr class="border-gray-300 border-t-2 my-3">
+
+          <!-- 보상 버튼 -->
+          <div class="text-center">
+            <button 
+              class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white
+                     
+                     font-medium nes-btn primary"
+            >
+              레벨 {{ userInfo.level+1 }} 달성 보상
+            </button>
           </div>
         </div>
       </div>
@@ -39,6 +71,9 @@
 <script setup>
 import BaseModal from './BaseModal.vue'
 import { questData } from "@/stores/mainStore"
+import { useUserDataStore } from '@/stores/userDataStore'
 
+const userDataStore = useUserDataStore() 
+const userInfo = userDataStore.userInfo
 defineEmits(['close-modal'])
 </script>

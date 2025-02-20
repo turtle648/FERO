@@ -1,7 +1,7 @@
 <template>
     <div>
         <button v-on:click="clickSubmitRoomId">매치시작</button>
-        <VideoComponent v-if="submittedRoomId"/>
+        <VideoComponent v-if="submittedRoomId" class="fixed inset-0 overflow-hidden"/>
     </div>
 </template>
   
@@ -19,4 +19,4 @@ const clickSubmitRoomId = (isClicked) => {
 
 <style scoped>
 /* 필요에 따라 스타일 추가 */
-</style>
+</style> 
