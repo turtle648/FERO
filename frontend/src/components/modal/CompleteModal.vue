@@ -96,7 +96,7 @@
 
     <!-- 랭크모드 결과 -->
     <!-- <MediumBaseModal title="Result"> -->
-    <div v-if="mode === 'rank'" title="Result" class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center">
+    <BaseModal v-if="mode === 'rank'" title="Result" class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center">
       <p class="text-lg mb-4 font-dgm">랭크모드 결과</p>
       <div v-if="isLoading" class="flex justify-center items-center">
         <svg class="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -144,7 +144,7 @@
       <div class="col-span-4 flex justify-center">
         <button class="nes-btn is-error w-[10vh] mb-[2vh]" @click="goToMain">EXIT</button>
       </div>
-    </div>
+    </BaseModal>
     <!-- </MediumBaseModal> -->
   </div>
 </template>
