@@ -116,7 +116,7 @@ public class MatchingController {
 
     // 게임 끝낼때
     @PostMapping("/endGame")
-    public ResponseEntity<?> endGmae(@RequestBody EndGameReq endGameReq){
+    public ResponseEntity<?> endGame(@RequestBody EndGameReq endGameReq){
 
         String userId = JwtTokenUtil.getUserIdFromJWT(endGameReq.getUserToken());
 
@@ -128,7 +128,7 @@ public class MatchingController {
                 endGameReq.getOpponentToken(),
                 (int) gameResultRepository.findByGameIdAndUserId(endGameReq.getGameId(), userId).get(0).getUserScore(),
                 (int) gameResultRepository.findByGameIdAndUserId(endGameReq.getGameId(), userId).get(0).getOpponentScore(),
-                (int) 1
+                endGameReq.getRemainTime()
         );
 
         log.info("#$#$#$#$#$#$#$#$#$#$======{}============", gameResultReq);

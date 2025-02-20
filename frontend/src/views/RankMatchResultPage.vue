@@ -36,6 +36,7 @@ const endGame = async () => {
       gameId: roomId.value,
       opponentToken: peerToken.value,
       userToken: userToken.value,
+      remainTime: remainTime.value,
     });
 
     const response = await axios.post(
@@ -44,6 +45,7 @@ const endGame = async () => {
         gameId: roomId.value,
         opponentToken: peerToken.value,
         userToken: userToken.value,
+        remainTime: remainTime.value,
       }
     );
     result.value = `API 응답: ${JSON.stringify(response.data)}`;

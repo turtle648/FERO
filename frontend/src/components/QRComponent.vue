@@ -1,11 +1,11 @@
 <template>
-  <div class="qr-container">
-    <img src="@/assets/Fitness_Hero_QR_Code.png" alt="QR Code for Fitness Hero">
+  <div class="flex justify-center items-center h-screen">
+    <img src="@/assets/Fitness_Hero_QR_Code.png" alt="QR Code for Fitness Hero" class="max-w-full h-auto">
   </div>
   <div class="title-container">
-    <h1 class="text-title">Hello Tailwind!</h1>
   </div>
 </template>
+
 
 <script></script>
 
