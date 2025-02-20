@@ -240,7 +240,7 @@ const completeFitnessSingle = async () => {
       requestData,
       {
         headers: {
-          Authorization: `Bearer ${token}`, // 헤더에 토큰 추가
+          Authorization: `${token}`, // 헤더에 토큰 추가
           "Content-Type": "application/json", // JSON 형식 명시
         },
       }
@@ -266,7 +266,7 @@ const completeFitnessSingle = async () => {
 const fetchRankResult = async (userToken, opponentToken, remainTime) => {
   let attempts = 0;
   isLoading.value = true; // 로딩 시작
-  console.log(userToken + ":" + opponentToken);
+  console.log(userToken + ":" + opponentToken + ":" + remainTime);
 
   while (attempts < 3) {
     try {
@@ -311,7 +311,7 @@ onMounted(() => {
   } else if (url.includes("rank-match")) {
     mode.value = "rank";
     console.log("props의 값" + props.count);
-    console.log("props의 값" + props.result);
+    console.log("props의 값" + props.result.remainTime);
 
     // 상대방의 예기치 못한 종료로 인해 remainTime이 -1 임
     if (props.result.remainTime == -1) {
