@@ -52,9 +52,18 @@
 import { ref, watch, onMounted, defineEmits, defineProps } from "vue";
 import MediapipeComponent from "@/components/MediapipeComponent.vue";
 import CompleteModal from "@/components/modal/CompleteModal.vue";
+import deep from "@/assets/musics/deep.mp3"
 
 // 상태 변수 e
-const count = ref(0);
+const count = ref(0)
+// Audio 객체 생성
+const audio = new Audio(deep)
+// count 값이 변경될 때마다 deep.mp3 재생
+watch(count, () => {
+  audio.currentTime = 0 // 재생 위치를 처음으로 설정
+  audio.play()
+})
+
 const isDown = ref(false);
 const feedback = ref("준비중...");
 const formFeedback = ref("");
