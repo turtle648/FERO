@@ -270,7 +270,7 @@ public class MatchingService {
             // 점수 차이가 100 이내인지 확인
             System.out.println("들어올 애 점수 : "+rankScore);
             System.out.println("큐에 있는 후보자 점수 : "+currentUserScore);
-            if (Math.abs(currentUserScore - rankScore) <= 1000) {
+            if (Math.abs(currentUserScore - rankScore) <= 100) {
                 // 매칭 성공
                 handleMatchSuccess(currentUserToken, userToken, exerciseId);
                 matchFound = true;
