@@ -27,7 +27,7 @@
       <!-- <button @click="completeFitnessSingle" class="w-[10vh] nes-btn is-primary font-dgm p-1">확인</button> -->
     </MiniBaseModal>
 
-    <BaseModal title="Result" class="single-result-modal" v-if="isSingleResultModalVisible">
+    <BaseModal title="Result" class="single-result-modal" v-if="isSingleResultModalVisible" @close-modal="goToMain">
       <div class="grid grid-cols-4 gap-4 text-container text-center text-xl">
         <!-- 제목 -->
         <!-- <div class="col-span-4 text-center mb-4">
@@ -96,8 +96,8 @@
 
     <!-- 랭크모드 결과 -->
     <!-- <MediumBaseModal title="Result"> -->
-    <BaseModal v-if="mode === 'rank'" title="Result" class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center">
-      <p class="text-lg mb-4 font-dgm">랭크모드 결과</p>
+    <div v-if="mode === 'rank'" title="Result" class="modal-content bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center z-50">
+      <!-- 로딩 상태 -->
       <div v-if="isLoading" class="flex justify-center items-center">
         <svg class="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -105,48 +105,82 @@
         </svg>
       </div>
 
+      <!-- 랭크 결과 -->
       <div v-else-if="rankResult">
+        <!-- 승리/패배/무승부 표시 -->
         <h2 v-if="props.result.remainTime == -1" class="text-lg font-bold">승리</h2>
         <h2 v-else class="text-lg font-bold">
           {{ rankResult.body.userScore > rankResult.body.opponentScore ? "승리" : rankResult.body.userScore < rankResult.body.opponentScore ? "패배" : "무승부" }}
         </h2>
+
+        <!-- 유저 정보 및 점수 -->
         <p>{{ rankResult.body.userId }} vs {{ rankResult.body.opponentId }}</p>
-        <p>운동 종류: {{ rankResult.body.exerciseId }}</p>
         <p>운동 개수: {{ props.count }}</p>
-        <p>랭크 점수 변화: {{ rankResult.body.beforeRankScore }} → {{ rankResult.body.afterRankScore }} ({{ rankResult.body.afterRankScore - rankResult.body.beforeRankScore }})</p>
-        <p>
-          레벨 변화: {{ rankResult.body.beforeUserLevel }} →
-          {{ rankResult.body.afterUserLevel }}
-        </p>
-        <p>경험치 변화: {{ rankResult.body.beforeUserExperience }} → {{ rankResult.body.afterUserExperience }} ({{ rankResult.body.afterUserExperience - rankResult.body.beforeUserExperience }})</p>
-        <p>근력 변화 ==========</p>
-        <ul>
-          <li>팔: {{ rankResult.body.beforeStats.armsStats }} → {{ rankResult.body.afterStats.armsStats }} ({{ rankResult.body.beforeStats.armsStats - rankResult.body.afterStats.armsStats }})</li>
-          <li>다리: {{ rankResult.body.beforeStats.legsStats }} → {{ rankResult.body.afterStats.legsStats }} ({{ rankResult.body.beforeStats.legsStats - rankResult.body.afterStats.legsStats }})</li>
-          <li>
-            가슴: {{ rankResult.body.beforeStats.chestStats }} → {{ rankResult.body.afterStats.chestStats }} ({{ rankResult.body.beforeStats.chestStats - rankResult.body.afterStats.chestStats }})
-          </li>
-          <li>복부: {{ rankResult.body.beforeStats.absStats }} → {{ rankResult.body.afterStats.absStats }} ({{ rankResult.body.beforeStats.absStats - rankResult.body.afterStats.absStats }})</li>
-          <li>등: {{ rankResult.body.beforeStats.backStats }} → {{ rankResult.body.afterStats.backStats }} ({{ rankResult.body.beforeStats.backStats - rankResult.body.afterStats.backStats }})</li>
-          <li>
-            지구력: {{ rankResult.body.beforeStats.staminaStats }} → {{ rankResult.body.afterStats.staminaStats }} ({{
-              rankResult.body.beforeStats.staminaStats - rankResult.body.afterStats.staminaStats
-            }})
-          </li>
-        </ul>
-      </div>
-      <div v-else>
-        <p class="text-red-500 font-dgm">💫 결과 계산 중 입니다 💫</p>
-        <!-- <img class="" src="@/assets/images/pesocom.png" alt="" /> -->
+
+        <!-- 스탯 변화 (4열 8행 레이아웃 적용) -->
+        <div class="grid grid-cols-4 gap-x-4 gap-y-2 mt-4 font-dgm">
+          <!-- 팔 -->
+          <div class="font-dgm bg-[rgba(255,99,132,0.8)]">Arm</div>
+          <div>{{ rankResult.body.beforeStats.armsStats }}</div>
+          <div>→</div>
+          <div>{{ rankResult.body.afterStats.armsStats }}</div>
+
+          <!-- 다리 -->
+          <div class="bg-[rgba(54,162,235,0.8)]">Leg</div>
+          <div>{{ rankResult.body.beforeStats.legsStats }}</div>
+          <div>→</div>
+          <div>{{ rankResult.body.afterStats.legsStats }}</div>
+
+          <!-- 가슴 -->
+          <div class="bg-[rgba(255,206,86,0.8)]">Chest</div>
+          <div>{{ rankResult.body.beforeStats.chestStats }}</div>
+          <div>→</div>
+          <div>{{ rankResult.body.afterStats.chestStats }}</div>
+
+          <!-- 복부 -->
+          <div class="bg-[rgba(75,192,192,0.8)]">Abs</div>
+          <div>{{ rankResult.body.beforeStats.absStats }}</div>
+          <div>→</div>
+          <div>{{ rankResult.body.afterStats.absStats }}</div>
+
+          <!-- 등 -->
+          <div class="bg-[rgba(153,102,255,0.8)]">Back</div>
+          <div>{{ rankResult.body.beforeStats.backStats }}</div>
+          <div>→</div>
+          <div>{{ rankResult.body.afterStats.backStats }}</div>
+
+          <!-- 지구력 -->
+          <div class="bg-[rgba(255,140,0,0.8)]">Stam</div>
+          <div>{{ rankResult.body.beforeStats.staminaStats }}</div>
+          <div>→</div>
+          <div>{{ rankResult.body.afterStats.staminaStats }}</div>
+
+          <!-- 랭크 점수 -->
+          <div class="bg-[rgba(255,50,211,0.8)]">Score</div>
+          <div>{{ rankResult.body.beforeRankScore }}</div>
+          <div>→</div>
+          <div>{{ rankResult.body.afterRankScore }}</div>
+
+          <!-- 경험치 -->
+          <div class="bg-[rgba(128,128,128,0.5)]">EXP</div>
+          <div>{{ rankResult.body.beforeUserExperience }}</div>
+          <div>→</div>
+          <div>{{ rankResult.body.afterUserExperience }}</div>
+        </div>
+        <div class="col-span-4 flex justify-center">
+          <button class="nes-btn is-error w-[10vh] mt-[2vh]" @click="goToMain">EXIT</button>
+        </div>
       </div>
 
-      <!-- <button v-if="mode === 'rank' && isDisabled" disabled class="px-4 py-2 bg-gray-500 text-white rounded">확인</button> -->
-      <div class="col-span-4 flex justify-center">
-        <button class="nes-btn is-error w-[10vh] mb-[2vh]" @click="goToMain">EXIT</button>
+      <!-- 결과 계산 중 -->
+      <div v-else>
+        <p class="text-red-500 font-dgm text-xl">💫 결과 계산 중 입니다 💫</p>
       </div>
-    </BaseModal>
-    <!-- </MediumBaseModal> -->
+
+      <!-- 종료 버튼 -->
+    </div>
   </div>
+  <!-- </MediumBaseModal> -->
 </template>
 
 <script setup>
@@ -328,4 +362,8 @@ onMounted(() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.modal-content {
+  @apply z-9000;
+}
+</style>
