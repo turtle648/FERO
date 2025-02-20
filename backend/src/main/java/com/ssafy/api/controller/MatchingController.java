@@ -128,7 +128,7 @@ public class MatchingController {
                 endGameReq.getOpponentToken(),
                 (int) gameResultRepository.findByGameIdAndUserId(endGameReq.getGameId(), userId).get(0).getUserScore(),
                 (int) gameResultRepository.findByGameIdAndUserId(endGameReq.getGameId(), userId).get(0).getOpponentScore(),
-                (int) 1
+                Integer.getInteger(endGameReq.getRemainTime())
         );
 
         log.info("#$#$#$#$#$#$#$#$#$#$======{}============", gameResultReq);

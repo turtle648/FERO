@@ -19,6 +19,6 @@ public interface GameResultService {
     List<GameResultsRes> getUserGameRecords(String userId);
 
     // 유저 기준 경기 결과 계산 (WIN, LOSE, DRAW)
-    GameResult.GameResultType getResult(int userScore, int opponentScore);
+    GameResult.GameResultType getResult(int userScore, int opponentScore, int remainTime);
 
     }
