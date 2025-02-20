@@ -118,9 +118,9 @@
         <p>운동 개수: {{ props.count }}</p>
 
         <!-- 스탯 변화 (4열 8행 레이아웃 적용) -->
-        <div class="grid grid-cols-4 gap-x-4 gap-y-2 mt-4">
+        <div class="grid grid-cols-4 gap-x-4 gap-y-2 mt-4 font-dgm">
           <!-- 팔 -->
-          <div class="bg-[rgba(255,99,132,0.8)]">Arm</div>
+          <div class="font-dgm bg-[rgba(255,99,132,0.8)]">Arm</div>
           <div>{{ rankResult.body.beforeStats.armsStats }}</div>
           <div>→</div>
           <div>{{ rankResult.body.afterStats.armsStats }}</div>
@@ -168,7 +168,7 @@
           <div>{{ rankResult.body.afterUserExperience }}</div>
         </div>
         <div class="col-span-4 flex justify-center">
-          <button class="nes-btn is-error w-[10vh] mb-[2vh]" @click="goToMain">EXIT</button>
+          <button class="nes-btn is-error w-[10vh] mt-[2vh]" @click="goToMain">EXIT</button>
         </div>
       </div>
 
