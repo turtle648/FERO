@@ -7,6 +7,8 @@
     class="absolute top-0 left-0 w-screen h-screen object-fill"
     style="z-index: 20; pointer-events: auto"
     autoplay
+    muted
+    :controls="false"
     @ended="navigateToMain"
     @click.stop
   />
