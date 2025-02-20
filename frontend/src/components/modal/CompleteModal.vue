@@ -1,18 +1,13 @@
 <template>
   <div class="fixed inset-0 flex justify-center items-center z-50">
     <!-- 튜토리얼 결과 -->
-    <MiniBaseModal v-if="mode === 'tutorial'" title="Result" class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center" @close-modal="completeFitnessTutorial">
-      <p class="text-lg font-bold mb-1 mt-4">튜토리얼 완료!</p>
+    <MiniBaseModal v-if="mode === 'tutorial'" class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center" @close-modal="completeFitnessTutorial">
+      <p class="text-lg font-bold mb-4">튜토리얼 완료!</p>
       <!-- <button @click="completeFitnessTutorial" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">확인</button> -->
     </MiniBaseModal>
 
     <!-- 싱글모드 결과 -->
-    <MiniBaseModal
-      v-if="mode === 'single'"
-      title="Result"
-      class="bg-white p-6 rounded-lg shadow-lg text-center w-[30vh] h-[35vh] flex flex-col justify-center items-center"
-      @close-modal="completeFitnessSingle"
-    >
+    <MiniBaseModal v-if="mode === 'single'" class="bg-white p-6 rounded-lg shadow-lg text-center w-[30vh] h-[35vh] flex flex-col justify-center items-center" @close-modal="completeFitnessSingle">
       <div class="text-container pb-4">
         <p class="font-dgm mb-4 text-xl mt-3">싱글모드 결과</p>
         <p class="text-base font-dgm mb-4">횟수: {{ count }}</p>
@@ -24,7 +19,7 @@
 
     <!-- 랭크모드 결과 -->
     <!-- <MediumBaseModal title="Result"> -->
-    <MediumBaseModal v-if="mode === 'rank'" class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center z-50">
+    <div v-if="mode === 'rank'" class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center z-50">
       <p class="text-lg mb-4 font-dgm">랭크모드 결과</p>
       <div v-if="isLoading" class="flex justify-center items-center">
         <svg class="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -70,7 +65,7 @@
 
       <button v-if="mode === 'rank' && isDisabled" disabled class="px-4 py-2 bg-gray-500 text-white rounded">확인</button>
       <button v-else @click="completeFitnessRank" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">확인</button>
-    </MediumBaseModal>
+    </div>
     <!-- </MediumBaseModal> -->
   </div>
 </template>
@@ -81,7 +76,7 @@ import { useMainStore, TUTORIAL_IDS } from "@/stores/mainStore"
 import { onMounted, ref, defineProps, watch } from "vue"
 import { useUserStore } from "@/stores/store"
 import axios from "axios"
-import MediumBaseModal from "@/components/modal/MediumBaseModal.vue"
+// import MediumBaseModal from "@/components/modal/MediumBaseModal.vue"
 // import BaseModal from "@/components/modal/BaseModal.vue"
 // import SmallBaseModal from "@/components/modal/SmallBaseModal.vue"
 import MiniBaseModal from "@/components/modal/MiniBaseModal.vue"

@@ -3,7 +3,7 @@
 <template>
   <Teleport to="body">
     <div class="fixed inset-0 flex items-center justify-center" @click="$emit('close-modal')">
-      <div class="bg-white w-[75%] h-[40%] max-w-4xl max-h-[60vh] rounded-lg shadow-lg flex flex-col" @click.stop>
+      <div class="bg-white w-[75%] h-[50%] max-w-4xl max-h-[60vh] rounded-lg shadow-lg flex flex-col" @click.stop>
         <!-- 헤더 영역 -->
 
         <div
