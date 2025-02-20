@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -29,6 +31,9 @@ public class ExerciseLogServiceImpl implements ExerciseLogService {
     private final UserStatsRepository userStatsRepository;
     private final UserCharacterRepository userCharacterRepository;
     private final UserRepository userRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public ExerciseStatsRatioRes getStatsByExerciseLog(Long exerciseStatsRatioId) {
@@ -115,35 +120,63 @@ public class ExerciseLogServiceImpl implements ExerciseLogService {
         // 이전 기록 가져오기
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
-        UserStats beforeStat = userStatsRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("이전 사용자 통계를 찾을 수 없습니다."));
-        UserCharacter beforeChar = userCharacterRepository.findByUser_UserId(userId)
-                .orElseThrow(() -> new RuntimeException("이전 캐릭터 정보를 찾을 수 없습니다."));
+        // Stats 깊은 복사
+        UserStats currentStats = userStatsRepository.findByUser(user).orElse(null);
+        UserStats beforeStats = null;
+        if (currentStats != null) {
+            beforeStats = new UserStats();
+            beforeStats.setId(currentStats.getId());
+            beforeStats.setAbsStats(currentStats.getAbsStats());
+            beforeStats.setArmsStats(currentStats.getArmsStats());
+            beforeStats.setBackStats(currentStats.getBackStats());
+            beforeStats.setChestStats(currentStats.getChestStats());
+            beforeStats.setLegsStats(currentStats.getLegsStats());
+            beforeStats.setStaminaStats(currentStats.getStaminaStats());
+            beforeStats.setUpdatedAt(currentStats.getUpdatedAt());
+        }
 
-        Short beforeLevel = beforeChar.getUserLevel();
-        Integer beforeExp = beforeChar.getUserExperience();
-        // 운동 기록 추가
-        addExerciseLogAndUpdateStats(event);
+        // Character 깊은 복사
+        UserCharacter currentCharacter = userCharacterRepository.findByUser_UserId(userId).orElse(null);
+        Short beforeLevel = null;
+        Integer beforeExperience = null;
+        if (currentCharacter != null) {
+            beforeLevel = currentCharacter.getUserLevel();
+            beforeExperience = currentCharacter.getUserExperience();
+        }
 
-        // 이후 기록 가져오기
-        UserStats afterStat = userStatsRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("이후 사용자 통계를 찾을 수 없습니다."));
-        UserCharacter afterChar = userCharacterRepository.findByUser_UserId(userId)
-                .orElseThrow(() -> new RuntimeException("이후 캐릭터 정보를 찾을 수 없습니다."));
-        Short afterLevel = afterChar.getUserLevel();
-        Integer afterExp = afterChar.getUserExperience();
+        // DB 반영 - before 상태 저장
+        entityManager.flush();
+        entityManager.clear();
+
+        // 운동 기록 추가 및 스탯 업데이트
+        ExerciseLogReq exerciseLogReq = new ExerciseLogReq();
+        exerciseLogReq.setExerciseCnt(event.getReq().getExerciseCnt());
+        exerciseLogReq.setExerciseStatsRatioId(event.getReq().getExerciseStatsRatioId());
+        exerciseLogReq.setExerciseDuration(event.getReq().getExerciseDuration());
+
+        addExerciseLogAndUpdateStats(new EventExerciseLog(userId, exerciseLogReq));
+
+        // DB 반영 - 업데이트된 상태 저장
+        entityManager.flush();
+        entityManager.clear();
+
+        // 이후 상태 조회
+        UserStats afterStats = userStatsRepository.findByUser(user).orElse(null);
+        UserCharacter updatedCharacter = userCharacterRepository.findByUser_UserId(userId).orElse(null);
+        Short afterLevel = (updatedCharacter != null) ? updatedCharacter.getUserLevel() : null;
+        Integer afterExperience = (updatedCharacter != null) ? updatedCharacter.getUserExperience() : null;
 
         // 결과 객체 생성 및 반환
         return SingleModeRes.builder()
                 .userId(user.getUserId())
-                .beforeStats(beforeStat)
-                .afterStats(afterStat)
+                .beforeStats(beforeStats)
+                .afterStats(afterStats)
                 .beforeUserLevel(beforeLevel)
-                .beforeUserExperience(beforeExp)
+                .beforeUserExperience(beforeExperience)
                 .afterUserLevel(afterLevel)
-                .afterUserExperience(afterExp)
-                .userScore(event.getReq().getExerciseCnt()) // 운동 횟수를 점수로 설정
-                .exerciseId(event.getReq().getExerciseStatsRatioId())  // 운동 ID 설정
+                .afterUserExperience(afterExperience)
+                .userScore(event.getReq().getExerciseCnt())
+                .exerciseId(event.getReq().getExerciseStatsRatioId())
                 .build();
     }
 
