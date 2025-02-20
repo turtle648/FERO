@@ -95,9 +95,43 @@
     </BaseModal>
 
     <!-- 랭크모드 결과 -->
+    <div class="flex flex-col h-full bg-white w-[75%] h-[70%] max-w-4xl max-h-[80vh] rounded-lg shadow-lg flex flex-col">
     <!-- <MediumBaseModal title="Result"> -->
-    <div v-if="mode === 'rank'" title="Result" class="modal-content bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center z-50">
-      <!-- 로딩 상태 -->
+    <!-- <div v-if="mode === 'rank'" title="Result" class="modal-content bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center z-50"> -->
+      <!-- 헤더 영역 -->
+      <div
+          class="relative w-full h-[10vh] flex justify-between items-center pl-[4vw] pr-[4vw] text-white text-xl font-bold"
+          :style="{
+            backgroundImage: `url(${require('@/assets/images/modal_header_background.png')})`,
+            backgroundSize: '100% 100%' /* 부모 요소에 완전히 맞춤 (잘리는 부분 없음) */,
+            backgroundRepeat: 'no-repeat' /* 반복 방지 */,
+            backgroundPosition: 'center' /* 중앙 정렬 */,
+          }"
+        >
+          <!-- <img class="w-full" src="@/assets/images/modal_header_background.png" alt=""> -->
+          <h2 class="font-bold" style="font-size: 2vh">
+            <slot name="header">Result</slot>
+          </h2>
+          <button
+            class="nes-btn is-normal bg-white text-gray-500 flex items-center justify-center shadow-md leading-none"
+            style="width: 2vh; height: 2vh; font-size: 2vh"
+            @click="$emit('close-modal')"
+          >
+            x
+          </button>
+        </div>
+
+      <!-- 컨텐츠 영역 -->
+      <div
+          class="font-dgm flex-1 overflow-y-auto pl-[7vw] pr-[7vw] pt-[2vh] pb-[4vh] max-h-[80vh] min-h-0"
+          :style="{
+            backgroundImage: `url(${require('@/assets/images/modal_body_background.png')})`,
+            backgroundSize: '100% 100%',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center',
+          }"
+      >
+          <!-- 로딩 상태 -->
       <div v-if="isLoading" class="flex justify-center items-center">
         <svg class="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -176,10 +210,20 @@
       <div v-else>
         <p class="text-red-500 font-dgm text-xl">💫 결과 계산 중 입니다 💫</p>
       </div>
+      </div>
+      
+      <!-- 로딩 상태 -->
+      <div v-if="isLoading" class="flex justify-center items-center">
+        <svg class="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+      </div>
 
+      </div>
       <!-- 종료 버튼 -->
     </div>
-  </div>
+  <!-- </div> -->
   <!-- </MediumBaseModal> -->
 </template>
 
