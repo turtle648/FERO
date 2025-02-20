@@ -475,7 +475,7 @@ END //
 DELIMITER //
 CREATE EVENT quest_completion_check
 ON SCHEDULE EVERY 1 DAY
-STARTS CURRENT_DATE + INTERVAL 1 DAY
+STARTS TIMESTAMP(CURRENT_DATE) + INTERVAL 1 DAY
 DO
 BEGIN
     -- 전날 퀘스트의 달성 여부 업데이트
@@ -484,7 +484,7 @@ SET is_completed = CASE
                        WHEN real_cnt >= exercise_cnt THEN TRUE
                        ELSE FALSE
     END
-WHERE quest_date = DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY);
+WHERE quest_date = DATE_SUB(TIMESTAMP(CURRENT_DATE), INTERVAL 1 DAY);
 END //
 DELIMITER ;
 
@@ -515,14 +515,14 @@ DELIMITER ;
 DELIMITER //
 CREATE EVENT daily_quest_creation
 ON SCHEDULE EVERY 1 DAY
-STARTS CURRENT_DATE + INTERVAL 1 DAY
+STARTS TIMESTAMP(CURRENT_DATE) + INTERVAL 1 DAY
 DO
 BEGIN
     -- 모든 사용자에 대해 스쿼트 퀘스트만 생성
 INSERT INTO quests (user_character_id, quest_date, exercise_id, exercise_cnt, real_cnt, message)
 SELECT
     uc.id,
-    CURRENT_DATE,
+    TIMESTAMP(CURRENT_DATE),
     2,  -- 스쿼트의 exercise_id
     calculate_exercise_count(uc.user_level),
     0,  -- real_cnt 초기값
