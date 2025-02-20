@@ -83,21 +83,21 @@ public class SignalingHandler extends TextWebSocketHandler {
 
         Long exerciseType = Long.parseLong(message.getExerciseType());
 
-        int result = 0;
-        if(remainTime != 0) {
-            result = 1;
-        }
-        if(remainTime == 0) {
-            if(userScore1 > userScore2) {
-                result = 1;
-            }
-            if(userScore2 > userScore1) {
-                result = 2;
-            }
-        }
+//        int result = 0;
+//        if(remainTime != 0) {
+//            result = 1;
+//        }
+//        if(remainTime == 0) {
+//            if(userScore1 > userScore2) {
+//                result = 1;
+//            }
+//            if(userScore2 > userScore1) {
+//                result = 2;
+//            }
+//        }
 
 
-        log.info("⚠️ exercise result publish :: {}", new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
+//        log.info("⚠️ exercise result publish :: {}", new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
         log.info("⚠️ game result publish :: {}", new GameResultReq(exerciseType, roomId, 1, userToken1, userToken2, userScore1, userScore2, remainTime));
 
         // 세션 상태 체크 후 메시지 전송
