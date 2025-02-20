@@ -24,7 +24,7 @@ public class QUserRankScores extends EntityPathBase<UserRankScores> {
 
     public final QBaseEntity _super = new QBaseEntity(this);
 
-    public final StringPath exerciseType = createString("exerciseType");
+    public final QExerciseStatsRatio exerciseStatsRatio;
 
     //inherited
     public final NumberPath<Long> id = _super.id;
@@ -51,6 +51,7 @@ public class QUserRankScores extends EntityPathBase<UserRankScores> {
 
     public QUserRankScores(Class<? extends UserRankScores> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.exerciseStatsRatio = inits.isInitialized("exerciseStatsRatio") ? new QExerciseStatsRatio(forProperty("exerciseStatsRatio")) : null;
         this.user = inits.isInitialized("user") ? new QUser(forProperty("user"), inits.get("user")) : null;
     }
 
