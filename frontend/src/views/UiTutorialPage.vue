@@ -44,7 +44,7 @@
     </section>
 
     <!-- 튜토리얼 완료 버튼 -->
-    <div v-if="currentStep === 14" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center space-y-4 z-50">
+    <div v-if="currentStep === 15" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center space-y-4 z-50">
       <button class="px-4 py-2 nes-btn is-primary font-dgm z-50 text-sm" @click="completeUiTutorial">튜토리얼 완료!</button>
     </div>
 
@@ -85,7 +85,7 @@ const currentStep = ref(1)
 
 // 다음 단계로 이동하는 함수
 const nextStep = () => {
-  if (currentStep.value < 14) {
+  if (currentStep.value < 15) {
     currentStep.value += 1 // 다음 단계로 이동
   }
 }

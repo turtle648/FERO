@@ -14,12 +14,7 @@
     <!-- 비디오 영역 -->
     <div class="video-container fixed inset-0 overflow-hidden">
       <canvas ref="canvasElement" class="absolute left-1/2 -translate-x-1/2">
-        <video 
-          ref="videoElement" 
-          muted 
-          playsinline
-          class="object-cover"
-        />
+        <video ref="videoElement" muted playsinline class="object-cover" />
       </canvas>
     </div>
 
@@ -37,7 +32,6 @@
       </canvas>
     </div> -->
 
-
     <!-- 버튼 영역 -->
     <div class="absolute bottom-0 inset-x-0 p-4 flex justify-between items-center z-20">
       <div class="flex-1">
@@ -52,7 +46,6 @@
     </div>
   </div>
 </template>
-
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue"
@@ -69,7 +62,7 @@ import ReportIssueButton from "@/components/button/ReportButton.vue"
 
 let intervalId = null // setInterval ID 저장 (타이머 초기화용)
 
-const selectedTime = ref(1 * 60 * 1000) // 1분을 밀리초로 변환 (60000ms)
+const selectedTime = ref(63000) // 1분을 밀리초로 변환 (60000ms)
 const timeLeft = ref(selectedTime.value) // 남은 시간 (ms)
 const formattedTime = ref(formatTime(timeLeft.value)) // 표시할 시간
 
@@ -224,8 +217,8 @@ onMounted(async () => {
   // Canvas 크기 설정
   // canvasElement.value.width = videoElement.value.videoWidth || window.innerWidth
   // canvasElement.value.height = videoElement.value.videoHeight || window.innerHeight
-  const canvas = canvasElement.value;
-  const video = videoElement.value;
+  const canvas = canvasElement.value
+  const video = videoElement.value
 
   // MediaPipe Pose 설정
   pose = new Pose({
@@ -242,17 +235,21 @@ onMounted(async () => {
   pose.onResults(onResults)
 
   // 비디오가 로드되었을 때 캔버스 크기 설정
-  video.addEventListener('canplay', () => {
-    // 세로 길이를 화면 높이로 설정
-    canvas.height = window.innerHeight;
-    
-    // 비디오의 원본 비율 계산
-    const aspectRatio = video.videoWidth / video.videoHeight;
-    
-    // 세로 길이에 맞춘 가로 길이 계산
-    canvas.width = canvas.height * aspectRatio;
-  }, { once: true });
-  
+  video.addEventListener(
+    "canplay",
+    () => {
+      // 세로 길이를 화면 높이로 설정
+      canvas.height = window.innerHeight
+
+      // 비디오의 원본 비율 계산
+      const aspectRatio = video.videoWidth / video.videoHeight
+
+      // 세로 길이에 맞춘 가로 길이 계산
+      canvas.width = canvas.height * aspectRatio
+    },
+    { once: true }
+  )
+
   camera = new Camera(videoElement.value, {
     onFrame: async () => {
       if (pose && videoElement.value) {
