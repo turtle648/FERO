@@ -56,8 +56,6 @@ const needToSendFinal = ref(false);
 const isMyExerciseComplete = ref(false);
 const isPeerExerciseComplete = ref(false);
 const isClose = ref(false);
-// const videoWidth = ref("100%");
-// const videoHeight = ref("auto");
 
 const emit = defineEmits(["setIsMatched"]);
 const props = defineProps(["exercise"]);
@@ -101,17 +99,6 @@ const finishExercise = () => {
     finishRoom();
   }
 };
-
-// const updateVideoSize = () => {
-//   const screenWidth = window.innerWidth;
-//   if (screenWidth < 768) {
-//     videoWidth.value = "90%"; // 모바일에서는 90% 크기로 조정
-//     videoHeight.value = "auto";
-//   } else {
-//     videoWidth.value = "80vw"; // 데스크탑에서는 80vw로 설정
-//     videoHeight.value = "80vh";
-//   }
-// };
 
 // 방 종료 처리
 const finishRoom = () => {
@@ -491,17 +478,13 @@ onBeforeUnmount(() => {
   video,
   canvas {
     object-fit: contain;
-    max-width: 100%; /* 화면 크기를 초과하지 않도록 설정 */
-    max-height: 100vh; /* 화면 높이를 초과하지 않도록 설정 */
   }
 }
 
 @media (min-width: 769px) {
   video,
   canvas {
-    object-fit: contain; /* 동일하게 contain으로 설정 */
-    max-width: 80vw; /* 화면의 80%만 차지하도록 설정 */
-    max-height: 80vh;
+    object-fit: cover;
   }
 }
 
@@ -510,9 +493,7 @@ onBeforeUnmount(() => {
 }
 
 .my-video {
-  width: 100%;
-  height: auto; /* 높이를 자동 조정하여 비율 유지 */
-  max-height: 80vh; /* 화면 크기를 넘지 않도록 설정 */
+  @apply w-full h-full object-contain relative z-10;
 }
 
 .peer-container {
@@ -520,9 +501,7 @@ onBeforeUnmount(() => {
 }
 
 .peer-video {
-  /* @apply w-full h-full object-contain; */
-  width: 100%;
-  height: auto; /* 비율 유지하면서 조정 */
+  @apply w-full h-full object-contain;
 }
 
 .controls {

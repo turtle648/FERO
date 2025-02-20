@@ -1,79 +1,109 @@
 <!-- views/RankMatchPage.vue -->
 <template>
-  <div v-if="!isMatched" class="rank-match-container">
-      <!-- 매칭 진행 상태 표시 -->
-      <div class="matching-status">
-          <div class="status-text">매칭을 찾는 중입니다...</div>
-          <div class="loading-spinner"></div>
+  <div v-if="!isMatched" class="rank-match-container bg-black">
+    <!-- 매칭 진행 상태 표시 -->
+    <div class="matching-status">
+      <div class="images-container">
+        <img src="@/assets/images/pesocom.png" alt="" class="w-[10vh] jump-animation delay-1" />
+        <img src="@/assets/images/pesocom.png" alt="" class="w-[10vh] jump-animation delay-2" />
+        <img src="@/assets/images/pesocom.png" alt="" class="w-[10vh] jump-animation delay-3" />
       </div>
+      <div class="status-text font-dgm text-white">{{ typedText }}</div>
+    </div>
+    <div class="btn-container">
+      <button class="nes-btn is-error" @click="cancelMatching">EXIT</button>
+    </div>
   </div>
-  <VideoComponent :class="{'hidden': !isMatched}" @set-is-matched="setIsMatched" :exercise="exercise"/>
+  <VideoComponent :class="{ hidden: !isMatched }" @set-is-matched="setIsMatched" :exercise="exercise" />
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import VideoComponent from '@/components/videoroom/VideoComponent.vue';
-import { useRoute } from 'vue-router';
+import { ref, onMounted } from "vue"
+import VideoComponent from "@/components/videoroom/VideoComponent.vue"
+import { useRoute, useRouter } from "vue-router"
 
-const route = useRoute();
-const exercise = ref(route.params.exercise); // URL 파라미터를 ref로 저장
-const isMatched = ref(false);
+const route = useRoute()
+const router = useRouter()
+const exercise = ref(route.params.exercise)
+const isMatched = ref(false)
 
 const setIsMatched = (value) => {
-  isMatched.value = value;
-  console.log("❤️ setIsMatched::" + isMatched.value);
+  isMatched.value = value
+  console.log("❤️ setIsMatched::" + isMatched.value)
 }
 
+const cancelMatching = () => {
+  router.push({ name: "Main" })
+}
+
+// 타이핑 효과 관련 로직
+const fullText = "매칭을 찾는 중입니다..."
+const typedText = ref("")
+let typingIndex = 0
+
+const startTypingEffect = () => {
+  if (typingIndex < fullText.length) {
+    typedText.value += fullText.charAt(typingIndex)
+    typingIndex++
+    setTimeout(startTypingEffect, 150)
+  } else {
+    setTimeout(() => {
+      typedText.value = ""
+      typingIndex = 0
+      startTypingEffect()
+    }, 1000)
+  }
+}
+
+onMounted(() => {
+  startTypingEffect()
+})
 </script>
 
 <style scoped>
 .rank-match-container {
-  @apply flex flex-col items-center justify-center min-h-screen bg-gray-100;
+  @apply flex flex-col items-center justify-center min-h-screen bg-black;
 }
 
 .matching-status {
   @apply flex flex-col items-center space-y-4;
 }
 
+.images-container {
+  @apply flex justify-center items-center space-x-4; /* 가로 정렬 및 간격 추가 */
+}
+
+/* 점프 애니메이션 */
+@keyframes jump {
+  0%,
+  100% {
+    transform: translateY(0); /* 원래 위치 */
+  }
+  50% {
+    transform: translateY(-20px); /* 위로 이동 */
+  }
+}
+
+.jump-animation {
+  animation: jump 1.5s infinite ease-in-out; /* 점프 애니메이션 */
+}
+
+/* 각 이미지에 딜레이 추가 */
+.delay-1 {
+  animation-delay: 0s;
+}
+.delay-2 {
+  animation-delay: 0.3s;
+}
+.delay-3 {
+  animation-delay: 0.6s;
+}
+
 .status-text {
-  @apply text-xl font-semibold text-gray-700;
+  @apply text-xl font-dgm text-white;
 }
 
-.loading-spinner {
-  @apply w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin;
-}
-
-.match-found {
-  @apply flex flex-col items-center space-y-6 p-6 bg-white rounded-lg shadow-md;
-}
-
-.button-group {
-  @apply flex space-x-4;
-}
-
-.accept-button {
-  @apply px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 
-         disabled:bg-gray-400 disabled:cursor-not-allowed;
-}
-
-.decline-button {
-  @apply px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600
-         disabled:bg-gray-400 disabled:cursor-not-allowed;
-}
-
-.error-status {
-  @apply flex flex-col items-center space-y-4 p-6 bg-white rounded-lg shadow-md;
-}
-
-.error-text {
-  @apply text-red-500 font-semibold;
-}
-
-.retry-button {
-  @apply px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600;
-}
-
-.hidden {
-  visibility: hidden;
+.btn-container {
+  @apply absolute bottom-8 left-1/2 transform -translate-x-1/2;
 }
 </style>
