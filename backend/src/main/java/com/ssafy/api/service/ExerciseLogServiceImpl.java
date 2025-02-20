@@ -5,6 +5,7 @@ import com.ssafy.api.request.ExerciseLogReq;
 import com.ssafy.api.request.ExerciseLogSearchReq;
 import com.ssafy.api.response.ExerciseLogRes;
 import com.ssafy.api.response.ExerciseStatsRatioRes;
+import com.ssafy.api.response.SingleModeRes;
 import com.ssafy.db.entity.*;
 import com.ssafy.db.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +28,7 @@ public class ExerciseLogServiceImpl implements ExerciseLogService {
     private final ExerciseLogRepository exerciseLogRepository;
     private final UserStatsRepository userStatsRepository;
     private final UserCharacterRepository userCharacterRepository;
+    private final UserRepository userRepository;
 
     @Override
     public ExerciseStatsRatioRes getStatsByExerciseLog(Long exerciseStatsRatioId) {
@@ -105,6 +108,43 @@ public class ExerciseLogServiceImpl implements ExerciseLogService {
         return exerciseLogs.stream()
                 .map(ExerciseLogRes::from)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public SingleModeRes getSingleModeResult(String userId, EventExerciseLog event) {
+        // 이전 기록 가져오기
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
+        UserStats beforeStat = userStatsRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("이전 사용자 통계를 찾을 수 없습니다."));
+        UserCharacter beforeChar = userCharacterRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new RuntimeException("이전 캐릭터 정보를 찾을 수 없습니다."));
+
+        Short beforeLevel = beforeChar.getUserLevel();
+        Integer beforeExp = beforeChar.getUserExperience();
+        // 운동 기록 추가
+        addExerciseLogAndUpdateStats(event);
+
+        // 이후 기록 가져오기
+        UserStats afterStat = userStatsRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("이후 사용자 통계를 찾을 수 없습니다."));
+        UserCharacter afterChar = userCharacterRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new RuntimeException("이후 캐릭터 정보를 찾을 수 없습니다."));
+        Short afterLevel = afterChar.getUserLevel();
+        Integer afterExp = afterChar.getUserExperience();
+
+        // 결과 객체 생성 및 반환
+        return SingleModeRes.builder()
+                .userId(user.getUserId())
+                .beforeStats(beforeStat)
+                .afterStats(afterStat)
+                .beforeUserLevel(beforeLevel)
+                .beforeUserExperience(beforeExp)
+                .afterUserLevel(afterLevel)
+                .afterUserExperience(afterExp)
+                .userScore(event.getReq().getExerciseCnt()) // 운동 횟수를 점수로 설정
+                .exerciseId(event.getReq().getExerciseStatsRatioId())  // 운동 ID 설정
+                .build();
     }
 
 
