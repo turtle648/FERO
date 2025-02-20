@@ -1,33 +1,35 @@
 <template>
-  <div v-if="isWakeWordDetected" class="fixed top-[12vh] right-3 flex items-center space-x-2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-md" style="z-index: 2147483647 !important;">
-    <img src="@/assets/images/pesocom.png" alt="파소콘" class="w-8 h-8 object-contain" />
-    <span>명령어 듣는 중...</span>
-    <MicIcon class="w-6 h-6 text-red-400" />
-    <div class="relative w-8 h-8">
-      <svg class="absolute top-0 left-0 w-full h-full">
-        <circle
-          class="text-gray-700"
-          stroke="currentColor"
-          stroke-width="4"
-          fill="transparent"
-          r="12"
-          cx="16"
-          cy="16"
-        />
-        <circle
-          class="text-blue-400 transition-all"
-          :style="{ strokeDasharray: '75.4', strokeDashoffset: `${(timer / 5) * 75.4}` }"
-          stroke="currentColor"
-          stroke-width="4"
-          fill="transparent"
-          r="12"
-          cx="16"
-          cy="16"
-        />
-     </svg>
+  <Teleport to="body">
+    <div v-if="isWakeWordDetected" class="fixed top-[12vh] right-3 flex items-center space-x-2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-md" style="z-index: 2147483647 !important;">
+      <img src="@/assets/images/pesocom.png" alt="파소콘" class="w-8 h-8 object-contain" />
+      <span>명령어 듣는 중...</span>
+      <MicIcon class="w-6 h-6 text-red-400" />
+      <div class="relative w-8 h-8">
+        <svg class="absolute top-0 left-0 w-full h-full">
+          <circle
+            class="text-gray-700"
+            stroke="currentColor"
+            stroke-width="4"
+            fill="transparent"
+            r="12"
+            cx="16"
+            cy="16"
+          />
+          <circle
+            class="text-blue-400 transition-all"
+            :style="{ strokeDasharray: '75.4', strokeDashoffset: `${(timer / 5) * 75.4}` }"
+            stroke="currentColor"
+            stroke-width="4"
+            fill="transparent"
+            r="12"
+            cx="16"
+            cy="16"
+          />
+       </svg>
+     </div>
    </div>
- </div>
- <div class="hidden"></div>
+   <div class="hidden"></div>
+  </Teleport>
 </template>
 
 <script setup>
