@@ -1,8 +1,9 @@
-<!-- components/modal/BaseModal.vue -->
+<!-- components/modal/MediumBaseModal.vue -->
+
 <template>
   <Teleport to="body">
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" @click="$emit('close-modal')">
-      <div class="bg-white w-[75%] h-[70%] max-w-4xl max-h-[80vh] rounded-lg shadow-lg flex flex-col" @click.stop>
+    <div class="fixed inset-0 flex items-center justify-center" @click="$emit('close-modal')">
+      <div class="bg-white w-[75%] h-[50%] max-w-4xl max-h-[60vh] rounded-lg shadow-lg flex flex-col" @click.stop>
         <!-- 헤더 영역 -->
 
         <div
@@ -29,7 +30,7 @@
 
         <!-- 컨텐츠 영역 -->
         <div
-          class="font-dgm flex-1 overflow-y-auto pl-[7vw] pr-[7vw] pt-[2vh] pb-[4vh] max-h-[80vh] min-h-0"
+          class="font-dgm flex-1 overflow-y-auto pl-[7vw] pr-[7vw] pt-[2vh] pb-[4vh] max-h-[50vh] min-h-0"
           :style="{
             backgroundImage: `url(${require('@/assets/images/modal_body_background.png')})`,
             backgroundSize: '100% 100%',

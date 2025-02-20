@@ -49,16 +49,16 @@
     </div>
 
     <div class="text-container absolute top-4 right-4 z-50">
-      <button type="button" class="nes-btn is-primary text-1xl font-dgm">스쿼트 횟수: 0</button>
+      <button type="button" class="nes-btn is-primary text-1xl font-dgm disabled">스쿼트 횟수: 0</button>
     </div>
 
     <!-- 상단 영역 -->
-    <div class="timer-container text-2xl absolute top-4 left-4 z-0 nes-btn">999:00</div>
+    <div class="timer-container text-2xl absolute top-4 left-4 z-0 nes-btn disabled">999:00</div>
 
     <div class="button-container flex absolute inset-0 items-end pb-4 z-30">
       <!-- ExitButton을 하단 중앙에 배치 -->
       <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2">
-        <ExitButton @click="stopCameraAndNavigate" />
+        <ExitButton />
       </div>
 
       <!-- ReportIssueButton을 하단 오른쪽에 배치 -->

@@ -35,54 +35,48 @@
       </button>
     </div>
 
-    <!-- 모드 선택 모달 -->
-    <div v-if="showModeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white p-5 rounded-lg shadow-md w-[80%] max-w-md">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold">Select Mode</h3>
-          <button class="text-gray-500 hover:text-gray-700" @click="showModeModal = false">×</button>
-        </div>
-
-        <div class="flex flex-col space-y-4">
-          <!-- Single Mode -->
-          <button class="mode-button" :class="{ 'opacity-50': !selectedNumber }" @click="confirmMode('single')" :disabled="!selectedNumber">
-            <p class="text-lg font-medium mb-3">Single Mode</p>
-            <div class="flex space-x-4">
-              <button
-                v-for="num in [1, 2, 5]"
-                :key="num"
-                :class="[
-                  'w-10 h-10 rounded-full flex items-center justify-center transition-colors',
-                  selectedNumber === num ? 'bg-white text-indigo-500 font-bold ring-2 ring-indigo-500' : 'bg-indigo-200 text-indigo-700 hover:bg-indigo-300',
-                ]"
-                @click.stop="selectNumber(num)"
-              >
-                {{ num }}
-              </button>
-            </div>
-          </button>
-
-          <!-- Rank Mode -->
-          <button class="mode-button" @click="confirmMode('rank')" :disabled="isLoading || !isSquatCompleted">
-            <p class="text-lg font-medium">
-              {{ isLoading ? "처리중..." : "Rank Mode" }}
-            </p>
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- 게임 시작 확인 모달 -->
-    <div v-if="showConfirmationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
-      <div class="bg-white p-6 rounded-lg shadow-md w-[80%] max-w-sm">
-        <h3 class="text-xl font-semibold mb-4">{{ confirmationMessage }}</h3>
-        <div class="flex justify-end space-x-4">
-          <button class="nes-btn" @click="closeConfirmationModal">취소</button>
-          <button class="nes-btn is-primary" @click="confirmGameStart">확인</button>
-        </div>
+    <SmallBaseModal v-if="showConfirmationModal" title="Confirm" @close-modal="closeConfirmationModal" @confirm="confirmGameStart">
+      <div class="max-w-sm">
+        <h3 class="text-base mb-4 text-center mt-9">{{ confirmationMessage }}</h3>
       </div>
-    </div>
+    </SmallBaseModal>
   </BaseModal>
+
+  <!-- 모드 선택 모달 -->
+  <MediumBaseModal v-if="showModeModal" title="Select Mode" @close-modal="$emit('close-modal')">
+    <div class="flex flex-col space-y-4">
+      <!-- Single Mode -->
+      <button class="mode-button" @click="handleSingleModeClick">
+        <p class="text-lg font-medium mb-3">Single Mode</p>
+        <div class="flex space-x-4">
+          <button
+            v-for="num in [1, 2, 5]"
+            :key="num"
+            :class="[
+              'w-10 h-10 rounded-full flex items-center justify-center transition-colors',
+              selectedNumber === num ? 'bg-white text-indigo-500 font-bold ring-2 ring-indigo-500' : 'bg-indigo-200 text-indigo-700 hover:bg-indigo-300',
+            ]"
+            @click.stop="selectNumber(num)"
+          >
+            {{ num }}
+          </button>
+        </div>
+      </button>
+
+      <!-- Rank Mode -->
+      <button class="mode-button" @click="confirmMode('rank')" :disabled="isLoading || !isSquatCompleted">
+        <p class="text-lg font-medium">
+          {{ isLoading ? "처리중..." : "Rank Mode" }}
+        </p>
+      </button>
+
+      <!-- 시간 선택 경고 모달 -->
+      <MiniModal title="Time" v-if="showTimeWarningModal" @close-modal="closeTimeWarningModal">
+        <h3 class="text-xl font-semibold mb-2 mt-8">시간을 선택 하세요</h3>
+      </MiniModal>
+    </div>
+  </MediumBaseModal>
 </template>
 
 <script setup>
@@ -90,10 +84,14 @@
 import { ref, computed, defineEmits } from "vue"
 import { useRouter } from "vue-router"
 import { useMainStore, TUTORIAL_IDS } from "@/stores/mainStore"
-import BaseModal from "./BaseModal.vue"
+import BaseModal from "@/components/modal/BaseModal.vue"
+import MediumBaseModal from "@/components/modal/BaseModal.vue"
+import SmallBaseModal from "@/components/modal/SmallBaseModal.vue"
+import MiniModal from "@/components/modal/MiniBaseModal.vue"
 
 const router = useRouter()
 const mainStore = useMainStore()
+
 defineEmits(["close-modal"])
 
 const showModeModal = ref(false)
@@ -102,6 +100,7 @@ const selectedNumber = ref(null)
 const selectedMode = ref(null)
 const confirmationMessage = ref("")
 const isLoading = ref(false)
+const showTimeWarningModal = ref(false)
 
 const isUICompleted = computed(() => {
   const uiTutorial = mainStore.tutorial.find((t) => t.tutorialId === TUTORIAL_IDS.UI)
@@ -133,6 +132,15 @@ const handleSquatClick = () => {
 
 const selectNumber = (num) => {
   selectedNumber.value = selectedNumber.value === num ? null : num
+}
+
+// 싱글모드 클릭 시 시간 선택 여부 확인
+const handleSingleModeClick = () => {
+  if (!selectedNumber.value) {
+    showTimeWarningModal.value = true // 시간 선택 경고 모달 표시
+  } else {
+    confirmMode("single")
+  }
 }
 
 //선택된 모드에 따라 확인 모달 표시
@@ -191,6 +199,11 @@ const closeConfirmationModal = () => {
 
 const restartTutorial = () => {
   router.push({ name: "UiTutorial" }) // UiTutorial로 이동
+}
+
+// 시간 선택 경고 모달 닫기
+const closeTimeWarningModal = () => {
+  showTimeWarningModal.value = false
 }
 </script>
 
