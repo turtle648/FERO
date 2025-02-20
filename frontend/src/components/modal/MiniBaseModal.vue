@@ -34,9 +34,9 @@
             <div class="w-[80%] flex">
               <!--  버튼 -->
               <button
-                class="font-dgm text-bold nes-btn is-error whitespace-nowrap flex items-center justify-center ml-auto mb-5"
+                class="font-dgm text-bold nes-btn is-primary whitespace-nowrap flex items-center justify-center ml-auto mb-5"
                 :style="{
-                  width: '45%',
+                  width: '40%',
                   height: '70%',
                   fontSize: 'clamp(0.75rem, 2vw, 1rem)',
                 }"

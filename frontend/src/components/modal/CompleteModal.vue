@@ -1,21 +1,21 @@
 <template>
   <div class="fixed inset-0 flex justify-center items-center z-50">
     <!-- 튜토리얼 결과 -->
-    <div v-if="mode === 'tutorial'" class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center">
+    <MiniBaseModal v-if="mode === 'tutorial'" class="bg-white p-6 rounded-lg shadow-lg text-center w-3/4 h-2/3 flex flex-col justify-center" @close-modal="completeFitnessTutorial">
       <p class="text-lg font-bold mb-4">튜토리얼 완료!</p>
-      <button @click="completeFitnessTutorial" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">확인</button>
-    </div>
+      <!-- <button @click="completeFitnessTutorial" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">확인</button> -->
+    </MiniBaseModal>
 
     <!-- 싱글모드 결과 -->
-    <div v-if="mode === 'single'" class="bg-white p-6 rounded-lg shadow-lg text-center w-[30vh] h-[35vh] flex flex-col justify-center items-center">
+    <MiniBaseModal v-if="mode === 'single'" class="bg-white p-6 rounded-lg shadow-lg text-center w-[30vh] h-[35vh] flex flex-col justify-center items-center" @close-modal="completeFitnessSingle">
       <div class="text-container pb-4">
-        <p class="font-dgm mb-4 text-base">싱글모드 결과</p>
+        <p class="font-dgm mb-4 text-xl mt-3">싱글모드 결과</p>
         <p class="text-base font-dgm mb-4">횟수: {{ count }}</p>
         <p class="text-base font-dgm mb-4">운동 시간: {{ exerciseDuration }}</p>
       </div>
 
-      <button @click="completeFitnessSingle" class="w-[10vh] nes-btn is-primary font-dgm p-1">확인</button>
-    </div>
+      <!-- <button @click="completeFitnessSingle" class="w-[10vh] nes-btn is-primary font-dgm p-1">확인</button> -->
+    </MiniBaseModal>
 
     <!-- 랭크모드 결과 -->
     <!-- <MediumBaseModal title="Result"> -->
@@ -79,6 +79,7 @@ import axios from "axios"
 // import MediumBaseModal from "@/components/modal/MediumBaseModal.vue"
 // import BaseModal from "@/components/modal/BaseModal.vue"
 // import SmallBaseModal from "@/components/modal/SmallBaseModal.vue"
+import MiniBaseModal from "@/components/modal/MiniBaseModal.vue"
 
 const router = useRouter()
 const route = useRoute()
@@ -88,6 +89,9 @@ const mode = ref("")
 const rankResult = ref("")
 const isDisabled = ref(true)
 const isLoading = ref(false) // 로딩 상태
+
+const exerciseDuration = ref(0) // 운동 시간
+const exerciseStatsRatioId = ref(2) // 운동 종류
 
 const props = defineProps(["count", "result"])
 
@@ -123,11 +127,40 @@ const completeFitnessTutorial = async () => {
   router.push({ name: "Main" })
 }
 
-const completeFitnessSingle = () => {
-  router.push({ name: "Main" })
-}
-const completeFitnessRank = () => {
-  router.push({ name: "Main" })
+// 싱글모드 결과 전송
+const completeFitnessSingle = async () => {
+  try {
+    // 운동 데이터 설정
+    const requestData = {
+      exerciseCnt: props.count, // 운동 횟수
+      exerciseDuration: exerciseDuration.value, // 운동 시간
+      exerciseStatsRatioId: exerciseStatsRatioId.value, // 운동 종류 ID
+    }
+
+    console.log("싱글모드 데이터 전송:", requestData)
+
+    // 사용자 토큰 가져오기 (예: Vuex 또는 Pinia에서 userStore 사용)
+    const token = userStore.accessToken
+
+    // API 호출
+    const response = await axios.post("https://i12e103.p.ssafy.io:8076/api/v1/exercise/log", requestData, {
+      headers: {
+        Authorization: `Bearer ${token}`, // 헤더에 토큰 추가
+        "Content-Type": "application/json", // JSON 형식 명시
+      },
+    })
+
+    if (response.status === 200) {
+      console.log("싱글모드 결과 전송 성공:", response.data)
+
+      // 성공적으로 데이터 전송 후 페이지 이동
+      router.push({ name: "Main" })
+    } else {
+      console.error("싱글모드 결과 전송 실패:", response.status, response.data)
+    }
+  } catch (error) {
+    console.error("싱글모드 결과 전송 중 오류 발생:", error.response?.data || error.message)
+  }
 }
 
 // 랭크 결과 API 호출 (최대 3번 재시도)
@@ -181,6 +214,9 @@ onMounted(() => {
       fetchRankResult(userStore.accessToken, props.result.peerToken)
     }
   }
+  const pathSegments = route.path.split("/").filter(Boolean) // URL을 '/' 기준으로 분할하고, 빈 요소(마지막 `/`) 제거
+  const timeFromUrl = parseInt(pathSegments[pathSegments.length - 1]) // 인지된 시간
+  exerciseDuration.value = timeFromUrl
 })
 </script>
 
