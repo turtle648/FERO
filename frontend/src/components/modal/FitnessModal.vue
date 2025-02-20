@@ -46,7 +46,7 @@
   <MediumBaseModal v-if="showModeModal" title="Select Mode" @close-modal="$emit('close-modal')">
     <div class="flex flex-col space-y-4">
       <!-- Single Mode -->
-      <button class="mode-button" @click="handleSingleModeClick">
+      <button class="mode-button nes-btn is-primary" @click="handleSingleModeClick">
         <p class="text-lg font-medium mb-3">Single Mode</p>
         <div class="flex space-x-4">
           <button
@@ -64,7 +64,7 @@
       </button>
 
       <!-- Rank Mode -->
-      <button class="mode-button" @click="confirmMode('rank')" :disabled="isLoading || !isSquatCompleted">
+      <button class="mode-button nes-btn is-primary" @click="confirmMode('rank')" :disabled="isLoading || !isSquatCompleted">
         <p class="text-lg font-medium">
           {{ isLoading ? "처리중..." : "Rank Mode" }}
         </p>
@@ -84,7 +84,7 @@ import { ref, computed, defineEmits } from "vue"
 import { useRouter } from "vue-router"
 import { useMainStore, TUTORIAL_IDS } from "@/stores/mainStore"
 import BaseModal from "@/components/modal/BaseModal.vue"
-import MediumBaseModal from "@/components/modal/BaseModal.vue"
+import MediumBaseModal from "@/components/modal/MediumBaseModal.vue"
 import SmallBaseModal from "@/components/modal/SmallBaseModal.vue"
 import MiniModal from "@/components/modal/MiniBaseModal.vue"
 
