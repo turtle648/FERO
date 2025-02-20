@@ -12,7 +12,7 @@
         <!-- 헤더 섹션 -->
         <div class="text-center w-full">
           <h1 class="text-4xl font-bold text-gray-800">Today's Fitness</h1>
-          <h2 class="text-3xl font-semibold text-blue-600 mt-1">[Squart]</h2>
+          <h2 class="text-3xl font-semibold text-blue-600 mt-1">[SQUAT]</h2>
           <div class="flex justify-between items-center mt-2">
             <span class="text-lg font-medium">일일 퀘스트</span>
             <span :class="[
@@ -53,7 +53,7 @@
           <hr class="border-gray-300 border-t-2 my-3">
 
           <!-- 보상 버튼 -->
-          <div class="text-center">
+          <!-- <div class="text-center">
             <button 
               class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white
                      
@@ -61,7 +61,7 @@
             >
               레벨 {{ userInfo.level+1 }} 달성 보상
             </button>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -71,9 +71,9 @@
 <script setup>
 import BaseModal from './BaseModal.vue'
 import { questData } from "@/stores/mainStore"
-import { useUserDataStore } from '@/stores/userDataStore'
+// import { useUserDataStore } from '@/stores/userDataStore'
 
-const userDataStore = useUserDataStore() 
-const userInfo = userDataStore.userInfo
+// const userDataStore = useUserDataStore() 
+// const userInfo = userDataStore.userInfo
 defineEmits(['close-modal'])
 </script>
