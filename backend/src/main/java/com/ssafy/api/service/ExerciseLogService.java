@@ -5,6 +5,7 @@ import com.ssafy.api.request.ExerciseLogReq;
 import com.ssafy.api.request.ExerciseLogSearchReq;
 import com.ssafy.api.response.ExerciseLogRes;
 import com.ssafy.api.response.ExerciseStatsRatioRes;
+import com.ssafy.api.response.SingleModeRes;
 import com.ssafy.db.entity.ExerciseLog;
 
 import java.util.List;
@@ -19,4 +20,6 @@ public interface ExerciseLogService {
             String userId,
             ExerciseLogSearchReq request
     );
+    // 싱글모드 결과 가져오기
+    SingleModeRes getSingleModeResult(String userId, EventExerciseLog event);
 }

@@ -3,10 +3,7 @@ package com.ssafy.api.controller;
 import com.ssafy.api.request.EventExerciseLog;
 import com.ssafy.api.request.ExerciseLogReq;
 import com.ssafy.api.request.ExerciseLogSearchReq;
-import com.ssafy.api.response.ExerciseLogRes;
-import com.ssafy.api.response.ExerciseStatsRatioRes;
-import com.ssafy.api.response.MonthlyQuestsStatusRes;
-import com.ssafy.api.response.QuestsRes;
+import com.ssafy.api.response.*;
 import com.ssafy.api.service.ExerciseLogService;
 import com.ssafy.api.service.ExerciseLogServiceImpl;
 import com.ssafy.api.service.QuestsService;
@@ -19,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -117,5 +115,19 @@ public class ExerciseController {
                 .orElse(ResponseEntity.noContent().build());
     }
 
+    @PostMapping("/single-mode")
+    @ApiOperation(value = "싱글 모드 결과 가져오기", notes = "싱글모드로 스탯, 레벨, 경험치의 전 후 값")
+    public ResponseEntity<SingleModeRes> getSingleModeResult(
+            HttpServletRequest request,
+            @RequestBody ExerciseLogReq exerciseLogReq) {
 
+        String authHeader = request.getHeader("Authorization");
+
+        // 헤더에서 토큰을 통해 사용자 ID 추출
+        String userId = JwtTokenUtil.getUserIdFromJWT(authHeader);
+
+        SingleModeRes result = exerciseLogService.getSingleModeResult(
+                userId, new EventExerciseLog(userId, exerciseLogReq));
+        return ResponseEntity.ok(result);
+    }
 }
