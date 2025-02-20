@@ -9,7 +9,7 @@
 import VideoComponent from '@/components/videoroom/VideoComponent.vue';
 import { ref } from 'vue'
 
-const submittedRoomId = ref(false);
+const submittedRoomId = ref(false)
 
 const clickSubmitRoomId = (isClicked) => {
     submittedRoomId.value = isClicked;
