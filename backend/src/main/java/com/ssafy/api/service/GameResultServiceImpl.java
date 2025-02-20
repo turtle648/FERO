@@ -2,20 +2,24 @@ package com.ssafy.api.service;
 
 import com.ssafy.api.request.GameResultReq;
 import com.ssafy.api.request.UserIdGameResultReq;
+import com.ssafy.api.response.GameResultsRes;
 import com.ssafy.db.entity.GameResult;
 import com.ssafy.db.repository.GameResultRepository;
+import com.ssafy.db.repository.UserCharacterRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class GameResultServiceImpl implements GameResultService{
 
     private final GameResultRepository gameResultRepository;
+    private final UserCharacterRepository userCharacterRepository;
 
     // 경기 결과 저장 (두 개의 레코드 생성)
     @EventListener
@@ -56,7 +60,21 @@ public class GameResultServiceImpl implements GameResultService{
 
 
     // 유저의 최근 경기 전적 조회
-    public List<GameResult> getUserGameRecords(String userId) {
-        return gameResultRepository.findByUserIdOrderByCreatedAtDesc(userId);
+    public List<GameResultsRes> getUserGameRecords(String userId) {
+        List<GameResult> results = gameResultRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        List<GameResultsRes> response = results.stream().map((result) ->
+            new GameResultsRes(
+                    userCharacterRepository.findByUser_UserId(result.getUserId()).get().getUserNickname(),
+                    result.getGameId(),
+                    result.getDuration(),
+                    result.getExerciseId(),
+                    userCharacterRepository.findByUser_UserId(result.getOpponentId()).get().getUserNickname(),
+                    result.getUserScore(),
+                    result.getOpponentScore(),
+                    result.getResult(),
+                    result.getCreatedAt()
+            )
+        ).collect(Collectors.toList());
+        return response;
     }
 }
