@@ -13,20 +13,28 @@
       </div>
 
       <!-- 일일 달성률 -->
-      <div class="progress-container space-y-2 mt-2 mb-3">
+      <div class="progress-container space-y-2 mt-2 mb-3 relative">
         <span class="font-dgm">일일 달성률</span>
-        <progress class="nes-progress is-primary w-[100%] h-[3vh]" 
-          :value="(questData.realCnt / questData.exerciseCnt) * 100" 
-          max="100">
-        </progress>
-        <span v-for="n in 5" :key="n"
-          :class="{
-            filled: (100 * questData.realCnt / questData.exerciseCnt) / 20 >= n,
-            empty: (100 * questData.realCnt / questData.exerciseCnt) / 20 < n,
-          }"
-          class="progress-box-cell"
-        ></span>
+        <div class="relative w-full">
+          <progress class="nes-progress is-primary w-[100%] h-[3vh]" 
+            :value="(questData.realCnt / questData.exerciseCnt) * 100" 
+            max="100">
+          </progress>
+          <span class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-black font-bold pb-2">
+            {{ Math.round((questData.realCnt / questData.exerciseCnt) * 100) }}%
+          </span>
+        </div>
+        <div class="flex space-x-1">
+          <span v-for="n in 5" :key="n"
+            :class="{
+              'filled': (100 * questData.realCnt / questData.exerciseCnt) / 20 >= n,
+              'empty': (100 * questData.realCnt / questData.exerciseCnt) / 20 < n,
+            }"
+            class="progress-box-cell"
+          ></span>
+        </div>
       </div>
+
 
       <!-- 그래프 이미지 -->
       <div class="status-element status-4">
