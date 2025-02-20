@@ -1,6 +1,5 @@
 <template>
   <BaseModal class="font-dgm" title="Select Exercise" @close-modal="$emit('close-modal')">
-    <p style="font-size: 20vh;">1</p>
     <!-- 메인 운동 선택 영역 -->
     <div class="font-dgm grid grid-rows-4 w-full h-full justify-items-center content-between">
       <!-- 스쿼트 그룹 -->
