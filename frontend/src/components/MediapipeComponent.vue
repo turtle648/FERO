@@ -14,12 +14,7 @@
     <!-- 비디오 영역 -->
     <div class="video-container fixed inset-0 overflow-hidden">
       <canvas ref="canvasElement" class="absolute left-1/2 -translate-x-1/2">
-        <video 
-          ref="videoElement" 
-          muted 
-          playsinline
-          class="object-cover"
-        />
+        <video ref="videoElement" muted playsinline class="object-cover" />
       </canvas>
     </div>
 
@@ -37,7 +32,6 @@
       </canvas>
     </div> -->
 
-
     <!-- 버튼 영역 -->
     <div class="absolute bottom-0 inset-x-0 p-4 flex justify-between items-center z-20">
       <div class="flex-1">
@@ -53,7 +47,6 @@
   </div>
 </template>
 
-
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
@@ -68,7 +61,7 @@ const router = useRouter()
 
 // 타이머 관련
 let intervalId = null
-const selectedTime = ref(1 * 60 * 1000)
+const selectedTime = ref(63000)
 const timeLeft = ref(selectedTime.value)
 const formattedTime = ref(formatTime(timeLeft.value))
 
@@ -129,45 +122,44 @@ let pose = null
 
 const applyFullscreenBlur = (canvasCtx, results) => {
   // 오프스크린 캔버스 생성
-  const offscreenCanvas = document.createElement("canvas");
-  offscreenCanvas.width = canvasElement.value.width;
-  offscreenCanvas.height = canvasElement.value.height;
-  const offscreenCtx = offscreenCanvas.getContext("2d");
+  const offscreenCanvas = document.createElement("canvas")
+  offscreenCanvas.width = canvasElement.value.width
+  offscreenCanvas.height = canvasElement.value.height
+  const offscreenCtx = offscreenCanvas.getContext("2d")
 
   // 전체 화면 블러 처리
-  offscreenCtx.drawImage(results.image, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
-  offscreenCtx.filter = "blur(20px)";
-  offscreenCtx.drawImage(offscreenCanvas, 0, 0);
-  
+  offscreenCtx.drawImage(results.image, 0, 0, offscreenCanvas.width, offscreenCanvas.height)
+  offscreenCtx.filter = "blur(20px)"
+  offscreenCtx.drawImage(offscreenCanvas, 0, 0)
+
   // 메인 캔버스에 합성
-  canvasCtx.drawImage(offscreenCanvas, 0, 0);
-};
+  canvasCtx.drawImage(offscreenCanvas, 0, 0)
+}
 
 const drawEmoji = (canvasCtx, landmarks) => {
-  const emoji = "😎";
-  const nose = landmarks[0];
-  const leftEar = landmarks[7];
-  const rightEar = landmarks[8];
-  
-  if(nose && leftEar && rightEar) {
-    const faceX = ((nose.x + leftEar.x + rightEar.x) / 3) * canvasElement.value.width;
-    const faceY = ((nose.y + leftEar.y + rightEar.y) / 3) * canvasElement.value.height;
-    
+  const emoji = "😎"
+  const nose = landmarks[0]
+  const leftEar = landmarks[7]
+  const rightEar = landmarks[8]
+
+  if (nose && leftEar && rightEar) {
+    const faceX = ((nose.x + leftEar.x + rightEar.x) / 3) * canvasElement.value.width
+    const faceY = ((nose.y + leftEar.y + rightEar.y) / 3) * canvasElement.value.height
+
     // 1. 귀 간 거리 기반 기본 크기 계산
-    const earDistance = Math.abs(leftEar.x - rightEar.x) * canvasElement.value.width;
-    let emojiSize = earDistance * 2;
-    
+    const earDistance = Math.abs(leftEar.x - rightEar.x) * canvasElement.value.width
+    let emojiSize = earDistance * 2
+
     // 2. 최소 크기 설정 (화면 세로의 1/5)
-    const minSize = window.innerHeight / 5;
-    emojiSize = Math.max(emojiSize, minSize); // [1]
+    const minSize = window.innerHeight / 5
+    emojiSize = Math.max(emojiSize, minSize) // [1]
 
-    canvasCtx.font = `${emojiSize}px sans-serif`;
-    canvasCtx.textAlign = "center";
-    canvasCtx.textBaseline = "middle";
-    canvasCtx.fillText(emoji, faceX, faceY);
+    canvasCtx.font = `${emojiSize}px sans-serif`
+    canvasCtx.textAlign = "center"
+    canvasCtx.textBaseline = "middle"
+    canvasCtx.fillText(emoji, faceX, faceY)
   }
-};
-
+}
 
 const onResults = (results) => {
   if (!canvasElement.value) return
@@ -189,21 +181,21 @@ const onResults = (results) => {
   }
 
   if (results.poseLandmarks) {
-    emit("pose-detected", results.poseLandmarks);
-    const landmarks = results.poseLandmarks;
-    
+    emit("pose-detected", results.poseLandmarks)
+    const landmarks = results.poseLandmarks
+
     // 얼굴 인식 여부 확인
-    const nose = landmarks[0];
-    const leftEar = landmarks[7];
-    const rightEar = landmarks[8];
-    
-    if(nose && leftEar && rightEar) {
-      drawEmoji(canvasCtx, landmarks);
+    const nose = landmarks[0]
+    const leftEar = landmarks[7]
+    const rightEar = landmarks[8]
+
+    if (nose && leftEar && rightEar) {
+      drawEmoji(canvasCtx, landmarks)
     } else {
-      applyFullscreenBlur(canvasCtx, results);
+      applyFullscreenBlur(canvasCtx, results)
     }
   } else {
-    applyFullscreenBlur(canvasCtx, results);
+    applyFullscreenBlur(canvasCtx, results)
   }
   canvasCtx.restore()
 }
@@ -240,11 +232,15 @@ onMounted(async () => {
 
   pose.onResults(onResults)
 
-  video.addEventListener('canplay', () => {
-    canvas.height = window.innerHeight
-    const aspectRatio = video.videoWidth / video.videoHeight
-    canvas.width = canvas.height * aspectRatio
-  }, { once: true })
+  video.addEventListener(
+    "canplay",
+    () => {
+      canvas.height = window.innerHeight
+      const aspectRatio = video.videoWidth / video.videoHeight
+      canvas.width = canvas.height * aspectRatio
+    },
+    { once: true }
+  )
 
   camera = new Camera(videoElement.value, {
     onFrame: async () => {
@@ -273,6 +269,5 @@ onUnmounted(() => {
   if (camera) camera.stop()
 })
 </script>
-
 
 <style scoped></style>
