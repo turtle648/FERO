@@ -84,7 +84,7 @@ import { ref, computed, defineEmits } from "vue"
 import { useRouter } from "vue-router"
 import { useMainStore, TUTORIAL_IDS } from "@/stores/mainStore"
 import BaseModal from "@/components/modal/BaseModal.vue"
-import MediumBaseModal from "@/components/modal/BaseModal.vue"
+import MediumBaseModal from "@/components/modal/MediumBaseModal.vue"
 import SmallBaseModal from "@/components/modal/SmallBaseModal.vue"
 import MiniModal from "@/components/modal/MiniBaseModal.vue"
 
