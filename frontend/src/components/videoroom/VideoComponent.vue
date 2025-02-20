@@ -493,7 +493,7 @@ onBeforeUnmount(() => {
 }
 
 .my-video {
-  @apply w-full h-full object-cover relative z-10;
+  @apply w-full h-full object-contain relative z-10;
 }
 
 .peer-container {
