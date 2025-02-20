@@ -140,10 +140,10 @@ let pose = null;
 
 const applyFullscreenBlur = (canvasCtx, results) => {
   // 오프스크린 캔버스 생성
-  const offscreenCanvas = document.createElement("canvas");
-  offscreenCanvas.width = canvasElement.value.width;
-  offscreenCanvas.height = canvasElement.value.height;
-  const offscreenCtx = offscreenCanvas.getContext("2d");
+  const offscreenCanvas = document.createElement("canvas")
+  offscreenCanvas.width = canvasElement.value.width
+  offscreenCanvas.height = canvasElement.value.height
+  const offscreenCtx = offscreenCanvas.getContext("2d")
 
   // 전체 화면 블러 처리
   offscreenCtx.drawImage(
@@ -157,8 +157,8 @@ const applyFullscreenBlur = (canvasCtx, results) => {
   offscreenCtx.drawImage(offscreenCanvas, 0, 0);
 
   // 메인 캔버스에 합성
-  canvasCtx.drawImage(offscreenCanvas, 0, 0);
-};
+  canvasCtx.drawImage(offscreenCanvas, 0, 0)
+}
 
 const drawEmoji = (canvasCtx, landmarks) => {
   const emoji = "😎";
@@ -178,13 +178,13 @@ const drawEmoji = (canvasCtx, landmarks) => {
     let emojiSize = earDistance * 2;
 
     // 2. 최소 크기 설정 (화면 세로의 1/5)
-    const minSize = window.innerHeight / 5;
-    emojiSize = Math.max(emojiSize, minSize); // [1]
+    const minSize = window.innerHeight / 5
+    emojiSize = Math.max(emojiSize, minSize) // [1]
 
-    canvasCtx.font = `${emojiSize}px sans-serif`;
-    canvasCtx.textAlign = "center";
-    canvasCtx.textBaseline = "middle";
-    canvasCtx.fillText(emoji, faceX, faceY);
+    canvasCtx.font = `${emojiSize}px sans-serif`
+    canvasCtx.textAlign = "center"
+    canvasCtx.textBaseline = "middle"
+    canvasCtx.fillText(emoji, faceX, faceY)
   }
 };
 
@@ -230,10 +230,10 @@ const onResults = (results) => {
     if (nose && leftEar && rightEar) {
       drawEmoji(canvasCtx, landmarks);
     } else {
-      applyFullscreenBlur(canvasCtx, results);
+      applyFullscreenBlur(canvasCtx, results)
     }
   } else {
-    applyFullscreenBlur(canvasCtx, results);
+    applyFullscreenBlur(canvasCtx, results)
   }
   canvasCtx.restore();
 };

@@ -13,17 +13,90 @@
     <!-- 싱글모드 결과 -->
     <MiniBaseModal
       v-if="mode === 'single'"
+      title="Result"
       class="bg-white p-6 rounded-lg shadow-lg text-center w-[30vh] h-[35vh] flex flex-col justify-center items-center"
-      @close-modal="completeFitnessSingle"
+      @close-modal="
+        () => {
+          completeFitnessSingle()
+          isSingleResultModalVisible = true
+        }
+      "
     >
       <div class="text-container pb-4">
-        <p class="font-dgm mb-4 text-xl mt-3">싱글모드 결과</p>
+        <p class="mb-4 text-3xl font-bold text-center">Sigle Mode</p>
         <p class="text-base font-dgm mb-4">횟수: {{ count }}</p>
-        <p class="text-base font-dgm mb-4">운동 시간: {{ exerciseDuration }}</p>
+        <p class="text-base font-dgm">운동 시간: {{ exerciseDuration }}</p>
       </div>
 
       <!-- <button @click="completeFitnessSingle" class="w-[10vh] nes-btn is-primary font-dgm p-1">확인</button> -->
     </MiniBaseModal>
+
+    <BaseModal title="Result" class="single-result-modal" v-if="isSingleResultModalVisible">
+      <div class="grid grid-cols-4 gap-4 text-container text-center text-xl">
+        <!-- 제목 -->
+        <!-- <div class="col-span-4 text-center mb-4">
+          <p class="text-3xl font-bold">Single Mode</p>
+        </div> -->
+
+        <!-- 운동 전후 스탯 -->
+        <div class="col-span-4">
+          <h3 class="text-3xl font-semibold mt-4 mb-0">Stats</h3>
+        </div>
+        <div class="col-span-4 grid grid-cols-4 gap-4">
+          <!-- Header Row -->
+          <div class="font-bold">Type</div>
+          <div class="font-bold">Before</div>
+          <div class="font-bold">-></div>
+          <div class="font-bold">After</div>
+
+          <!-- Arms -->
+          <div class="bg-[rgba(255,99,132,0.8)]">Arm</div>
+          <div>{{ singleResult.beforeStats.armsStats }}</div>
+          <div>→</div>
+          <div>{{ singleResult.afterStats.armsStats }}</div>
+
+          <!-- Legs -->
+          <div class="bg-[rgba(54,162,235,0.8)]">Legs</div>
+          <div>{{ singleResult.beforeStats.legsStats }}</div>
+          <div>→</div>
+          <div>{{ singleResult.afterStats.legsStats }}</div>
+
+          <!-- Chest -->
+          <div class="bg-[rgba(255,206,86,0.8)]">Chest</div>
+          <div>{{ singleResult.beforeStats.chestStats }}</div>
+          <div>→</div>
+          <div>{{ singleResult.afterStats.chestStats }}</div>
+
+          <!-- Abs -->
+          <div class="bg-[rgba(75,192,192,0.8)]">Abs</div>
+          <div>{{ singleResult.beforeStats.absStats }}</div>
+          <div>→</div>
+          <div>{{ singleResult.afterStats.absStats }}</div>
+
+          <!-- Back -->
+          <div class="bg-[rgba(153,102,255,0.8)]">Back</div>
+          <div>{{ singleResult.beforeStats.backStats }}</div>
+          <div>→</div>
+          <div>{{ singleResult.afterStats.backStats }}</div>
+
+          <!-- Stamina -->
+          <div class="bg-[rgba(255,140,0,0.8)]">Stam</div>
+          <div>{{ singleResult.beforeStats.staminaStats }}</div>
+          <div>→</div>
+          <div>{{ singleResult.afterStats.staminaStats }}</div>
+
+          <!-- EXP -->
+          <div class="bg-[rgba(255,50,211,0.8)]">EXP</div>
+          <div>{{ singleResult.beforeUserExperience }}</div>
+          <div>→</div>
+          <div>{{ singleResult.afterUserExperience }}</div>
+
+          <div class="col-span-4 flex justify-center">
+            <button class="nes-btn is-error w-[10vh] mb-[2vh]">EXIT</button>
+          </div>
+        </div>
+      </div>
+    </BaseModal>
 
     <!-- 랭크모드 결과 -->
     <!-- <MediumBaseModal title="Result"> -->
@@ -165,18 +238,41 @@ import { onMounted, ref, defineProps, watch } from "vue";
 import { useUserStore } from "@/stores/store";
 import axios from "axios";
 // import MediumBaseModal from "@/components/modal/MediumBaseModal.vue"
-// import BaseModal from "@/components/modal/BaseModal.vue"
+import BaseModal from "@/components/modal/BaseModal.vue"
 // import SmallBaseModal from "@/components/modal/SmallBaseModal.vue"
 import MiniBaseModal from "@/components/modal/MiniBaseModal.vue";
 
-const router = useRouter();
-const route = useRoute();
-const mainStore = useMainStore();
-const userStore = useUserStore();
-const mode = ref("");
-const rankResult = ref("");
-const isDisabled = ref(true);
-const isLoading = ref(false); // 로딩 상태
+const router = useRouter()
+const route = useRoute()
+const mainStore = useMainStore()
+const userStore = useUserStore()
+const mode = ref("")
+const rankResult = ref("")
+const isDisabled = ref(true)
+const isLoading = ref(false) // 로딩 상태
+const singleResult = ref({
+  userId: "",
+  beforeStats: {
+    armsStats: 0,
+    legsStats: 0,
+    chestStats: 0,
+    absStats: 0,
+    backStats: 0,
+    staminaStats: 0,
+  },
+  afterStats: {
+    armsStats: 0,
+    legsStats: 0,
+    chestStats: 0,
+    absStats: 0,
+    backStats: 0,
+    staminaStats: 0,
+  },
+  userScore: 0,
+  exerciseId: null,
+}) // 싱글모드 결과
+
+const isSingleResultModalVisible = ref(false) // single-result-modal 표시 여부
 
 const exerciseDuration = ref(0); // 운동 시간
 const exerciseStatsRatioId = ref(2); // 운동 종류
@@ -203,6 +299,7 @@ watch(
   { deep: true, immediate: false }
 );
 
+// 튜토리얼 완료
 const completeFitnessTutorial = async () => {
   await mainStore.loadTutorial();
   const tutorialId = Number(route.params.exercise) || null;
@@ -219,10 +316,9 @@ const completeFitnessTutorial = async () => {
   router.push({ name: "Main" });
 };
 
-// 싱글모드 결과 전송
+// 싱글모드 결과
 const completeFitnessSingle = async () => {
   try {
-    // 운동 데이터 설정
     const requestData = {
       exerciseCnt: props.count, // 운동 횟수
       exerciseDuration: exerciseDuration.value, // 운동 시간
@@ -231,26 +327,23 @@ const completeFitnessSingle = async () => {
 
     console.log("싱글모드 데이터 전송:", requestData);
 
-    // 사용자 토큰 가져오기 (예: Vuex 또는 Pinia에서 userStore 사용)
-    const token = userStore.accessToken;
+    const token = userStore.accessToken
 
-    // API 호출
-    const response = await axios.post(
-      "https://i12e103.p.ssafy.io:8076/api/v1/exercise/log",
-      requestData,
-      {
-        headers: {
-          Authorization: `${token}`, // 헤더에 토큰 추가
-          "Content-Type": "application/json", // JSON 형식 명시
-        },
-      }
-    );
+    const response = await axios.post("https://i12e103.p.ssafy.io:8076/api/v1/exercise/single-mode", requestData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
 
     if (response.status === 200) {
       console.log("싱글모드 결과 전송 성공:", response.data);
 
-      // 성공적으로 데이터 전송 후 페이지 이동
-      router.push({ name: "Main" });
+      // API 응답 데이터를 상태 변수에 저장
+      singleResult.value = response.data
+
+      // 모달 활성화
+      isSingleResultModalVisible.value = true
     } else {
       console.error("싱글모드 결과 전송 실패:", response.status, response.data);
     }
