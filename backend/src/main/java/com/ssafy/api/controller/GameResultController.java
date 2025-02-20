@@ -1,6 +1,7 @@
 package com.ssafy.api.controller;
 
 import com.ssafy.api.request.UserIdGameResultReq;
+import com.ssafy.api.response.GameResultsRes;
 import com.ssafy.api.service.GameResultServiceImpl;
 import com.ssafy.common.util.JwtTokenUtil;
 import com.ssafy.db.entity.GameResult;
@@ -29,7 +30,7 @@ public class GameResultController {
 
     @GetMapping
     @ApiOperation(value = "유저 경기 전적 조회", notes = "특정 유저의 최근 경기 전적을 조회한다.")
-    public ResponseEntity<List<GameResult>> getUserGameRecords(HttpServletRequest request) {
+    public ResponseEntity<List<GameResultsRes>> getUserGameRecords(HttpServletRequest request) {
         String userId = JwtTokenUtil.getUserIdFromJWT(request.getHeader("Authorization"));
 
         return ResponseEntity.ok(gameResultService.getUserGameRecords(userId));

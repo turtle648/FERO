@@ -6,6 +6,7 @@ import com.ssafy.api.request.GameResultReq;
 import com.ssafy.api.request.UserIdGameResultReq;
 import com.ssafy.api.response.ExerciseLogRes;
 import com.ssafy.api.response.ExerciseStatsRatioRes;
+import com.ssafy.api.response.GameResultsRes;
 import com.ssafy.db.entity.ExerciseLog;
 import com.ssafy.db.entity.GameResult;
 
@@ -15,7 +16,7 @@ public interface GameResultService {
     // 게임 결과(전적) 저장
     void saveGameResult(UserIdGameResultReq gameResultReq);
     // 전적 조회
-    List<GameResult> getUserGameRecords(String userId);
+    List<GameResultsRes> getUserGameRecords(String userId);
 
     // 유저 기준 경기 결과 계산 (WIN, LOSE, DRAW)
     GameResult.GameResultType getResult(int userScore, int opponentScore);

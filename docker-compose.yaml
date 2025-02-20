@@ -47,12 +47,14 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: "root"
       MYSQL_DATABASE: "E103_DB"
+      TZ: Asia/Seoul
     ports:
       - 3307:3306
     volumes:
       - my-sql-volume:/var/lib/mysql
       - /home/ubuntu/S12P11E103/db/config/my.cnf:/etc/mysql/conf.d/my.cnf
       - /home/ubuntu/S12P11E103/db:/docker-entrypoint-initdb.d
+      - /etc/localtime:/etc/localtime:ro
     networks:
       - my-sql-network
     healthcheck:

@@ -389,14 +389,19 @@ public class MatchingService {
         entityManager.flush();
         entityManager.clear();
 
-        int result;
-        if (gameResultReq.getUser1Score() > gameResultReq.getUser2Score()) {
-            result = 1;  // user1 승리
-        } else if (gameResultReq.getUser1Score() < gameResultReq.getUser2Score()) {
-            result = 2;  // user1 패배 (user2 승리)
-        } else {
-            result = 0;  // 무승부 (승자 없음)
+        int result = 0;
+        if(gameResultReq.getRemainTime() != 0) {
+            result = 1;
         }
+        if(gameResultReq.getRemainTime() == 0) {
+            if(gameResultReq.getUser1Score() > gameResultReq.getUser1Score()) {
+                result = 1;
+            }
+            if(gameResultReq.getUser2Score() > gameResultReq.getUser1Score()) {
+                result = 2;
+            }
+        }
+
 
         ExerciseResultEvent exerciseResultEvent = new ExerciseResultEvent(
                 userId,
