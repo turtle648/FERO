@@ -616,13 +616,13 @@ VALUES
 
 -- 기본 튜토리얼 데이터 삽입
 INSERT INTO tutorial_types (id, tutorial_name) VALUES
-   (1, 'pushup'),
-   (2, 'squat'),
-   (3, 'lunge'),
-   (4, 'plank'),
-   (97, 'Start'),
-   (98, 'MainPage'),
-   (99, 'UI');
+				   (1, 'pushup'),
+				   (2, 'squat'),
+				   (3, 'lunge'),
+				   (4, 'plank'),
+				   (97, 'Start'),
+				   (98, 'MainPage'),
+				   (99, 'UI');
 
 -- user_info 더미 데이터 (20명, 모든 비밀번호는 '1234')
 INSERT INTO user_info (user_id, user_password, user_name, user_email, phone_number) VALUES
