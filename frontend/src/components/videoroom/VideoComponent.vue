@@ -7,6 +7,7 @@
       @set-count="setCount"
       @get-time-left="setTime"
       :command="command"
+      :is-timer-start="isTimerStart"
     />
 
     <div class="peer-container" :class="{ hidden: isClose }">
@@ -69,6 +70,7 @@ const roomId = ref(null);
 const currentPeerId = ref(null);
 const peerToken = ref(null);
 const command = ref("");
+const isTimerStart = ref(false);
 
 let webSocket;
 let myStream;
@@ -132,6 +134,7 @@ const cleanupAndNavigate = (finalRoomId, finalPeerToken) => {
     isClose.value = true;
     myPeerConnection.close();
     myPeerConnection = null;
+    isTimerStart.value = false;
   }
 
   console.log(finalRoomId + ":" + finalPeerToken);
@@ -354,6 +357,8 @@ const getMedia = async () => {
 
     if (myFace.value) {
       myFace.value.srcObject = myStream;
+      isTimerStart.value = true;
+      console.log("isTimerStart" + isTimerStart.value);
     }
   } catch (e) {
     console.error("미디어 스트림 에러:", e);
