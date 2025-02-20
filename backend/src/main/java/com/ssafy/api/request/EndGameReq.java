@@ -13,5 +13,5 @@ public class EndGameReq {
     private String userToken;
     private String opponentToken;
     private String gameId;
-    private String remainTime;
+    private Integer remainTime;
 }
