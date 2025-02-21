@@ -17,8 +17,9 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
 //    // 친구 요청이 이미 존재하는지 확인
     Optional<Friend> findByUserIdAndFriendId(String userId, String friendId);
 
-//    List<Friend> findByUserIdAndStatus(Friend.FriendStatus status);
+    // 친구 요청을 확인
+    List<Friend> findByFriendIdAndStatus(String friendId, Friend.FriendStatus status);
 
 //    // 친구 요청 삭제 (친구 관계 끊기)
-//    void deleteByUserAndFriend(User user, User friend);
+    void deleteByUserIdAndFriendId(String userId, String friendId);
 }

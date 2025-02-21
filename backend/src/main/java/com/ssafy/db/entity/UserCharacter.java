@@ -26,11 +26,14 @@ public class UserCharacter extends BaseEntity implements Serializable {
     @Column(name = "user_nickname", unique = true, nullable = false, length = 15)
     private String userNickname;
 
-    @Column(nullable = false)
+    @Column(name = "gender", nullable = false)
     private char gender;
 
-    @Column(nullable = false)
+    @Column(name = "avatar", nullable = false)
     private String avatar;
+
+    @Column(name = "user_rank", nullable = false)
+    private String userRank = "-";
 
     @Column(name = "user_level", nullable = false, columnDefinition = "SMALLINT UNSIGNED DEFAULT 1")
     private Short userLevel = 1;

@@ -1,30 +1,30 @@
 <!-- components/modal/CalendarModal.vue -->
 <template>
-  <BaseModal title="Calendar" @close-modal="$emit('close-modal')">
-    <div class="flex flex-col w-full h-full max-w-[40vh] bg-white">
+  <BaseModal class="font-dgm" title="Calendar" @close-modal="$emit('close-modal')">
+    <div class="flex flex-col w-full h-full bg-white font-dgm">
       <!-- 달력 헤더 -->
-      <header class="flex justify-between items-center p-4 border-b">
+      <header class="flex justify-between items-center border-b">
         <button @click="prevMonth" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full transition-colors">❮</button>
         <h2 class="text-lg font-bold">{{ currentYear }}년 {{ currentMonth + 1 }}월</h2>
         <button @click="nextMonth" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full transition-colors">❯</button>
       </header>
 
       <!-- 달력 본문 -->
-      <div class="flex-1 p-4">
+      <div class="flex-1">
         <!-- 요일 헤더 -->
-        <div class="grid grid-cols-7 mb-2">
+        <div class="grid grid-cols-7 mb-1">
           <span v-for="day in ['일', '월', '화', '수', '목', '금', '토']" :key="day" class="text-center font-medium text-gray-600 text-sm py-2">
             {{ day }}
           </span>
         </div>
 
         <!-- 날짜 그리드 -->
-        <div ref="daysContainer" class="grid grid-cols-7 gap-1 days">
+        <div ref="daysContainer" class="grid grid-cols-7 gap-1 days text-center">
           <!-- 날짜들은 renderCalendar 함수에서 동적으로 추가됨 -->
         </div>
       </div>
       <div class="flex flex-col w-full h-[50%]">
-        <Bar :data="chartData" :options="options" />
+        <Bar ref="chartRef" :data="chartData" :options="options" />
       </div>
     </div>
   </BaseModal>
@@ -33,7 +33,7 @@
 <script setup>
 import BaseModal from "./BaseModal.vue"
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from "chart.js"
-import { ref, defineEmits, onMounted, computed } from "vue"
+import { ref, defineEmits, onMounted } from "vue"
 import { useMainStore } from "@/stores/mainStore"
 import { Bar } from "vue-chartjs"
 import * as chartConfig from "../config/chartConfig.js"
@@ -52,50 +52,102 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 // 선택된 날짜 상태 관리
 const selectedDate = ref(new Date())
 
+// 글로벌 폰트 설정
+ChartJS.defaults.font.family = "DungGeunMo" // 원하는 폰트 이름
+ChartJS.defaults.font.size = 12 // 폰트 크기
+ChartJS.defaults.font.weight = "normal" // 폰트 굵기
+ChartJS.defaults.color = "#000" // 텍스트 색상
+
 // 차트 데이터 computed 속성으로 변경
-const chartData = computed(() => ({
+const chartData = ref({
   labels: ["팔", "다리", "가슴", "복근", "등", "체력"],
   datasets: [
     {
       label: "운동 데이터",
-      backgroundColor: "rgba(236, 72, 153, 1)",
-      pointBackgroundColor: "rgba(236, 72, 153, 1)",
+      backgroundColor: [
+        "rgba(255, 99, 132, 0.8)", // 빨강
+        "rgba(54, 162, 235, 0.8)", // 파랑
+        "rgba(255, 206, 86, 0.8)", // 노랑
+        "rgba(75, 192, 192, 0.8)", // 청록
+        "rgba(153, 102, 255, 0.8)", // 보라
+        "rgba(255, 159, 64, 0.8)", // 주황
+      ],
+      // pointBackgroundColor: ["rgba(236, 72, 153, 1)"],
       pointBorderColor: "#fff",
       pointHoverBackgroundColor: "#fff",
       pointHoverBorderColor: "rgba(236, 72, 153, 1)",
-      data: getSelectedDateData(),
+      data: [0, 0, 0, 0, 0, 0], // 기본값 설정
     },
   ],
-}))
+})
 
-const options = ref(chartConfig.options)
+// 개별 차트 옵션 설정
+const options = ref({
+  ...chartConfig.options,
+  plugins: {
+    legend: {
+      // labels: {
+      //   font: {
+      //     family: "font-dgm",
+      //     size: 14,
+      //     style: "normal",
+      //     weight: "normal",
+      //   },
+      // },
+      display: false,
+    },
+    title: {
+      display: true,
+      text: "운동 데이터 차트",
+      font: {
+        family: "font-dgm",
+        size: 14,
+        style: "normal",
+        weight: "bold",
+      },
+    },
+    tooltip: {
+      titleFont: { family: "font-dgm", size: 14 },
+      bodyFont: { family: "font-dgm", size: 12 },
+    },
+  },
+})
 
 defineEmits(["close-modal"])
-// const closeCalendarModal = () => {
-//   emit("close-modal")
-// }
 
 // 날짜 관련 상태 관리
 const currentDate = new Date()
 const currentYear = ref(currentDate.getFullYear())
 const currentMonth = ref(currentDate.getMonth())
 const daysContainer = ref(null)
+const chartRef = ref(null)
+
+const updateChartData = async () => {
+  const data = await getSelectedDateData()
+  console.log(data)
+
+  chartData.value = {
+    ...chartData.value,
+    datasets: [
+      {
+        ...chartData.value.datasets[0],
+        data: data,
+      },
+    ],
+  }
+}
 
 // 선택된 날짜의 데이터 가져오기
 const getSelectedDateData = async () => {
   const year = selectedDate.value.getFullYear()
-  const month = selectedDate.value.getMonth()
+  const month = selectedDate.value.getMonth() + 1
   const date = selectedDate.value.getDate()
   console.log("📅" + year + "년 " + month + "월 " + date + "일")
 
   const response = await mainStore.getMonthStatus(year, month)
   console.log(response)
 
-  const dateData = response.find((value) => {
-    return value.date === date
-  })
-
-  console.log(dateData)
+  const dateData = response.find((value) => value.date == date)
 
   return dateData ? dateData.status : [0, 0, 0, 0, 0, 0]
 }
@@ -105,6 +157,8 @@ const questData = ref([])
 
 // 퀘스트 데이터 가져오기
 const fetchQuestData = async () => {
+  console.log("💯" + currentYear.value + ":" + currentMonth.value)
+
   try {
     const response = await mainStore.isQuestCompleted(currentYear.value, currentMonth.value + 1)
 
@@ -126,8 +180,9 @@ const fetchQuestData = async () => {
 }
 
 // 날짜 선택 핸들러
-const handleDateSelect = (day) => {
+const handleDateSelect = async (day) => {
   selectedDate.value = new Date(currentYear.value, currentMonth.value, day)
+  await updateChartData()
 }
 
 // 달력 렌더링
@@ -152,8 +207,8 @@ const renderCalendar = () => {
 
     const isSelected =
       i === selectedDate.value.getDate() && currentMonth.value === selectedDate.value.getMonth() && currentYear.value === selectedDate.value.getFullYear() ? "bg-blue-500 text-white" : ""
-
     const questStatus = questData.value !== "no-data" && questData.value.find((q) => q.day === i)
+
     const questClass = questStatus ? (questStatus.isCompleted ? "text-green-500" : "text-red-500") : ""
 
     daysHTML += `<span
@@ -211,6 +266,7 @@ onMounted(async () => {
   })
 
   await fetchQuestData()
+  await updateChartData()
 })
 </script>
 

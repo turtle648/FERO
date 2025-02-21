@@ -5,17 +5,21 @@ import com.ssafy.api.request.ExerciseLogReq;
 import com.ssafy.api.request.ExerciseLogSearchReq;
 import com.ssafy.api.response.ExerciseLogRes;
 import com.ssafy.api.response.ExerciseStatsRatioRes;
+import com.ssafy.api.response.SingleModeRes;
 import com.ssafy.db.entity.*;
 import com.ssafy.db.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +30,10 @@ public class ExerciseLogServiceImpl implements ExerciseLogService {
     private final ExerciseLogRepository exerciseLogRepository;
     private final UserStatsRepository userStatsRepository;
     private final UserCharacterRepository userCharacterRepository;
+    private final UserRepository userRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public ExerciseStatsRatioRes getStatsByExerciseLog(Long exerciseStatsRatioId) {
@@ -36,7 +44,7 @@ public class ExerciseLogServiceImpl implements ExerciseLogService {
 
     @Override
     @Transactional
-    @EventListener
+//    @EventListener
     public ExerciseLog addExerciseLogAndUpdateStats(EventExerciseLog event) {
         String userId = event.getUserId();
         ExerciseLogReq req = event.getReq();
@@ -105,6 +113,71 @@ public class ExerciseLogServiceImpl implements ExerciseLogService {
         return exerciseLogs.stream()
                 .map(ExerciseLogRes::from)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public SingleModeRes getSingleModeResult(String userId, EventExerciseLog event) {
+        // 이전 기록 가져오기
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
+        // Stats 깊은 복사
+        UserStats currentStats = userStatsRepository.findByUser(user).orElse(null);
+        UserStats beforeStats = null;
+        if (currentStats != null) {
+            beforeStats = new UserStats();
+            beforeStats.setId(currentStats.getId());
+            beforeStats.setAbsStats(currentStats.getAbsStats());
+            beforeStats.setArmsStats(currentStats.getArmsStats());
+            beforeStats.setBackStats(currentStats.getBackStats());
+            beforeStats.setChestStats(currentStats.getChestStats());
+            beforeStats.setLegsStats(currentStats.getLegsStats());
+            beforeStats.setStaminaStats(currentStats.getStaminaStats());
+            beforeStats.setUpdatedAt(currentStats.getUpdatedAt());
+        }
+
+        // Character 깊은 복사
+        UserCharacter currentCharacter = userCharacterRepository.findByUser_UserId(userId).orElse(null);
+        Short beforeLevel = null;
+        Integer beforeExperience = null;
+        if (currentCharacter != null) {
+            beforeLevel = currentCharacter.getUserLevel();
+            beforeExperience = currentCharacter.getUserExperience();
+        }
+
+        // DB 반영 - before 상태 저장
+        entityManager.flush();
+        entityManager.clear();
+
+        // 운동 기록 추가 및 스탯 업데이트
+        ExerciseLogReq exerciseLogReq = new ExerciseLogReq();
+        exerciseLogReq.setExerciseCnt(event.getReq().getExerciseCnt());
+        exerciseLogReq.setExerciseStatsRatioId(event.getReq().getExerciseStatsRatioId());
+        exerciseLogReq.setExerciseDuration(event.getReq().getExerciseDuration());
+
+        addExerciseLogAndUpdateStats(new EventExerciseLog(userId, exerciseLogReq));
+
+        // DB 반영 - 업데이트된 상태 저장
+        entityManager.flush();
+        entityManager.clear();
+
+        // 이후 상태 조회
+        UserStats afterStats = userStatsRepository.findByUser(user).orElse(null);
+        UserCharacter updatedCharacter = userCharacterRepository.findByUser_UserId(userId).orElse(null);
+        Short afterLevel = (updatedCharacter != null) ? updatedCharacter.getUserLevel() : null;
+        Integer afterExperience = (updatedCharacter != null) ? updatedCharacter.getUserExperience() : null;
+
+        // 결과 객체 생성 및 반환
+        return SingleModeRes.builder()
+                .userId(user.getUserId())
+                .beforeStats(beforeStats)
+                .afterStats(afterStats)
+                .beforeUserLevel(beforeLevel)
+                .beforeUserExperience(beforeExperience)
+                .afterUserLevel(afterLevel)
+                .afterUserExperience(afterExperience)
+                .userScore(event.getReq().getExerciseCnt())
+                .exerciseId(event.getReq().getExerciseStatsRatioId())
+                .build();
     }
 
 

@@ -41,16 +41,6 @@ public class FriendService {
                 .status(Friend.FriendStatus.pending)
                 .build();
         friendRepository.save(newFriendRequest);
-
-//        Friend newFriendRequest2 = Friend.builder()
-//                .userId(user2Id)
-//                .friendId(user1Id)
-//                .friendNickname(user.getUserCharacter().getUserNickname())
-//                .friendLevel(user.getUserCharacter().getUserLevel())
-//                .status(Friend.FriendStatus.pending)
-//                .build();
-//        friendRepository.save(newFriendRequest2);
-
     }
 
 //    // 친구 요청 수락
@@ -78,18 +68,18 @@ public class FriendService {
 
         friendRepository.save(reverseFriend);
     }
-//
+
 //    // 친구 삭제
-//    @Transactional
-//    public void removeFriend(String userId, String friendId) {
-//        User user = userRepository.findByUserId(userId)
-//                .orElseThrow(() -> new IllegalArgumentException("유저 없음"));
-//        User friend = userRepository.findByUserId(friendId)
-//                .orElseThrow(() -> new IllegalArgumentException("친구 대상 유저 없음"));
-//
-//        friendRepository.deleteByUserAndFriend(user, friend);
-//        friendRepository.deleteByUserAndFriend(friend, user); // 반대 방향 삭제
-//    }
+    @Transactional
+    public void removeFriend(String userId, String friendId) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유저 없음"));
+        User friend = userRepository.findByUserId(friendId)
+                .orElseThrow(() -> new IllegalArgumentException("친구 대상 유저 없음"));
+
+        friendRepository.deleteByUserIdAndFriendId(userId, friendId);
+        friendRepository.deleteByUserIdAndFriendId(friendId, userId); // 반대 방향 삭제
+    }
 
     // 친구 목록 조회
     public List<FriendRes> getFriends(String userId) {
@@ -101,6 +91,23 @@ public class FriendService {
         return friends.stream().map(friend -> new FriendRes(
                 friend.getFriendId(),
                 friend.getFriendNickname(),
+                friend.getFriendLevel(),
+                friend.getStatus()
+        )).collect(Collectors.toList());
+    }
+
+
+    // 친구 요청을 조회
+    public List<FriendRes> getPendingFriends(String userId) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유저 없음"));
+
+        // userId가 friend_id로 들어간 pending 요청을 조회합니다.
+        List<Friend> friends = friendRepository.findByFriendIdAndStatus(userId, Friend.FriendStatus.pending);
+
+        return friends.stream().map(friend -> new FriendRes(
+                friend.getUserId(),             // 요청 보낸 사람의 아이디
+                friend.getFriendNickname(),     // 요청 보낸 사람의 닉네임 (혹은 원하는 정보)
                 friend.getFriendLevel(),
                 friend.getStatus()
         )).collect(Collectors.toList());

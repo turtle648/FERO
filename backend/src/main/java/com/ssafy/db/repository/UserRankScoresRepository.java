@@ -5,7 +5,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -18,7 +17,7 @@ public interface UserRankScoresRepository extends JpaRepository<UserRankScores, 
     Optional<UserRankScores> findByUser_UserIdAndExerciseStatsRatio_Id(String userUserId, Long id);
 
     @Modifying
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     @Query("UPDATE UserRankScores ur SET ur.rankScore = ur.rankScore + :rankScore " +
             "WHERE ur.user.userId = :userId AND ur.exerciseStatsRatio.id = :exerciseId")
     void updateUserRankScore(

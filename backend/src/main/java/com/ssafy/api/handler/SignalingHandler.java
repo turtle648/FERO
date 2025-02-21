@@ -83,22 +83,22 @@ public class SignalingHandler extends TextWebSocketHandler {
 
         Long exerciseType = Long.parseLong(message.getExerciseType());
 
-        int result = 0;
-        if(remainTime != 0) {
-            result = 1;
-        }
-        if(remainTime == 0) {
-            if(userScore1 > userScore2) {
-                result = 1;
-            }
-            if(userScore2 > userScore1) {
-                result = 2;
-            }
-        }
+//        int result = 0;
+//        if(remainTime != 0) {
+//            result = 1;
+//        }
+//        if(remainTime == 0) {
+//            if(userScore1 > userScore2) {
+//                result = 1;
+//            }
+//            if(userScore2 > userScore1) {
+//                result = 2;
+//            }
+//        }
 
 
-        log.info("⚠️ exercise result publish :: {}", new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
-        log.info("⚠️ game result publish :: {}", new GameResultReq(exerciseType, roomId, 1, userToken1, userToken2, userScore1, userScore2));
+//        log.info("⚠️ exercise result publish :: {}", new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
+        log.info("⚠️ game result publish :: {}", new GameResultReq(exerciseType, roomId, 1, userToken1, userToken2, userScore1, userScore2, remainTime));
 
         // 세션 상태 체크 후 메시지 전송
         WebSocketSession session1 = sessions.get(userUUID1);
@@ -144,15 +144,16 @@ public class SignalingHandler extends TextWebSocketHandler {
         tokenWithUid.entrySet().removeIf(entry -> entry.getValue().equals(userUUID2));
 
 
-        eventPublisher.publishEvent(new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
-        eventPublisher.publishEvent(new UserIdGameResultReq(exerciseType, roomId, 60, JwtTokenUtil.getUserIdFromJWT(userToken1), JwtTokenUtil.getUserIdFromJWT(userToken2), userScore1, userScore2));
-        eventPublisher.publishEvent(new EventExerciseLog(JwtTokenUtil.getUserIdFromJWT(userToken1), user1LogReq));
-        eventPublisher.publishEvent(new EventExerciseLog(JwtTokenUtil.getUserIdFromJWT(userToken2), user2LogReq));
+        eventPublisher.publishEvent(new UserIdGameResultReq(exerciseType, roomId, 60, JwtTokenUtil.getUserIdFromJWT(userToken1), JwtTokenUtil.getUserIdFromJWT(userToken2), userScore1, userScore2, remainTime));
+//        eventPublisher.publishEvent(new ExerciseResultEvent(userToken1, userToken2, userScore1, userScore2, result, exerciseType));
+//        eventPublisher.publishEvent(new EventExerciseLog(JwtTokenUtil.getUserIdFromJWT(userToken1), user1LogReq));
+//        eventPublisher.publishEvent(new EventExerciseLog(JwtTokenUtil.getUserIdFromJWT(userToken2), user2LogReq));
     }
 
     @EventListener
     public void matchResult(MatchSuccessEvent event) {
         log.info(">>> ❤️ [ws] 이벤트 리스너 동작!: {}", event);
+
         String user1 = event.getUserToken1();
         String user2 = event.getUserToken2();
         Date date = new Date();

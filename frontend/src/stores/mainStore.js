@@ -6,11 +6,14 @@ import axios from "axios";
 // 튜토리얼 타입 상수화 (확장성 고려)
 export const TUTORIAL_IDS = {
   UI: 99,
+  MAIN_PAGE: 98, // 메인 페이지 튜토리얼
   PUSHUP: 1,
   SQUAT: 2,
   LUNGE: 3,
   PLANK: 4,
-};
+}
+
+export const questData = ref('')
 
 export const useMainStore = defineStore("main", () => {
   const tutorial = ref([]);
@@ -21,7 +24,7 @@ export const useMainStore = defineStore("main", () => {
     baseURL: "https://i12e103.p.ssafy.io:8076/api/v1",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${authToken.value}`,
+      Authorization: `${authToken.value}`,
     },
   });
 
@@ -93,12 +96,13 @@ export const useMainStore = defineStore("main", () => {
 
   // 퀘스트 한달치
   async function isQuestCompleted(year, month) {
+    console.log(month, year);
     try {
       console.time(`[⏱️] Sending Date Year: ${year}, Month: ${month}`);
 
       // API 호출
-      const data = { year, month };
-      const response = await api.get("/exercise/monthly", data);
+      const params = { year, month };
+      const response = await api.get("/exercise/monthly", { params });
 
       console.log("✅ Date Sent Successfully:", response.data);
       return response.data; // 성공 시 응답 데이터 반환
@@ -115,18 +119,39 @@ export const useMainStore = defineStore("main", () => {
 
   async function getMonthStatus(year, month) {
     const params = { month, year };
+    console.time(
+      `[⏱️] GET MONTHSTATUS Sending Date Year: ${year}, Month: ${month}`
+    );
+
     const response = await api.get("/userStats/history", { params });
+
+    console.log("✅ Date Sent Successfully:", response.data);
+
     return response.data;
   }
+  
+  // 퀘스트 확인 및 퀘스트데이터 업데이트
+  const getQuestData = async () => {
+    try {
+        const response = await api.get('/exercise/today')
+
+        console.log('API Response:', response.data) // 리스폰스 값 확인
+        questData.value = response.data[0]
+    } catch (error) {
+        console.error('퀘스트 데이터 조회 실패', error)
+    }
+}
 
   return {
     tutorial,
     authToken,
+    questData,
     uiTutorialCompleted,
     TUTORIAL_IDS, // 상수 노출
     loadTutorial,
     completeTutorial,
     isQuestCompleted,
     getMonthStatus,
+    getQuestData,
   };
 });

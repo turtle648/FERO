@@ -82,7 +82,7 @@
   
   const modalIcon = computed(() => {
     if (!props.isSignUpMode) {
-      return require('@/assets/images/fitnessHeroFromISAEKAI.png')
+      return require('@/assets/images/fitnessHero.png')
     }
     return require(`@/assets/images/icon/sign-up-${signUpStep.value}.png`)
   })

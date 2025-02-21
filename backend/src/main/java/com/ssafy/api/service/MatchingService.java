@@ -259,6 +259,7 @@ public class MatchingService {
                 currentIndex++;
                 continue;
             }
+
             // 3-2. 매칭 가능한 상대 찾기 (rankScore +- 100 범위)
             // 후보자가 sorted-set 에 없으면 스킵 -- queue에서 삭제
             Double currentZScore = redisTemplate.opsForZSet().score(sortedSetKey, currentUserToken);
@@ -269,7 +270,7 @@ public class MatchingService {
             // 점수 차이가 100 이내인지 확인
             System.out.println("들어올 애 점수 : "+rankScore);
             System.out.println("큐에 있는 후보자 점수 : "+currentUserScore);
-            if (Math.abs(currentUserScore - rankScore) <= 1000) {
+            if (Math.abs(currentUserScore - rankScore) <= 100) {
                 // 매칭 성공
                 handleMatchSuccess(currentUserToken, userToken, exerciseId);
                 matchFound = true;
@@ -327,6 +328,7 @@ public class MatchingService {
     }
     }
 
+    // 게임 끝날 때 변화값 띄우기
     @Transactional
     public GameResultInfoRes saveGameResult(GameResultReq gameResultReq) {
         GameResultInfoRes gameResultInfoRes = new GameResultInfoRes();
@@ -381,23 +383,29 @@ public class MatchingService {
         exerciseLogReq.setExerciseStatsRatioId(gameResultReq.getExerciseId());
         exerciseLogReq.setExerciseDuration(gameResultReq.getDuration());
         exerciseLogService.addExerciseLogAndUpdateStats(new EventExerciseLog(userId, exerciseLogReq));
+        log.info(exerciseLogReq.toString());
 
         // DB 반영 - 업데이트된 상태 저장
         entityManager.flush();
         entityManager.clear();
 
-        Integer result;
-        if (gameResultReq.getUser1Score() > gameResultReq.getUser2Score()) {
-            result = 1;  // user1 승리
-        } else if (gameResultReq.getUser1Score() < gameResultReq.getUser2Score()) {
-            result = 2;  // user1 패배 (user2 승리)
-        } else {
-            result = 0;  // 무승부 (승자 없음)
+        int result = 0;
+        if(gameResultReq.getRemainTime() != 0) {
+            result = 1;
+        }
+        if(gameResultReq.getRemainTime() == 0) {
+            if(gameResultReq.getUser1Score() > gameResultReq.getUser1Score()) {
+                result = 1;
+            }
+            if(gameResultReq.getUser2Score() > gameResultReq.getUser1Score()) {
+                result = 2;
+            }
         }
 
+
         ExerciseResultEvent exerciseResultEvent = new ExerciseResultEvent(
-                gameResultReq.getUserToken1(),
-                gameResultReq.getUserToken2(),
+                userId,
+                opponentId,
                 gameResultReq.getUser1Score(),
                 gameResultReq.getUser2Score(),
                 result,
@@ -405,11 +413,14 @@ public class MatchingService {
         );
 
         RankUpdateRes rankUpdateRes = userRankScoresServiceImpl.updateRankScore(exerciseResultEvent);
+        log.info("@@@@@@@@===========================");
+
         gameResultInfoRes.setBeforeRankScore(rankUpdateRes.getUser1PreviousScore());
         gameResultInfoRes.setAfterRankScore(rankUpdateRes.getUser1NewScore());
 
-        // 새로운 트랜잭션에서 after 상태 조회를 위해 clear
+//        // 새로운 트랜잭션에서 after 상태 조회를 위해 clear
         entityManager.clear();
+
 
         // 업데이트된 after 상태 조회
         UserStats afterStats = userStatsRepository.findByUser(user).orElse(null);

@@ -4,13 +4,13 @@
   "name": "FERO",
   "launcherName": "FERO",
   "display": "standalone",
-  "themeColor": "#4ADE80",
+  "themeColor": "#333A40",
   "themeColorDark": "#000000",
   "navigationColor": "#000000",
   "navigationColorDark": "#000000",
   "navigationDividerColor": "#000000",
   "navigationDividerColorDark": "#000000",
-  "backgroundColor": "#FFFFFF",
+  "backgroundColor": "#F2F2F2",
   "enableNotifications": true,
   "startUrl": "/",
   "iconUrl": "https://i12e103.p.ssafy.io/android-icon-144x144.png",
@@ -21,8 +21,8 @@
     "path": "/home/ubuntu/S12P11E103/frontend/android.keystore",
     "alias": "android"
   },
-  "appVersionName": "2",
-  "appVersionCode": 2,
+  "appVersionName": "3",
+  "appVersionCode": 3,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://i12e103.p.ssafy.io/manifest.json",
@@ -40,5 +40,5 @@
   "fingerprints": [],
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
-  "appVersion": "2"
+  "appVersion": "3"
 }

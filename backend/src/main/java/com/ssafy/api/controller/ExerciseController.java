@@ -3,10 +3,7 @@ package com.ssafy.api.controller;
 import com.ssafy.api.request.EventExerciseLog;
 import com.ssafy.api.request.ExerciseLogReq;
 import com.ssafy.api.request.ExerciseLogSearchReq;
-import com.ssafy.api.response.ExerciseLogRes;
-import com.ssafy.api.response.ExerciseStatsRatioRes;
-import com.ssafy.api.response.MonthlyQuestsStatusRes;
-import com.ssafy.api.response.QuestsRes;
+import com.ssafy.api.response.*;
 import com.ssafy.api.service.ExerciseLogService;
 import com.ssafy.api.service.ExerciseLogServiceImpl;
 import com.ssafy.api.service.QuestsService;
@@ -19,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -53,7 +51,7 @@ public class ExerciseController {
         String authHeader = request.getHeader("Authorization");
 
         // 헤더에서 토큰을 통해 사용자 ID 추출
-        String userId = JwtTokenUtil.extractUserIdFromToken(authHeader);
+        String userId = JwtTokenUtil.getUserIdFromJWT(authHeader);
 
         ExerciseLog savedExerciseLog = exerciseLogService.addExerciseLogAndUpdateStats(
                 new EventExerciseLog(userId, exerciseLogReq)
@@ -76,7 +74,7 @@ public class ExerciseController {
         }
 
         try {
-            String userId = JwtTokenUtil.extractUserIdFromToken(authHeader);
+            String userId = JwtTokenUtil.getUserIdFromJWT(authHeader);
             System.out.println("조회 대상 사용자 ID : " + userId);
 
             // DTO 대신 파라미터 직접 전달
@@ -101,7 +99,7 @@ public class ExerciseController {
             @ApiParam(value = "조회할 연도", required = true) @RequestParam int year,
             @ApiParam(value = "조회할 월", required = true) @RequestParam int month
     ) {
-        String userId = JwtTokenUtil.extractUserIdFromToken(request.getHeader("Authorization"));
+        String userId = JwtTokenUtil.getUserIdFromJWT(request.getHeader("Authorization"));
         return questService.getMonthlyQuestStatus(userId, year, month)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
@@ -110,12 +108,26 @@ public class ExerciseController {
     @GetMapping("/today")
     @ApiOperation(value = "오늘의 퀘스트 조회", notes = "현재 로그인한 사용자의 오늘 퀘스트 정보를 조회")
     public ResponseEntity<List<QuestsRes>> getTodayQuests(HttpServletRequest request) {
-        String userId = JwtTokenUtil.extractUserIdFromToken(request.getHeader("Authorization"));
+        String userId = JwtTokenUtil.getUserIdFromJWT(request.getHeader("Authorization"));
 
         return questService.getTodayQuest(userId, LocalDate.now())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
     }
 
+    @PostMapping("/single-mode")
+    @ApiOperation(value = "싱글 모드 결과 가져오기", notes = "싱글모드로 스탯, 레벨, 경험치의 전 후 값")
+    public ResponseEntity<SingleModeRes> getSingleModeResult(
+            HttpServletRequest request,
+            @RequestBody ExerciseLogReq exerciseLogReq) {
 
+        String authHeader = request.getHeader("Authorization");
+
+        // 헤더에서 토큰을 통해 사용자 ID 추출
+        String userId = JwtTokenUtil.getUserIdFromJWT(authHeader);
+
+        SingleModeRes result = exerciseLogService.getSingleModeResult(
+                userId, new EventExerciseLog(userId, exerciseLogReq));
+        return ResponseEntity.ok(result);
+    }
 }

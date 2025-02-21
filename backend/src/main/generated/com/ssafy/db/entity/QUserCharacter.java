@@ -43,6 +43,8 @@ public class QUserCharacter extends EntityPathBase<UserCharacter> {
 
     public final StringPath userNickname = createString("userNickname");
 
+    public final StringPath userRank = createString("userRank");
+
     public QUserCharacter(String variable) {
         this(UserCharacter.class, forVariable(variable), INITS);
     }

@@ -1,3 +1,33 @@
+<!-- views/
+└── StartPage.vue
+    └── layouts/
+        └── StartPageLayout.vue
+            ├── BackgroundOrganism.vue
+            │   └── molecules/
+            │       ├── BackgroundImageMolecule.vue
+            │       │   └── atoms/
+            │       │       └── BaseImageAtom.vue
+            │       └── BackgroundMusicMolecule.vue
+            │           └── atoms/
+            │               └── AudioAtom.vue
+            ├── AudioControlButtonMolecule.vue [NEW]  // 새로 추가된 컴포넌트
+            │   └── atoms/
+            │       └── ButtonAtom.vue
+            ├── LogoOrganism.vue
+            │   └── molecules/
+            │       └── LogoImageMolecule.vue
+            │           └── atoms/
+            │               └── BaseImageAtom.vue
+            └── StartButtonOrganism.vue
+                └── molecules/
+                    ├── BaseButtonMolecule.vue
+                    │   └── atoms/
+                    │       └── ButtonAtom.vue
+                    └── ButtonTextMolecule.vue
+                        └── atoms/
+                            ├── TextAtom.vue
+                            └── HighlightedTextAtom.vue -->
+
 <!-- views/StartPage.vue -->
 <template>
   <StartPageLayout
@@ -9,13 +39,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref,nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import StartPageLayout from '@/components/layouts/StartPageLayout.vue'
 
 const router = useRouter()
 const showModal = ref(false)
-const audioPlayerRef = ref(null)
 const token = localStorage.getItem('authToken')
 
 const goToMain = async () => {
@@ -34,22 +63,4 @@ const goToMain = async () => {
 const closeModal = () => { 
   showModal.value = false 
 }
-
-const playMusic = async () => {
-  await nextTick()
-  if (audioPlayerRef.value) {
-    audioPlayerRef.value.playAudio()
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('click', playMusic, { once: true })
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', playMusic)
-  if (audioPlayerRef.value) {
-    audioPlayerRef.value.pauseAudio()
-  }
-})
 </script>

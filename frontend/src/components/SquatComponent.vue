@@ -5,22 +5,24 @@
     </div>
 
     <div class="media-container">
-      <MediapipeComponent @get-Time="getTime" @pose-detected="processPose" @open-modal="openModal" class="z-0" />
-      <CompleteModal v-if="showModal" :result="result" :count="count" class="z-20" />
+      <MediapipeComponent @get-Time="getTime" @pose-detected="processPose" @open-modal="openModal" :is-timer-start="isTimerStart" class="z-0" />
+      <CompleteModal v-if="showModal" :result="result" :count="count" />
     </div>
 
     <div class="text-container absolute top-4 right-4">
       <!-- <div class="count text-yellow-500 text-4xl font-dgm bg-white">스쿼트 횟수: {{ count }}</div> -->
-      <button type="button" class="nes-btn is-primary text-1xl font-dgm">스쿼트 횟수: {{ count }}</button>
+      <button type="button" class="nes-btn is-primary text-1xl font-dgm">COUNT : {{ count }}</button>
       <div v-if="showGreat" class="great-message text-red text-3xl">Great!</div>
     </div>
 
-    <div v-if="showErrorModal" class="landmark-error-modal absolute inset-x-0 top-[30%] transform flex items-center justify-center text-yellow-500 text-2xl z-20 font-dgm">
-      전신이 나오도록
-      <br />
-      위치를 수정해주세요
+    <div v-if="showErrorModal" class="landmark-error-modal absolute inset-x-0 top-[30%] transform flex items-center justify-center text-yellow-500 text-xl z-20 font-dgm">
+      <button type="button" class="nes-btn is-warning">
+        몸 전체가 화면에 나오도록
+        <br />
+        위치를 수정해주세요
+      </button>
     </div>
-    <button v-if="isTutorialMode" @click="setCountToThree" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 absolute bottom-4 left-4 z-50">3</button>
+    <!-- <button v-if="isTutorialMode" @click="setCountToThree" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 absolute bottom-4 left-4 z-50">3</button> -->
   </div>
 </template>
 
@@ -28,9 +30,18 @@
 import { ref, watch, onMounted, defineEmits, defineProps } from "vue"
 import MediapipeComponent from "@/components/MediapipeComponent.vue"
 import CompleteModal from "@/components/modal/CompleteModal.vue"
+import deep from "@/assets/musics/deep.mp3"
 
 // 상태 변수 e
 const count = ref(0)
+// Audio 객체 생성
+const audio = new Audio(deep)
+// count 값이 변경될 때마다 deep.mp3 재생
+watch(count, () => {
+  audio.currentTime = 0 // 재생 위치를 처음으로 설정
+  audio.play()
+})
+
 const isDown = ref(false)
 const feedback = ref("준비중...")
 const formFeedback = ref("")
@@ -49,18 +60,21 @@ const emit = defineEmits(["setCount", "getTimeLeft"])
 //   return "Unknown Mode"
 // }
 
-const props = defineProps(["command"])
+const props = defineProps(["command", "isTimerStart"])
 const result = ref("")
-watch(
-  () => props.command,
-  (newCommand) => {
-    console.log(newCommand, "명령받음")
-    if (newCommand) {
-      showModal.value = true
-      result.value = newCommand
-    }
+const isTimerStart = ref(false)
+
+watch([() => props.command, () => props.isTimerStart], ([newCommand, newTimerStart]) => {
+  console.log(newCommand, "명령받음")
+  if (newCommand) {
+    showModal.value = true
+    result.value = newCommand
   }
-)
+  if (newTimerStart) {
+    console.log("SquatComponent new TimerStart: " + newTimerStart)
+    isTimerStart.value = newTimerStart
+  }
+})
 
 const getTime = (value) => {
   console.log()
@@ -176,15 +190,18 @@ const processPose = (landmarks) => {
 }
 
 // 임시 버튼 클릭 핸들러 함수
-const setCountToThree = () => {
-  count.value = 3
-  if (isTutorialMode) {
-    showModal.value = true // 튜토리얼 모드일 경우 완료 상태로 전환
-  }
-}
+// const setCountToThree = () => {
+//   count.value = 3
+//   if (isTutorialMode) {
+//     showModal.value = true // 튜토리얼 모드일 경우 완료 상태로 전환
+//   }
+// }
 
 // 로딩 스피너 타이머 설정
 onMounted(() => {
+  if (props.isTimerStart) {
+    isTimerStart.value = true
+  }
   setTimeout(() => {
     showSpinner.value = false // 스피너 숨기기
   }, 2000)

@@ -34,8 +34,9 @@ public class TutorialController {
     @ApiOperation(value = "캐릭터의 전체 튜토리얼 현황 불러오기", notes = "캐릭터의 모든 튜토리얼 현황 조회")
     public ResponseEntity<List<GetTutorialRes>> getTutorials(HttpServletRequest request) {
 
-        String token = request.getHeader("Authorization");
-        String userId = JwtTokenUtil.getUserIdFromJWT(token);  // JWT 토큰에서 userId 추출
+//        String token = request.getHeader("Authorization");
+//        String userId = JwtTokenUtil.getUserIdFromJWT(token);  // JWT 토큰에서 userId 추출
+        String userId = JwtTokenUtil.getUserIdFromJWT(request.getHeader("Authorization"));
 
         List<GetTutorialRes> tutorials = userTutorialProgressService.getTutorials(userId);
 

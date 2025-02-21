@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS E103_DB;
+-- DROP DATABASE IF EXISTS E103_DB;
 
-CREATE DATABASE E103_DB;
+-- CREATE DATABASE E103_DB;
 
 USE E103_DB;
 
@@ -28,6 +28,9 @@ CREATE TABLE user_character (
 
                                 user_level SMALLINT UNSIGNED NOT NULL DEFAULT 1 CHECK (user_level <= 999),
                                 user_experience INT NOT NULL DEFAULT 0,
+
+                                user_rank VARCHAR(12) DEFAULT "-"
+                                    CHECK (user_rank IN ('Bronze', 'Silver', 'Gold', 'Diamond', '-')),
 
                                 points SMALLINT UNSIGNED NOT NULL DEFAULT 0 CHECK (points <= 50000),
                                 FOREIGN KEY (user_id) REFERENCES user_info(user_id) ON DELETE CASCADE
@@ -105,20 +108,21 @@ FROM
         JOIN exercise_stats_ratio esr ON el.exercise_stats_ratio_id = esr.id
 GROUP BY
     el.user_id, esr.exercise_type;
-    
+
 
 -- 게임 결과에 대한 테이블(한 게임당 user1, user2 각각 기준으로 하나씩 생성)
 CREATE TABLE game_results (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    game_id VARCHAR(200) NOT NULL,         -- 동일한 경기 기록을 식별하는 gameId
-    exercise_id BIGINT NOT NULL,          -- 운동 종류 ID
-    user_id VARCHAR(30) NOT NULL,              -- 유저 ID
-    opponent_id VARCHAR(100) NOT NULL,          -- 상대방 ID
-    user_score SMALLINT NOT NULL,              -- 유저의 점수
-    opponent_score SMALLINT NOT NULL,          -- 상대방 점수
-    result ENUM('WIN', 'LOSE', 'DRAW') NOT NULL, -- 유저 기준 결과
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_user_id (user_id)           -- 유저별 조회 최적화
+                              id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                              game_id VARCHAR(200) NOT NULL,         -- 동일한 경기 기록을 식별하는 gameId
+                              exercise_id BIGINT NOT NULL,          -- 운동 종류 ID
+                              user_id VARCHAR(30) NOT NULL,              -- 유저 ID
+                              opponent_id VARCHAR(100) NOT NULL,          -- 상대방 ID
+                              user_score SMALLINT NOT NULL,              -- 유저의 점수
+                              opponent_score SMALLINT NOT NULL,          -- 상대방 점수
+                              result ENUM('WIN', 'LOSE', 'DRAW') NOT NULL, -- 유저 기준 결과
+                              duration SMALLINT,
+                              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                              INDEX idx_user_id (user_id)           -- 유저별 조회 최적화
 );
 
 
@@ -164,17 +168,17 @@ CREATE TABLE chat_message (
 
 -- 유저간의 친구정보에 대한 테이블
 CREATE TABLE friends (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id VARCHAR(30) NOT NULL,
-    friend_id VARCHAR(30) NOT NULL,
-    friend_nickname VARCHAR(15),
-    friend_level INT NOT NULL,
-    status VARCHAR(10) CHECK (status IN ('pending', 'accepted', 'blocked')),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                         id INT AUTO_INCREMENT PRIMARY KEY,
+                         user_id VARCHAR(30) NOT NULL,
+                         friend_id VARCHAR(30) NOT NULL,
+                         friend_nickname VARCHAR(15),
+                         friend_level INT NOT NULL,
+                         status VARCHAR(10) CHECK (status IN ('pending', 'accepted', 'blocked')),
+                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     -- updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
-    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES user_info(user_id) ON DELETE CASCADE,
-    CONSTRAINT fk_friend FOREIGN KEY (friend_id) REFERENCES user_info(user_id) ON DELETE CASCADE,
-    UNIQUE KEY unique_friendship (user_id, friend_id)
+                         CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES user_info(user_id) ON DELETE CASCADE,
+                         CONSTRAINT fk_friend FOREIGN KEY (friend_id) REFERENCES user_info(user_id) ON DELETE CASCADE,
+                         UNIQUE KEY unique_friendship (user_id, friend_id)
 );
 
 CREATE TABLE quests (
@@ -194,18 +198,18 @@ CREATE TABLE quests (
 
 -- 사용자의 스탯 히스토리
 CREATE TABLE user_stats_history (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    user_character_id BIGINT NOT NULL,
-    arms_stats SMALLINT UNSIGNED NOT NULL,
-    legs_stats SMALLINT UNSIGNED NOT NULL,
-    chest_stats SMALLINT UNSIGNED NOT NULL,
-    abs_stats SMALLINT UNSIGNED NOT NULL,
-    back_stats SMALLINT UNSIGNED NOT NULL,
-    stamina_stats SMALLINT UNSIGNED NOT NULL,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    stats_date DATE NOT NULL,
-    FOREIGN KEY (user_character_id) REFERENCES user_character(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_date_user (user_character_id, stats_date)
+                                    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                                    user_character_id BIGINT NOT NULL,
+                                    arms_stats SMALLINT UNSIGNED NOT NULL,
+                                    legs_stats SMALLINT UNSIGNED NOT NULL,
+                                    chest_stats SMALLINT UNSIGNED NOT NULL,
+                                    abs_stats SMALLINT UNSIGNED NOT NULL,
+                                    back_stats SMALLINT UNSIGNED NOT NULL,
+                                    stamina_stats SMALLINT UNSIGNED NOT NULL,
+                                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                    stats_date DATE NOT NULL,
+                                    FOREIGN KEY (user_character_id) REFERENCES user_character(id) ON DELETE CASCADE,
+                                    UNIQUE KEY unique_date_user (user_character_id, stats_date)
 );
 
 
@@ -284,6 +288,40 @@ END //
 
 DELIMITER ;
 
+
+-- 유저 캐릭터 생성시 자동으로 튜토리얼 퀘스트 생성
+DELIMITER //
+
+CREATE TRIGGER create_squat_quest
+AFTER INSERT ON user_character
+FOR EACH ROW
+BEGIN
+    -- 스쿼트 운동 ID 확인 (exercise_stats_ratio에서 ID가 2라고 가정)
+    DECLARE squat_exercise_id BIGINT;
+    SET squat_exercise_id = (SELECT id FROM exercise_stats_ratio WHERE exercise_type = 'squat' LIMIT 1);
+
+    -- 퀘스트 생성
+    INSERT INTO quests (
+        user_character_id,
+        quest_date,
+        exercise_id,
+        exercise_cnt,
+        real_cnt,
+        is_completed,
+        message
+    ) VALUES (
+        NEW.id, -- 새로 추가된 캐릭터의 ID
+        CURRENT_DATE, -- 오늘 날짜
+        squat_exercise_id, -- 스쿼트 운동 ID
+        3, -- 기본 횟수 3회
+        0, -- 초기 운동 횟수
+        FALSE, -- 달성 여부 기본값
+        '스쿼트를 3번 해주세요!'
+    );
+END //
+
+DELIMITER ;
+
 DELIMITER //
 
 CREATE TRIGGER after_exercise_log_insert
@@ -355,7 +393,7 @@ BEGIN
       AND quest_date = DATE(NEW.exercise_date);
 END IF;
 END //
-DELIMITER;
+DELIMITER ;
 
 -- 스탯 히스토리 업데이트 이후 히스토리 갱신
 DELIMITER //
@@ -374,8 +412,8 @@ BEGIN
     -- 오늘 날짜의 히스토리 존재 여부 확인
     SELECT COUNT(*) INTO stats_history_exists
     FROM user_stats_history
-    WHERE user_character_id = user_char_id 
-    AND stats_date = CURRENT_DATE;
+    WHERE user_character_id = user_char_id
+      AND stats_date = CURRENT_DATE;
 
     IF stats_history_exists = 0 THEN
         -- 해당 날짜의 기록이 없으면 새로 INSERT
@@ -400,19 +438,19 @@ BEGIN
         );
     ELSE
         -- 해당 날짜의 기록이 있으면 UPDATE
-        UPDATE user_stats_history
-        SET
-            chest_stats = NEW.chest_stats,
-            back_stats = NEW.back_stats,
-            stamina_stats = NEW.stamina_stats,
-            arms_stats = NEW.arms_stats,
-            legs_stats = NEW.legs_stats,
-            abs_stats = NEW.abs_stats,
-            updated_at = CURRENT_TIMESTAMP
-        WHERE 
-            user_character_id = user_char_id
-            AND stats_date = CURRENT_DATE;
-    END IF;
+    UPDATE user_stats_history
+    SET
+        chest_stats = NEW.chest_stats,
+        back_stats = NEW.back_stats,
+        stamina_stats = NEW.stamina_stats,
+        arms_stats = NEW.arms_stats,
+        legs_stats = NEW.legs_stats,
+        abs_stats = NEW.abs_stats,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE
+        user_character_id = user_char_id
+      AND stats_date = CURRENT_DATE;
+END IF;
 END //
 DELIMITER ;
 
@@ -426,10 +464,43 @@ CREATE FUNCTION calculate_exercise_count(user_level INT)
     DETERMINISTIC
 BEGIN
     -- 기본 횟수 5회, 5레벨 단위로 2회씩 증가
-    RETURN 5 + (2 * FLOOR(user_level / 5));
+RETURN 5 + (2 * FLOOR(user_level / 5));
 END //
 
 DELIMITER ;
+
+
+-- 유저 랭크 업데이트 트리거
+DELIMITER //
+
+CREATE TRIGGER update_user_rank_on_update
+    AFTER UPDATE ON user_rank_scores
+    FOR EACH ROW
+BEGIN
+    DECLARE avg_rank_score INT;
+    DECLARE new_rank VARCHAR(12);
+
+    -- 해당 유저의 운동별 랭크 점수 평균 계산
+    SELECT AVG(rank_score) INTO avg_rank_score
+    FROM user_rank_scores
+    WHERE user_id = NEW.user_id;
+
+    -- 랭크 결정 로직
+    IF avg_rank_score >= 1300 THEN
+        SET new_rank = 'Diamond';
+    ELSEIF avg_rank_score >= 1200 THEN
+        SET new_rank = 'Gold';
+    ELSEIF avg_rank_score >= 1100 THEN
+        SET new_rank = 'Silver';
+    ELSE
+        SET new_rank = 'Bronze';
+END IF;
+
+-- user_character 테이블의 user_rank 업데이트
+UPDATE user_character
+SET user_rank = new_rank
+WHERE user_id = NEW.user_id;
+END // 
 
 
 -- EVENT SCHEDULER
@@ -438,7 +509,7 @@ DELIMITER ;
 DELIMITER //
 CREATE EVENT quest_completion_check
 ON SCHEDULE EVERY 1 DAY
-STARTS CURRENT_DATE + INTERVAL 1 DAY
+STARTS TIMESTAMP(CURRENT_DATE) + INTERVAL 1 DAY
 DO
 BEGIN
     -- 전날 퀘스트의 달성 여부 업데이트
@@ -447,7 +518,7 @@ SET is_completed = CASE
                        WHEN real_cnt >= exercise_cnt THEN TRUE
                        ELSE FALSE
     END
-WHERE quest_date = DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY);
+WHERE quest_date = DATE_SUB(TIMESTAMP(CURRENT_DATE), INTERVAL 1 DAY);
 END //
 DELIMITER ;
 
@@ -478,20 +549,20 @@ DELIMITER ;
 DELIMITER //
 CREATE EVENT daily_quest_creation
 ON SCHEDULE EVERY 1 DAY
-STARTS CURRENT_DATE + INTERVAL 1 DAY
+STARTS TIMESTAMP(CURRENT_DATE) + INTERVAL 1 DAY
 DO
 BEGIN
     -- 모든 사용자에 대해 스쿼트 퀘스트만 생성
 INSERT INTO quests (user_character_id, quest_date, exercise_id, exercise_cnt, real_cnt, message)
 SELECT
     uc.id,
-    CURRENT_DATE,
+    TIMESTAMP(CURRENT_DATE),
     2,  -- 스쿼트의 exercise_id
     calculate_exercise_count(uc.user_level),
     0,  -- real_cnt 초기값
     CONCAT('스쿼트를 ',
-           calculate_exercise_count(uc.user_level),
-           '번 해주세요!')
+    calculate_exercise_count(uc.user_level),
+    '번 해주세요!')
 FROM user_character uc;
 END //
 DELIMITER ;
@@ -512,145 +583,146 @@ VALUES
 
 -- 기본 튜토리얼 데이터 삽입
 INSERT INTO tutorial_types (id, tutorial_name) VALUES
-    (1, 'pushup'),
-    (2, 'squat'),
-    (3, 'lunge'),
-    (4, 'plank'),
-    (97, 'Start'),
-    (98, 'MainPage'),
-    (99, 'UI');
+                                                   (1, 'pushup'),
+                                                   (2, 'squat'),
+                                                   (3, 'lunge'),
+                                                   (4, 'plank'),
+                                                   (97, 'Start'),
+                                                   (98, 'MainPage'),
+                                                   (99, 'UI');
 
 -- user_info 더미 데이터 (20명, 모든 비밀번호는 '1234')
 INSERT INTO user_info (user_id, user_password, user_name, user_email, phone_number) VALUES
-    ('ssafy123', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Hong Gil-dong', 'hong123@gmail.com', '010-1234-5678'),
-    ('kim456', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Kim Chul-soo', 'kim456@naver.com', '010-2345-6789'),
-    ('lee789', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Lee Young-hee', 'lee789@daum.net', '010-3456-7890'),
-    ('park234', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Park Ji-sung', 'park234@gmail.com', '010-4567-8901'),
-    ('choi567', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Choi Min-soo', 'choi567@naver.com', '010-5678-9012'),
-    ('jung111', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Jung So-hee', 'jung111@gmail.com', '010-6789-0123'),
-    ('kang222', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Kang Dong-won', 'kang222@naver.com', '010-7890-1234'),
-    ('yoon333', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Yoon Seo-jun', 'yoon333@daum.net', '010-8901-2345'),
-    ('shin444', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Shin Min-ah', 'shin444@gmail.com', '010-9012-3456'),
-    ('song555', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Song Hye-kyo', 'song555@naver.com', '010-0123-4567'),
-    ('yang666', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Yang Hyun-suk', 'yang666@gmail.com', '010-1111-2222'),
-    ('han777', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Han Ji-min', 'han777@naver.com', '010-2222-3333'),
-    ('oh888', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Oh Yeon-seo', 'oh888@daum.net', '010-3333-4444'),
-    ('seo999', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Seo In-guk', 'seo999@gmail.com', '010-4444-5555'),
-    ('bae000', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Bae Suzy', 'bae000@naver.com', '010-5555-6666'),
-    ('cha123', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Cha Eun-woo', 'cha123@gmail.com', '010-6666-7777'),
-    ('moon234', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Moon Chae-won', 'moon234@naver.com', '010-7777-8888'),
-    ('joo345', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Joo Ji-hoon', 'joo345@daum.net', '010-8888-9999'),
-    ('ryu456', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Ryu Jun-yeol', 'ryu456@gmail.com', '010-9999-0000'),
-    ('kwon567', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Kwon Sang-woo', 'kwon567@naver.com', '010-0000-1111');
+                                                                                        ('ssafy123', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Hong Gil-dong', 'hong123@gmail.com', '010-1234-5678'),
+                                                                                        ('kim456', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Kim Chul-soo', 'kim456@naver.com', '010-2345-6789'),
+                                                                                        ('lee789', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Lee Young-hee', 'lee789@daum.net', '010-3456-7890'),
+                                                                                        ('park234', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Park Ji-sung', 'park234@gmail.com', '010-4567-8901'),
+                                                                                        ('choi567', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Choi Min-soo', 'choi567@naver.com', '010-5678-9012'),
+                                                                                        ('jung111', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Jung So-hee', 'jung111@gmail.com', '010-6789-0123'),
+                                                                                        ('kang222', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Kang Dong-won', 'kang222@naver.com', '010-7890-1234'),
+                                                                                        ('yoon333', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Yoon Seo-jun', 'yoon333@daum.net', '010-8901-2345'),
+                                                                                        ('shin444', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Shin Min-ah', 'shin444@gmail.com', '010-9012-3456'),
+                                                                                        ('song555', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Song Hye-kyo', 'song555@naver.com', '010-0123-4567'),
+                                                                                        ('yang666', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Yang Hyun-suk', 'yang666@gmail.com', '010-1111-2222'),
+                                                                                        ('han777', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Han Ji-min', 'han777@naver.com', '010-2222-3333'),
+                                                                                        ('oh888', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Oh Yeon-seo', 'oh888@daum.net', '010-3333-4444'),
+                                                                                        ('seo999', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Seo In-guk', 'seo999@gmail.com', '010-4444-5555'),
+                                                                                        ('bae000', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Bae Suzy', 'bae000@naver.com', '010-5555-6666'),
+                                                                                        ('cha123', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Cha Eun-woo', 'cha123@gmail.com', '010-6666-7777'),
+                                                                                        ('moon234', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Moon Chae-won', 'moon234@naver.com', '010-7777-8888'),
+                                                                                        ('joo345', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Joo Ji-hoon', 'joo345@daum.net', '010-8888-9999'),
+                                                                                        ('ryu456', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Ryu Jun-yeol', 'ryu456@gmail.com', '010-9999-0000'),
+                                                                                        ('kwon567', '$2a$10$9VI57YSLYInyXsp74P1FaOIvVUzFXbV2BRgi.ar/5bBUrpj7S3Gg.', 'Kwon Sang-woo', 'kwon567@naver.com', '010-0000-1111');
 
-INSERT INTO user_character (user_id, user_nickname, gender, avatar, user_level, user_experience, points) VALUES
-    ('ssafy123', 'GilDong', 'M', '7-3-9', 5, 128, 1000),
-    ('kim456', 'ChulSoo123', 'M', '2-6-4', 3, 57, 500),
-    ('lee789', 'YoungHee', 'F', '1-8-10', 7, 184, 1500),
-    ('park234', 'JiSungSoccer', 'M', '5-9-2', 4, 76, 800),
-    ('choi567', 'MinSooKing', 'M', '4-7-1', 2, 93, 300),
-    ('jung111', 'SoHeeJjang', 'F', '10-3-5', 8, 42, 2000),
-    ('kang222', 'DongWonOppa', 'M', '6-2-8', 6, 177, 1200),
-    ('yoon333', 'SeoJunMan', 'M', '9-4-1', 9, 25, 2300),
-    ('shin444', 'MinAhGirl', 'F', '3-7-6', 3, 134, 600),
-    ('song555', 'HyeKyoNim', 'F', '8-5-2', 5, 61, 1100),
-    ('yang666', 'HyunSeokBoss', 'M', '7-4-9', 6, 90, 1700),
-    ('han777', 'JiMinLove', 'F', '5-3-2', 4, 130, 900),
-    ('oh888', 'YeonSeoStar', 'F', '2-9-6', 7, 145, 1600),
-    ('seo999', 'InGukRocks', 'M', '1-6-4', 5, 112, 1200),
-    ('bae000', 'SuzyBae', 'F', '9-8-5', 3, 98, 700),
-    ('cha123', 'EunWooOppa', 'M', '6-7-3', 6, 121, 1300),
-    ('moon234', 'ChaeWonMoon', 'F', '4-5-7', 5, 80, 1100),
-    ('joo345', 'JiHoonJjang', 'M', '3-9-2', 7, 150, 1800),
-    ('ryu456', 'JunYeolBest', 'M', '8-2-4', 4, 101, 900),
-    ('kwon567', 'SangWooPower', 'M', '7-6-1', 5, 139, 1400);
 
+-- 유저 캐릭터 정보
+INSERT INTO user_character (user_id, user_nickname, gender, avatar, user_level, user_experience, user_rank, points) VALUES
+                                                                                                                        ('ssafy123', 'GilDong', 'M', '7-3-9', 5, 138, 'Silver', 1000),
+                                                                                                                        ('kim456', 'ChulSoo123', 'M', '2-6-4', 3, 67, 'Diamond', 500),
+                                                                                                                        ('lee789', 'YoungHee', 'F', '1-8-10', 7, 184, 'Diamond', 1500),
+                                                                                                                        ('park234', 'JiSungSoccer', 'M', '5-9-2', 4, 76, 'Gold', 800),
+                                                                                                                        ('choi567', 'MinSooKing', 'M', '4-7-1', 2, 98, 'Diamond', 300),
+                                                                                                                        ('jung111', 'SoHeeJjang', 'F', '10-3-5', 8, 47, 'Diamond', 2000),
+                                                                                                                        ('kang222', 'DongWonOppa', 'M', '6-2-8', 6, 182, 'Diamond', 1200),
+                                                                                                                        ('yoon333', 'SeoJunMan', 'M', '9-4-1', 9, 35, 'Diamond', 2300),
+                                                                                                                        ('shin444', 'MinAhGirl', 'F', '3-7-6', 3, 144, 'Diamond', 600),
+                                                                                                                        ('song555', 'HyeKyoNim', 'F', '8-5-2', 5, 61, 'Bronze', 1100),
+                                                                                                                        ('yang666', 'HyunSeokBoss', 'M', '7-4-9', 6, 95, 'Gold', 1700),
+                                                                                                                        ('han777', 'JiMinLove', 'F', '5-3-2', 4, 135, 'Diamond', 900),
+                                                                                                                        ('oh888', 'YeonSeoStar', 'F', '2-9-6', 7, 150, 'Gold', 1600),
+                                                                                                                        ('seo999', 'InGukRocks', 'M', '1-6-4', 5, 122, 'Silver', 1200),
+                                                                                                                        ('bae000', 'SuzyBae', 'F', '9-8-5', 3, 103, 'Silver', 700),
+                                                                                                                        ('cha123', 'EunWooOppa', 'M', '6-7-3', 6, 131, 'Gold', 1300),
+                                                                                                                        ('moon234', 'ChaeWonMoon', 'F', '4-5-7', 5, 85, 'Bronze', 1100),
+                                                                                                                        ('joo345', 'JiHoonJjang', 'M', '3-9-2', 7, 155, 'Gold', 1800),
+                                                                                                                        ('ryu456', 'JunYeolBest', 'M', '8-2-4', 4, 101, 'Diamond', 900),
+                                                                                                                        ('kwon567', 'SangWooPower', 'M', '7-6-1', 5, 139, 'Gold', 1400);
 
 
 
 TRUNCATE TABLE user_rank_scores;
 
 INSERT INTO user_rank_scores (user_id, exercise_id, rank_score) VALUES
-    ('ssafy123', 1, 1148),
-    ('ssafy123', 2, 1238),
-    ('ssafy123', 3, 1080),
-    ('ssafy123', 4, 1228),
-    ('kim456', 1, 1706),
-    ('kim456', 2, 1109),
-    ('kim456', 3, 1347),
-    ('kim456', 4, 1403),
-    ('lee789', 1, 1020),
-    ('lee789', 2, 1237),
-    ('lee789', 3, 1789),
-    ('lee789', 4, 1587),
-    ('park234', 1, 866),
-    ('park234', 2, 1728),
-    ('park234', 3, 991),
-    ('park234', 4, 1349),
-    ('choi567', 1, 1177),
-    ('choi567', 2, 1575),
-    ('choi567', 3, 1633),
-    ('choi567', 4, 1360),
-    ('jung111', 1, 1782),
-    ('jung111', 2, 1631),
-    ('jung111', 3, 857),
-    ('jung111', 4, 1217),
-    ('kang222', 1, 1632),
-    ('kang222', 2, 1250),
-    ('kang222', 3, 940),
-    ('kang222', 4, 1608),
-    ('yoon333', 1, 1506),
-    ('yoon333', 2, 1678),
-    ('yoon333', 3, 1028),
-    ('yoon333', 4, 1698),
-    ('shin444', 1, 1301),
-    ('shin444', 2, 1460),
-    ('shin444', 3, 1399),
-    ('shin444', 4, 1328),
-    ('song555', 1, 912),
-    ('song555', 2, 905),
-    ('song555', 3, 938),
-    ('song555', 4, 1047),
-    ('yang666', 1, 869),
-    ('yang666', 2, 1553),
-    ('yang666', 3, 1699),
-    ('yang666', 4, 887),
-    ('han777', 1, 1132),
-    ('han777', 2, 1468),
-    ('han777', 3, 1470),
-    ('han777', 4, 1455),
-    ('oh888', 1, 862),
-    ('oh888', 2, 1679),
-    ('oh888', 3, 911),
-    ('oh888', 4, 1476),
-    ('seo999', 1, 1454),
-    ('seo999', 2, 1186),
-    ('seo999', 3, 892),
-    ('seo999', 4, 912),
-    ('bae000', 1, 954),
-    ('bae000', 2, 1364),
-    ('bae000', 3, 1355),
-    ('bae000', 4, 878),
-    ('cha123', 1, 1073),
-    ('cha123', 2, 1212),
-    ('cha123', 3, 1729),
-    ('cha123', 4, 930),
-    ('moon234', 1, 1068),
-    ('moon234', 2, 819),
-    ('moon234', 3, 1076),
-    ('moon234', 4, 1085),
-    ('joo345', 1, 1479),
-    ('joo345', 2, 993),
-    ('joo345', 3, 895),
-    ('joo345', 4, 1619),
-    ('ryu456', 1, 1590),
-    ('ryu456', 2, 886),
-    ('ryu456', 3, 1346),
-    ('ryu456', 4, 1492),
-    ('kwon567', 1, 1309),
-    ('kwon567', 2, 1480),
-    ('kwon567', 3, 1098),
-    ('kwon567', 4, 1303);
+                                                                    ('ssafy123', 1, 1148),
+                                                                    ('ssafy123', 2, 1238),
+                                                                    ('ssafy123', 3, 1080),
+                                                                    ('ssafy123', 4, 1228),
+                                                                    ('kim456', 1, 1706),
+                                                                    ('kim456', 2, 1109),
+                                                                    ('kim456', 3, 1347),
+                                                                    ('kim456', 4, 1403),
+                                                                    ('lee789', 1, 1020),
+                                                                    ('lee789', 2, 1237),
+                                                                    ('lee789', 3, 1789),
+                                                                    ('lee789', 4, 1587),
+                                                                    ('park234', 1, 866),
+                                                                    ('park234', 2, 1728),
+                                                                    ('park234', 3, 991),
+                                                                    ('park234', 4, 1349),
+                                                                    ('choi567', 1, 1177),
+                                                                    ('choi567', 2, 1575),
+                                                                    ('choi567', 3, 1633),
+                                                                    ('choi567', 4, 1360),
+                                                                    ('jung111', 1, 1782),
+                                                                    ('jung111', 2, 1631),
+                                                                    ('jung111', 3, 857),
+                                                                    ('jung111', 4, 1217),
+                                                                    ('kang222', 1, 1632),
+                                                                    ('kang222', 2, 1250),
+                                                                    ('kang222', 3, 940),
+                                                                    ('kang222', 4, 1608),
+                                                                    ('yoon333', 1, 1506),
+                                                                    ('yoon333', 2, 1678),
+                                                                    ('yoon333', 3, 1028),
+                                                                    ('yoon333', 4, 1698),
+                                                                    ('shin444', 1, 1301),
+                                                                    ('shin444', 2, 1460),
+                                                                    ('shin444', 3, 1399),
+                                                                    ('shin444', 4, 1328),
+                                                                    ('song555', 1, 912),
+                                                                    ('song555', 2, 905),
+                                                                    ('song555', 3, 938),
+                                                                    ('song555', 4, 1047),
+                                                                    ('yang666', 1, 869),
+                                                                    ('yang666', 2, 1553),
+                                                                    ('yang666', 3, 1699),
+                                                                    ('yang666', 4, 887),
+                                                                    ('han777', 1, 1132),
+                                                                    ('han777', 2, 1468),
+                                                                    ('han777', 3, 1470),
+                                                                    ('han777', 4, 1455),
+                                                                    ('oh888', 1, 862),
+                                                                    ('oh888', 2, 1679),
+                                                                    ('oh888', 3, 911),
+                                                                    ('oh888', 4, 1476),
+                                                                    ('seo999', 1, 1454),
+                                                                    ('seo999', 2, 1186),
+                                                                    ('seo999', 3, 892),
+                                                                    ('seo999', 4, 912),
+                                                                    ('bae000', 1, 954),
+                                                                    ('bae000', 2, 1364),
+                                                                    ('bae000', 3, 1355),
+                                                                    ('bae000', 4, 878),
+                                                                    ('cha123', 1, 1073),
+                                                                    ('cha123', 2, 1212),
+                                                                    ('cha123', 3, 1729),
+                                                                    ('cha123', 4, 930),
+                                                                    ('moon234', 1, 1068),
+                                                                    ('moon234', 2, 819),
+                                                                    ('moon234', 3, 1076),
+                                                                    ('moon234', 4, 1085),
+                                                                    ('joo345', 1, 1479),
+                                                                    ('joo345', 2, 993),
+                                                                    ('joo345', 3, 895),
+                                                                    ('joo345', 4, 1619),
+                                                                    ('ryu456', 1, 1590),
+                                                                    ('ryu456', 2, 886),
+                                                                    ('ryu456', 3, 1346),
+                                                                    ('ryu456', 4, 1492),
+                                                                    ('kwon567', 1, 1309),
+                                                                    ('kwon567', 2, 1480),
+                                                                    ('kwon567', 3, 1098),
+                                                                    ('kwon567', 4, 1303);
 
 UPDATE user_stats
 SET
@@ -662,6 +734,35 @@ SET
     stamina_stats = FLOOR(10 + (RAND() * (1000 - 10))),
     updated_at = DATE_ADD(NOW(), INTERVAL -FLOOR(RAND() * 365) DAY)
 WHERE id > 0;
+
+INSERT INTO quests (user_character_id, quest_date, quest_time, exercise_id, exercise_cnt, real_cnt, is_completed, message)
+VALUES
+    ('1', current_date(), NULL, '2', '7', '7', '1', '스쿼트를 7번 해주세요!'),
+    ('2', current_date(), '00:00:53', '2', '7', '2', '0', '스쿼트를 7번 해주세요!');
+
+
+-- 게임 전적 정보 입력
+INSERT INTO game_results (game_id, duration, exercise_id, user_id, opponent_id, user_score, opponent_score, result) VALUES
+                                                                                                                        ('game_001', 60, 2, 'hong123', 'kim456', 10, 8, 'WIN'),
+                                                                                                                        ('game_001', 60, 2, 'kim456', 'hong123', 8, 10, 'LOSE'),
+                                                                                                                        ('game_002', 60, 2, 'lee789', 'park234', 12, 12, 'DRAW'),
+                                                                                                                        ('game_002', 60, 2, 'park234', 'lee789', 12, 12, 'DRAW'),
+                                                                                                                        ('game_003', 60, 2, 'choi567', 'jung111', 5, 9, 'LOSE'),
+                                                                                                                        ('game_003', 60, 2, 'jung111', 'choi567', 9, 5, 'WIN'),
+                                                                                                                        ('game_004', 60, 2, 'kang222', 'yoon333', 15, 18, 'LOSE'),
+                                                                                                                        ('game_004', 60, 2, 'yoon333', 'kang222', 18, 15, 'WIN'),
+                                                                                                                        ('game_005', 60, 2, 'shin444', 'song555', 7, 7, 'DRAW'),
+                                                                                                                        ('game_005', 60, 2, 'song555', 'shin444', 7, 7, 'DRAW'),
+                                                                                                                        ('game_006', 60, 2, 'yang666', 'han777', 13, 10, 'WIN'),
+                                                                                                                        ('game_006', 60, 2, 'han777', 'yang666', 10, 13, 'LOSE'),
+                                                                                                                        ('game_007', 60, 2, 'oh888', 'seo999', 6, 14, 'LOSE'),
+                                                                                                                        ('game_007', 60, 2, 'seo999', 'oh888', 14, 6, 'WIN'),
+                                                                                                                        ('game_008', 60, 2, 'bae000', 'cha123', 20, 19, 'WIN'),
+                                                                                                                        ('game_008', 60, 2, 'cha123', 'bae000', 19, 20, 'LOSE'),
+                                                                                                                        ('game_009', 60, 2, 'moon234', 'joo345', 9, 11, 'LOSE'),
+                                                                                                                        ('game_009', 60, 2, 'joo345', 'moon234', 11, 9, 'WIN'),
+                                                                                                                        ('game_010', 60, 2, 'ryu456', 'kwon567', 15, 15, 'DRAW'),
+                                                                                                                        ('game_010', 60, 2, 'kwon567', 'ryu456', 15, 15, 'DRAW');
 
 INSERT INTO exercise_log (user_id, exercise_duration, exercise_cnt, exercise_stats_ratio_id, exercise_date)
 SELECT
@@ -695,7 +796,25 @@ FROM (
 ORDER BY RAND()
     LIMIT 50;
 
-INSERT INTO quests (user_character_id, quest_date, quest_time, exercise_id, exercise_cnt, real_cnt, is_completed, message) 
-VALUES 
-('1', '2025-02-12', NULL, '2', '7', '7', '1', '스쿼트를 7번 해주세요!'),
-('1', '2025-02-13', '00:40:53', '2', '7', '2', '0', '스쿼트를 7번 해주세요!');
+INSERT INTO quests (user_character_id, quest_date, quest_time, exercise_id, exercise_cnt, real_cnt, is_completed, message)
+VALUES
+    (1, '2025-02-20', NULL, '2', 7, 0, 0, '스쿼트를 7번 해주세요!'),
+    (2, '2025-02-20', '00:04:32', '2', 7, 2, 0, '스쿼트를 7번 해주세요!'),
+    (3, '2025-02-20', '00:02:15', '2', 9, 5, 0, '스쿼트를 9번 해주세요!'),
+    (4, '2025-02-20', NULL, '2', 5, 0, 0, '스쿼트를 5번 해주세요!'),
+    (5, '2025-02-20', '00:05:21', '2', 5, 3, 0, '스쿼트를 5번 해주세요!'),
+    (6, '2025-02-20', NULL, '2', 7, 0, 0, '스쿼트를 7번 해주세요!'),
+    (7, '2025-02-20', '00:03:48', '2', 9, 6, 0, '스쿼트를 9번 해주세요!'),
+    (8, '2025-02-20', NULL, '2', 5, 0, 0, '스쿼트를 5번 해주세요!'),
+    (9, '2025-02-20', '00:01:55', '2', 7, 4, 0, '스쿼트를 7번 해주세요!'),
+    (10, '2025-02-20', '00:05:10', '2', 5, 2, 0, '스쿼트를 5번 해주세요!'),
+    (11, '2025-02-20', NULL, '2', 7, 0, 0, '스쿼트를 7번 해주세요!'),
+    (12, '2025-02-20', '00:03:22', '2', 9, 7, 0, '스쿼트를 9번 해주세요!'),
+    (13, '2025-02-20', NULL, '2', 5, 0, 0, '스쿼트를 5번 해주세요!'),
+    (14, '2025-02-20', '00:02:50', '2', 7, 3, 0, '스쿼트를 7번 해주세요!'),
+    (15, '2025-02-20', '00:04:44', '2', 9, 5, 0, '스쿼트를 9번 해주세요!'),
+    (16, '2025-02-20', NULL, '2', 5, 0, 0, '스쿼트를 5번 해주세요!'),
+    (17, '2025-02-20', '00:03:10', '2', 7, 4, 0, '스쿼트를 7번 해주세요!'),
+    (18, '2025-02-20', NULL, '2', 5, 0, 0, '스쿼트를 5번 해주세요!'),
+    (19, '2025-02-20', '00:01:40', '2', 9, 6, 0, '스쿼트를 9번 해주세요!'),
+    (20, '2025-02-20', '00:02:59', '2', 7, 2, 0, '스쿼트를 7번 해주세요!');
